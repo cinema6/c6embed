@@ -1,0 +1,26 @@
+{
+    "appUrl": "/__dirname/<%= settings.appDir %>/",
+    "appModule": "c6.embed",
+    "appDir": "app",
+    "distDir": "dist",
+    "awsJSON": ".aws.json",
+    "saucelabsJSON": ".saucelabs.json",
+    "browserstackJSON": ".browserstack.json",
+    "sandboxPort": 9000,
+    "collateralDir": "c6Content",
+    "experiencesJSON": "<%= settings.appDir %>/assets/mock/experiences.json",
+    "libUrl": "http://s3.amazonaws.com/c6.dev/ext/",
+    "defaultE2EEnv": "browserstack",
+    "s3": {
+        "test": {
+            "bucket": "c6.dev",
+            "collateral": "media/src/site/collateral/",
+            "app": "content/<%= package.name %>/"
+        },
+        "production": {
+            "bucket": "cinema6.com-etc",
+            "collateral": "collateral/",
+            "app": "experiences/<%= package.name %>/"
+        }
+    }
+}

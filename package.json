@@ -1,0 +1,60 @@
+{
+  "name": "c6embed",
+  "version": "0.0.1",
+  "description": "Cinema6 Angular Stub.",
+  "keywords": [
+    "c6embed"
+  ],
+  "dependencies": {
+    "asEvented": "~0.4.3",
+    "q": "~1.0.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "load-grunt-config": "git://github.com/firstandthird/load-grunt-config",
+    "grunt-git-assist": "git+ssh://git@github.com:cinema6/grunt-git-assist",
+    "c6-sandbox": "git+ssh://git@github.com:cinema6/sandbox",
+    "connect-livereload": "~0.3.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-open": "~0.2.2",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-jshint": "~0.7.2",
+    "karma-script-launcher": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.1",
+    "karma-html2js-preprocessor": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.2",
+    "karma-jasmine": "~0.1.3",
+    "requirejs": "~2.1.9",
+    "karma-requirejs": "~0.2.0",
+    "karma-coffee-preprocessor": "~0.1.1",
+    "karma-phantomjs-launcher": "~0.1.1",
+    "karma": "~0.10.8",
+    "grunt-karma": "~0.6.2",
+    "protractor": "~0.14.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-htmlmin": "~0.1.3",
+    "grunt-contrib-cssmin": "~0.7.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-sed": "~0.1.1",
+    "grunt-angular-templates": "~0.5.0",
+    "grunt-c6-util": "git+ssh://git@github.com:cinema6/c6-grunt-util",
+    "aws-sdk": "~2.0.0-rc3",
+    "q": "~1.0.0",
+    "prompt": "~0.2.12",
+    "escape-regexp": "0.0.1",
+    "underscore": "~1.5.2",
+    "karma-junit-reporter": "~0.2.1",
+    "karma-commonjs": "0.0.6"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "readmeFilename": "README.md",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cinema6/c6embed.git"
+  }
+}
