@@ -259,11 +259,11 @@
                 describe('if the status code is not 4xx or 5xx', function() {
                     beforeEach(function(done) {
                         xhr.status = 200;
-                        xhr.response = {
+                        xhr.response = JSON.stringify({
                             name: 'Josh',
                             city: 'Pittstown',
                             state: 'NJ'
-                        };
+                        });
 
                         xhr.onreadystatechange();
                         setTimeout(done, 0);
@@ -272,9 +272,12 @@
                     it('should resolve the promise with the response', function() {
                         expect(success).toHaveBeenCalledWith({
                             status: 200,
-                            data: xhr.response,
-                            headers: xhr.getAllResponseHeaders
+                            data: JSON.parse(xhr.response),
+                            headers: jasmine.any(Function)
                         });
+                        success.calls.mostRecent().args[0].headers();
+                        expect(xhr.getAllResponseHeaders).toHaveBeenCalled();
+                        expect(xhr.getAllResponseHeaders.calls.mostRecent().object).toBe(xhr);
                     });
                 });
 
@@ -291,8 +294,11 @@
                         expect(failure).toHaveBeenCalledWith({
                             status: 404,
                             data: xhr.response,
-                            headers: xhr.getAllResponseHeaders
+                            headers: jasmine.any(Function)
                         });
+                        failure.calls.mostRecent().args[0].headers();
+                        expect(xhr.getAllResponseHeaders).toHaveBeenCalled();
+                        expect(xhr.getAllResponseHeaders.calls.mostRecent().object).toBe(xhr);
                     });
                 });
             });

@@ -10,7 +10,7 @@ module.exports = function(deps) {
             var protocol = url.match(/^\w+:/)[0].slice(0, -1),
                 portMatcher = url.match(/:\d+/),
                 port = portMatcher && portMatcher[0].slice(1),
-                host = url.match(/\/\/(\w+\.)?\w+\.\w+/)[0].slice(2);
+                host = url.match(/\/\/(\w|\d+|\.)+/)[0].slice(2);
 
             if (!port) {
                 port = (protocol === 'https') ? '443' : '80';

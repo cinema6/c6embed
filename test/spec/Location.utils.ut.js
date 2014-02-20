@@ -62,6 +62,12 @@
 
                         expect($location.originOf('/test/foo.html?test')).toBe('http://www.cinema6.com:80');
                     });
+
+                    it('should handle localhost and IP urls', function() {
+                        expect($location.originOf('http://localhost:9000')).toBe('http://localhost:9000');
+
+                        expect($location.originOf('http://10.61.32.32:3000')).toBe('http://10.61.32.32:3000');
+                    });
                 });
             });
         });
