@@ -5,17 +5,8 @@
         dist: {
             files: [
                 {
-                    src: [
-                        '<%= settings.appDir %>/assets/scripts/app.js',
-                        '<%= settings.appDir %>/assets/scripts/**/*.js',
-                        '.tmp/templates.js',
-                        '!<%= settings.appDir %>/assets/scripts/main.js'
-                    ],
-                    dest: '<%= _versionDir %>/scripts/c6app.min.js'
-                },
-                {
-                    src: '.tmp/main.js',
-                    dest: '<%= _versionDir %>/scripts/main.js'
+                    src: ['<%= settings.distDir %>/c6embed.js'],
+                    dest: '<%= settings.distDir %>/c6embed.min.js'
                 }
             ]
         }

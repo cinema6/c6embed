@@ -44,7 +44,8 @@ module.exports = function(grunt) {
      *********************************************************************************************/
 
     grunt.registerTask('server', 'start a development server', [
-        'connect:sandbox',
+        'connect:server',
+        'browserify:server',
         'open:server',
         'watch:livereload'
     ]);
@@ -104,13 +105,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build', 'build app into distDir', [
         'test:unit',
-        'git_last_commit',
-        'clean:build',
-        'copy:dist',
-        'ngtemplates:dist',
-        'htmlmin:dist',
-        'sed',
-        'cssmin:dist',
+        'browserify:dist',
         'uglify:dist'
     ]);
 

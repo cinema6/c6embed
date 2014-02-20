@@ -5,9 +5,11 @@
         options: {
             hostname: '0.0.0.0'
         },
-        sandbox: {
+        server: {
             options: {
-                port: '<%= settings.sandboxPort %>'
+                port: '<%= settings.sandboxPort %>',
+                base: 'app',
+                livereload: true
             }
         }
     };

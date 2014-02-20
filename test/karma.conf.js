@@ -24,6 +24,10 @@ module.exports = function(config) {
             'test/spec/**/*.js'
         ],
 
+        exclude: [
+            'src/main.js'
+        ],
+
         preprocessors: {
             'node_modules/q/q.js': ['commonjs'],
             'node_modules/asEvented/asevented.js': ['commonjs'],
