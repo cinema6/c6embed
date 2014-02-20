@@ -7,8 +7,12 @@
             c6Ajax;
 
         var $window,
+            $location,
+            browserInfo,
             xhrs,
-            xhr;
+            xhr,
+            xdrs,
+            xdr;
 
         function MockXHR() {
             var self = this;
@@ -44,17 +48,50 @@
             xhr = this;
         }
 
+        function MockXDR() {
+            this.onerror = null;
+            this.onload = null;
+            this.onprogress = null;
+            this.ontimeout = null;
+
+            this.abort = jasmine.createSpy('xdr.abort()');
+            this.open = jasmine.createSpy('xdr.open(method, url)');
+            this.send = jasmine.createSpy('xdr.send(string)');
+
+            this.constructor = MockXHR;
+            this.contentType = '';
+            this.responseText = '';
+            this.timeout = 0;
+
+            xdrs.push(this);
+
+            xdr = this;
+        }
+
         beforeEach(function() {
             xhrs = [];
+            xdrs = [];
 
-            C6AJAX = require('../../lib/C6AJAX');
+            C6AJAX = require('../../lib/c6ajax/C6AJAX');
             q = require('../../node_modules/q/q.js');
 
             $window = {
                 XMLHttpRequest: MockXHR
             };
 
-            c6Ajax = new C6AJAX({ q: q, window: $window });
+            $location = {
+                origin: 'http://elitedaily.com:80',
+                originOf: jasmine.createSpy('$location.originOf()')
+                    .and.returnValue('http://elitedaily.com:80')
+            };
+
+            browserInfo = {
+                profile: {
+                    cors: true
+                }
+            };
+
+            c6Ajax = new C6AJAX({ q: q, window: $window, location: $location, browserInfo: browserInfo });
         });
 
         it('should exist', function() {
@@ -331,6 +368,190 @@
 
                     expect(xhr.open).toHaveBeenCalledWith('PUT', 'foo.com');
                     expect(xhr.send).toHaveBeenCalledWith({ name: 'josh' });
+                });
+            });
+        });
+
+        describe('if the request is cross-domain, there is not CORS support, but there is XDomainRequest support (IE8/IE9)', function() {
+            beforeEach(function() {
+                browserInfo.profile.cors = false;
+                $window.XDomainRequest = MockXDR;
+
+                c6Ajax = new C6AJAX({ q: q, window: $window, location: $location, browserInfo: browserInfo });
+            });
+
+            describe('GETting', function() {
+                beforeEach(function() {
+                    $location.originOf.and.returnValue('http://www.foo.com:80');
+                });
+
+                it('should send an XDR request to the server', function() {
+                    c6Ajax({
+                        method: 'GET',
+                        url: 'http://www.foo.com',
+                        params: {
+                            name: 'josh',
+                            age: 22
+                        },
+                        timeout: 30000,
+                        responseType: 'json'
+                    });
+
+                    expect(xdr.open).toHaveBeenCalledWith('GET', 'http://www.foo.com?name=josh&age=22');
+                    expect(xdr.timeout).toBe(30000);
+                    expect(xdr.send).toHaveBeenCalledWith('');
+                });
+
+                it('should support a minimal amount of configuration', function() {
+                    c6Ajax({
+                        method: 'GET',
+                        url: 'http://www.foo.com/test.html'
+                    });
+
+                    expect(xdr.open).toHaveBeenCalledWith('GET', 'http://www.foo.com/test.html');
+                    expect(xdr.timeout).toBe(0);
+                    expect(xdr.send).toHaveBeenCalledWith('');
+                });
+            });
+
+            describe('POSTing', function() {
+                beforeEach(function() {
+                    $location.originOf.and.returnValue('http://cinema6.com:80');
+                });
+
+                it('should send an XDR request to the server', function() {
+                    c6Ajax({
+                        method: 'POST',
+                        url: 'http://cinema6.com/api/experiences',
+                        data: {
+                            experiences: [
+                                {
+                                    name: 'Awesome Experience'
+                                }
+                            ]
+                        }
+                    });
+
+                    expect(xdr.open).toHaveBeenCalledWith('POST', 'http://cinema6.com/api/experiences');
+                    expect(xdr.timeout).toBe(0);
+                    expect(xdr.send).toHaveBeenCalledWith(JSON.stringify({
+                        experiences: [
+                            {
+                                name: 'Awesome Experience'
+                            }
+                        ]
+                    }));
+                });
+
+                it('should support sending non-JSON data', function() {
+                    expect(function() {
+                        c6Ajax({
+                            method: 'POST',
+                            url: 'http://cinema6.com/api/experiences',
+                            data: 'I\'m just a string!'
+                        });
+                    }).not.toThrow();
+
+                    expect(xdr.open).toHaveBeenCalledWith('POST', 'http://cinema6.com/api/experiences');
+                    expect(xdr.timeout).toBe(0);
+                    expect(xdr.send).toHaveBeenCalledWith('I\'m just a string!');
+                });
+            });
+
+            describe('responding to events', function() {
+                var success, fail;
+
+                beforeEach(function() {
+                    $location.originOf.and.returnValue('http://www.benfolds.com:80');
+
+                    success = jasmine.createSpy('success');
+                    fail = jasmine.createSpy('fail');
+                });
+
+                describe('onerror', function() {
+                    it('should reject the promise', function(done) {
+                        c6Ajax({
+                            method: 'GET',
+                            url: 'http://www.benfolds.com/test.json'
+                        }).then(success, fail);
+
+                        xdr.onerror();
+
+                        setTimeout(function() {
+                            expect(fail).toHaveBeenCalledWith({
+                                status: null,
+                                data: 'The XDomainRequest failed. We\'d tell you more if we could...',
+                                headers: jasmine.any(Function)
+                            });
+                            done();
+                        }, 1);
+                    });
+                });
+
+                describe('ontimeout', function() {
+                    it('should reject the promise', function(done) {
+                        c6Ajax({
+                            method: 'GET',
+                            url: 'http://www.benfolds.com',
+                            timeout: 10000
+                        }).then(success, fail);
+
+                        xdr.ontimeout();
+
+                        setTimeout(function() {
+                            expect(fail).toHaveBeenCalledWith({
+                                status: null,
+                                data: 'The XDomainRequest timed out after 10000ms.',
+                                headers: jasmine.any(Function)
+                            });
+                            done();
+                        }, 1);
+                    });
+                });
+
+                describe('onload', function() {
+                    it('should resolve the promise', function(done) {
+                        c6Ajax({
+                            method: 'GET',
+                            url: 'http://www.benfolds.com'
+                        }).then(success, fail);
+
+                        xdr.responseText = '<html><head><title>Ben Folds</title></head><body>Homepage</body></html>';
+                        xdr.onload();
+
+                        setTimeout(function() {
+                            expect(success).toHaveBeenCalledWith({
+                                status: null,
+                                data: xdr.responseText,
+                                headers: jasmine.any(Function)
+                            });
+                            done();
+                        }, 1);
+                    });
+
+                    it('should try to convert the text into JSON', function(done) {
+                        var obj = {
+                            name: 'Josh',
+                            age: 22
+                        };
+
+                        c6Ajax({
+                            method: 'GET',
+                            url: 'http://www.benfolds.com/foo.json'
+                        }).then(success, fail);
+
+                        xdr.responseText = JSON.stringify(obj);
+                        xdr.onload();
+
+                        setTimeout(function() {
+                            expect(success).toHaveBeenCalledWith({
+                                status: null,
+                                data: obj,
+                                headers: jasmine.any(Function)
+                            });
+                            done();
+                        }, 1);
+                    });
                 });
             });
         });
