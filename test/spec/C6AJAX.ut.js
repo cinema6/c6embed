@@ -21,7 +21,19 @@
             this.readyState = 0;
             this.response = null;
             this.responseText = null;
-            this.responseType = '';
+            Object.defineProperty(this, 'responseType', {
+                get: function() {
+                    return responseType;
+                },
+                set: function(value) {
+                    if (self.open.calls.count() < 1) {
+                        throw new Error('Must call open() before setting responseType!');
+                    }
+
+                    responseType = value;
+                }
+            });
+            var responseType = '';
             this.responseXML = null;
             this.status = null;
             this.statusText = null;
