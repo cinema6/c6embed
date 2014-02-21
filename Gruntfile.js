@@ -64,13 +64,11 @@ module.exports = function(grunt) {
     grunt.registerTask('test:unit', 'run unit tests', [
         'jshint:all',
         'clean:build',
-        'ngtemplates:test',
         'karma:unit'
     ]);
 
     grunt.registerTask('test:unit:debug', 'run unit tests whenever files change', [
         'clean:build',
-        'ngtemplates:test',
         'karma:debug',
         'watch:unit'
     ]);
