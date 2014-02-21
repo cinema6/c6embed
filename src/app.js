@@ -35,7 +35,7 @@ module.exports = function(deps) {
         }
     }
 
-    /* SUPER-DUPER ASYNC PROMISE CHANGE STARTS HERE */
+    /* SUPER-DUPER ASYNC PROMISE CHAIN STARTS HERE */
     function createFrame() {
         var iframe = $document.createElement('iframe'),
             script = config.script,
@@ -44,6 +44,8 @@ module.exports = function(deps) {
         iframe.src = 'about:blank';
         iframe.width = config.width;
         iframe.height = config.height;
+        iframe.scrolling = 'yes';
+        iframe.style.border = 'none';
 
         return q.when(parent.insertBefore(iframe, script.nextSibling));
     }
@@ -78,8 +80,8 @@ module.exports = function(deps) {
             baseTag = '<base href="' + appUrl(experience.appUri) + '/">';
 
         frameDoc.open();
-        frameDoc.write(indexHTML);
         frameDoc.write(baseTag);
+        frameDoc.write(indexHTML);
         frameDoc.close();
 
         return [experience, iframe];

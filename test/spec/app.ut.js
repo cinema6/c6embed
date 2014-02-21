@@ -145,6 +145,8 @@
             expect(iframe.src).toBe('about:blank');
             expect(iframe.height).toBe(config.height);
             expect(iframe.width).toBe(config.width);
+            expect(iframe.style.border).toBe('none');
+            expect(iframe.scrolling).toBe('yes');
 
             expect(parent.insertBefore).toHaveBeenCalledWith(iframe, script.nextSibling);
         });
