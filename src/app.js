@@ -79,9 +79,8 @@ module.exports = function(deps) {
         var frameDoc = iframe.contentWindow.document,
             baseTag = '<base href="' + appUrl(experience.appUri) + '/">';
 
-        frameDoc.open();
-        frameDoc.write(baseTag);
-        frameDoc.write(indexHTML);
+        frameDoc.open('text/html', 'replace');
+        frameDoc.write(indexHTML, baseTag);
         frameDoc.close();
 
         return [experience, iframe];
