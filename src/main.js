@@ -84,12 +84,14 @@
         q: q,
         c6Db: c6Db,
         c6Ajax: c6Ajax,
-        experience: experience
+        experience: experience,
+        window: window
     })
         .then(function(result) {
             if (!window.console) { return; }
             window.console.log(result);
-        }, function(error) {
+        })
+        .catch(function(error) {
             if (!window.console) { return; }
             window.console.error(error);
         });
