@@ -6,7 +6,8 @@ module.exports = function(deps) {
         q = deps.q,
         c6Db = deps.c6Db,
         c6Ajax = deps.c6Ajax,
-        experienceService = deps.experience;
+        experienceService = deps.experience,
+        $window = deps.window;
 
 
     /* HELPER FUNCTIONS */
@@ -77,11 +78,14 @@ module.exports = function(deps) {
             indexHTML = data[2];
 
         var frameDoc = iframe.contentWindow.document,
-            baseTag = '<base href="' + appUrl(experience.appUri) + '/">';
+            baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
+            pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>';
 
-        frameDoc.open();
-        frameDoc.write(baseTag);
-        frameDoc.write(indexHTML);
+        frameDoc.open('text/html', 'replace');
+        if ($window.history.replaceState) {
+            frameDoc.write(pushState);
+        }
+        frameDoc.write(baseTag, indexHTML);
         frameDoc.close();
 
         return [experience, iframe];

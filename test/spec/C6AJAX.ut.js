@@ -126,7 +126,7 @@
                 responseType: 'json'
             });
 
-            expect(xhr.open).toHaveBeenCalledWith('GET', 'http://www.foo.com?name=josh&age=22');
+            expect(xhr.open).toHaveBeenCalledWith('GET', 'http://www.foo.com?name=josh&age=22', true);
             expect(xhr.setRequestHeader).toHaveBeenCalledWith('Header1', 'blah blah');
             expect(xhr.setRequestHeader).toHaveBeenCalledWith('Another-Header', 'foo');
             expect(xhr.timeout).toBe(30000);
@@ -141,7 +141,7 @@
                 url: 'http://www.cinema6.com'
             });
 
-            expect(xhr.open).toHaveBeenCalledWith('DELETE', 'http://www.cinema6.com');
+            expect(xhr.open).toHaveBeenCalledWith('DELETE', 'http://www.cinema6.com', true);
             expect(xhr.setRequestHeader).not.toHaveBeenCalled();
             expect(xhr.timeout).toBe(0);
             expect(xhr.responseType).toBe('');
@@ -162,7 +162,7 @@
                 }
             });
 
-            expect(xhr.open).toHaveBeenCalledWith('POST', 'http://api.twitter.com/tweets');
+            expect(xhr.open).toHaveBeenCalledWith('POST', 'http://api.twitter.com/tweets', true);
             expect(xhr.setRequestHeader).not.toHaveBeenCalled();
             expect(xhr.timeout).toBe(0);
             expect(xhr.responseType).toBe('');
@@ -186,7 +186,7 @@
                 }
             });
 
-            expect(xhr.open).toHaveBeenCalledWith('GET', 'http://www.test.com?url=http%3A%2F%2Fwww.troll.com%3Fname%3Djoe&full%20name=Joe%20Lewis');
+            expect(xhr.open).toHaveBeenCalledWith('GET', 'http://www.test.com?url=http%3A%2F%2Fwww.troll.com%3Fname%3Djoe&full%20name=Joe%20Lewis', true);
         });
 
         it('should return a promise', function() {
@@ -323,14 +323,14 @@
                         params: { name: 'howard' }
                     }).then).toEqual(jasmine.any(Function));
 
-                    expect(xhr.open).toHaveBeenCalledWith('GET', 'http://www.apple.com?name=howard');
+                    expect(xhr.open).toHaveBeenCalledWith('GET', 'http://www.apple.com?name=howard', true);
                     expect(xhr.send).toHaveBeenCalled();
                 });
 
                 it('should work without providing a config object', function() {
                     c6Ajax.get('foo.com');
 
-                    expect(xhr.open).toHaveBeenCalledWith('GET', 'foo.com');
+                    expect(xhr.open).toHaveBeenCalledWith('GET', 'foo.com', true);
                     expect(xhr.send).toHaveBeenCalled();
                 });
             });
@@ -341,14 +341,14 @@
                         params: { name: 'howard' }
                     }).then).toEqual(jasmine.any(Function));
 
-                    expect(xhr.open).toHaveBeenCalledWith('DELETE', 'http://www.apple.com?name=howard');
+                    expect(xhr.open).toHaveBeenCalledWith('DELETE', 'http://www.apple.com?name=howard', true);
                     expect(xhr.send).toHaveBeenCalled();
                 });
 
                 it('should work without providing a config object', function() {
                     c6Ajax.delete('foo.com');
 
-                    expect(xhr.open).toHaveBeenCalledWith('DELETE', 'foo.com');
+                    expect(xhr.open).toHaveBeenCalledWith('DELETE', 'foo.com', true);
                     expect(xhr.send).toHaveBeenCalled();
                 });
             });
@@ -359,14 +359,14 @@
                         params: { name: 'howard' }
                     }).then).toEqual(jasmine.any(Function));
 
-                    expect(xhr.open).toHaveBeenCalledWith('POST', 'http://www.apple.com?name=howard');
+                    expect(xhr.open).toHaveBeenCalledWith('POST', 'http://www.apple.com?name=howard', true);
                     expect(xhr.send).toHaveBeenCalledWith({ name: 'josh' });
                 });
 
                 it('should work without providing a config object', function() {
                     c6Ajax.post('foo.com', { name: 'josh' });
 
-                    expect(xhr.open).toHaveBeenCalledWith('POST', 'foo.com');
+                    expect(xhr.open).toHaveBeenCalledWith('POST', 'foo.com', true);
                     expect(xhr.send).toHaveBeenCalledWith({ name: 'josh' });
                 });
             });
@@ -377,14 +377,14 @@
                         params: { name: 'howard' }
                     }).then).toEqual(jasmine.any(Function));
 
-                    expect(xhr.open).toHaveBeenCalledWith('PUT', 'http://www.apple.com?name=howard');
+                    expect(xhr.open).toHaveBeenCalledWith('PUT', 'http://www.apple.com?name=howard', true);
                     expect(xhr.send).toHaveBeenCalledWith({ name: 'josh' });
                 });
 
                 it('should work without providing a config object', function() {
                     c6Ajax.put('foo.com', { name: 'josh' });
 
-                    expect(xhr.open).toHaveBeenCalledWith('PUT', 'foo.com');
+                    expect(xhr.open).toHaveBeenCalledWith('PUT', 'foo.com', true);
                     expect(xhr.send).toHaveBeenCalledWith({ name: 'josh' });
                 });
             });
