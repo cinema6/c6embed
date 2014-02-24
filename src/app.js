@@ -73,20 +73,26 @@ module.exports = function(deps) {
     }
 
     function loadApp(data) {
+        /* jshint scripturl:true */
         var experience = data[0],
             iframe = data[1],
             indexHTML = data[2];
 
-        var frameDoc = iframe.contentWindow.document,
-            baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
-            pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>';
+        var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
+            pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+            matchHead = indexHTML.match(/<head>/),
+            headEndIndex = matchHead.index + matchHead[0].length;
 
-        frameDoc.open('text/html', 'replace');
-        if ($window.history.replaceState) {
-            frameDoc.write(pushState);
-        }
-        frameDoc.write(baseTag, indexHTML);
-        frameDoc.close();
+        indexHTML = [
+            indexHTML.slice(0, headEndIndex),
+            baseTag,
+            !!$window.history.replaceState ?
+                pushState : '',
+            indexHTML.slice(headEndIndex)
+        ].join('');
+
+        iframe.setAttribute('data-srcdoc', indexHTML);
+        iframe.src = 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')';
 
         return [experience, iframe];
     }
