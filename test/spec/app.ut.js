@@ -43,6 +43,7 @@
             }
         };
         this.style = {};
+        this.setAttribute = jasmine.createSpy('iframe.setAttribute()');
     }
 
     function Session() {
@@ -195,6 +196,7 @@
     });
 
     describe('loading the app into the iframe', function() {
+        /* jshint scripturl:true */
         describe('if the browser supports history.replaceState()', function() {
             beforeEach(function(done) {
                 $window.history.replaceState = function() {};
@@ -204,17 +206,17 @@
             });
 
             it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer', function() {
-                var iframeDoc = iframe.contentWindow.document;
-
-                expect(iframeDoc.open).toHaveBeenCalled();
-                expect(iframeDoc.write).toHaveBeenCalledWith(
-                    '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>'
-                );
-                expect(iframeDoc.write).toHaveBeenCalledWith(
-                    '<base href="http://cinema6.com/experiences/minireel/">',
-                    indexHTML
-                );
-                expect(iframeDoc.close).toHaveBeenCalled();
+                expect(iframe.setAttribute).toHaveBeenCalledWith('data-srcdoc', [
+                    '<html>',
+                    '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                    '        <title>My Title</title>',
+                    '    </head>',
+                    '    <body>',
+                    '        <h1>This is the file!</h1>',
+                    '    </body>',
+                    '</html>'
+                ].join('\n'));
+                expect(iframe.src).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
             });
         });
 
@@ -225,14 +227,17 @@
             });
 
             it('should write the contents of index.html into the iframe with a base tag to fix relative urls', function() {
-                var iframeDoc = iframe.contentWindow.document;
-
-                expect(iframeDoc.open).toHaveBeenCalled();
-                expect(iframeDoc.write).toHaveBeenCalledWith(
-                    '<base href="http://cinema6.com/experiences/minireel/">',
-                    indexHTML
-                );
-                expect(iframeDoc.close).toHaveBeenCalled();
+                expect(iframe.setAttribute).toHaveBeenCalledWith('data-srcdoc', [
+                    '<html>',
+                    '    <head><base href="http://cinema6.com/experiences/minireel/">',
+                    '        <title>My Title</title>',
+                    '    </head>',
+                    '    <body>',
+                    '        <h1>This is the file!</h1>',
+                    '    </body>',
+                    '</html>'
+                ].join('\n'));
+                expect(iframe.src).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
             });
         });
     });
