@@ -64,6 +64,13 @@
             location: $location
         });
 
+    /* Create C6Query */
+    var C6Query = require('../lib/C6Query'),
+        c6Query = new C6Query({
+            document: document,
+            window: window
+        });
+
     /* Create and Configure C6DB */
     var FixtureAdapter = require('../lib/c6db/adapters/Fixture'),
         C6DB = require('../lib/c6db/C6DB'),
@@ -85,7 +92,8 @@
         c6Db: c6Db,
         c6Ajax: c6Ajax,
         experience: experience,
-        window: window
+        window: window,
+        $: c6Query
     })
         .then(function(result) {
             if (!window.console) { return; }

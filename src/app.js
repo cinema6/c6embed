@@ -7,8 +7,8 @@ module.exports = function(deps) {
         c6Db = deps.c6Db,
         c6Ajax = deps.c6Ajax,
         experienceService = deps.experience,
-        $window = deps.window;
-
+        $window = deps.window,
+        $ = deps.$;
 
     /* HELPER FUNCTIONS */
     function appUrl(url) {
@@ -34,11 +34,30 @@ module.exports = function(deps) {
         for (prop in fullscreenStyles) {
             style[prop] = bool ? fullscreenStyles[prop] : '';
         }
+
+        $('body>*').forEachNode(function(node, parent) {
+            var $node = $(node);
+
+            if (parent.tagName === 'BODY') {
+                $node.addClass('c6__play-that-funky-music-white-boy');
+                $node.css({
+                    position: 'relative',
+                    height: '0px'
+                });
+                return;
+            }
+
+            if ($node.css('position') === 'fixed') {
+                $node.addClass('c6__play-that-funky-music-white-boy');
+                $node.css('position', 'relative');
+            }
+        });
     }
 
     /* SUPER-DUPER ASYNC PROMISE CHAIN STARTS HERE */
     function createFrame() {
         var iframe = $document.createElement('iframe'),
+            $iframe = $(iframe),
             script = config.script,
             parent = script.parentNode;
 
@@ -47,6 +66,7 @@ module.exports = function(deps) {
         iframe.height = config.height;
         iframe.scrolling = 'yes';
         iframe.style.border = 'none';
+        $iframe.addClass('c6__cant-touch-this');
 
         return q.when(parent.insertBefore(iframe, script.nextSibling));
     }

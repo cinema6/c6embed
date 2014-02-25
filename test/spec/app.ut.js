@@ -3,6 +3,8 @@
 
     var app,
         q,
+        C6Query,
+        $,
         asEvented;
 
     var $document,
@@ -13,6 +15,8 @@
         $window;
 
     var iframe,
+        testFrame,
+        testDoc,
         exp,
         session,
         indexHTML;
@@ -44,6 +48,7 @@
         };
         this.style = {};
         this.setAttribute = jasmine.createSpy('iframe.setAttribute()');
+        this.className = '';
     }
 
     function Session() {
@@ -55,13 +60,62 @@
     }
 
     function run() {
-        app({ document: $document, config: config, q: q, c6Db: c6Db, c6Ajax: c6Ajax, experience: experience, window: $window });
+        app({ document: $document, config: config, q: q, c6Db: c6Db, c6Ajax: c6Ajax, experience: experience, window: $window, $: $ });
     }
 
     beforeEach(function() {
+        var body = document.getElementsByTagName('body')[0];
+
+        testFrame = document.createElement('iframe');
+
+        testFrame.src = 'about:blank';
+        testFrame.width = '800';
+        testFrame.height = '600';
+
+        body.appendChild(testFrame);
+        testDoc = testFrame.contentWindow.document;
+
+        testDoc.open('text/html', 'replace');
+        testDoc.write([
+            '<html>',
+            '    <head>',
+            '        <title>Elite Daily</title>',
+            '        <style>',
+            '            .container {',
+            '                position: relative;',
+            '            }',
+            '            .floater {',
+            '                position: absolute; width: 200px; height: 1000px;',
+            '            }',
+            '            .fixed {',
+            '                position: fixed; width: 20px; height: 300px !important;',
+            '            }',
+            '        </style>',
+            '    </head>',
+            '    <body>',
+            '        <div class="container">',
+            '            <article>',
+            '                <h1>My Post</h1>',
+            '                <iframe style="position: fixed; height: 100%; width: 100%;" src="about:blank" class="c6__cant-touch-this"></iframe>',
+            '                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tristique volutpat dolor quis convallis. Nunc vestibulum, mauris quis luctus imperdiet.</p>',
+            '                <p>Nunc accumsan malesuada metus, eget malesuada nibh dignissim et. Pellentesque tempor, nisi in semper varius, urna eros mattis eros, non luctus diam urna a mi.</p>',
+            '            </article>',
+            '            <div class="floater">I\'m floating!</div>',
+            '            <div>',
+            '                <span class="fixed">I\'m fixed!</span>',
+            '            </div>',
+            '        </div>',
+            '    </body>',
+            '</html>'
+        ].join('\n'));
+        testDoc.close();
+
         app = require('../../src/app');
         q = require('../../node_modules/q/q.js');
         asEvented = require('../../node_modules/asEvented/asevented.js');
+        C6Query = require('../../lib/C6Query');
+
+        $ = new C6Query({ window: testFrame.contentWindow, document: testDoc });
 
         exp = {
             id: 'e-dbc8133f4d41a7',
@@ -141,6 +195,10 @@
         };
     });
 
+    afterEach(function() {
+        document.getElementsByTagName('body')[0].removeChild(testFrame);
+    });
+
     describe('creating the iframe', function() {
         beforeEach(run);
 
@@ -153,6 +211,7 @@
             expect(iframe.width).toBe(config.width);
             expect(iframe.style.border).toBe('none');
             expect(iframe.scrolling).toBe('yes');
+            expect($(iframe).classes()).toContain('c6__cant-touch-this');
 
             expect(parent.insertBefore).toHaveBeenCalledWith(iframe, script.nextSibling);
         });
@@ -277,6 +336,29 @@
                     expect(style.width).toBe('100%');
                     expect(style.height).toBe('100%');
                     expect(style.zIndex).toBe(999999999999999);
+                });
+
+                it('should shrink the site down to an itty-bitty thang', function() {
+                    var $body = $('body'),
+                        $firstChildren = $($body[0].childNodes),
+                        $fixed = $('.fixed');
+
+                    $firstChildren.forEach(function(child) {
+                        if (child instanceof testFrame.contentWindow.Text) { return; }
+
+                        var $child = $(child);
+
+                        expect($child.css('position')).toBe('relative');
+                        expect($child.css('height')).toBe('0px');
+                        expect($child.classes()).toContain('c6__play-that-funky-music-white-boy');
+                    });
+
+                    expect($fixed.classes()).toContain('c6__play-that-funky-music-white-boy');
+                    expect($fixed.css('position')).toBe('relative');
+                });
+
+                it('should not mess with elements that have the c6__cant-touch-this class', function() {
+                    expect($('.c6__cant-touch-this').css('position')).toBe('fixed');
                 });
             });
 
