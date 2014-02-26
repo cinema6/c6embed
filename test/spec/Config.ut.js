@@ -3,7 +3,9 @@
 
     describe('Config', function() {
         var Config,
-            config;
+            config,
+            C6Query,
+            $;
 
         var $window,
             $document,
@@ -19,6 +21,7 @@
 
         beforeEach(function() {
             Config = require('../../src/Config');
+            C6Query = require('../../lib/C6Query');
 
             scripts = [
                 new MockElement({
@@ -51,10 +54,14 @@
                         if (name === 'script') {
                             return scripts;
                         }
-                    })
+                    }),
+                createElement: function(tagName) {
+                    return document.createElement(tagName);
+                }
             };
 
-            config = new Config({ document: $document, window: $window });
+            $ = new C6Query({ document: $document, window: $window });
+            config = new Config({ document: $document, window: $window, $: $ });
         });
 
         it('should exist', function() {
@@ -64,7 +71,7 @@
         it('should pull configuration data from the last script tag (the script tag that loaded this JS)', function() {
             expect(config.experienceId).toBe('e-4cb24cfbe4f2fc');
             expect(config.src).toBe('embed.js');
-            expect(config.script).toBe(myScript);
+            expect(config.$script).toEqual($(myScript));
             expect(config.height).toBe('300');
             expect(config.width).toBe('100%');
         });
@@ -73,7 +80,7 @@
             expect(config.debug).toBe(false);
 
             $window.__C6_DEBUG__ = true;
-            config = new Config({ document: $document, window: $window });
+            config = new Config({ document: $document, window: $window, $: $ });
             expect(config.debug).toBe(true);
         });
     });

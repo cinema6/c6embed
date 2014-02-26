@@ -5,9 +5,22 @@
         var C6Query,
             $;
 
-        var testBox;
+        var testBox,
+            elements,
+            element;
+
+        function MockElement(tagName) {
+            var el = document.createElement(tagName);
+
+            elements.push(el);
+            element = el;
+
+            return el;
+        }
 
         beforeEach(function() {
+            elements = [];
+
             C6Query = require('../../lib/C6Query');
 
             testBox = document.createElement('div');
@@ -15,6 +28,11 @@
             testBox.style.width = '800px';
             testBox.style.height = '600px';
             testBox.style.position = 'relative';
+
+            testBox.createElement = jasmine.createSpy('$document.createElement()')
+                .and.callFake(function(tagName) {
+                    return new MockElement(tagName);
+                });
 
             document.getElementsByTagName('body')[0].appendChild(testBox);
 
@@ -73,12 +91,42 @@
                     expect($foo.length).toBe(2);
                 });
             });
+
+            describe('with a selector', function() {
+                it('should return the selector', function() {
+                    var $div = $('<div>');
+
+                    expect($($div)).toBe($div);
+                });
+            });
+        });
+
+        describe('creating', function() {
+            it('should create a new HTML element of the specified type and with the specified attributes and return it in a Selector', function() {
+                var $div = $('<div class="my-class" data-test="foo">');
+
+                expect($div.classes()).toEqual(['my-class']);
+                expect($div.attr('data-test')).toBe('foo');
+            });
+
+            it('should support creating elements whose attributes include spaces', function() {
+                var $div = $('<div class="my-class foo" style="border: none;">');
+
+                expect($div.classes()).toEqual(['my-class', 'foo']);
+                expect($div.attr('style')).toBe('border: none;');
+            });
+
+            it('should support creating elements with contents', function() {
+                var $span = $('<span>Hello friend!</span>');
+
+                expect($span[0].firstChild.nodeValue).toBe('Hello friend!');
+            });
         });
 
         describe('Selector', function() {
             beforeEach(function() {
                 testBox.innerHTML = [
-                    '<div class="c6 howard josh evan scott" style="position: relative; height: 10%;"></div>',
+                    '<div class="c6 howard josh evan scott" style="position: relative; height: 10%; width: 10px;"></div>',
                     '<div class="c6 moo steph"></div>',
                     '<section>',
                     '    <h1>Title</h1>',
@@ -119,6 +167,12 @@
                         var $classes = $('.c6');
 
                         expect($classes.classes()).toEqual(['c6', 'howard', 'josh', 'evan', 'scott', 'moo', 'steph']);
+                    });
+
+                    it('should return an empty array if there are no classes', function() {
+                        var $div = $('<div>');
+
+                        expect($div.classes()).toEqual([]);
                     });
                 });
 
@@ -177,6 +231,13 @@
                         expect($('.c6.howard').css('height')).toBe('60px');
                         expect($('.c6.moo').css('position')).toBe('static');
                     });
+
+                    it('should return undefined if it can\'t get the computed css values for an element', function() {
+                        var span = document.createElement('span');
+                        span.innerHTML = 'Foo';
+
+                        expect($(span.firstChild).css('height')).toBeUndefined();
+                    });
                 });
 
                 describe('css(config)', function() {
@@ -208,6 +269,161 @@
                         $c6.forEach(function(node) {
                             expect(node.style.display).toBe('');
                         });
+                    });
+                });
+
+                describe('hasClass(class)', function() {
+                    it('should return a bool indicating if any of the elements in the selector has the class or not', function() {
+                        var $c6 = $('.c6'),
+                            $dev = $('.c6.howard'),
+                            $design = $('.c6.moo');
+
+                        expect($c6.hasClass('steph')).toBe(true);
+                        expect($c6.hasClass('evan')).toBe(true);
+
+                        expect($dev.hasClass('josh')).toBe(true);
+                        expect($dev.hasClass('steph')).toBe(false);
+
+                        expect($design.hasClass('moo')).toBe(true);
+                        expect($design.hasClass('howard')).toBe(false);
+                    });
+                });
+
+                describe('attr(prop)', function() {
+                    it('should get the attribute from the first element in the Selector', function() {
+                        var $dev = $('.howard');
+
+                        expect($dev.attr('class')).toBe('c6 howard josh evan scott');
+                        expect($dev.attr('style')).toBe('position: relative; height: 10%; width: 10px;');
+                    });
+                });
+
+                describe('attr(prop, value)', function() {
+                    it('should set the attribute to the provided value for every element in the Selector', function() {
+                        var $c6 = $('.c6');
+
+                        $c6.attr('data-test', 'foo');
+
+                        $c6.forEach(function(node) {
+                            expect(node.getAttribute('data-test')).toBe('foo');
+                        });
+                    });
+                });
+
+                describe('prop(key)', function() {
+                    it('should get the object property of the first element', function() {
+                        var $dev = $('.howard');
+
+                        $dev[0].c6Foo = 'test';
+
+                        expect($dev.prop('c6Foo')).toBe('test');
+                    });
+                });
+
+                describe('prop(key, value)', function() {
+                    it('should set the element property to the provided value for all elements', function() {
+                        var $c6 = $('.c6');
+
+                        $c6.prop('c6Foo', 'hello');
+
+                        $c6.forEach(function(node) {
+                            expect(node.c6Foo).toBe('hello');
+                        });
+                    });
+                });
+
+                describe('data(key) and data(key, value)', function() {
+                    it('should store data on all elements and retrieve data from the first element', function() {
+                        var $c6 = $('.c6'),
+                            $dev = $('.howard'),
+                            $design = $('.moo'),
+                            data = {};
+
+                        $c6.data('foo', data);
+
+                        expect($c6.data('foo')).toBe(data);
+                        expect($dev.data('foo')).toBe(data);
+                        expect($design.data('foo')).toBe(data);
+                    });
+
+                    it('should be undefined if there is no data', function() {
+                        expect($('.moo').data('test')).toBeUndefined();
+                    });
+                });
+
+                describe('createSnapshot() and revertTo(index)', function() {
+                    it('should save a copy of the current attributes state and allow you to revert to that state', function() {
+                        var $c6 = $('.c6'),
+                            $dev = $('.howard'),
+                            $design = $('.moo');
+
+                        $c6.createSnapshot();
+
+                        $dev.attr('data-test', 'foo');
+                        $dev.css({
+                            position: 'fixed'
+                        });
+
+                        $dev.createSnapshot();
+
+                        $dev.css({
+                            width: '200px'
+                        });
+
+                        $design.addClass('foo-class');
+
+                        $dev.revertTo(1);
+                        expect($dev.css('width')).toBe('10px');
+                        expect($dev.css('position')).toBe('fixed');
+                        expect($dev.attr('data-test')).toBe('foo');
+
+                        $c6.revertTo();
+                        expect($design.hasClass('foo-class')).toBe(false);
+                        expect($dev[0].hasAttribute('data-test')).toBe(false);
+                        expect($dev.css('position')).toBe('relative');
+                    });
+
+                    it('should do nothing if there is no snapshot to revert to', function() {
+                        expect(function() {
+                            $('.howard').revertTo();
+                        }).not.toThrow();
+                    });
+
+                    it('should be resilient to attribute being undefined', function() {
+                        var $script = $('<script>');
+
+                        $script.createSnapshot();
+
+                        $script.addClass('foo-class');
+                        $script.css({
+                            visibility: 'hidden',
+                            overflow: 'hidden',
+                            height: 0
+                        });
+
+                        expect(function() {
+                            $script.revertTo(0);
+                        }).not.toThrow();
+                    });
+                });
+
+                describe('insertBefore(selector)', function() {
+                    it('should insert the element before the first element in the Selector', function() {
+                        var $div = $('<div id="inserted">');
+
+                        expect($div.insertBefore('ul')).toBe($div);
+
+                        expect($('ul')[0].previousSibling).toBe($div[0]);
+                    });
+                });
+
+                describe('insertAfter(selector)', function() {
+                    it('should insert the elements after the first element in the Selector', function() {
+                        var $div = $('<div>');
+
+                        expect($div.insertAfter('ul')).toBe($div);
+
+                        expect($('ul')[0].nextSibling).toBe($div[0]);
                     });
                 });
             });
