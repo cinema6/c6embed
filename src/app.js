@@ -35,7 +35,8 @@ module.exports = function(deps) {
 
         if (bool) {
             $('body>*').forEachNode(function(node, parent) {
-                var $node = $(node);
+                var $node = $(node),
+                    style = node.style;
 
                 if ($node.hasClass('c6__cant-touch-this')) {
                     return;
@@ -44,18 +45,16 @@ module.exports = function(deps) {
                 if (parent.tagName === 'BODY') {
                     $node.createSnapshot();
                     $node.addClass('c6__play-that-funky-music-white-boy');
-                    $node.css({
-                        position: 'relative !important',
-                        height: '0px !important',
-                        overflow: 'hidden !important'
-                    });
+                    style.setProperty('position', 'relative', 'important');
+                    style.setProperty('height', '0px', 'important');
+                    style.setProperty('overflow', 'hidden', 'important');
                     return;
                 }
 
                 if ($node.css('position') === 'fixed') {
                     $node.createSnapshot();
                     $node.addClass('c6__play-that-funky-music-white-boy');
-                    $node.css('position', 'relative !important');
+                    style.setProperty('position', 'relative', 'important');
                 }
             });
         } else {
