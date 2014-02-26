@@ -45,9 +45,9 @@ module.exports = function(deps) {
                     $node.createSnapshot();
                     $node.addClass('c6__play-that-funky-music-white-boy');
                     $node.css({
-                        position: 'relative',
-                        height: '0px',
-                        overflow: 'hidden'
+                        position: 'relative !important',
+                        height: '0px !important',
+                        overflow: 'hidden !important'
                     });
                     return;
                 }
@@ -55,7 +55,7 @@ module.exports = function(deps) {
                 if ($node.css('position') === 'fixed') {
                     $node.createSnapshot();
                     $node.addClass('c6__play-that-funky-music-white-boy');
-                    $node.css('position', 'relative');
+                    $node.css('position', 'relative !important');
                 }
             });
         } else {

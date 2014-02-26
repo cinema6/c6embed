@@ -62,7 +62,7 @@
                 '                position: absolute; width: 200px; height: 1000px;',
                 '            }',
                 '            .fixed {',
-                '                position: fixed; width: 20px; height: 300px !important;',
+                '                position: fixed !important; width: 20px; height: 300px !important;',
                 '            }',
                 '        </style>',
                 '    </head>',
