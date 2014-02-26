@@ -1,14 +1,13 @@
 module.exports = function(deps) {
     'use strict';
 
-    var $document = deps.document,
-        config = deps.config,
+    var config = deps.config,
         q = deps.q,
         c6Db = deps.c6Db,
         c6Ajax = deps.c6Ajax,
         experienceService = deps.experience,
-        $window = deps.window;
-
+        $window = deps.window,
+        $ = deps.$;
 
     /* HELPER FUNCTIONS */
     function appUrl(url) {
@@ -17,7 +16,7 @@ module.exports = function(deps) {
             'http://cinema6.com/experiences/') + url;
     }
 
-    function setFullscreen(element, bool) {
+    function setFullscreen($element, bool) {
         var fullscreenStyles = {
                 position: 'fixed',
                 top: 0,
@@ -28,43 +27,66 @@ module.exports = function(deps) {
                 height: '100%',
                 zIndex: 999999999999999
             },
-            style = element.style,
             prop;
 
         for (prop in fullscreenStyles) {
-            style[prop] = bool ? fullscreenStyles[prop] : '';
+            $element.css(prop, bool ? fullscreenStyles[prop] : '');
+        }
+
+        if (bool) {
+            $('body>*').forEachNode(function(node, parent) {
+                var $node = $(node);
+
+                if ($node.hasClass('c6__cant-touch-this')) {
+                    return;
+                }
+
+                if (parent.tagName === 'BODY') {
+                    $node.createSnapshot();
+                    $node.addClass('c6__play-that-funky-music-white-boy');
+                    $node.css({
+                        position: 'relative',
+                        height: '0px',
+                        overflow: 'hidden'
+                    });
+                    return;
+                }
+
+                if ($node.css('position') === 'fixed') {
+                    $node.createSnapshot();
+                    $node.addClass('c6__play-that-funky-music-white-boy');
+                    $node.css('position', 'relative');
+                }
+            });
+        } else {
+            $('.c6__play-that-funky-music-white-boy').revertTo(0);
         }
     }
 
     /* SUPER-DUPER ASYNC PROMISE CHAIN STARTS HERE */
     function createFrame() {
-        var iframe = $document.createElement('iframe'),
-            script = config.script,
-            parent = script.parentNode;
+        var $script = config.$script,
+            $iframe = $('<iframe src="about:blank" width="' +
+                        config.width + '" height="' + config.height +
+                        '" scrolling="yes" style="border: none;" class="c6__cant-touch-this">');
 
-        iframe.src = 'about:blank';
-        iframe.width = config.width;
-        iframe.height = config.height;
-        iframe.scrolling = 'yes';
-        iframe.style.border = 'none';
-
-        return q.when(parent.insertBefore(iframe, script.nextSibling));
+        return q.when($iframe.insertAfter($script));
     }
 
-    function fetchExperience(iframe) {
+    function fetchExperience($iframe) {
         return q.all([
             c6Db.find('experience', config.experienceId),
-            iframe
+            $iframe
         ]);
     }
 
     function fetchIndex(data) {
         var experience = data[0],
-            iframe = data[1];
+            $iframe = data[1];
 
         return q.all([
             experience,
-            iframe,
+            $iframe,
             c6Ajax.get(appUrl(experience.appUri) + '/index.html')
                 .then(function(response) {
                     return response.data;
@@ -75,7 +97,7 @@ module.exports = function(deps) {
     function loadApp(data) {
         /* jshint scripturl:true */
         var experience = data[0],
-            iframe = data[1],
+            $iframe = data[1],
             indexHTML = data[2];
 
         var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
@@ -91,21 +113,21 @@ module.exports = function(deps) {
             indexHTML.slice(headEndIndex)
         ].join('');
 
-        iframe.setAttribute('data-srcdoc', indexHTML);
-        iframe.src = 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')';
+        $iframe.attr('data-srcdoc', indexHTML);
+        $iframe.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
 
-        return [experience, iframe];
+        return [experience, $iframe];
     }
 
     function communicateWithApp(data) {
         var experience = data[0],
-            iframe = data[1];
+            $iframe = data[1];
 
-        var session = experienceService.registerExperience(experience, iframe.contentWindow);
+        var session = experienceService.registerExperience(experience, $iframe.prop('contentWindow'));
 
         session.once('ready', function() {
             session.on('fullscreenMode', function(fullscreen) {
-                setFullscreen(iframe, fullscreen);
+                setFullscreen($iframe, fullscreen);
             });
         });
 
