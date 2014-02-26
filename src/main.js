@@ -87,7 +87,6 @@
 
     /* Run the Application! */
     return app({
-        document: window.document,
         config: config,
         q: q,
         c6Db: c6Db,
