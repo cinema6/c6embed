@@ -99,6 +99,21 @@
                     expect($($div)).toBe($div);
                 });
             });
+
+            describe('with a comment', function() {
+                it('should make the comment element 0', function() {
+                    var comment = document.createComment('This is a comment'),
+                        $comment = $(comment);
+
+                    expect($comment[0]).toBe(comment);
+                });
+            });
+
+            describe('if something falsy is passed in', function() {
+                it('should return an empty selector', function() {
+                    expect($(null).length).toBe(0);
+                });
+            });
         });
 
         describe('creating', function() {
