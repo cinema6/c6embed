@@ -83,5 +83,14 @@
             config = new Config({ document: $document, window: $window, $: $ });
             expect(config.debug).toBe(true);
         });
+
+        it('should set the base collateral directory based on the debug mode', function() {
+            expect(config.collateralBase).toBe('http://cinema6.com/collateral');
+
+            $window.__C6_DEBUG__ = true;
+            config = new Config({ document: $document, window: $window, $: $ });
+
+            expect(config.collateralBase).toBe('https://s3.amazonaws.com/c6.dev/media/src/site/collateral');
+        });
     });
 }());
