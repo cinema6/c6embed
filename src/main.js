@@ -3,11 +3,19 @@
 
     var app = require('./app');
 
+    /* Create C6Query */
+    var C6Query = require('../lib/C6Query'),
+        c6Query = new C6Query({
+            document: document,
+            window: window
+        });
+
     /* Create Config */
     var Config = require('./Config'),
         config = new Config({
             window: window,
-            document: window.document
+            document: window.document,
+            $: c6Query
         });
 
     /* Fetch Q */
@@ -79,13 +87,13 @@
 
     /* Run the Application! */
     return app({
-        document: window.document,
         config: config,
         q: q,
         c6Db: c6Db,
         c6Ajax: c6Ajax,
         experience: experience,
-        window: window
+        window: window,
+        $: c6Query
     })
         .then(function(result) {
             if (!window.console) { return; }
