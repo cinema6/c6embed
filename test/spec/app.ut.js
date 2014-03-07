@@ -98,7 +98,12 @@
 
             exp = {
                 id: 'e-dbc8133f4d41a7',
-                appUri: 'minireel'
+                appUri: 'minireel',
+                img: {
+                    test: 'foo.jpg',
+                    foo: 'hello/test.jpg',
+                    tag: null
+                }
             };
 
             indexHTML = [
@@ -198,13 +203,27 @@
             });
         });
 
+        describe('transforming the experience', function() {
+            beforeEach(function(done) {
+                config.collateralBase = 'http://www.cinema6.com/foo/test';
+                run();
+                setTimeout(done, 2);
+            });
+
+            it('should resolve properties on the "img" object to full urls', function() {
+                expect(exp.img.test).toBe(config.collateralBase + '/foo.jpg');
+                expect(exp.img.foo).toBe(config.collateralBase + '/hello/test.jpg');
+                expect(exp.img.tag).toBeNull();
+            });
+        });
+
         describe('fetching index.html', function() {
             describe('if in debug mode', function() {
                 beforeEach(function(done) {
                     config.debug = true;
 
                     run();
-                    setTimeout(done, 2);
+                    setTimeout(done, 3);
                 });
 
                 it('should fetch the index file from the dev box', function() {
@@ -215,7 +234,7 @@
             describe('if not in debug mode', function() {
                 beforeEach(function(done) {
                     run();
-                    setTimeout(done, 2);
+                    setTimeout(done, 3);
                 });
 
                 it('should fetch the index file from the dev box', function() {
@@ -231,7 +250,7 @@
                     $window.history.replaceState = function() {};
 
                     run();
-                    setTimeout(done, 3);
+                    setTimeout(done, 4);
                 });
 
                 it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer', function() {
@@ -254,7 +273,7 @@
             describe('if the browser does not support history.replaceState()', function() {
                 beforeEach(function(done) {
                     run();
-                    setTimeout(done, 3);
+                    setTimeout(done, 4);
                 });
 
                 it('should write the contents of index.html into the iframe with a base tag to fix relative urls', function() {
@@ -278,7 +297,7 @@
         describe('communicating with the application', function() {
             beforeEach(function(done) {
                 run();
-                setTimeout(done, 4);
+                setTimeout(done, 5);
             });
 
             it('should register the experience', function() {

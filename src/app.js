@@ -79,6 +79,19 @@ module.exports = function(deps) {
         ]);
     }
 
+    function transformExperience(data) {
+        var experience = data[0];
+
+        var img = experience.img,
+            key;
+
+        for (key in img) {
+            img[key] = img[key] && config.collateralBase + '/' + img[key];
+        }
+
+        return data;
+    }
+
     function fetchIndex(data) {
         var experience = data[0],
             $iframe = data[1];
@@ -136,6 +149,7 @@ module.exports = function(deps) {
     /* Execute the chain */
     return createFrame()
         .then(fetchExperience)
+        .then(transformExperience)
         .then(fetchIndex)
         .then(loadApp)
         .then(communicateWithApp);
