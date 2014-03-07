@@ -71,7 +71,7 @@ module.exports = function(deps) {
             $container,
             $iframe = $('<iframe src="about:blank" width="' +
                         width + '" height="' + height +
-                        '" scrolling="yes" style="border: none;" class="c6__cant-touch-this">');
+                        '" scrolling="no" style="border: none;" class="c6__cant-touch-this">');
 
         if (isResponsive) {
             $container = $([

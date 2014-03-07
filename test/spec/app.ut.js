@@ -186,7 +186,7 @@
                     expect($iframe[0].height).toBe(config.height);
                     expect($iframe[0].width).toBe(config.width);
                     expect($iframe.prop('style').border).toBe('none');
-                    expect($iframe[0].scrolling).toBe('yes');
+                    expect($iframe[0].scrolling).toBe('no');
                     expect($iframe.classes()).toContain('c6__cant-touch-this');
 
                     expect($iframe[0].previousSibling).toBe($script[0]);
@@ -216,7 +216,7 @@
                     expect($iframe.prop('style').position).toBe('absolute');
                     expect($iframe.prop('style').top).toBe('0px');
                     expect($iframe.prop('style').left).toBe('0px');
-                    expect($iframe[0].scrolling).toBe('yes');
+                    expect($iframe[0].scrolling).toBe('no');
                     expect($iframe.classes()).toContain('c6__cant-touch-this');
 
                     expect($container[0].previousSibling).toBe($script[0]);
