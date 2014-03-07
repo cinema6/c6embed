@@ -77,7 +77,7 @@ module.exports = function(deps) {
             $container = $([
                 '<div id="c6-responsive"',
                 '    class="c6__cant-touch-this"',
-                '    style="position: relative; width:100%; height:0; box-sizing: border-box; -moz-box-sizing: border-box;">'
+                '    style="position: relative; width:100%; height:0; box-sizing: border-box; -moz-box-sizing: border-box; font-size: 16px;">'
             ].join(''));
 
             $iframe.css({
@@ -171,12 +171,12 @@ module.exports = function(deps) {
             session.on('fullscreenMode', function(fullscreen) {
                 setFullscreen($iframe, fullscreen);
             });
+        });
 
-            session.on('responsiveStyles', function(styles) {
-                if ($container) {
-                    $container.css(styles);
-                }
-            });
+        session.on('responsiveStyles', function(styles) {
+            if ($container) {
+                $container.css(styles);
+            }
         });
 
         return 'Success! Every went according to plan!';

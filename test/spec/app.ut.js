@@ -205,7 +205,7 @@
                         $script = config.$script;
 
                     expect($container.length).toBe(1);
-                    expect($container.attr('style')).toBe('position: relative; width:100%; height:0; box-sizing: border-box; -moz-box-sizing: border-box;');
+                    expect($container.attr('style')).toBe('position: relative; width:100%; height:0; box-sizing: border-box; -moz-box-sizing: border-box; font-size: 16px;');
                     expect($container.classes()).toContain('c6__cant-touch-this');
 
                     expect($iframe.length).toBe(1);
