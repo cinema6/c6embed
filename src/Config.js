@@ -11,6 +11,7 @@ module.exports = function(deps) {
     this.experienceId = $thisScript.attr('data-exp');
     this.width = $thisScript.attr('data-width');
     this.height = $thisScript.attr('data-height');
+    this.responsive = !this.width && !this.height;
 
     this.src = $thisScript.attr('src');
     this.$script = $thisScript;
