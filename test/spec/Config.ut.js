@@ -9,6 +9,7 @@
 
         var $window,
             $document,
+            myScriptData,
             myScript,
             scripts;
 
@@ -23,6 +24,15 @@
             Config = require('../../src/Config');
             C6Query = require('../../lib/C6Query');
 
+            myScriptData = {
+                attributes: {
+                    src: 'embed.js',
+                    'data-exp': 'e-4cb24cfbe4f2fc',
+                    'data-height': '300',
+                    'data-width': '100%'
+                }
+            };
+
             scripts = [
                 new MockElement({
                     attributes: {
@@ -34,14 +44,7 @@
                         src: 'test.js'
                     }
                 }),
-                new MockElement({
-                    attributes: {
-                        src: 'embed.js',
-                        'data-exp': 'e-4cb24cfbe4f2fc',
-                        'data-height': '300',
-                        'data-width': '100%'
-                    }
-                })
+                new MockElement(myScriptData)
             ];
 
             myScript = scripts[2];
@@ -91,6 +94,20 @@
             config = new Config({ document: $document, window: $window, $: $ });
 
             expect(config.collateralBase).toBe('https://s3.amazonaws.com/c6.dev/media/src/site/collateral');
+        });
+
+        it('should be responsive if a width and height are not set', function() {
+            expect(config.responsive).toBe(false);
+
+            delete myScriptData.attributes['data-height'];
+            config = new Config({ document: $document, window: $window, $: $ });
+
+            expect(config.responsive).toBe(false);
+
+            delete myScriptData.attributes['data-width'];
+            config = new Config({ document: $document, window: $window, $: $ });
+
+            expect(config.responsive).toBe(true);
         });
     });
 }());
