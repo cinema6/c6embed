@@ -27,10 +27,11 @@ module.exports = function(deps) {
                 height: '100%',
                 zIndex: 999999999999999
             },
+            originalStyles = $element.data('originalStyles'),
             prop;
 
         for (prop in fullscreenStyles) {
-            $element.css(prop, bool ? fullscreenStyles[prop] : '');
+            $element.css(prop, bool ? fullscreenStyles[prop] : originalStyles[prop] || '');
         }
 
         if (bool) {
@@ -71,7 +72,8 @@ module.exports = function(deps) {
             $container,
             $iframe = $('<iframe src="about:blank" width="' +
                         width + '" height="' + height +
-                        '" scrolling="no" style="border: none;" class="c6__cant-touch-this">');
+                        '" scrolling="no" style="border: none;" class="c6__cant-touch-this">'),
+            styles = {};
 
         if (isResponsive) {
             $container = $([
@@ -88,6 +90,12 @@ module.exports = function(deps) {
 
             $container.append($iframe);
         }
+
+        $($iframe.prop('style')).forEach(function(style) {
+            styles[style] = $iframe.prop('style')[style];
+        });
+
+        $iframe.data('originalStyles', styles);
 
         ($container || $iframe).insertAfter($script);
 

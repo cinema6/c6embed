@@ -371,6 +371,29 @@
             });
         });
 
+        describe('in responsive mode', function() {
+            describe('when the experience requests to leave fullscreen', function() {
+                beforeEach(function(done) {
+                    config.responsive = true;
+                    run();
+                    setTimeout(function() {
+                        session.trigger('ready', true);
+                        done();
+                    }, 5);
+                });
+
+                it('should revert its styling back to the original styles', function() {
+                    var $iframe = $('.mr-container iframe'),
+                        originalStyle = $iframe.attr('style');
+
+                    session.trigger('fullscreenMode', true);
+                    session.trigger('fullscreenMode', false);
+
+                    expect($iframe.attr('style')).toBe(originalStyle);
+                });
+            });
+        });
+
         describe('communicating with the application', function() {
             beforeEach(function(done) {
                 run();
