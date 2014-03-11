@@ -98,7 +98,12 @@
 
             exp = {
                 id: 'e-dbc8133f4d41a7',
-                appUri: 'minireel'
+                appUri: 'minireel',
+                img: {
+                    test: 'foo.jpg',
+                    foo: 'hello/test.jpg',
+                    tag: null
+                }
             };
 
             indexHTML = [
@@ -169,21 +174,53 @@
         });
 
         describe('creating the iframe', function() {
-            beforeEach(run);
+            describe('if width and height are explicit', function() {
+                beforeEach(run);
 
-            it('should create an empty iframe after the script tag', function() {
-                var $iframe = $('div.mr-container iframe'),
-                    $script = config.$script;
+                it('should create an empty iframe after the script tag', function() {
+                    var $iframe = $('div.mr-container iframe'),
+                        $script = config.$script;
 
-                expect($iframe.length).toBe(1);
-                expect($iframe[0].src).toBe('about:blank');
-                expect($iframe[0].height).toBe(config.height);
-                expect($iframe[0].width).toBe(config.width);
-                expect($iframe.prop('style').border).toBe('none');
-                expect($iframe[0].scrolling).toBe('yes');
-                expect($iframe.classes()).toContain('c6__cant-touch-this');
+                    expect($iframe.length).toBe(1);
+                    expect($iframe[0].src).toBe('about:blank');
+                    expect($iframe[0].height).toBe(config.height);
+                    expect($iframe[0].width).toBe(config.width);
+                    expect($iframe.prop('style').border).toBe('none');
+                    expect($iframe[0].scrolling).toBe('no');
+                    expect($iframe.classes()).toContain('c6__cant-touch-this');
 
-                expect($iframe[0].previousSibling).toBe($script[0]);
+                    expect($iframe[0].previousSibling).toBe($script[0]);
+                });
+            });
+
+            describe('if it should be responsive', function() {
+                beforeEach(function() {
+                    config.responsive = true;
+                    run();
+                });
+
+                it('should put the iframe in a special responsive container', function() {
+                    var $container = $('#c6-responsive'),
+                        $iframe = $('#c6-responsive>iframe'),
+                        $script = config.$script;
+
+                    expect($container.length).toBe(1);
+                    expect($container.attr('style')).toBe('position: relative; width:100%; height:0; box-sizing: border-box; -moz-box-sizing: border-box; font-size: 16px;');
+                    expect($container.classes()).toContain('c6__cant-touch-this');
+
+                    expect($iframe.length).toBe(1);
+                    expect($iframe[0].src).toBe('about:blank');
+                    expect($iframe[0].height).toBe('100%');
+                    expect($iframe[0].width).toBe('100%');
+                    expect($iframe.prop('style').border).toBe('none');
+                    expect($iframe.prop('style').position).toBe('absolute');
+                    expect($iframe.prop('style').top).toBe('0px');
+                    expect($iframe.prop('style').left).toBe('0px');
+                    expect($iframe[0].scrolling).toBe('no');
+                    expect($iframe.classes()).toContain('c6__cant-touch-this');
+
+                    expect($container[0].previousSibling).toBe($script[0]);
+                });
             });
         });
 
@@ -198,13 +235,27 @@
             });
         });
 
+        describe('transforming the experience', function() {
+            beforeEach(function(done) {
+                config.collateralBase = 'http://www.cinema6.com/foo/test';
+                run();
+                setTimeout(done, 2);
+            });
+
+            it('should resolve properties on the "img" object to full urls', function() {
+                expect(exp.img.test).toBe(config.collateralBase + '/foo.jpg');
+                expect(exp.img.foo).toBe(config.collateralBase + '/hello/test.jpg');
+                expect(exp.img.tag).toBeNull();
+            });
+        });
+
         describe('fetching index.html', function() {
             describe('if in debug mode', function() {
                 beforeEach(function(done) {
                     config.debug = true;
 
                     run();
-                    setTimeout(done, 2);
+                    setTimeout(done, 3);
                 });
 
                 it('should fetch the index file from the dev box', function() {
@@ -215,7 +266,7 @@
             describe('if not in debug mode', function() {
                 beforeEach(function(done) {
                     run();
-                    setTimeout(done, 2);
+                    setTimeout(done, 3);
                 });
 
                 it('should fetch the index file from the dev box', function() {
@@ -231,7 +282,7 @@
                     $window.history.replaceState = function() {};
 
                     run();
-                    setTimeout(done, 3);
+                    setTimeout(done, 4);
                 });
 
                 it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer', function() {
@@ -254,7 +305,7 @@
             describe('if the browser does not support history.replaceState()', function() {
                 beforeEach(function(done) {
                     run();
-                    setTimeout(done, 3);
+                    setTimeout(done, 4);
                 });
 
                 it('should write the contents of index.html into the iframe with a base tag to fix relative urls', function() {
@@ -275,10 +326,78 @@
             });
         });
 
+        describe('setting responsive styles', function() {
+            describe('if the experience is responsive', function() {
+                beforeEach(function(done) {
+                    config.responsive = true;
+                    run();
+                    setTimeout(function() {
+                        session.trigger('ready', true);
+                        done();
+                    }, 5);
+                });
+
+                it('should give the container the provided styles', function() {
+                    var styles = {
+                            paddingTop: '10px',
+                            minHeight: '20%',
+                            maxHeight: '35%'
+                        },
+                        $container = $('#c6-responsive');
+
+                    session.trigger('responsiveStyles', styles);
+
+                    expect($container.css('minHeight')).toBe('20%');
+                    expect($container.css('maxHeight')).toBe('35%');
+                    expect($container.css('padding-top')).toBe('10px');
+                });
+            });
+
+            describe('if the experience is not responsive', function() {
+                beforeEach(function(done) {
+                    config.responsive = false;
+                    run();
+                    setTimeout(function() {
+                        session.trigger('ready', true);
+                        done();
+                    }, 5);
+                });
+
+                it('should do nothing destructive', function() {
+                    expect(function() {
+                        session.trigger('responsiveStyles', {});
+                    }).not.toThrow();
+                });
+            });
+        });
+
+        describe('in responsive mode', function() {
+            describe('when the experience requests to leave fullscreen', function() {
+                beforeEach(function(done) {
+                    config.responsive = true;
+                    run();
+                    setTimeout(function() {
+                        session.trigger('ready', true);
+                        done();
+                    }, 5);
+                });
+
+                it('should revert its styling back to the original styles', function() {
+                    var $iframe = $('.mr-container iframe'),
+                        originalStyle = $iframe.attr('style');
+
+                    session.trigger('fullscreenMode', true);
+                    session.trigger('fullscreenMode', false);
+
+                    expect($iframe.attr('style')).toBe(originalStyle);
+                });
+            });
+        });
+
         describe('communicating with the application', function() {
             beforeEach(function(done) {
                 run();
-                setTimeout(done, 4);
+                setTimeout(done, 5);
             });
 
             it('should register the experience', function() {

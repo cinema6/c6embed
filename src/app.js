@@ -27,10 +27,11 @@ module.exports = function(deps) {
                 height: '100%',
                 zIndex: 999999999999999
             },
+            originalStyles = $element.data('originalStyles'),
             prop;
 
         for (prop in fullscreenStyles) {
-            $element.css(prop, bool ? fullscreenStyles[prop] : '');
+            $element.css(prop, bool ? fullscreenStyles[prop] : originalStyles[prop] || '');
         }
 
         if (bool) {
@@ -65,27 +66,75 @@ module.exports = function(deps) {
     /* SUPER-DUPER ASYNC PROMISE CHAIN STARTS HERE */
     function createFrame() {
         var $script = config.$script,
+            isResponsive = config.responsive,
+            width = isResponsive ? '100%' : config.width,
+            height = isResponsive ? '100%' : config.height,
+            $container,
             $iframe = $('<iframe src="about:blank" width="' +
-                        config.width + '" height="' + config.height +
-                        '" scrolling="yes" style="border: none;" class="c6__cant-touch-this">');
+                        width + '" height="' + height +
+                        '" scrolling="no" style="border: none;" class="c6__cant-touch-this">'),
+            styles = {};
 
-        return q.when($iframe.insertAfter($script));
+        if (isResponsive) {
+            $container = $([
+                '<div id="c6-responsive"',
+                '    class="c6__cant-touch-this"',
+                '    style="position: relative; width:100%; height:0; box-sizing: border-box; -moz-box-sizing: border-box; font-size: 16px;">'
+            ].join(''));
+
+            $iframe.css({
+                position: 'absolute',
+                top: 0,
+                left: 0
+            });
+
+            $container.append($iframe);
+        }
+
+        $($iframe.prop('style')).forEach(function(style) {
+            styles[style] = $iframe.prop('style')[style];
+        });
+
+        $iframe.data('originalStyles', styles);
+
+        ($container || $iframe).insertAfter($script);
+
+        return q.when([$iframe, $container]);
     }
 
-    function fetchExperience($iframe) {
+    function fetchExperience(data) {
+        var $iframe = data[0],
+            $container = data[1];
+
         return q.all([
             c6Db.find('experience', config.experienceId),
-            $iframe
+            $iframe,
+            $container
         ]);
+    }
+
+    function transformExperience(data) {
+        var experience = data[0];
+
+        var img = experience.img,
+            key;
+
+        for (key in img) {
+            img[key] = img[key] && config.collateralBase + '/' + img[key];
+        }
+
+        return data;
     }
 
     function fetchIndex(data) {
         var experience = data[0],
-            $iframe = data[1];
+            $iframe = data[1],
+            $container = data[2];
 
         return q.all([
             experience,
             $iframe,
+            $container,
             c6Ajax.get(appUrl(experience.appUri) + '/index.html')
                 .then(function(response) {
                     return response.data;
@@ -97,7 +146,8 @@ module.exports = function(deps) {
         /* jshint scripturl:true */
         var experience = data[0],
             $iframe = data[1],
-            indexHTML = data[2];
+            $container = data[2],
+            indexHTML = data[3];
 
         var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
             pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
@@ -115,12 +165,13 @@ module.exports = function(deps) {
         $iframe.attr('data-srcdoc', indexHTML);
         $iframe.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
 
-        return [experience, $iframe];
+        return [experience, $iframe, $container];
     }
 
     function communicateWithApp(data) {
         var experience = data[0],
-            $iframe = data[1];
+            $iframe = data[1],
+            $container = data[2];
 
         var session = experienceService.registerExperience(experience, $iframe.prop('contentWindow'));
 
@@ -130,12 +181,19 @@ module.exports = function(deps) {
             });
         });
 
+        session.on('responsiveStyles', function(styles) {
+            if ($container) {
+                $container.css(styles);
+            }
+        });
+
         return 'Success! Every went according to plan!';
     }
 
     /* Execute the chain */
     return createFrame()
         .then(fetchExperience)
+        .then(transformExperience)
         .then(fetchIndex)
         .then(loadApp)
         .then(communicateWithApp);

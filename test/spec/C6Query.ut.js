@@ -441,6 +441,17 @@
                         expect($('ul')[0].nextSibling).toBe($div[0]);
                     });
                 });
+
+                describe('append(selector)', function() {
+                    it('should insert the specified selector into the target', function() {
+                        var $div = $('<div>'),
+                            $child = $('<span>Hello</span>');
+
+                        expect($div.append($child)).toBe($div);
+
+                        expect($child[0].parentNode).toBe($div[0]);
+                    });
+                });
             });
         });
     });
