@@ -46,7 +46,7 @@
                     success = jasmine.createSpy('findAll() success');
                     failure = jasmine.createSpy('findAll() failure');
 
-                    result = [{}, {}, {}];
+                    result = { data: [{}, {}, {}], status: 200 };
 
                     c6Ajax.get.and.returnValue(q.when(result));
                 });
@@ -55,7 +55,7 @@
                     adapter._services.content.findAll('experience')
                         .then(success, failure)
                         .finally(function() {
-                            expect(success).toHaveBeenCalledWith(result);
+                            expect(success).toHaveBeenCalledWith(result.data);
                             done();
                         });
 
@@ -72,10 +72,13 @@
                     failure = jasmine.createSpy('find() failure');
 
                     result = {
-                        id: 'e1',
                         data: {
-                            test: 'foo'
-                        }
+                            id: 'e1',
+                            data: {
+                                test: 'foo'
+                            }
+                        },
+                        status: 200
                     };
 
                     c6Ajax.get.and.returnValue(q.when(result));
@@ -85,7 +88,7 @@
                     adapter._services.content.find('expgroup', 'e1')
                         .then(success, failure)
                         .finally(function() {
-                            expect(success).toHaveBeenCalledWith([result]);
+                            expect(success).toHaveBeenCalledWith([result.data]);
                             done();
                         });
 
@@ -101,12 +104,15 @@
                     success = jasmine.createSpy('findQuery() success');
                     failure = jasmine.createSpy('findQuery() failure');
 
-                    result = [
-                        {
-                            id: 'e3',
-                            type: 'foo'
-                        }
-                    ];
+                    result = {
+                        data: [
+                            {
+                                id: 'e3',
+                                type: 'foo'
+                            }
+                        ],
+                        status: 200
+                    };
 
                     c6Ajax.get.and.returnValue(q.when(result));
                 });
@@ -117,7 +123,7 @@
                     adapter._services.content.findQuery('experience', query)
                         .then(success, failure)
                         .finally(function() {
-                            expect(success).toHaveBeenCalledWith(result);
+                            expect(success).toHaveBeenCalledWith(result.data);
                             done();
                         });
 
