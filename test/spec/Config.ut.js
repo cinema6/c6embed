@@ -87,6 +87,15 @@
             expect(config.debug).toBe(true);
         });
 
+        it('should set the apiBase based on the __C6_DEBUG__ flag', function() {
+            expect(config.apiBase).toBe('http://cinema6.com/api');
+
+            $window.__C6_DEBUG__ = true;
+            config = new Config({ document: $document, window: $window, $: $ });
+
+            expect(config.apiBase).toBe('http://staging.cinema6.com/api');
+        });
+
         it('should set the base collateral directory based on the debug mode', function() {
             expect(config.collateralBase).toBe('http://cinema6.com/collateral');
 

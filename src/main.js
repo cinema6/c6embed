@@ -73,17 +73,17 @@
         });
 
     /* Create and Configure C6DB */
-    var FixtureAdapter = require('../lib/c6db/adapters/Fixture'),
+    var Cinema6Adapter = require('../lib/c6db/adapters/Cinema6'),
         C6DB = require('../lib/c6db/C6DB'),
-        adapter = new FixtureAdapter({
+        cinema6Adapter = new Cinema6Adapter({
             c6Ajax: c6Ajax,
             q: q
         }),
         c6Db = new C6DB({
             q: q
         });
-    adapter.jsonSrc = 'http://s3.amazonaws.com/c6.dev/mock/fixtures.json';
-    c6Db.adapter = adapter;
+    cinema6Adapter.apiBase = config.apiBase;
+    c6Db.adapter = cinema6Adapter;
 
     /* Run the Application! */
     return app({
