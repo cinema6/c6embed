@@ -154,6 +154,25 @@ module.exports = function(deps) {
             matchHead = indexHTML.match(/<head>/),
             headEndIndex = matchHead.index + matchHead[0].length;
 
+        // It is very important for IE <= 10 that an event listener
+        // for "load" is placed on the window. Really, we don't
+        // even need to wait for the load before proceeding, but
+        // I figured it couldn't hurt to wait. If the "load"
+        // handler is removed those versions of IE will fail in
+        // strange ways to do postMessage communication.
+        function waitForLoad(object) {
+            var deferred = q.defer();
+
+            object.onload = function() {
+                deferred.resolve(object);
+            };
+            object.onerror = function() {
+                deferred.reject(object);
+            };
+
+            return deferred.promise;
+        }
+
         indexHTML = [
             indexHTML.slice(0, headEndIndex),
             baseTag,
@@ -165,7 +184,7 @@ module.exports = function(deps) {
         $iframe.attr('data-srcdoc', indexHTML);
         $iframe.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
 
-        return [experience, $iframe, $container];
+        return [experience, $iframe, $container, waitForLoad($iframe.prop('contentWindow'))];
     }
 
     function communicateWithApp(data) {
@@ -173,6 +192,8 @@ module.exports = function(deps) {
             $iframe = data[1],
             $container = data[2];
 
+        // It is also important that the window object is accessed through the iframe here, even
+        // though it is technically accessible as the fourth member of the data array.
         var session = experienceService.registerExperience(experience, $iframe.prop('contentWindow'));
 
         session.once('ready', function() {
