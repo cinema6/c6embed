@@ -118,7 +118,26 @@
             ].join('\n');
 
             $window = {
-                history: {}
+                history: {},
+                addEventListener: jasmine.createSpy('window.addEventListener()')
+                    .and.callFake(function(event, handler) {
+                        var handlers = this._handlers[event] = (this._handlers[event] || []);
+
+                        handlers.push(handler);
+                    }),
+                removeEventListener: jasmine.createSpy('window.removeEventListener()')
+                    .and.callFake(function(event, handler) {
+                        var handlers = this._handlers[event] = (this._handlers[event] || []);
+
+                        handlers.splice(handlers.indexOf(handler), 1);
+                    }),
+                _handlers: {},
+                trigger: function(event) {
+                    (this._handlers[event] || []).forEach(function(handler) {
+                        handler({});
+                    });
+                },
+                scrollTo: jasmine.createSpy('window.scrollTo()')
             };
 
             config = {
@@ -454,6 +473,21 @@
                     it('should not mess with elements that have the c6__cant-touch-this class', function() {
                         expect($('.c6__cant-touch-this').css('position')).toBe('fixed');
                     });
+
+                    it('should scroll the window to the top', function() {
+                        expect($window.scrollTo).toHaveBeenCalledWith(0);
+                    });
+
+                    it('should scroll to the top whenever the device orientation changes', function() {
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(2);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(3);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(4);
+                    });
                 });
 
                 describe('when the experience requests to leave fullscreen', function() {
@@ -486,6 +520,17 @@
 
                         expect($fixed.css('position')).toBe('fixed');
                         expect($fixed.hasClass('c6__play-that-funky-music-white-boy')).toBe(false);
+                    });
+
+                    it('should not trigger a scroll to the top', function() {
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(1);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(1);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(1);
                     });
                 });
             });

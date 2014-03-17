@@ -16,6 +16,10 @@ module.exports = function(deps) {
             'http://cinema6.com/experiences/') + url;
     }
 
+    function scrollTop() {
+        $window.scrollTo(0);
+    }
+
     function setFullscreen($element, bool) {
         var fullscreenStyles = {
                 position: 'fixed',
@@ -35,6 +39,10 @@ module.exports = function(deps) {
         }
 
         if (bool) {
+            $window.scrollTo(0);
+
+            $window.addEventListener('orientationchange', scrollTop, false);
+
             $('body>*').forEachNode(function(node, parent) {
                 var $node = $(node),
                     style = node.style;
@@ -59,6 +67,8 @@ module.exports = function(deps) {
                 }
             });
         } else {
+            $window.removeEventListener('orientationchange', scrollTop, false);
+
             $('.c6__play-that-funky-music-white-boy').revertTo(0);
         }
     }
