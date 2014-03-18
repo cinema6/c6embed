@@ -3,14 +3,53 @@
 
     describe('BrowserInfo', function() {
         var BrowserInfo,
-            browserInfo;
+            C6Query,
+            browserInfo,
+            $;
 
         var userAgent,
             modernizr,
-            mockWindow;
+            mockWindow,
+            testFrame,
+            testDoc;
 
-        beforeEach(function() {
+        beforeEach(function(done) {
+            var body = document.getElementsByTagName('body')[0];
+
+            function waitForReady() {
+                if (testDoc.readyState === 'complete') {
+                    done();
+                } else {
+                    setTimeout(waitForReady, 50);
+                }
+            }
+
+            testFrame = document.createElement('iframe');
+
+            testFrame.src = 'about:blank';
+            testFrame.width = '800';
+            testFrame.height = '600';
+
+            body.appendChild(testFrame);
+            testDoc = testFrame.contentWindow.document;
+
+            testDoc.open('text/html', 'replace');
+            testDoc.write([
+                '<html>',
+                '    <head>',
+                '        <title>My Page</title>',
+                '    </head>',
+                '    <body>',
+                '        <p>Hello World!</p>',
+                '    </body>',
+                '</html>'
+            ].join('\n'));
+            testDoc.close();
+
+            setTimeout(waitForReady, 50);
+
             BrowserInfo = require('../../lib/BrowserInfo');
+            C6Query = require('../../lib/C6Query');
 
             mockWindow = {
                 screen: {
@@ -49,7 +88,13 @@
                 }
             };
 
-            browserInfo = new BrowserInfo({ userAgent: userAgent, modernizr: modernizr, window: mockWindow });
+            $ = new C6Query({ window: testFrame.contentWindow, document: testDoc });
+
+            browserInfo = new BrowserInfo({ userAgent: userAgent, modernizr: modernizr, window: mockWindow, $: $ });
+        });
+
+        afterEach(function() {
+            document.getElementsByTagName('body')[0].removeChild(testFrame);
         });
 
         it('should exist', function() {
@@ -68,6 +113,89 @@
             describe('methods', function() {
                 describe('generateProfile()', function() {
                     var profile;
+
+                    describe('on an iOS device running >= iOS 7.1', function() {
+                        beforeEach(function() {
+                            userAgent.app.name = 'safari';
+                            userAgent.os.name = 'ios';
+                            userAgent.os.version = '7.1.0';
+                            userAgent.device.isIOS = function() { return true; };
+                        });
+
+                        describe('minimalUi', function() {
+                            describe('if there are no viewport metatags', function() {
+                                beforeEach(function() {
+                                    profile = browserInfo.generateProfile();
+                                });
+
+                                it('should be false', function() {
+                                    expect(profile.minimalUi).toBe(false);
+                                });
+                            });
+
+                            describe('if there are viewport metatags, but minimal-ui is not set', function() {
+                                beforeEach(function() {
+                                    var $viewport1 = $('<meta name="viewport" content="width=device-width">'),
+                                        $viewport2 = $('<meta name="viewport" content="initial-scale=2.3, user-scalable=no">'),
+                                        $head = $('head');
+
+                                    $head.append($viewport1);
+                                    $head.append($viewport2);
+
+                                    profile = browserInfo.generateProfile();
+                                });
+
+                                it('should be false', function() {
+                                    expect(profile.minimalUi).toBe(false);
+                                });
+                            });
+
+                            describe('if the minimal-ui value is set', function() {
+                                beforeEach(function() {
+                                    var $viewport1 = $('<meta name="viewport" content="width=device-width">'),
+                                        $viewport2 = $('<meta name="viewport" content="initial-scale=2.3,user-scalable=no, minimal-ui">'),
+                                        $head = $('head');
+
+                                    $head.append($viewport1);
+                                    $head.append($viewport2);
+
+                                    profile = browserInfo.generateProfile();
+                                });
+
+                                it('should be true', function() {
+                                    expect(profile.minimalUi).toBe(true);
+                                });
+                            });
+                        });
+                    });
+
+                    describe('on an iOS device running < iOS 7.1', function() {
+                        beforeEach(function() {
+                            userAgent.app.name = 'safari';
+                            userAgent.os.name = 'ios';
+                            userAgent.os.version = '7.0.6';
+                            userAgent.device.isIOS = function() { return true; };
+                        });
+
+                        describe('minimalUi', function() {
+                            describe('if the minimal-ui value is set', function() {
+                                beforeEach(function() {
+                                    var $viewport1 = $('<meta name="viewport" content="width=device-width,minimal-ui">'),
+                                        $viewport2 = $('<meta name="viewport" content="initial-scale=2.3,user-scalable=no">'),
+                                        $head = $('head');
+
+                                    $head.append($viewport1);
+                                    $head.append($viewport2);
+
+                                    profile = browserInfo.generateProfile();
+                                });
+
+                                it('should be false', function() {
+                                    expect(profile.minimalUi).toBe(false);
+                                });
+                            });
+                        });
+                    });
 
                     describe('on an iOS device running < iOS 7', function() {
                         beforeEach(function() {

@@ -52,7 +52,8 @@
         browserInfo = new BrowserInfo({
             modernizr: modernizr,
             window: window,
-            userAgent: userAgent
+            userAgent: userAgent,
+            $: c6Query
         });
 
     /* Create Experience */
