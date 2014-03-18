@@ -202,13 +202,13 @@
 
                     expect($iframe.length).toBe(1);
                     expect($iframe[0].src).toBe('about:blank');
-                    expect($iframe[0].height).toBe(config.height);
+                    expect($iframe[0].height).toBe('0');
                     expect($iframe[0].width).toBe(config.width);
                     expect($iframe.prop('style').border).toBe('none');
                     expect($iframe[0].scrolling).toBe('no');
                     expect($iframe.classes()).toContain('c6__cant-touch-this');
 
-                    expect($iframe[0].previousSibling).toBe($script[0]);
+                    expect($iframe[0].previousSibling.previousSibling).toBe($script[0]);
                 });
             });
 
@@ -229,7 +229,7 @@
 
                     expect($iframe.length).toBe(1);
                     expect($iframe[0].src).toBe('about:blank');
-                    expect($iframe[0].height).toBe('100%');
+                    expect($iframe[0].height).toBe('0');
                     expect($iframe[0].width).toBe('100%');
                     expect($iframe.prop('style').border).toBe('none');
                     expect($iframe.prop('style').position).toBe('absolute');
@@ -238,8 +238,16 @@
                     expect($iframe[0].scrolling).toBe('no');
                     expect($iframe.classes()).toContain('c6__cant-touch-this');
 
-                    expect($container[0].previousSibling).toBe($script[0]);
+                    expect($container[0].previousSibling.previousSibling).toBe($script[0]);
                 });
+            });
+
+            it('should create a placeholder div after the script', function() {
+                var $script = config.$script;
+
+                run();
+
+                expect($($script[0].nextSibling).prop('id')).toBe('c6-placeholder');
             });
         });
 
@@ -374,7 +382,7 @@
 
             describe('if the experience is not responsive', function() {
                 beforeEach(function(done) {
-                    config.responsive = false;
+                    config.responsive = true;
                     run();
                     setTimeout(function() {
                         session.trigger('ready', true);
@@ -411,6 +419,29 @@
                     expect($iframe.attr('style')).toBe(originalStyle);
                 });
             });
+
+            describe('when the experience is ready', function() {
+                beforeEach(function(done) {
+                    config.responsive = true;
+                    run();
+                    setTimeout(function() {
+                        $('.mr-container iframe')[0].contentWindow.onload();
+                        setTimeout(function() {
+                            session.trigger('ready', true);
+                            done();
+                        });
+                    }, 5);
+                });
+
+                it('should set the iframe to be 100% of the responsive container', function() {
+                    var $iframe = $('.mr-container iframe'),
+                        $responsive = $('#c6-responsive');
+
+                    $responsive.css('height', '300px');
+
+                    expect($iframe.css('height')).toBe($responsive.css('height'));
+                });
+            });
         });
 
         describe('communicating with the application', function() {
@@ -430,6 +461,18 @@
 
                 it('should listen for the fullscreenMode event', function() {
                     expect(session.on).toHaveBeenCalledWith('fullscreenMode', jasmine.any(Function));
+                });
+
+                it('should remove the placeholder', function() {
+                    var $script = config.$script;
+
+                    expect($script[0].nextSibling).toBe($('.mr-container iframe')[0]);
+                });
+
+                it('should set the iframe to the correct height', function() {
+                    var $iframe = $('.mr-container iframe');
+
+                    expect($iframe.css('height')).toBe('200px');
                 });
 
                 describe('when the experience requests fullscreen', function() {

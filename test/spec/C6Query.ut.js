@@ -452,6 +452,18 @@
                         expect($child[0].parentNode).toBe($div[0]);
                     });
                 });
+
+                describe('remove()', function() {
+                    it('should remove the elements of the selector from the DOM', function() {
+                        var $lis = $('li');
+
+                        $lis.remove();
+
+                        $lis.forEach(function(li) {
+                            expect(li.parentNode).toBeNull();
+                        });
+                    });
+                });
             });
         });
     });
