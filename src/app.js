@@ -78,11 +78,16 @@ module.exports = function(deps) {
         var $script = config.$script,
             isResponsive = config.responsive,
             width = isResponsive ? '100%' : config.width,
-            height = isResponsive ? '100%' : config.height,
+            cssWidth = isResponsive ? width : width + 'px',
             $container,
             $iframe = $('<iframe src="about:blank" width="' +
-                        width + '" height="' + height +
-                        '" scrolling="no" style="border: none;" class="c6__cant-touch-this">'),
+                        width + '" height="0" scrolling="no" ' +
+                        'style="border: none;" class="c6__cant-touch-this">'),
+            $placeholder = $(
+                '<div id="c6-placeholder" style=" width: ' + cssWidth + '; height: 7em; padding-top: 6em;  font-size: 16px; text-align: center; line-height: 1; font-style: normal; background: #f2f2f2; color: #898989">' +
+                    'Preparing your Video Experience&#8230;' +
+                '</div>'
+            ),
             styles = {};
 
         if (isResponsive) {
@@ -108,19 +113,15 @@ module.exports = function(deps) {
         $iframe.data('originalStyles', styles);
 
         ($container || $iframe).insertAfter($script);
+        $placeholder.insertAfter($script);
 
-        return q.when([$iframe, $container]);
+        return q.when([$iframe, $container, $placeholder]);
     }
 
     function fetchExperience(data) {
-        var $iframe = data[0],
-            $container = data[1];
+        data.unshift(c6Db.find('experience', config.experienceId));
 
-        return q.all([
-            c6Db.find('experience', config.experienceId),
-            $iframe,
-            $container
-        ]);
+        return q.all(data);
     }
 
     function transformExperience(data) {
@@ -137,27 +138,21 @@ module.exports = function(deps) {
     }
 
     function fetchIndex(data) {
-        var experience = data[0],
-            $iframe = data[1],
-            $container = data[2];
+        var experience = data[0];
 
-        return q.all([
-            experience,
-            $iframe,
-            $container,
-            c6Ajax.get(appUrl(experience.appUri) + '/index.html')
-                .then(function(response) {
-                    return response.data;
-                })
-        ]);
+        data.unshift(c6Ajax.get(appUrl(experience.appUri) + '/index.html')
+            .then(function(response) {
+                return response.data;
+            }));
+
+        return q.all(data);
     }
 
     function loadApp(data) {
         /* jshint scripturl:true */
-        var experience = data[0],
-            $iframe = data[1],
-            $container = data[2],
-            indexHTML = data[3];
+        var indexHTML = data[0],
+            experience = data[1],
+            $iframe = data[2];
 
         var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
             pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
@@ -194,19 +189,25 @@ module.exports = function(deps) {
         $iframe.attr('data-srcdoc', indexHTML);
         $iframe.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
 
-        return [experience, $iframe, $container, waitForLoad($iframe.prop('contentWindow'))];
+        data.push(waitForLoad($iframe.prop('contentWindow')));
+
+        return data;
     }
 
     function communicateWithApp(data) {
-        var experience = data[0],
-            $iframe = data[1],
-            $container = data[2];
+        var experience = data[1],
+            $iframe = data[2],
+            $container = data[3],
+            $placeholder = data[4];
 
         // It is also important that the window object is accessed through the iframe here, even
         // though it is technically accessible as the fourth member of the data array.
         var session = experienceService.registerExperience(experience, $iframe.prop('contentWindow'));
 
         session.once('ready', function() {
+            $placeholder.remove();
+            $iframe.prop('height', config.responsive ? '100%' : config.height);
+
             session.on('fullscreenMode', function(fullscreen) {
                 setFullscreen($iframe, fullscreen);
             });
