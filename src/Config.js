@@ -17,7 +17,7 @@ module.exports = function(deps) {
     this.$script = $thisScript;
     this.debug = !!$window.__C6_DEBUG__;
     this.collateralBase = this.debug ?
-        'https://s3.amazonaws.com/c6.dev/media/src/site/collateral' :
+        'https://staging.cinema6.com/collateral' :
         'http://cinema6.com/collateral';
     this.apiBase = this.debug ?
         'http://staging.cinema6.com/api' :

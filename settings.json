@@ -13,12 +13,12 @@
     "defaultE2EEnv": "browserstack",
     "s3": {
         "test": {
-            "bucket": "c6.dev",
-            "collateral": "media/src/site/collateral/",
-            "app": "content/<%= package.name %>/"
+            "bucket": "staging.cinema6.com-api",
+            "collateral": "collateral/",
+            "app": "experiences/<%= package.name %>/"
         },
         "production": {
-            "bucket": "cinema6.com-etc",
+            "bucket": "cinema6.com-api",
             "collateral": "collateral/",
             "app": "experiences/<%= package.name %>/"
         }

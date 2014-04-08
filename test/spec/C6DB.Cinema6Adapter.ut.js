@@ -59,7 +59,7 @@
                             done();
                         });
 
-                    expect(c6Ajax.get).toHaveBeenCalledWith('http://cinema6.com/api/content/experiences');
+                    expect(c6Ajax.get).toHaveBeenCalledWith('http://cinema6.com/api/content/public/experiences');
                 });
             });
 
@@ -92,7 +92,7 @@
                             done();
                         });
 
-                    expect(c6Ajax.get).toHaveBeenCalledWith('http://cinema6.com/api/content/expgroup/e1');
+                    expect(c6Ajax.get).toHaveBeenCalledWith('http://cinema6.com/api/content/public/expgroup/e1');
                 });
             });
 
@@ -127,7 +127,7 @@
                             done();
                         });
 
-                    expect(c6Ajax.get).toHaveBeenCalledWith('http://cinema6.com/api/content/experiences', {
+                    expect(c6Ajax.get).toHaveBeenCalledWith('http://cinema6.com/api/content/public/experiences', {
                         params: query
                     });
                 });

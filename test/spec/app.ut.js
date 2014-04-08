@@ -12,7 +12,8 @@
             c6Ajax,
             experience,
             config,
-            $window;
+            $window,
+            browserInfo;
 
         var testFrame,
             testDoc,
@@ -29,7 +30,7 @@
         }
 
         function run() {
-            app({ config: config, q: q, c6Db: c6Db, c6Ajax: c6Ajax, experience: experience, window: $window, $: $ });
+            app({ config: config, q: q, c6Db: c6Db, c6Ajax: c6Ajax, experience: experience, window: $window, $: $, browserInfo : browserInfo });
         }
 
         beforeEach(function(done) {
@@ -185,6 +186,12 @@
                             return q.when(exp);
                         }
                     })
+            };
+
+            browserInfo = {
+                profile : {
+                    device : null 
+                }
             };
         });
 
@@ -475,8 +482,9 @@
                     expect($iframe.css('height')).toBe('200px');
                 });
 
-                describe('when the experience requests fullscreen', function() {
+                describe('when the experience requests fullscreen on a phone', function() {
                     beforeEach(function() {
+                        browserInfo.profile.device = 'phone';
                         session.trigger('fullscreenMode', true);
                     });
 
@@ -533,8 +541,51 @@
                     });
                 });
 
-                describe('when the experience requests to leave fullscreen', function() {
+                describe('when the experience requests fullscreen on desktop',function(){
                     beforeEach(function() {
+                        browserInfo.profile.device = 'desktop';
+                        session.trigger('fullscreenMode', true);
+                    });
+
+                    it('should shrink the site down to an itty-bitty thang', function() {
+                        var $body = $('body'),
+                            $firstChildren = $($body[0].childNodes),
+                            $fixed = $('.fixed');
+
+                        $firstChildren.forEach(function(child) {
+                            if (child instanceof testFrame.contentWindow.Text) { return; }
+
+                            var $child = $(child);
+
+                            expect($child.css('position')).toBe('static');
+                            expect($child.css('height')).toBe('300px');
+                            expect($child.css('overflow')).toBe('visible');
+                            expect($child.classes()).toContain('container');
+                        });
+
+                        expect($fixed.classes()).toContain('fixed');
+                        expect($fixed.css('position')).toBe('fixed');
+                    });
+                    
+                    it('should not scroll the window to the top', function() {
+                        expect($window.scrollTo).not.toHaveBeenCalled();
+                    });
+
+                    it('should not scroll to the top whenever the device orientation changes', function() {
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(0);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(0);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(0);
+                    });
+                });
+
+                describe('when the experience requests to leave fllscrn on mobile', function() {
+                    beforeEach(function() {
+                        browserInfo.profile.device = 'phone';
                         session.trigger('fullscreenMode', true);
                         session.trigger('fullscreenMode', false);
                     });

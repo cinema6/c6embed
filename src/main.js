@@ -94,7 +94,8 @@
         c6Ajax: c6Ajax,
         experience: experience,
         window: window,
-        $: c6Query
+        $: c6Query,
+        browserInfo: browserInfo
     })
         .then(function(result) {
             if (!window.console) { return; }
