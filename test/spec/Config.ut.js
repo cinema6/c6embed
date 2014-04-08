@@ -102,7 +102,7 @@
             $window.__C6_DEBUG__ = true;
             config = new Config({ document: $document, window: $window, $: $ });
 
-            expect(config.collateralBase).toBe('https://s3.amazonaws.com/c6.dev/media/src/site/collateral');
+            expect(config.collateralBase).toBe('https://staging.cinema6.com/collateral');
         });
 
         it('should be responsive if a width and height are not set', function() {
