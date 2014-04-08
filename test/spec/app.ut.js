@@ -145,7 +145,8 @@
                 experienceId: 'e-dbc8133f4d41a7',
                 $script: $('#mockScript'),
                 width: '100%',
-                height: '200'
+                height: '200',
+                expBase : 'http://cinema6.com/experiences'
             };
 
             experience = {
@@ -158,7 +159,7 @@
             c6Ajax = jasmine.createSpy('c6Ajax()')
                 .and.callFake(function(config) {
                     if (config.method === 'GET') {
-                        if (config.url === 'http://s3.amazonaws.com/c6.dev/content/minireel/index.html' ||
+                        if (config.url === 'http://staging.cinema6.com/experiences/minireel/index.html' ||
                             config.url === 'http://cinema6.com/experiences/minireel/index.html') {
 
                             return q.when({
@@ -286,14 +287,13 @@
         describe('fetching index.html', function() {
             describe('if in debug mode', function() {
                 beforeEach(function(done) {
-                    config.debug = true;
-
+                    config.expBase = 'http://staging.cinema6.com/experiences';
                     run();
                     setTimeout(done, 3);
                 });
 
                 it('should fetch the index file from the dev box', function() {
-                    expect(c6Ajax.get).toHaveBeenCalledWith('http://s3.amazonaws.com/c6.dev/content/minireel/index.html');
+                    expect(c6Ajax.get).toHaveBeenCalledWith('http://staging.cinema6.com/experiences/minireel/index.html');
                 });
             });
 

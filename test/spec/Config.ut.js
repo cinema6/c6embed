@@ -96,13 +96,22 @@
             expect(config.apiBase).toBe('http://staging.cinema6.com/api');
         });
 
+        it('should set the expBase based on the __C6_DEBUG__ flag', function() {
+            expect(config.expBase).toBe('http://cinema6.com/experiences');
+
+            $window.__C6_DEBUG__ = true;
+            config = new Config({ document: $document, window: $window, $: $ });
+
+            expect(config.expBase).toBe('http://staging.cinema6.com/experiences');
+        });
+
         it('should set the base collateral directory based on the debug mode', function() {
             expect(config.collateralBase).toBe('http://cinema6.com/collateral');
 
             $window.__C6_DEBUG__ = true;
             config = new Config({ document: $document, window: $window, $: $ });
 
-            expect(config.collateralBase).toBe('https://staging.cinema6.com/collateral');
+            expect(config.collateralBase).toBe('http://staging.cinema6.com/collateral');
         });
 
         it('should be responsive if a width and height are not set', function() {

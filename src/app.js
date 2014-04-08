@@ -12,9 +12,7 @@ module.exports = function(deps) {
 
     /* HELPER FUNCTIONS */
     function appUrl(url) {
-        return (config.debug ?
-            'http://s3.amazonaws.com/c6.dev/content/' :
-            'http://cinema6.com/experiences/') + url;
+        return config.expBase + '/' + url;
     }
 
     function scrollTop() {

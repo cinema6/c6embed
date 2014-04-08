@@ -17,8 +17,11 @@ module.exports = function(deps) {
     this.$script = $thisScript;
     this.debug = !!$window.__C6_DEBUG__;
     this.collateralBase = this.debug ?
-        'https://staging.cinema6.com/collateral' :
+        'http://staging.cinema6.com/collateral' :
         'http://cinema6.com/collateral';
+    this.expBase = this.debug ?
+        'http://staging.cinema6.com/experiences' :
+        'http://cinema6.com/experiences';
     this.apiBase = this.debug ?
         'http://staging.cinema6.com/api' :
         'http://cinema6.com/api';
