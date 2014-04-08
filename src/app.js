@@ -7,7 +7,8 @@ module.exports = function(deps) {
         c6Ajax = deps.c6Ajax,
         experienceService = deps.experience,
         $window = deps.window,
-        $ = deps.$;
+        $ = deps.$,
+        browserInfo = deps.browserInfo;
 
     /* HELPER FUNCTIONS */
     function appUrl(url) {
@@ -38,6 +39,11 @@ module.exports = function(deps) {
             $element.css(prop, bool ? fullscreenStyles[prop] : originalStyles[prop] || '');
         }
 
+        // No scrolling magic if we are not a phone
+        if (browserInfo.profile.device !== 'phone'){
+            return;
+        }
+         
         if (bool) {
             $window.scrollTo(0);
 
