@@ -146,7 +146,7 @@
                 $script: $('#mockScript'),
                 width: '100%',
                 height: '200',
-                expBase : 'http://cinema6.com/experiences',
+                experienceBase : 'http://cinema6.com/experiences',
                 env: 'production'
             };
 
@@ -288,7 +288,7 @@
         describe('fetching index.html', function() {
             describe('if in debug mode', function() {
                 beforeEach(function(done) {
-                    config.expBase = 'http://staging.cinema6.com/experiences';
+                    config.experienceBase = 'http://staging.cinema6.com/experiences';
                     run();
                     setTimeout(done, 3);
                 });

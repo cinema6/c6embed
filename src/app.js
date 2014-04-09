@@ -12,7 +12,7 @@ module.exports = function(deps) {
 
     /* HELPER FUNCTIONS */
     function appUrl(url) {
-        return config.expBase + '/' + url;
+        return config.experienceBase + '/' + url;
     }
 
     function scrollTop() {
