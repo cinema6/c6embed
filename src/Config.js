@@ -15,14 +15,9 @@ module.exports = function(deps) {
 
     this.src = $thisScript.attr('src');
     this.$script = $thisScript;
-    this.debug = !!$window.__C6_DEBUG__;
-    this.collateralBase = this.debug ?
-        'http://staging.cinema6.com/collateral' :
-        'http://cinema6.com/collateral';
-    this.expBase = this.debug ?
-        'http://staging.cinema6.com/experiences' :
-        'http://cinema6.com/experiences';
-    this.apiBase = this.debug ?
-        'http://staging.cinema6.com/api' :
-        'http://cinema6.com/api';
+    this.env            = ($window.__C6_ENV__ || 'production').toLowerCase();
+    this.urlRoot        = ($window.__C6_URL_ROOT__ || 'http://cinema6.com');
+    this.collateralBase = ($window.__C6_BASE_COL__ || (this.urlRoot + '/collateral'));
+    this.experienceBase = ($window.__C6_BASE_EXP__ || (this.urlRoot + '/experiences'));
+    this.apiBase        = ($window.__C6_BASE_API__ || (this.urlRoot + '/api'));
 };
