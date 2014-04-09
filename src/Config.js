@@ -15,7 +15,9 @@ module.exports = function(deps) {
 
     this.src = $thisScript.attr('src');
     this.$script = $thisScript;
-    this.debug = !!$window.__C6_DEBUG__;
+    this.env = ($window.__C6_ENV__ || 'production').toLowerCase();
+    this.debug = ($window.__C6_DEBUG__ === undefined) ?
+        (this.env !== 'production') : !!$window.__C6_DEBUG__;
     this.collateralBase = this.debug ?
         'http://staging.cinema6.com/collateral' :
         'http://cinema6.com/collateral';

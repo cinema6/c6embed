@@ -146,7 +146,8 @@
                 $script: $('#mockScript'),
                 width: '100%',
                 height: '200',
-                expBase : 'http://cinema6.com/experiences'
+                expBase : 'http://cinema6.com/experiences',
+                env: 'production'
             };
 
             experience = {
@@ -324,7 +325,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kEnv:\'production\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -347,7 +348,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/">',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kEnv:\'production\'};</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',

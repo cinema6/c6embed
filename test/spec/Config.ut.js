@@ -50,7 +50,6 @@
             myScript = scripts[2];
 
             $window = {};
-
             $document = {
                 getElementsByTagName: jasmine.createSpy('$document.getElementsByTagName()')
                     .and.callFake(function(name) {
@@ -79,10 +78,35 @@
             expect(config.width).toBe('100%');
         });
 
+        it('should set Config.env to production if __C6_ENV__ is not set', function(){
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.env).toEqual('production');
+        });
+
+        it('should set Config.env to __C6_ENV__ if __C6_ENV__ is set', function(){
+            $window.__C6_ENV__ = 'staging';
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.env).toEqual('staging');
+        });
+
+        it('should set Config.env to lc(__C6_ENV__) if __C6_ENV__ is set', function(){
+            $window.__C6_ENV__ = 'Staging';
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.env).toEqual('staging');
+        });
+
         it('should set a debug flag if the __C6_DEBUG__ flag is set', function() {
             expect(config.debug).toBe(false);
 
             $window.__C6_DEBUG__ = true;
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.debug).toBe(true);
+        });
+
+        it('should set a debug flag if the __C6_DEBUG__ flag is not set and __C6_ENV__ is not "production"',function(){
+            expect(config.debug).toBe(false);
+
+            $window.__C6_ENV__ = 'test';
             config = new Config({ document: $document, window: $window, $: $ });
             expect(config.debug).toBe(true);
         });
