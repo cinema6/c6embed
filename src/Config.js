@@ -15,9 +15,9 @@ module.exports = function(deps) {
 
     this.src = $thisScript.attr('src');
     this.$script = $thisScript;
-    this.env            = ($window.__C6_ENV__ || 'production').toLowerCase();
+    this.debug          = !!$window.__C6_DEBUG__;
     this.urlRoot        = ($window.__C6_URL_ROOT__ || 'http://cinema6.com');
-    this.collateralBase = ($window.__C6_BASE_COL__ || (this.urlRoot + '/collateral'));
-    this.experienceBase = ($window.__C6_BASE_EXP__ || (this.urlRoot + '/experiences'));
-    this.apiBase        = ($window.__C6_BASE_API__ || (this.urlRoot + '/api'));
+    this.collateralBase = (this.urlRoot + '/collateral');
+    this.experienceBase = (this.urlRoot + '/experiences');
+    this.apiBase        = (this.urlRoot + '/api');
 };

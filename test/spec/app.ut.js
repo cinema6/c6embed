@@ -147,7 +147,8 @@
                 width: '100%',
                 height: '200',
                 experienceBase : 'http://cinema6.com/experiences',
-                env: 'production'
+                urlRoot: 'http://cinema6.com',
+                debug: true
             };
 
             experience = {
@@ -325,7 +326,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kEnv:\'production\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -348,7 +349,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kEnv:\'production\'};</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kEnvUrlRoot:\'http://cinema6.com\'};</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',

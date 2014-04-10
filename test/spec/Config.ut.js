@@ -78,21 +78,15 @@
             expect(config.width).toBe('100%');
         });
 
-        it('should set Config.env to production if __C6_ENV__ is not set', function(){
+        it('should set Config.debug to false if __C6_DEBUG__ is not set', function(){
             config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.env).toEqual('production');
+            expect(config.debug).toEqual(false);
         });
 
-        it('should set Config.env to __C6_ENV__ if __C6_ENV__ is set', function(){
-            $window.__C6_ENV__ = 'staging';
+        it('should set Config.debug to __C6_DEBUG__ if __C6_DEBUG__ is set', function(){
+            $window.__C6_DEBUG__ = true;
             config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.env).toEqual('staging');
-        });
-
-        it('should set Config.env to lc(__C6_ENV__) if __C6_ENV__ is set', function(){
-            $window.__C6_ENV__ = 'Staging';
-            config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.env).toEqual('staging');
+            expect(config.debug).toEqual(true);
         });
 
         it('should set urlBase to http://cinema6.com if __C6_URL_ROOT__ is not set',function(){
@@ -106,40 +100,22 @@
             expect(config.urlRoot).toBe('http://staging.cinema6.com');
         });
 
-        it('should set the apiBase based on urlBase if no __C6_BASE_API__ ', function() {
+        it('should set the apiBase based on urlBase', function() {
             $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
             config = new Config({ document: $document, window: $window, $: $ });
             expect(config.apiBase).toBe('http://staging.cinema6.com/api');
         });
 
-        it('should set the apiBase based on __C6_BASE_API__ if set', function() {
-            $window.__C6_BASE_API__ = 'http://applesauce.com/api';
-            config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.apiBase).toBe('http://applesauce.com/api');
-        });
-
-        it('should set the experienceBase based on urlBase if no __C6_BASE_EXP__ ', function() {
+        it('should set the experienceBase based on urlBase', function() {
             $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
             config = new Config({ document: $document, window: $window, $: $ });
             expect(config.experienceBase).toBe('http://staging.cinema6.com/experiences');
         });
 
-        it('should set the experienceBase based on __C6_BASE_EXP__ if set', function() {
-            $window.__C6_BASE_EXP__ = 'http://applesauce.com/experiences';
-            config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.experienceBase).toBe('http://applesauce.com/experiences');
-        });
-        
-        it('should set the collBase based on urlBase if no __C6_BASE_COL__ ', function() {
+        it('should set the collBase based on urlBase', function() {
             $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
             config = new Config({ document: $document, window: $window, $: $ });
             expect(config.collateralBase).toBe('http://staging.cinema6.com/collateral');
-        });
-
-        it('should set the collBase based on __C6_BASE_COL__ if set', function() {
-            $window.__C6_BASE_COL__ = 'http://applesauce.com/collateral';
-            config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.collateralBase).toBe('http://applesauce.com/collateral');
         });
 
         it('should be responsive if a width and height are not set', function() {
