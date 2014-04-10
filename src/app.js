@@ -159,7 +159,10 @@ module.exports = function(deps) {
             $iframe = data[2];
 
         var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
-            envTag  = '<script>window.c6={kEnv:\'' + config.env + '\'};</script>',
+            envTag  = '<script>window.c6={'+
+                'kDebug:'        + config.debug + ',' +
+                'kEnvUrlRoot:\'' + config.urlRoot + '\'' +
+                '};</script>',
             pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
             matchHead = indexHTML.match(/<head>/),
             headEndIndex = matchHead.index + matchHead[0].length;
