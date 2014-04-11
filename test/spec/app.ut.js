@@ -15,7 +15,8 @@
             $window,
             browserInfo;
 
-        var testFrame,
+        var tracker,
+            testFrame,
             testDoc,
             exp,
             session,
@@ -25,7 +26,7 @@
             asEvented.call(this);
 
             spyOn(this, 'on').and.callThrough();
-
+            this.ping = jasmine.createSpy('session.ping');
             session = this;
         }
 
@@ -629,6 +630,63 @@
                         expect($window.scrollTo.calls.count()).toBe(1);
                     });
                 });
+            });
+
+        });
+
+        describe('google analytics',function(){
+            beforeEach(function(){
+                config.gaAcctId = 'abc';
+                tracker = {
+                    get : jasmine.createSpy('tracker.get')
+                };
+                tracker.get.and.returnValue('fake_client_id');
+
+                $window.__c6_ga__ = jasmine.createSpy('window.__c6_ga__');
+                $window.__c6_ga__.getByName = jasmine.createSpy('ga.getByName')
+                    .and.returnValue(tracker);
+            });
+            it('sends /embed-app page view',function(done){
+                run();
+                setTimeout(function(){
+                    expect($window.__c6_ga__.calls.argsFor(0)).toEqual(['c6.send','pageview',
+                        { 
+                            page : '/embed-app?experienceId=e-dbc8133f4d41a7',
+                            title : 'c6Embed App' 
+                    }]);
+                    done();
+                },1);
+            });
+
+            it('sends a ping if it gets a clientId',function(done){
+                run();
+                setTimeout(function(){
+                    $window.__c6_ga__.calls.mostRecent().args[0]();
+                    expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
+                    expect(tracker.get).toHaveBeenCalledWith('clientId');
+                    expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id' } );
+                    done();
+                },1);
+            });
+
+            it('sends no ping if it gets no clientId',function(done){
+                tracker.get.and.returnValue(undefined);
+                run();
+                setTimeout(function(){
+                    $window.__c6_ga__.calls.mostRecent().args[0]();
+                    expect(session.ping).not.toHaveBeenCalled();
+                    done();
+                },1);
+            });
+
+            it('sends no ping if no tracker is returned',function(done){
+                $window.__c6_ga__.getByName.and.returnValue(undefined);
+                run();
+                setTimeout(function(){
+                    $window.__c6_ga__.calls.mostRecent().args[0]();
+                    expect(session.ping).not.toHaveBeenCalled();
+                    done();
+                },1);
             });
         });
     });

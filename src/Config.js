@@ -20,4 +20,5 @@ module.exports = function(deps) {
     this.collateralBase = (this.urlRoot + '/collateral');
     this.experienceBase = (this.urlRoot + '/experiences');
     this.apiBase        = (this.urlRoot + '/api');
+    this.gaAcctId       = 'UA-44457821-2';
 };
