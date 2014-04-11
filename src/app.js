@@ -233,7 +233,7 @@ module.exports = function(deps) {
             'title' : 'c6Embed App'
         });
 
-        $window.__c6_ga__(function(tracker){
+        $window.__c6_ga__(function(){
             var tracker = $window.__c6_ga__.getByName('c6'), clientId;
             try {
                 clientId = tracker.get('clientId');
