@@ -227,7 +227,28 @@ module.exports = function(deps) {
                 $container.css(styles);
             }
         });
+      
+        $window.__c6_ga__('c6.send', 'pageview', {
+            'page'  : '/embed-app?experienceId=' + config.experienceId,
+            'title' : 'c6Embed App'
+        });
 
+        $window.__c6_ga__(function(tracker){
+            var tracker = $window.__c6_ga__.getByName('c6'), clientId;
+            try {
+                clientId = tracker.get('clientId');
+            }catch(e){
+                
+            }
+
+            if (clientId){
+                session.ping('initAnalytics',{
+                    accountId: config.gaAcctId,
+                    clientId:   clientId
+                });
+            }
+        });
+        
         return 'Success! Every went according to plan!';
     }
 

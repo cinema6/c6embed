@@ -86,6 +86,20 @@
     cinema6Adapter.apiBase = config.apiBase;
     c6Db.adapter = cinema6Adapter;
 
+
+    /* Create GA Tracker */
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+
+    window.__c6_ga__('create', config.gaAcctId, { 'name' : 'c6' });
+    
+    window.__c6_ga__('c6.send', 'pageview', {
+        'page'  : '/embed-main?experienceId=' + config.experienceId,
+        'title' : 'c6Embed Main'
+    });
+
     /* Run the Application! */
     return app({
         config: config,
