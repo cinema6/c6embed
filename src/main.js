@@ -93,7 +93,10 @@
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
 
-    window.__c6_ga__('create', config.gaAcctId, { 'name' : 'c6' });
+    window.__c6_ga__('create', config.gaAcctId, {
+        'name'       : 'c6',
+        'cookieName' : '_c6ga'
+    });
     
     window.__c6_ga__('c6.send', 'pageview', {
         'page'  : '/embed-main?experienceId=' + config.experienceId,
