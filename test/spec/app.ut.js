@@ -139,7 +139,8 @@
                         handler({});
                     });
                 },
-                scrollTo: jasmine.createSpy('window.scrollTo()')
+                scrollTo: jasmine.createSpy('window.scrollTo()'),
+                __c6_ga__ : jasmine.createSpy('window.__c6_ga__')
             };
 
             config = {
@@ -642,7 +643,7 @@
                 };
                 tracker.get.and.returnValue('fake_client_id');
 
-                $window.__c6_ga__ = jasmine.createSpy('window.__c6_ga__');
+//                $window.__c6_ga__ = jasmine.createSpy('window.__c6_ga__');
                 $window.__c6_ga__.getByName = jasmine.createSpy('ga.getByName')
                     .and.returnValue(tracker);
             });
@@ -661,6 +662,7 @@
             it('sends a ping if it gets a clientId',function(done){
                 run();
                 setTimeout(function(){
+                    session.trigger('ready', true);
                     $window.__c6_ga__.calls.mostRecent().args[0]();
                     expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
                     expect(tracker.get).toHaveBeenCalledWith('clientId');
@@ -673,6 +675,7 @@
                 tracker.get.and.returnValue(undefined);
                 run();
                 setTimeout(function(){
+                    session.trigger('ready', true);
                     $window.__c6_ga__.calls.mostRecent().args[0]();
                     expect(session.ping).not.toHaveBeenCalled();
                     done();
@@ -683,6 +686,7 @@
                 $window.__c6_ga__.getByName.and.returnValue(undefined);
                 run();
                 setTimeout(function(){
+                    session.trigger('ready', true);
                     $window.__c6_ga__.calls.mostRecent().args[0]();
                     expect(session.ping).not.toHaveBeenCalled();
                     done();
