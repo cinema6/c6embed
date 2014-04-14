@@ -647,12 +647,12 @@
                 $window.__c6_ga__.getByName = jasmine.createSpy('ga.getByName')
                     .and.returnValue(tracker);
             });
-            it('sends /embed-app page view',function(done){
+            it('sends /embed/app page view',function(done){
                 run();
                 setTimeout(function(){
                     expect($window.__c6_ga__.calls.argsFor(0)).toEqual(['c6.send','pageview',
                         { 
-                            page : '/embed-app?experienceId=e-dbc8133f4d41a7',
+                            page : '/embed/app?experienceId=e-dbc8133f4d41a7',
                             title : 'c6Embed App' 
                     }]);
                     done();

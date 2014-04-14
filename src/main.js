@@ -99,7 +99,7 @@
     });
     
     window.__c6_ga__('c6.send', 'pageview', {
-        'page'  : '/embed-main?experienceId=' + config.experienceId,
+        'page'  : '/embed/main?experienceId=' + config.experienceId,
         'title' : 'c6Embed Main'
     });
 

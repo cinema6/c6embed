@@ -245,7 +245,7 @@ module.exports = function(deps) {
         });
       
         $window.__c6_ga__('c6.send', 'pageview', {
-            'page'  : '/embed-app?experienceId=' + config.experienceId,
+            'page'  : '/embed/app?experienceId=' + config.experienceId,
             'title' : 'c6Embed App'
         });
 
