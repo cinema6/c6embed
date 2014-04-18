@@ -530,7 +530,7 @@
                     });
 
                     it('should scroll the window to the top', function() {
-                        expect($window.scrollTo).toHaveBeenCalledWith(0);
+                        expect($window.scrollTo).toHaveBeenCalledWith(0, 0);
                     });
 
                     it('should scroll to the top whenever the device orientation changes', function() {

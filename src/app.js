@@ -41,9 +41,9 @@ module.exports = function(deps) {
         if (browserInfo.profile.device !== 'phone'){
             return;
         }
-         
+
         if (bool) {
-            $window.scrollTo(0);
+            $window.scrollTo(0, 0);
 
             $window.addEventListener('orientationchange', scrollTop, false);
 
@@ -220,13 +220,14 @@ module.exports = function(deps) {
             session.on('fullscreenMode', function(fullscreen) {
                 setFullscreen($iframe, fullscreen);
             });
-            
+
+            /* jshint camelcase:false */
             $window.__c6_ga__(function(){
                 var tracker = $window.__c6_ga__.getByName('c6'), clientId;
                 try {
                     clientId = tracker.get('clientId');
                 }catch(e){
-                    
+
                 }
 
                 if (clientId){
@@ -243,7 +244,8 @@ module.exports = function(deps) {
                 $container.css(styles);
             }
         });
-      
+
+        /* jshint camelcase:false */
         $window.__c6_ga__('c6.send', 'pageview', {
             'page'  : '/embed/app?experienceId=' + config.experienceId,
             'title' : 'c6Embed App'
