@@ -99,6 +99,7 @@
         'name'       : 'c6',
         'cookieName' : '_c6ga'
     });
+    window.__c6_ga__('c6.require', 'displayfeatures');
 
     window.__c6_ga__('c6.send', 'pageview', {
         'page'  : '/embed/main?experienceId=' + config.experienceId,
