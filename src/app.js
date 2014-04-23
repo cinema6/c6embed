@@ -156,13 +156,13 @@ module.exports = function(deps) {
         /* jshint scripturl:true */
         var indexHTML = data[0],
             experience = data[1],
-            $iframe = data[2],
-            mode    = (browserInfo.profile.device === 'phone') ? 'mobile' : experience.mode;
+            $iframe = data[2];
 
         var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
             envTag  = '<script>window.c6={'+
                 'kDebug:'        + config.debug + ',' +
-                'kMode:\''         + mode + '\',' +
+                'kMode:\''         + experience.mode + '\',' +
+                'kDevice:\''       + browserInfo.profile.device + '\',' +
                 'kEnvUrlRoot:\'' + config.urlRoot + '\'' +
                 '};</script>',
             pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',

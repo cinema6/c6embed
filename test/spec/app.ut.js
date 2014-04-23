@@ -195,7 +195,7 @@
 
             browserInfo = {
                 profile : {
-                    device : null 
+                    device : 'desktop' 
                 }
             };
         });
@@ -328,7 +328,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kDevice:\'desktop\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -354,7 +354,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'mobile\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kDevice:\'phone\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -378,7 +378,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kEnvUrlRoot:\'http://cinema6.com\'};</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kDevice:\'desktop\',kEnvUrlRoot:\'http://cinema6.com\'};</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
