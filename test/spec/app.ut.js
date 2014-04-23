@@ -318,17 +318,43 @@
             describe('if the browser supports history.replaceState()', function() {
                 beforeEach(function(done) {
                     $window.history.replaceState = function() {};
-
+                    exp.mode = 'lightbox';
                     run();
                     setTimeout(done, 4);
                 });
 
-                it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer', function() {
+                it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer, mode=lightbox', function() {
                     var $iframe = $('.mr-container iframe');
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '        <title>My Title</title>',
+                        '    </head>',
+                        '    <body>',
+                        '        <h1>This is the file!</h1>',
+                        '    </body>',
+                        '</html>'
+                    ].join('\n'));
+                    expect(decodeURI($iframe.prop('src'))).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
+                });
+            });
+
+            describe('if mobile the browser supports history.replaceState()', function() {
+                beforeEach(function(done) {
+                    $window.history.replaceState = function() {};
+                    browserInfo.profile.device = 'phone';
+                    exp.mode = 'lightbox';
+                    run();
+                    setTimeout(done, 4);
+                });
+
+                it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer, mode=mobile', function() {
+                    var $iframe = $('.mr-container iframe');
+
+                    expect($iframe.attr('data-srcdoc')).toBe([
+                        '<html>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'mobile\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -342,6 +368,7 @@
 
             describe('if the browser does not support history.replaceState()', function() {
                 beforeEach(function(done) {
+                    exp.mode = 'lightbox';
                     run();
                     setTimeout(done, 4);
                 });
@@ -351,7 +378,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kEnvUrlRoot:\'http://cinema6.com\'};</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kEnvUrlRoot:\'http://cinema6.com\'};</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
