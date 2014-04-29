@@ -1,6 +1,6 @@
 {
   "name": "c6embed",
-  "version": "0.2.0",
+  "version": "0.8.1",
   "description": "Script to embed Cinema6 experiences.",
   "keywords": [
     "c6embed"
@@ -10,7 +10,7 @@
     "q": "~1.0.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "grunt": "^0.4.4",
     "load-grunt-config": "git://github.com/firstandthird/load-grunt-config",
     "grunt-git-assist": "git+ssh://git@github.com:cinema6/grunt-git-assist",
     "connect-livereload": "~0.3.0",
@@ -18,14 +18,6 @@
     "grunt-open": "~0.2.2",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-jshint": "~0.7.2",
-    "karma-script-launcher": "~0.1.0",
-    "karma-chrome-launcher": "~0.1.1",
-    "karma-html2js-preprocessor": "~0.1.0",
-    "karma-firefox-launcher": "~0.1.2",
-    "karma-coffee-preprocessor": "~0.1.1",
-    "karma-phantomjs-launcher": "~0.1.1",
-    "karma": "~0.10.8",
-    "grunt-karma": "~0.6.2",
     "protractor": "~0.14.0",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-uglify": "~0.2.7",
@@ -35,11 +27,21 @@
     "prompt": "~0.2.12",
     "escape-regexp": "0.0.1",
     "underscore": "~1.5.2",
-    "karma-junit-reporter": "~0.2.1",
-    "karma-commonjs": "0.0.6",
-    "karma-jasmine": "~0.2.1",
     "browserify": "~3.30.1",
-    "grunt-browserify": "~1.3.1"
+    "grunt-browserify": "~1.3.1",
+    "karma": "^0.12.4",
+    "grunt-karma": "^0.8.2",
+    "karma-chrome-launcher": "^0.1.3",
+    "karma-coffee-preprocessor": "^0.2.1",
+    "karma-commonjs": "0.0.7",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-html2js-preprocessor": "^0.1.0",
+    "karma-jasmine": "^0.2.2",
+    "karma-junit-reporter": "^0.2.1",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "requirejs": "^2.1.11",
+    "karma-requirejs": "^0.2.1",
+    "karma-script-launcher": "^0.1.0"
   },
   "engines": {
     "node": ">=0.8.0"

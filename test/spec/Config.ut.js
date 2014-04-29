@@ -50,7 +50,6 @@
             myScript = scripts[2];
 
             $window = {};
-
             $document = {
                 getElementsByTagName: jasmine.createSpy('$document.getElementsByTagName()')
                     .and.callFake(function(name) {
@@ -79,21 +78,44 @@
             expect(config.width).toBe('100%');
         });
 
-        it('should set a debug flag if the __C6_DEBUG__ flag is set', function() {
-            expect(config.debug).toBe(false);
-
-            $window.__C6_DEBUG__ = true;
+        it('should set Config.debug to false if __C6_DEBUG__ is not set', function(){
             config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.debug).toBe(true);
+            expect(config.debug).toEqual(false);
         });
 
-        it('should set the base collateral directory based on the debug mode', function() {
-            expect(config.collateralBase).toBe('http://cinema6.com/collateral');
-
+        it('should set Config.debug to __C6_DEBUG__ if __C6_DEBUG__ is set', function(){
             $window.__C6_DEBUG__ = true;
             config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.debug).toEqual(true);
+        });
 
-            expect(config.collateralBase).toBe('https://s3.amazonaws.com/c6.dev/media/src/site/collateral');
+        it('should set urlBase to http://portal.cinema6.com if __C6_URL_ROOT__ is not set',function(){
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.urlRoot).toBe('http://portal.cinema6.com');
+        });
+
+        it('should set urlBase to __C6_URL_ROOT__ if set',function(){
+            $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.urlRoot).toBe('http://staging.cinema6.com');
+        });
+
+        it('should set the apiBase based on urlBase', function() {
+            $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.apiBase).toBe('http://staging.cinema6.com/api');
+        });
+
+        it('should set the appBase based on urlBase', function() {
+            $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.appBase).toBe('http://staging.cinema6.com/apps');
+        });
+
+        it('should set the collBase based on urlBase', function() {
+            $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
+            config = new Config({ document: $document, window: $window, $: $ });
+            expect(config.collateralBase).toBe('http://staging.cinema6.com/collateral');
         });
 
         it('should be responsive if a width and height are not set', function() {

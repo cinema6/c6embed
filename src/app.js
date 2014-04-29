@@ -7,13 +7,16 @@ module.exports = function(deps) {
         c6Ajax = deps.c6Ajax,
         experienceService = deps.experience,
         $window = deps.window,
-        $ = deps.$;
+        $ = deps.$,
+        browserInfo = deps.browserInfo;
 
     /* HELPER FUNCTIONS */
     function appUrl(url) {
-        return (config.debug ?
-            'http://s3.amazonaws.com/c6.dev/content/' :
-            'http://cinema6.com/experiences/') + url;
+        return config.appBase + '/' + url;
+    }
+
+    function scrollTop() {
+        $window.scrollTo(0);
     }
 
     function setFullscreen($element, bool) {
@@ -34,7 +37,16 @@ module.exports = function(deps) {
             $element.css(prop, bool ? fullscreenStyles[prop] : originalStyles[prop] || '');
         }
 
+        // No scrolling magic if we are not a phone
+        if (browserInfo.profile.device !== 'phone'){
+            return;
+        }
+
         if (bool) {
+            $window.scrollTo(0, 0);
+
+            $window.addEventListener('orientationchange', scrollTop, false);
+
             $('body>*').forEachNode(function(node, parent) {
                 var $node = $(node),
                     style = node.style;
@@ -59,6 +71,8 @@ module.exports = function(deps) {
                 }
             });
         } else {
+            $window.removeEventListener('orientationchange', scrollTop, false);
+
             $('.c6__play-that-funky-music-white-boy').revertTo(0);
         }
     }
@@ -68,11 +82,16 @@ module.exports = function(deps) {
         var $script = config.$script,
             isResponsive = config.responsive,
             width = isResponsive ? '100%' : config.width,
-            height = isResponsive ? '100%' : config.height,
+            cssWidth = isResponsive ? width : width + 'px',
             $container,
             $iframe = $('<iframe src="about:blank" width="' +
-                        width + '" height="' + height +
-                        '" scrolling="no" style="border: none;" class="c6__cant-touch-this">'),
+                        width + '" height="0" scrolling="no" ' +
+                        'style="border: none;" class="c6__cant-touch-this">'),
+            $placeholder = $(
+                '<div id="c6-placeholder" style=" width: ' + cssWidth + '; height: 7em; padding-top: 6em;  font-size: 16px; text-align: center; line-height: 1; font-style: normal; background: #f2f2f2; color: #898989">' +
+                    'Preparing your Video Experience&#8230;' +
+                '</div>'
+            ),
             styles = {};
 
         if (isResponsive) {
@@ -98,19 +117,15 @@ module.exports = function(deps) {
         $iframe.data('originalStyles', styles);
 
         ($container || $iframe).insertAfter($script);
+        $placeholder.insertAfter($script);
 
-        return q.when([$iframe, $container]);
+        return q.when([$iframe, $container, $placeholder]);
     }
 
     function fetchExperience(data) {
-        var $iframe = data[0],
-            $container = data[1];
+        data.unshift(c6Db.find('experience', config.experienceId));
 
-        return q.all([
-            c6Db.find('experience', config.experienceId),
-            $iframe,
-            $container
-        ]);
+        return q.all(data);
     }
 
     function transformExperience(data) {
@@ -127,36 +142,56 @@ module.exports = function(deps) {
     }
 
     function fetchIndex(data) {
-        var experience = data[0],
-            $iframe = data[1],
-            $container = data[2];
+        var experience = data[0];
 
-        return q.all([
-            experience,
-            $iframe,
-            $container,
-            c6Ajax.get(appUrl(experience.appUri) + '/index.html')
-                .then(function(response) {
-                    return response.data;
-                })
-        ]);
+        data.unshift(c6Ajax.get(appUrl(experience.appUri) + '/index.html')
+            .then(function(response) {
+                return response.data;
+            }));
+
+        return q.all(data);
     }
 
     function loadApp(data) {
         /* jshint scripturl:true */
-        var experience = data[0],
-            $iframe = data[1],
-            $container = data[2],
-            indexHTML = data[3];
+        var indexHTML = data[0],
+            experience = data[1],
+            $iframe = data[2];
 
         var baseTag = '<base href="' + appUrl(experience.appUri) + '/">',
+            envTag  = '<script>window.c6={'+
+                'kDebug:'        + config.debug + ',' +
+                'kMode:\''         + experience.mode + '\',' +
+                'kDevice:\''       + browserInfo.profile.device + '\',' +
+                'kEnvUrlRoot:\'' + config.urlRoot + '\'' +
+                '};</script>',
             pushState = '<script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
             matchHead = indexHTML.match(/<head>/),
             headEndIndex = matchHead.index + matchHead[0].length;
 
+        // It is very important for IE <= 10 that an event listener
+        // for "load" is placed on the window. Really, we don't
+        // even need to wait for the load before proceeding, but
+        // I figured it couldn't hurt to wait. If the "load"
+        // handler is removed those versions of IE will fail in
+        // strange ways to do postMessage communication.
+        function waitForLoad(object) {
+            var deferred = q.defer();
+
+            object.onload = function() {
+                deferred.resolve(object);
+            };
+            object.onerror = function() {
+                deferred.reject(object);
+            };
+
+            return deferred.promise;
+        }
+
         indexHTML = [
             indexHTML.slice(0, headEndIndex),
             baseTag,
+            envTag,
             !!$window.history.replaceState ?
                 pushState : '',
             indexHTML.slice(headEndIndex)
@@ -165,19 +200,44 @@ module.exports = function(deps) {
         $iframe.attr('data-srcdoc', indexHTML);
         $iframe.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
 
-        return [experience, $iframe, $container];
+        data.push(waitForLoad($iframe.prop('contentWindow')));
+
+        return data;
     }
 
     function communicateWithApp(data) {
-        var experience = data[0],
-            $iframe = data[1],
-            $container = data[2];
+        var experience = data[1],
+            $iframe = data[2],
+            $container = data[3],
+            $placeholder = data[4];
 
+        // It is also important that the window object is accessed through the iframe here, even
+        // though it is technically accessible as the fourth member of the data array.
         var session = experienceService.registerExperience(experience, $iframe.prop('contentWindow'));
 
         session.once('ready', function() {
+            $placeholder.remove();
+            $iframe.prop('height', config.responsive ? '100%' : config.height);
+
             session.on('fullscreenMode', function(fullscreen) {
                 setFullscreen($iframe, fullscreen);
+            });
+
+            /* jshint camelcase:false */
+            $window.__c6_ga__(function(){
+                var tracker = $window.__c6_ga__.getByName('c6'), clientId;
+                try {
+                    clientId = tracker.get('clientId');
+                }catch(e){
+
+                }
+
+                if (clientId){
+                    session.ping('initAnalytics',{
+                        accountId: config.gaAcctId,
+                        clientId:   clientId
+                    });
+                }
             });
         });
 
@@ -185,6 +245,12 @@ module.exports = function(deps) {
             if ($container) {
                 $container.css(styles);
             }
+        });
+
+        /* jshint camelcase:false */
+        $window.__c6_ga__('c6.send', 'pageview', {
+            'page'  : '/embed/app?experienceId=' + config.experienceId,
+            'title' : 'c6Embed App'
         });
 
         return 'Success! Every went according to plan!';

@@ -12,9 +12,11 @@
             c6Ajax,
             experience,
             config,
-            $window;
+            $window,
+            browserInfo;
 
-        var testFrame,
+        var tracker,
+            testFrame,
             testDoc,
             exp,
             session,
@@ -24,12 +26,12 @@
             asEvented.call(this);
 
             spyOn(this, 'on').and.callThrough();
-
+            this.ping = jasmine.createSpy('session.ping');
             session = this;
         }
 
         function run() {
-            app({ config: config, q: q, c6Db: c6Db, c6Ajax: c6Ajax, experience: experience, window: $window, $: $ });
+            app({ config: config, q: q, c6Db: c6Db, c6Ajax: c6Ajax, experience: experience, window: $window, $: $, browserInfo : browserInfo });
         }
 
         beforeEach(function(done) {
@@ -118,14 +120,37 @@
             ].join('\n');
 
             $window = {
-                history: {}
+                history: {},
+                addEventListener: jasmine.createSpy('window.addEventListener()')
+                    .and.callFake(function(event, handler) {
+                        var handlers = this._handlers[event] = (this._handlers[event] || []);
+
+                        handlers.push(handler);
+                    }),
+                removeEventListener: jasmine.createSpy('window.removeEventListener()')
+                    .and.callFake(function(event, handler) {
+                        var handlers = this._handlers[event] = (this._handlers[event] || []);
+
+                        handlers.splice(handlers.indexOf(handler), 1);
+                    }),
+                _handlers: {},
+                trigger: function(event) {
+                    (this._handlers[event] || []).forEach(function(handler) {
+                        handler({});
+                    });
+                },
+                scrollTo: jasmine.createSpy('window.scrollTo()'),
+                __c6_ga__ : jasmine.createSpy('window.__c6_ga__')
             };
 
             config = {
                 experienceId: 'e-dbc8133f4d41a7',
                 $script: $('#mockScript'),
                 width: '100%',
-                height: '200'
+                height: '200',
+                appBase: 'http://cinema6.com/experiences',
+                urlRoot: 'http://cinema6.com',
+                debug: true
             };
 
             experience = {
@@ -138,7 +163,7 @@
             c6Ajax = jasmine.createSpy('c6Ajax()')
                 .and.callFake(function(config) {
                     if (config.method === 'GET') {
-                        if (config.url === 'http://s3.amazonaws.com/c6.dev/content/minireel/index.html' ||
+                        if (config.url === 'http://staging.cinema6.com/experiences/minireel/index.html' ||
                             config.url === 'http://cinema6.com/experiences/minireel/index.html') {
 
                             return q.when({
@@ -167,6 +192,12 @@
                         }
                     })
             };
+
+            browserInfo = {
+                profile : {
+                    device : 'desktop' 
+                }
+            };
         });
 
         afterEach(function() {
@@ -183,13 +214,13 @@
 
                     expect($iframe.length).toBe(1);
                     expect($iframe[0].src).toBe('about:blank');
-                    expect($iframe[0].height).toBe(config.height);
+                    expect($iframe[0].height).toBe('0');
                     expect($iframe[0].width).toBe(config.width);
                     expect($iframe.prop('style').border).toBe('none');
                     expect($iframe[0].scrolling).toBe('no');
                     expect($iframe.classes()).toContain('c6__cant-touch-this');
 
-                    expect($iframe[0].previousSibling).toBe($script[0]);
+                    expect($iframe[0].previousSibling.previousSibling).toBe($script[0]);
                 });
             });
 
@@ -210,7 +241,7 @@
 
                     expect($iframe.length).toBe(1);
                     expect($iframe[0].src).toBe('about:blank');
-                    expect($iframe[0].height).toBe('100%');
+                    expect($iframe[0].height).toBe('0');
                     expect($iframe[0].width).toBe('100%');
                     expect($iframe.prop('style').border).toBe('none');
                     expect($iframe.prop('style').position).toBe('absolute');
@@ -219,8 +250,16 @@
                     expect($iframe[0].scrolling).toBe('no');
                     expect($iframe.classes()).toContain('c6__cant-touch-this');
 
-                    expect($container[0].previousSibling).toBe($script[0]);
+                    expect($container[0].previousSibling.previousSibling).toBe($script[0]);
                 });
+            });
+
+            it('should create a placeholder div after the script', function() {
+                var $script = config.$script;
+
+                run();
+
+                expect($($script[0].nextSibling).prop('id')).toBe('c6-placeholder');
             });
         });
 
@@ -252,14 +291,13 @@
         describe('fetching index.html', function() {
             describe('if in debug mode', function() {
                 beforeEach(function(done) {
-                    config.debug = true;
-
+                    config.appBase = 'http://staging.cinema6.com/experiences';
                     run();
                     setTimeout(done, 3);
                 });
 
                 it('should fetch the index file from the dev box', function() {
-                    expect(c6Ajax.get).toHaveBeenCalledWith('http://s3.amazonaws.com/c6.dev/content/minireel/index.html');
+                    expect(c6Ajax.get).toHaveBeenCalledWith('http://staging.cinema6.com/experiences/minireel/index.html');
                 });
             });
 
@@ -280,17 +318,43 @@
             describe('if the browser supports history.replaceState()', function() {
                 beforeEach(function(done) {
                     $window.history.replaceState = function() {};
-
+                    exp.mode = 'lightbox';
                     run();
                     setTimeout(done, 4);
                 });
 
-                it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer', function() {
+                it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer, mode=lightbox', function() {
                     var $iframe = $('.mr-container iframe');
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kDevice:\'desktop\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
+                        '        <title>My Title</title>',
+                        '    </head>',
+                        '    <body>',
+                        '        <h1>This is the file!</h1>',
+                        '    </body>',
+                        '</html>'
+                    ].join('\n'));
+                    expect(decodeURI($iframe.prop('src'))).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
+                });
+            });
+
+            describe('if mobile the browser supports history.replaceState()', function() {
+                beforeEach(function(done) {
+                    $window.history.replaceState = function() {};
+                    browserInfo.profile.device = 'phone';
+                    exp.mode = 'lightbox';
+                    run();
+                    setTimeout(done, 4);
+                });
+
+                it('should write the contents of index.html into the iframe with a base tag to fix relative urls, and a replaceState() command to fix document.referrer, mode=mobile', function() {
+                    var $iframe = $('.mr-container iframe');
+
+                    expect($iframe.attr('data-srcdoc')).toBe([
+                        '<html>',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kDevice:\'phone\',kEnvUrlRoot:\'http://cinema6.com\'};</script><script>window.history.replaceState({}, "parent", window.parent.location.href);</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -304,6 +368,7 @@
 
             describe('if the browser does not support history.replaceState()', function() {
                 beforeEach(function(done) {
+                    exp.mode = 'lightbox';
                     run();
                     setTimeout(done, 4);
                 });
@@ -313,7 +378,7 @@
 
                     expect($iframe.attr('data-srcdoc')).toBe([
                         '<html>',
-                        '    <head><base href="http://cinema6.com/experiences/minireel/">',
+                        '    <head><base href="http://cinema6.com/experiences/minireel/"><script>window.c6={kDebug:true,kMode:\'lightbox\',kDevice:\'desktop\',kEnvUrlRoot:\'http://cinema6.com\'};</script>',
                         '        <title>My Title</title>',
                         '    </head>',
                         '    <body>',
@@ -355,7 +420,7 @@
 
             describe('if the experience is not responsive', function() {
                 beforeEach(function(done) {
-                    config.responsive = false;
+                    config.responsive = true;
                     run();
                     setTimeout(function() {
                         session.trigger('ready', true);
@@ -392,6 +457,29 @@
                     expect($iframe.attr('style')).toBe(originalStyle);
                 });
             });
+
+            describe('when the experience is ready', function() {
+                beforeEach(function(done) {
+                    config.responsive = true;
+                    run();
+                    setTimeout(function() {
+                        $('.mr-container iframe')[0].contentWindow.onload();
+                        setTimeout(function() {
+                            session.trigger('ready', true);
+                            done();
+                        });
+                    }, 5);
+                });
+
+                it('should set the iframe to be 100% of the responsive container', function() {
+                    var $iframe = $('.mr-container iframe'),
+                        $responsive = $('#c6-responsive');
+
+                    $responsive.css('height', '300px');
+
+                    expect($iframe.css('height')).toBe($responsive.css('height'));
+                });
+            });
         });
 
         describe('communicating with the application', function() {
@@ -413,8 +501,21 @@
                     expect(session.on).toHaveBeenCalledWith('fullscreenMode', jasmine.any(Function));
                 });
 
-                describe('when the experience requests fullscreen', function() {
+                it('should remove the placeholder', function() {
+                    var $script = config.$script;
+
+                    expect($script[0].nextSibling).toBe($('.mr-container iframe')[0]);
+                });
+
+                it('should set the iframe to the correct height', function() {
+                    var $iframe = $('.mr-container iframe');
+
+                    expect($iframe.css('height')).toBe('200px');
+                });
+
+                describe('when the experience requests fullscreen on a phone', function() {
                     beforeEach(function() {
+                        browserInfo.profile.device = 'phone';
                         session.trigger('fullscreenMode', true);
                     });
 
@@ -454,10 +555,68 @@
                     it('should not mess with elements that have the c6__cant-touch-this class', function() {
                         expect($('.c6__cant-touch-this').css('position')).toBe('fixed');
                     });
+
+                    it('should scroll the window to the top', function() {
+                        expect($window.scrollTo).toHaveBeenCalledWith(0, 0);
+                    });
+
+                    it('should scroll to the top whenever the device orientation changes', function() {
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(2);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(3);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(4);
+                    });
                 });
 
-                describe('when the experience requests to leave fullscreen', function() {
+                describe('when the experience requests fullscreen on desktop',function(){
                     beforeEach(function() {
+                        browserInfo.profile.device = 'desktop';
+                        session.trigger('fullscreenMode', true);
+                    });
+
+                    it('should shrink the site down to an itty-bitty thang', function() {
+                        var $body = $('body'),
+                            $firstChildren = $($body[0].childNodes),
+                            $fixed = $('.fixed');
+
+                        $firstChildren.forEach(function(child) {
+                            if (child instanceof testFrame.contentWindow.Text) { return; }
+
+                            var $child = $(child);
+
+                            expect($child.css('position')).toBe('static');
+                            expect($child.css('height')).toBe('300px');
+                            expect($child.css('overflow')).toBe('visible');
+                            expect($child.classes()).toContain('container');
+                        });
+
+                        expect($fixed.classes()).toContain('fixed');
+                        expect($fixed.css('position')).toBe('fixed');
+                    });
+                    
+                    it('should not scroll the window to the top', function() {
+                        expect($window.scrollTo).not.toHaveBeenCalled();
+                    });
+
+                    it('should not scroll to the top whenever the device orientation changes', function() {
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(0);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(0);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(0);
+                    });
+                });
+
+                describe('when the experience requests to leave fllscrn on mobile', function() {
+                    beforeEach(function() {
+                        browserInfo.profile.device = 'phone';
                         session.trigger('fullscreenMode', true);
                         session.trigger('fullscreenMode', false);
                     });
@@ -487,7 +646,78 @@
                         expect($fixed.css('position')).toBe('fixed');
                         expect($fixed.hasClass('c6__play-that-funky-music-white-boy')).toBe(false);
                     });
+
+                    it('should not trigger a scroll to the top', function() {
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(1);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(1);
+
+                        $window.trigger('orientationchange');
+                        expect($window.scrollTo.calls.count()).toBe(1);
+                    });
                 });
+            });
+
+        });
+
+        describe('google analytics',function(){
+            beforeEach(function(){
+                config.gaAcctId = 'abc';
+                tracker = {
+                    get : jasmine.createSpy('tracker.get')
+                };
+                tracker.get.and.returnValue('fake_client_id');
+
+//                $window.__c6_ga__ = jasmine.createSpy('window.__c6_ga__');
+                $window.__c6_ga__.getByName = jasmine.createSpy('ga.getByName')
+                    .and.returnValue(tracker);
+            });
+            it('sends /embed/app page view',function(done){
+                run();
+                setTimeout(function(){
+                    expect($window.__c6_ga__.calls.argsFor(0)).toEqual(['c6.send','pageview',
+                        { 
+                            page : '/embed/app?experienceId=e-dbc8133f4d41a7',
+                            title : 'c6Embed App' 
+                    }]);
+                    done();
+                },1);
+            });
+
+            it('sends a ping if it gets a clientId',function(done){
+                run();
+                setTimeout(function(){
+                    session.trigger('ready', true);
+                    $window.__c6_ga__.calls.mostRecent().args[0]();
+                    expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
+                    expect(tracker.get).toHaveBeenCalledWith('clientId');
+                    expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id' } );
+                    done();
+                },1);
+            });
+
+            it('sends no ping if it gets no clientId',function(done){
+                tracker.get.and.returnValue(undefined);
+                run();
+                setTimeout(function(){
+                    session.trigger('ready', true);
+                    $window.__c6_ga__.calls.mostRecent().args[0]();
+                    expect(session.ping).not.toHaveBeenCalled();
+                    done();
+                },1);
+            });
+
+            it('sends no ping if no tracker is returned',function(done){
+                $window.__c6_ga__.getByName.and.returnValue(undefined);
+                run();
+                setTimeout(function(){
+                    session.trigger('ready', true);
+                    $window.__c6_ga__.calls.mostRecent().args[0]();
+                    expect(session.ping).not.toHaveBeenCalled();
+                    done();
+                },1);
             });
         });
     });

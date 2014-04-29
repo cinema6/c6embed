@@ -52,7 +52,8 @@
         browserInfo = new BrowserInfo({
             modernizr: modernizr,
             window: window,
-            userAgent: userAgent
+            userAgent: userAgent,
+            $: c6Query
         });
 
     /* Create Experience */
@@ -73,17 +74,38 @@
         });
 
     /* Create and Configure C6DB */
-    var FixtureAdapter = require('../lib/c6db/adapters/Fixture'),
+    var Cinema6Adapter = require('../lib/c6db/adapters/Cinema6'),
         C6DB = require('../lib/c6db/C6DB'),
-        adapter = new FixtureAdapter({
+        cinema6Adapter = new Cinema6Adapter({
             c6Ajax: c6Ajax,
             q: q
         }),
         c6Db = new C6DB({
             q: q
         });
-    adapter.jsonSrc = 'http://s3.amazonaws.com/c6.dev/mock/fixtures.json';
-    c6Db.adapter = adapter;
+    cinema6Adapter.apiBase = config.apiBase;
+    c6Db.adapter = cinema6Adapter;
+
+
+    /* Create GA Tracker */
+    /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+    /* jshint sub:false, asi:false, expr:false, indent:4 */
+
+    window.__c6_ga__('create', config.gaAcctId, {
+        'name'       : 'c6',
+        'cookieName' : '_c6ga'
+    });
+    window.__c6_ga__('c6.require', 'displayfeatures');
+
+    window.__c6_ga__('c6.send', 'pageview', {
+        'page'  : '/embed/main?experienceId=' + config.experienceId,
+        'title' : 'c6Embed Main'
+    });
+    /* jshint camelcase:true */
 
     /* Run the Application! */
     return app({
@@ -93,7 +115,8 @@
         c6Ajax: c6Ajax,
         experience: experience,
         window: window,
-        $: c6Query
+        $: c6Query,
+        browserInfo: browserInfo
     })
         .then(function(result) {
             if (!window.console) { return; }
