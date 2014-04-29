@@ -230,4 +230,5 @@ ex:
 ```bash
 $> grunt publish:test #Upload collateral assets and app to test server
 $> grunt publish:production #Upload collateral assets and app to production server
+
 ```
