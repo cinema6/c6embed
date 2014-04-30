@@ -89,9 +89,9 @@
             expect(config.debug).toEqual(true);
         });
 
-        it('should set urlBase to http://portal.cinema6.com if __C6_URL_ROOT__ is not set',function(){
+        it('should set urlBase to //portal.cinema6.com if __C6_URL_ROOT__ is not set',function(){
             config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.urlRoot).toBe('http://portal.cinema6.com');
+            expect(config.urlRoot).toBe('//portal.cinema6.com');
         });
 
         it('should set urlBase to __C6_URL_ROOT__ if set',function(){
