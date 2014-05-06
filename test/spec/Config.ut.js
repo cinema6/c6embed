@@ -112,12 +112,6 @@
             expect(config.appBase).toBe('http://staging.cinema6.com/apps');
         });
 
-        it('should set the collBase based on urlBase', function() {
-            $window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
-            config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.collateralBase).toBe('http://staging.cinema6.com/collateral');
-        });
-
         it('should be responsive if a width and height are not set', function() {
             expect(config.responsive).toBe(false);
 
