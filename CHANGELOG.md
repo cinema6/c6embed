@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v0.8.3 (April 30, 2014)
+* Get mode of experience from the data object
+
 ## v0.8.2 (April 30, 2014)
 * Replaced protocol ref with //
 

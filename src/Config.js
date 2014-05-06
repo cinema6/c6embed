@@ -17,7 +17,6 @@ module.exports = function(deps) {
     this.$script = $thisScript;
     this.debug          = !!$window.__C6_DEBUG__;
     this.urlRoot        = ($window.__C6_URL_ROOT__ || '//portal.cinema6.com');
-    this.collateralBase = (this.urlRoot + '/collateral');
     this.appBase        = (this.urlRoot + '/apps');
     this.apiBase        = (this.urlRoot + '/api');
     this.gaAcctId       = 'UA-44457821-2';
