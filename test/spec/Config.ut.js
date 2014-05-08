@@ -49,7 +49,7 @@
 
             myScript = scripts[2];
 
-            $window = {};
+            $window = { location : { } };
             $document = {
                 getElementsByTagName: jasmine.createSpy('$document.getElementsByTagName()')
                     .and.callFake(function(name) {
@@ -89,9 +89,10 @@
             expect(config.debug).toEqual(true);
         });
 
-        it('should set urlBase to //portal.cinema6.com if __C6_URL_ROOT__ is not set',function(){
+        it('should set urlBase to window.location.protocl + //portal.cinema6.com if __C6_URL_ROOT__ is not set',function(){
+            $window.location.protocol = 'https:'
             config = new Config({ document: $document, window: $window, $: $ });
-            expect(config.urlRoot).toBe('//portal.cinema6.com');
+            expect(config.urlRoot).toBe('https://portal.cinema6.com');
         });
 
         it('should set urlBase to __C6_URL_ROOT__ if set',function(){
