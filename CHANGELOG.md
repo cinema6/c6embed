@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v0.8.5 (May 8, 2014)
+* [FIX]: Account for more CSS properties when shrinking down a parent
+  page
+* [FEATURE]: Deploy c6embed right from this repository without the
+  common library project
+
 ## v0.8.4 (May 8, 2014)
 * [FIX]: Fix for issue where iframe would not load assets relative to
   the base tag
