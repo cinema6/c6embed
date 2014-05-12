@@ -61,6 +61,9 @@ module.exports = function(deps) {
                     style.setProperty('position', 'relative', 'important');
                     style.setProperty('height', '0px', 'important');
                     style.setProperty('overflow', 'hidden', 'important');
+                    style.setProperty('min-height', '0px', 'important');
+                    style.setProperty('margin', '0px', 'important');
+                    style.setProperty('padding', '0px', 'important');
                     return;
                 }
 

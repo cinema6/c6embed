@@ -1,7 +1,6 @@
 {
     "appUrl": "/__dirname/<%= settings.appDir %>/",
     "appModule": "c6.embed",
-    "appDir": "app",
     "distDir": "dist",
     "awsJSON": ".aws.json",
     "saucelabsJSON": ".saucelabs.json",
@@ -13,14 +12,12 @@
     "defaultE2EEnv": "browserstack",
     "s3": {
         "test": {
-            "bucket": "com.cinema6.staging",
-            "collateral": "collateral/",
-            "app": "apps/<%= package.name %>/"
+            "bucket": "c6.dev",
+            "app": "ext/<%= package.name %>/"
         },
         "production": {
-            "bucket": "com.cinema6.portal",
-            "collateral": "collateral/",
-            "app": "apps/<%= package.name %>/"
+            "bucket": "c6.ext",
+            "app": "<%= package.name %>/"
         }
     }
 }

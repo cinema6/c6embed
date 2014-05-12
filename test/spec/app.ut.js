@@ -66,6 +66,9 @@
                 '            .fixed {',
                 '                position: fixed !important; width: 20px; height: 300px !important;',
                 '            }',
+                '            .container {',
+                '                min-height: 200px; margin: 100px; padding: 50px;',
+                '            }',
                 '        </style>',
                 '    </head>',
                 '    <body>',
@@ -525,7 +528,7 @@
                             var $child = $(child);
 
                             expect($child.css('position')).toBe('relative');
-                            expect($child.css('height')).toBe('0px');
+                            expect($child[0].getBoundingClientRect().height).toBe(0);
                             expect($child.css('overflow')).toBe('hidden');
                             expect($child.classes()).toContain('c6__play-that-funky-music-white-boy');
                         });
@@ -611,7 +614,7 @@
                         expect($iframe.css('right')).toBe('auto');
                         expect($iframe.css('bottom')).toBe('auto');
                         expect($iframe.css('left')).toBe('auto');
-                        expect($iframe.css('width')).toBe('784px');
+                        expect($iframe.css('width')).toBe('484px');
                         expect($iframe.css('height')).toBe('200px');
                         expect($iframe.css('zIndex')).toBe('auto');
                     });
