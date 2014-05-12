@@ -3,7 +3,7 @@ module.exports = {
         options: {
             banner: [
                 '/*',
-                ' * Copyright © Cinema6 2013 All Rights Reserved. No part of this library',
+                ' * Copyright © Cinema6 2014 All Rights Reserved. No part of this library',
                 ' * may be reproduced without Cinema6\'s express consent.',
                 ' *',
                 ' * Build Version: <%= git_tag %>',
