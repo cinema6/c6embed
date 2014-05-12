@@ -5,6 +5,7 @@
   page
 * [FEATURE]: Deploy c6embed right from this repository without the
   common library project
+* [FEATURE]: Add a banner to the built library
 
 ## v0.8.4 (May 8, 2014)
 * [FIX]: Fix for issue where iframe would not load assets relative to
