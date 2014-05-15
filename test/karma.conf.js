@@ -22,7 +22,8 @@ module.exports = function(config) {
             'node_modules/asEvented/asevented.js',
             'lib/**/*.js',
             'src/**/*.js',
-            'test/spec/**/*.js'
+            'test/spec/**/*.js',
+            'test/helpers/**/*.js'
         ],
 
         exclude: [
@@ -34,7 +35,8 @@ module.exports = function(config) {
             'node_modules/asEvented/asevented.js': ['commonjs'],
             'lib/**/*.js': ['commonjs'],
             'src/**/*.js': ['commonjs'],
-            'test/spec/**/*.js': ['commonjs']
+            'test/spec/**/*.js': ['commonjs'],
+            'test/helpers/**/*.js': ['commonjs']
         },
 
         // test results reporter to use
