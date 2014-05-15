@@ -94,7 +94,7 @@
 
             setTimeout(waitForReady, 50);
 
-            app = require('../../src/app');
+            app = require('../../src/app.old');
             q = require('../../node_modules/q/q.js');
             asEvented = require('../../node_modules/asEvented/asevented.js');
             C6Query = require('../../lib/C6Query');
