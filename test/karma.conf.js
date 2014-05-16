@@ -23,7 +23,8 @@ module.exports = function(config) {
             'lib/**/*.js',
             'src/**/*.js',
             'test/spec/**/*.js',
-            'test/helpers/**/*.js'
+            'test/helpers/**/*.js',
+            { pattern: 'lite/**/*.js', included: false }
         ],
 
         exclude: [

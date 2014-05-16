@@ -7,6 +7,7 @@
                 '<%= settings.appDir %>/**/*.html',
                 'src/**/*.js',
                 'lib/**/*.js',
+                'lite/**/*.js',
             ],
             options: {
                 livereload: true
@@ -17,7 +18,8 @@
             files: [
                 'src/**/*.js',
                 'lib/**/*.js',
-                'test/spec/**/*.js'
+                'lite/**/*.js',
+                'test/spec/**/*.js',
             ],
             tasks: ['karma:debug:run']
         },
