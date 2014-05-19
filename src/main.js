@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    var app = require('./app');
+    //var app = require('./app');
 
     /* Create C6Query */
     var C6Query = require('../lib/C6Query'),
@@ -108,7 +108,7 @@
     /* jshint camelcase:true */
 
     /* Run the Application! */
-    return app({
+    /*return app({
         config: config,
         q: q,
         c6Db: c6Db,
@@ -126,4 +126,5 @@
             if (!window.console) { return; }
             window.console.error(error);
         });
+    */
 }());
