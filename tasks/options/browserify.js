@@ -8,7 +8,7 @@ module.exports = {
         files: [
             {
                 src: ['src/main.js'],
-                dest: '<%= settings.distDir %>/c6embed.js'
+                dest: '<%= settings.distDir %>/app.js'
             }
         ]
     },

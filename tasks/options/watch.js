@@ -12,7 +12,7 @@
             options: {
                 livereload: true
             },
-            tasks: ['browserify:server']
+            tasks: ['browserify:server', 'copy:embed']
         },
         unit: {
             files: [

@@ -2,6 +2,7 @@
     "appUrl": "/__dirname/<%= settings.appDir %>/",
     "appModule": "c6.embed",
     "distDir": "dist",
+    "appDir": "app",
     "awsJSON": ".aws.json",
     "saucelabsJSON": ".saucelabs.json",
     "browserstackJSON": ".browserstack.json",
