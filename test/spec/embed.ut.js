@@ -81,7 +81,7 @@
                             expect($iframe.attr('style')).toContain('position: absolute;');
                             expect($iframe.attr('style')).toContain('top: 0px;');
                             expect($iframe.attr('style')).toContain('left: 0px;');
-                            expect($iframe.attr('src')).toBe(window.__C6_URL_ROOT__ + '/collateral/splash/' + config['data-splash'] + '.html?exp=e-123');
+                            expect($iframe.attr('src')).toBe(window.__C6_URL_ROOT__ + '/collateral/splash/' + config['data-splash'] + '/index.html?exp=e-123');
                         });
                     });
 
@@ -90,9 +90,21 @@
                             expect(window.c6).toEqual({
                                 embeds: {
                                     'e-123': {
-                                        script: $script[0],
                                         embed: $('#c6embed-e-123')[0],
-                                        load: false
+                                        load: false,
+                                        config: (function() {
+                                            var result = {};
+
+                                            for (var key in config) {
+                                                result[key.replace(/^data-/, '')] = config[key];
+                                            }
+
+                                            result.script = $script[0];
+                                            result.src = $script.attr('src');
+                                            result.responsive = !result.height;
+
+                                            return result;
+                                        }())
                                     }
                                 },
                                 app: null,

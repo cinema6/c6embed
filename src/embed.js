@@ -17,6 +17,7 @@
             }
 
             result.script = script;
+            result.responsive = !result.height;
 
             return result;
         }(document.getElementsByTagName('script'))),
@@ -56,7 +57,7 @@
             width: '100%',
             scrolling: 'no',
             style: 'border: none; position: absolute; top: 0px; left: 0px;',
-            src: base + '/collateral/splash/' + config.splash + '.html' +
+            src: base + '/collateral/splash/' + config.splash + '/index.html' +
                 '?exp=' + encodeURIComponent(config.exp)
         },
         div = document.createElement('div'),
@@ -92,9 +93,9 @@
     script.parentNode.insertBefore(div, script);
 
     c6.embeds[config.exp] = {
-        script: config.script,
         embed: div,
-        load: false
+        load: false,
+        config: config
     };
 
 }(window));

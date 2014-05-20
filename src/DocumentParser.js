@@ -34,7 +34,7 @@ module.exports = function() {
             return this;
         },
         setGlobalObject: function(prop, object) {
-            this.injectScript([
+            return this.injectScript([
                 'function(window) {',
                 '    window["' + prop + '"] = ' + JSON.stringify(object) + ';',
                 '}'

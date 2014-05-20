@@ -4,37 +4,19 @@ module.exports = function(deps) {
     var $ = deps.$,
         documentParser = deps.documentParser;
 
-    return function(width, height) {
+    return function() {
         var $result = $([
-            '<div style="position: relative;">',
-            '    <iframe src="about:blank"',
-            '        width="100%"',
-            '        height="0"',
-            '        scrolling="no"',
-            '        style="border: none;"',
-            '        class="c6__cant-touch-this">',
-            '    </iframe>',
-            '</div>'
+            '<iframe src="about:blank"',
+            '    width="100%"',
+            '    height="0"',
+            '    scrolling="no"',
+            '    style="border: none; position: absolute; top: 0px; left: 0px;"',
+            '    class="c6__cant-touch-this">',
+            '</iframe>'
         ].join(''));
 
-        if (!width || !height) {
-            $result.css({
-                width: '100%',
-                height: '0',
-                'box-sizing': 'border-box',
-                '-moz-box-sizing': 'border-box',
-                fontSize: '16px'
-            });
-        } else {
-            $result.css({
-                width: width,
-                height: height
-            });
-        }
-
         $result.load = function(html, cb) {
-            var $iframe = $($result[0].childNodes[1]),
-                document = documentParser(html);
+            var document = documentParser(html);
 
             document.injectScript(function(window) {
                 (window.history.replaceState || function() {}).call(
@@ -46,11 +28,38 @@ module.exports = function(deps) {
                 window.frameElement.c6Loaded(window);
             });
 
-            $iframe.prop('c6Loaded', cb);
-            $iframe.attr('data-srcdoc', document.toString());
+            this.prop('c6Loaded', cb);
+            this.attr('data-srcdoc', document.toString());
             /* jshint scripturl:true */
-            $iframe.attr('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
+            this.attr('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
             /* jshint scripturl:false */
+        };
+
+        $result.fullscreen = function(enterFullscreen) {
+            this.css(enterFullscreen ?
+                {
+                    position: 'fixed',
+                    right: '0px',
+                    bottom: '0px',
+                    zIndex: 9007199254740992
+                } :
+                {
+                    position: 'absolute',
+                    bottom: '',
+                    right: '',
+                    zIndex: ''
+                }
+            );
+
+            return this;
+        };
+
+        $result.show = function() {
+            this.attr('height', '100%');
+        };
+
+        $result.hide = function() {
+            this.attr('height', '0');
         };
 
         return $result;

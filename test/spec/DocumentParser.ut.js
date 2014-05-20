@@ -66,10 +66,10 @@
                     });
 
                     it('should inject a script that sets the global up', function() {
-                        document.setGlobalObject('c6', {
+                        expect(document.setGlobalObject('c6', {
                             foo: 'bar',
                             test: true
-                        });
+                        })).toBe(document);
 
                         expect(document.injectScript.calls.mostRecent().args[0].toString()).toBe([
                             'function(window) {',

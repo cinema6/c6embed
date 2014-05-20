@@ -39,18 +39,11 @@
             expect(frameFactory).toEqual(jasmine.any(Function));
         });
 
-        it('should return an iframe wrapped in a div', function() {
-            var $result = frameFactory();
-
-            expect($result.prop('tagName')).toBe('DIV');
-            expect($result[0].childNodes[1].tagName).toBe('IFRAME');
-        });
-
         describe('the iframe', function() {
             var $iframe;
 
             beforeEach(function() {
-                $iframe = $(frameFactory()[0].childNodes[1]);
+                $iframe = $(frameFactory()[0]);
             });
 
             it('should have a src of about:blank', function() {
@@ -63,6 +56,15 @@
 
             it('should have a height of 0', function() {
                 expect($iframe.attr('height')).toBe('0');
+            });
+
+            it('should be positioned absolutely', function() {
+                expect($iframe.attr('style')).toContain('position: absolute;');
+            });
+
+            it('should be in the top left corner', function() {
+                expect($iframe.attr('style')).toContain('top: 0px;');
+                expect($iframe.attr('style')).toContain('left: 0px;');
             });
 
             it('should not be scrollable', function() {
@@ -78,48 +80,13 @@
             });
         });
 
-        describe('the div', function() {
-            var $div;
-
-            [[null, null], ['100px', null], [null, '200px']].forEach(function(args) {
-                describe('if ' + args + ' are supplied as arguments', function() {
-                    beforeEach(function() {
-                        $div = frameFactory.apply(null, args);
-                    });
-
-                    it('should give the div responsive styles', function() {
-                        var styles = $div.attr('style').toString();
-
-                        ['position: relative;', 'width: 100%;', 'height: 0px;', 'box-sizing: border-box;', 'font-size: 16px;']
-                            .forEach(function(style) {
-                                expect(styles).toContain(style);
-                            });
-                    });
-                });
-            });
-
-            describe('if a width and height are specified', function() {
-                beforeEach(function() {
-                    $div = frameFactory('70%', '300px');
-                });
-
-                it('should give the div static styles', function() {
-                    var styles = $div.attr('style').toString();
-
-                    ['position: relative;', 'width: 70%;', 'height: 300px;'].forEach(function(style) {
-                        expect(styles).toContain(style);
-                    });
-                });
-            });
-        });
-
         describe('methods', function() {
             var $result,
                 $iframe;
 
             beforeEach(function() {
                 $result = frameFactory();
-                $iframe = $($result[0].childNodes[1]);
+                $iframe = $result;
             });
 
             describe('load(html, cb)', function() {
@@ -185,6 +152,67 @@
                     /* jshint scripturl:true */
                     expect($iframe.attr('src')).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
                     /* jshint scripturl:false */
+                });
+            });
+
+            describe('fullscreen(bool)', function() {
+                it('should be chainable', function() {
+                    [true, false].forEach(function(bool) {
+                        expect($result.fullscreen(bool)).toBe($result);
+                    });
+                });
+
+                describe('when true is passed in', function() {
+                    beforeEach(function() {
+                        $result.fullscreen(true);
+                    });
+
+                    it('should give the iframe fullscreen styles', function() {
+                        ['position: fixed;', 'top: 0px;', 'left: 0px;', 'bottom: 0px;', 'right: 0px;', 'z-index: 9007199254740992;']
+                            .forEach(function(definition) {
+                                expect($iframe.attr('style')).toContain(definition);
+                            });
+                    });
+                });
+
+                describe('when false is passed in', function() {
+                    beforeEach(function() {
+                        $result.fullscreen(true);
+                        $result.fullscreen(false);
+                    });
+
+                    it('should remove any fullscreen styles', function() {
+                        ['position: absolute;', 'top: 0px;', 'left: 0px;']
+                            .forEach(function(definition) {
+                                expect($iframe.attr('style')).toContain(definition);
+                            });
+
+                        ['bottom: 0px;', 'right: 0px;', 'z-index: 9007199254740992;']
+                            .forEach(function(definition) {
+                                expect($iframe.attr('style')).not.toContain(definition);
+                            });
+                    });
+                });
+            });
+
+            describe('show()', function() {
+                beforeEach(function() {
+                    $result.show();
+                });
+
+                it('should set the height to 100%', function() {
+                    expect($result.attr('height')).toBe('100%');
+                });
+            });
+
+            describe('hide()', function() {
+                beforeEach(function() {
+                    $result.show();
+                    $result.hide();
+                });
+
+                it('should set the height to 0', function() {
+                    expect($result.attr('height')).toBe('0');
                 });
             });
         });
