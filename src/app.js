@@ -10,73 +10,150 @@ module.exports = function(deps) {
         documentParser = deps.documentParser,
         browserInfo = deps.browserInfo,
         experienceService = deps.experienceService,
-        hostDocument = deps.hostDocument;
+        hostDocument = deps.hostDocument,
+        Observable = deps.Observable,
+        Q = deps.Q;
 
-    var c6 = window.c6;
+    var c6 = window.c6,
+        embeds = c6.embeds,
+        id = null,
+        settings = null,
+        loads = [];
 
     function appUrl(url) {
         return config.appBase + '/' + url;
     }
 
     c6.loadExperience = function(settings) {
-        var $iframe = frameFactory(),
-            $container = $(settings.embed),
-            appConfig = {
-                kDebug: config.debug,
-                kDevice: browserInfo.profile.device,
-                kEnvUrlRoot: config.urlRoot
-            },
-            appFolder = null;
+        var promise;
 
-        function fetchExperience() {
-            return c6Db.find('experience', settings.config.exp);
-        }
+        function bootstrap() {
+            var $iframe = frameFactory(),
+                $container = $(settings.embed),
+                $splash = $($container.prop('firstChild')),
+                appConfig = {
+                    kDebug: config.debug,
+                    kDevice: browserInfo.profile.device,
+                    kEnvUrlRoot: config.urlRoot
+                },
+                appFolder = null,
+                state = null;
 
-        function scrapeConfiguration(experience) {
-            appConfig.kMode = experience.data.mode;
-            appFolder = appUrl(experience.appUri + '/');
-            settings.experience = experience;
-        }
+            function fetchExperience() {
+                return c6Db.find('experience', settings.config.exp);
+            }
 
-        function fetchApp() {
-            return c6Ajax.get(appFolder + 'index.html')
-                .then(function parse(response) {
-                    return documentParser(response.data);
-                });
-        }
+            function scrapeConfiguration(experience) {
+                appConfig.kMode = experience.data.mode;
+                appFolder = appUrl(experience.appUri + '/');
+                settings.experience = experience;
+            }
 
-        function modifyApp(document) {
-            return document
-                .setGlobalObject('c6', appConfig)
-                .setBase(appFolder);
-        }
+            function fetchApp() {
+                return c6Ajax.get(appFolder + 'index.html')
+                    .then(function parse(response) {
+                        return documentParser(response.data);
+                    });
+            }
 
-        function communicateWithApp(appWindow) {
-            var session = experienceService.registerExperience(settings.experience, appWindow);
+            function modifyApp(document) {
+                return document
+                    .setGlobalObject('c6', appConfig)
+                    .setBase(appFolder);
+            }
 
-            session
-                .once('ready', function appReady() {
+            function loadApp(document) {
+                $iframe.load(document.toString(), communicateWithApp);
+
+                return experienceService.getSession(settings.config.exp);
+            }
+
+            function communicateWithApp(appWindow) {
+                var session = settings.session = experienceService.registerExperience(
+                    settings.experience,
+                    appWindow
+                );
+
+                session
+                    .on('open', function openApp() {
+                        state.set('active', true);
+                    })
+                    .on('close', function closeApp() {
+                        state.set('active', false);
+                    })
+                    .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
+                        $iframe.fullscreen(shouldEnterFullscreen);
+
+                        if (browserInfo.profile.device === 'phone') {
+                            hostDocument.shrink(shouldEnterFullscreen);
+                        }
+                    })
+                    .on('responsiveStyles', function setResponsiveStyles(styles) {
+                        if (settings.config.responsive) {
+                            settings.state.set('responsiveStyles', styles);
+                        }
+                    });
+            }
+
+            function finish() {
+                return settings;
+            }
+
+            $container.createSnapshot();
+
+            state = settings.state = new Observable({
+                responsiveStyles: null,
+                active: false
+            })
+            .observe('active', function(active) {
+                function setResponsiveStyles(styles) {
+                    $container.css(styles);
+                }
+
+                function tellSplash(message) {
+                    $splash.prop('contentWindow').postMessage(message, '*');
+                }
+
+                if (active) {
                     $iframe.show();
-                })
-                .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
-                    $iframe.fullscreen(shouldEnterFullscreen);
+                    tellSplash('hide');
 
-                    if (browserInfo.profile.device === 'phone') {
-                        hostDocument.shrink(shouldEnterFullscreen);
-                    }
-                });
+                    this.observe('responsiveStyles', setResponsiveStyles);
+                } else {
+                    $iframe.hide();
+                    tellSplash('show');
+
+                    $container.revertTo(0);
+                    this.ignore('responsiveStyles', setResponsiveStyles);
+                }
+            });
+
+            $container.append($iframe);
+
+            return fetchExperience()
+                .then(scrapeConfiguration)
+                .then(fetchApp)
+                .then(modifyApp)
+                .then(loadApp)
+                .then(finish);
         }
 
-        function loadApp(document) {
-            $iframe.load(document.toString(), communicateWithApp);
-        }
+        promise = settings.promise || (settings.promise = bootstrap());
 
-        $container.append($iframe);
+        promise.then(function(settings) {
+            settings.state.set('active', true);
+        });
 
-        return fetchExperience()
-            .then(scrapeConfiguration)
-            .then(fetchApp)
-            .then(modifyApp)
-            .then(loadApp);
+        return promise;
     };
+
+    for (id in embeds) {
+        settings = embeds[id];
+
+        if (settings.load) {
+            loads.push(c6.loadExperience(settings));
+        }
+    }
+
+    return Q.all(loads);
 };

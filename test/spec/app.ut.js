@@ -4,9 +4,11 @@
     describe('app', function() {
         var app;
 
-        var C6Query;
+        var C6Query,
+            ObservableProvider;
 
         var $,
+            Observable,
             Q,
             AsEvented;
 
@@ -24,7 +26,8 @@
             experience,
             indexHTML,
             parsedDoc,
-            session;
+            session,
+            safeSession;
 
         function Session() {
             AsEvented.call(this);
@@ -34,7 +37,7 @@
         };
 
         function run() {
-            app({
+            return app({
                 window: $window,
                 frameFactory: frameFactory,
                 $: $,
@@ -45,7 +48,8 @@
                 documentParser: mockDocumentParser,
                 browserInfo: browserInfo,
                 experienceService: experienceService,
-                hostDocument: hostDocument
+                hostDocument: hostDocument,
+                Observable: Observable
             });
         }
 
@@ -79,6 +83,9 @@
 
             C6Query = require('../../lib/C6Query');
             $ = new C6Query({ document: document, window: window });
+
+            ObservableProvider = require('../../lib/ObservableProvider');
+            Observable = new ObservableProvider();
 
             frameFactory = function() {
                 $iframe = $('<iframe src="about:blank"></iframe>');
@@ -116,9 +123,13 @@
 
             session = new Session();
 
+            safeSession = new Session();
+
             experienceService = {
                 registerExperience: jasmine.createSpy('experienceService.registerExperience()')
-                    .and.returnValue(session)
+                    .and.returnValue(session),
+                getSession: jasmine.createSpy('experienceService.getSession()')
+                    .and.returnValue(Q.when(safeSession))
             };
 
             hostDocument = {
@@ -132,6 +143,12 @@
             expect(app).toEqual(jasmine.any(Function));
         });
 
+        it('should return a promise', function() {
+            var Promise = Q.when().constructor;
+
+            expect(run()).toEqual(jasmine.any(Promise));
+        });
+
         it('should replace the c6.loadExperience method', function() {
             var c6 = $window.c6,
                 loadExperience = c6.loadExperience;
@@ -143,18 +160,82 @@
             expect($window.c6.loadExperience).not.toBe(loadExperience);
         });
 
+        describe('on the first run', function() {
+            var c6,
+                embed1, embed2;
+
+            beforeEach(function() {
+                embed1 = $('<div><iframe src="about:blank"></iframe></div>')[0];
+                embed2 = $('<div><iframe src="about:blank"></iframe></div>')[0];
+
+                c6 = $window.c6;
+
+                c6.embeds = {
+                    'e-123': {
+                        load: false
+                    },
+                    'e-abc': {
+                        load: false
+                    },
+                    'e-456': {
+                        load: true,
+                        embed: embed1,
+                        config: {
+                            exp: 'e-456'
+                        }
+                    },
+                    'e-def': {
+                        load: true,
+                        embed: embed2,
+                        config: {
+                            exp: 'e-456'
+                        }
+                    },
+                    'e-789': {
+                        load: false
+                    }
+                };
+
+                [embed1, embed2].forEach(function(embed) {
+                    $('body').append(embed);
+                });
+
+                run();
+            });
+
+            afterEach(function() {
+                [embed1, embed2].forEach(function(embed) {
+                    $(embed).remove();
+                });
+            });
+
+            it('should load all the embeds where load is true', function() {
+                for (var id in c6.embeds) {
+                    if (c6.embeds[id].load) {
+                        expect(c6.embeds[id].state).toEqual(jasmine.any(Observable), id);
+                    } else {
+                        expect(c6.embeds[id].state).not.toBeDefined(id);
+                    }
+                }
+            });
+        });
+
         describe('c6.loadExperience(embed)', function() {
-            var embed;
+            var settings,
+                $embed,
+                $splash,
+                promise,
+                success;
 
             beforeEach(function(done) {
+                success = jasmine.createSpy('success()');
+
                 c6Ajax.get.and.returnValue(Q.when({
                     data: indexHTML
                 }));
 
-                run();
-
-                embed = {
-                    embed: $('<div>')[0],
+                settings = {
+                    embed: $('<div style="padding: 10px; margin-top: 10px;"><iframe src="about:blank"></iframe></div>')[0],
                     load: true,
                     config: {
                         exp: 'e-68cde3e4177b8a',
@@ -162,15 +243,38 @@
                     }
                 };
 
-                $window.c6.loadExperience(embed).finally(done);
+                $embed = $(settings.embed);
+                $('body').append($embed);
+                $splash = $($embed.prop('firstChild'));
+                spyOn($splash.prop('contentWindow'), 'postMessage');
+
+                run();
+
+                promise = $window.c6.loadExperience(settings);
+
+                promise
+                    .then(success)
+                    .finally(done);
+            });
+
+            afterEach(function() {
+                $embed.remove();
+            });
+
+            it('should add an observeable state object to the settings', function() {
+                expect(settings.state).toEqual(jasmine.any(Observable));
+                expect(settings.state).toEqual(jasmine.objectContaining({
+                    responsiveStyles: null,
+                    active: jasmine.any(Boolean)
+                }));
             });
 
             it('should put the iframe in the embed container', function() {
-                expect(embed.embed.firstChild).toBe($iframe[0]);
+                expect(settings.embed.childNodes[1]).toBe($iframe[0]);
             });
 
             it('should fetch the experience', function() {
-                expect(c6Db.find).toHaveBeenCalledWith('experience', embed.config.exp);
+                expect(c6Db.find).toHaveBeenCalledWith('experience', settings.config.exp);
             });
 
             it('should fetch index.html', function() {
@@ -179,6 +283,31 @@
 
             it('should parse the document', function() {
                 expect(mockDocumentParser).toHaveBeenCalledWith(indexHTML);
+            });
+
+            it('should resolve to the settings object', function() {
+                expect(experienceService.getSession).toHaveBeenCalledWith(settings.config.exp);
+                expect(success).toHaveBeenCalledWith(settings);
+            });
+
+            it('should set put a reference to the promise on the settings object', function() {
+                expect(settings.promise).toBe(promise);
+            });
+
+            it('should just return the same promise if called again', function() {
+                expect($window.c6.loadExperience(settings)).toBe(promise);
+            });
+
+            describe('when the app is loaded', function() {
+                beforeEach(function(done) {
+                    spyOn(settings.state, 'set').and.callThrough();
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should set active to true', function() {
+                    expect(settings.state.set).toHaveBeenCalledWith('active', true);
+                });
             });
 
             it('should setup a global c6 object in the app', function() {
@@ -198,6 +327,85 @@
                 expect($iframe.load).toHaveBeenCalledWith(parsedDoc.toString(), jasmine.any(Function));
             });
 
+            describe('state observation', function() {
+                var state;
+
+                beforeEach(function() {
+                    state = settings.state;
+
+                    spyOn(state, 'observe').and.callThrough();
+                });
+
+                describe('active', function() {
+                    describe('when false', function() {
+                        beforeEach(function() {
+                            state.set('active', true);
+                            $iframe.hide.calls.reset();
+                            $splash.prop('contentWindow').postMessage.calls.reset();
+                            state.set('responsiveStyles', {
+                                padding: '20px',
+                                marginTop: '50px'
+                            });
+
+                            state.set('active', false);
+                        });
+
+                        it('should hide the iframe', function() {
+                            expect($iframe.hide).toHaveBeenCalled();
+                        });
+
+                        it('should not pay attetion to responsiveStyles', function() {
+                            state.set('responsiveStyles', { top: '20px' });
+
+                            expect(settings.embed.style.top).toBe('');
+                        });
+
+                        it('should post a nice message to the splash page', function() {
+                            expect($splash.prop('contentWindow').postMessage).toHaveBeenCalledWith('show', '*');
+                        });
+
+                        it('should revert back to the original container style', function() {
+                            ['padding', 'marginTop'].forEach(function(prop) {
+                                expect(settings.embed.style[prop]).toBe('10px');
+                            });
+                        });
+                    });
+
+                    describe('when true', function() {
+                        beforeEach(function() {
+                            state.set('active', true);
+                        });
+
+                        it('should show the iframe', function() {
+                            expect($iframe.show).toHaveBeenCalled();
+                        });
+
+                        it('should post a nice message to the splash page', function() {
+                            expect($splash.prop('contentWindow').postMessage).toHaveBeenCalledWith('hide', '*');
+                        });
+
+                        describe('if there are responsiveStyles', function() {
+                            var styles;
+
+                            beforeEach(function() {
+                                styles = {
+                                    paddingTop: '50%',
+                                    marginLeft: '10px'
+                                };
+
+                                state.set('responsiveStyles', styles);
+                            });
+
+                            it('should set the styles on the container', function() {
+                                for (var prop in styles) {
+                                    expect(settings.embed.style[prop]).toBe(styles[prop]);
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+
             describe('when the app loads', function() {
                 var appWindow;
 
@@ -213,13 +421,31 @@
                     expect(experienceService.registerExperience).toHaveBeenCalledWith(experience, appWindow);
                 });
 
-                describe('when the app is ready', function() {
+                it('should put the session on the embed settings object', function() {
+                    expect(settings.session).toBe(session);
+                });
+
+                describe('when the app wants to open', function() {
                     beforeEach(function() {
-                        session.emit('ready', true);
+                        spyOn(settings.state, 'set').and.callThrough();
+
+                        session.emit('open');
                     });
 
-                    it('should show the app', function() {
-                        expect($iframe.show).toHaveBeenCalled();
+                    it('should set active to true', function() {
+                        expect(settings.state.set).toHaveBeenCalledWith('active', true);
+                    });
+                });
+
+                describe('when the app wants to close', function() {
+                    beforeEach(function() {
+                        spyOn(settings.state, 'set').and.callThrough();
+
+                        session.emit('close');
+                    });
+
+                    it('should set active to false', function() {
+                        expect(settings.state.set).toHaveBeenCalledWith('active', false);
                     });
                 });
 
@@ -292,6 +518,8 @@
                             height: '70px',
                             marginTop: '10px'
                         };
+
+                        spyOn(settings.state, 'set').and.callThrough();
                     });
 
                     describe('when the embed is responsive', function() {
@@ -299,10 +527,20 @@
                             session.emit('responsiveStyles', styles);
                         });
 
-                        it('should set the styles on the container', function() {
-                            for (var prop in styles) {
-                                expect(embed.embed.style[prop]).toBe(styles[prop]);
-                            }
+                        it('should set the styles on the state object', function() {
+                            expect(settings.state.set).toHaveBeenCalledWith('responsiveStyles', styles);
+                        });
+                    });
+
+                    describe('when the embed is not responsive', function() {
+                        beforeEach(function() {
+                            settings.config.responsive = false;
+
+                            session.emit('responsiveStyles', styles);
+                        });
+
+                        it('should not set the styles', function() {
+                            expect(settings.state.set).not.toHaveBeenCalled();
                         });
                     });
                 });
