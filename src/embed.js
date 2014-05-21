@@ -27,6 +27,14 @@
 
             result.script = script;
             result.responsive = !result.height;
+            result.splash = (function() {
+                var parts = result.splash.split(':');
+
+                return {
+                    style: parts[0],
+                    ratio: parts[1].split('/').map(parseFloat)
+                };
+            }());
 
             return result;
         }(document.getElementsByTagName('script'))),
@@ -54,7 +62,9 @@
             fontSize: '16px',
             minWidth: '18.75em',
             minHeight: '19.625em',
-            padding: '8.125em 0px 63% 0px'
+            padding: '0px 0px ' +
+                ((config.splash.ratio[1] / config.splash.ratio[0]) * 100) +
+                '% 0px'
         },
         staticStyles = {
             width: config.width,
@@ -66,7 +76,7 @@
             width: '100%',
             scrolling: 'no',
             style: 'border: none; position: absolute; top: 0px; left: 0px;',
-            src: base + '/collateral/splash/' + config.splash + '/index.html' +
+            src: base + '/collateral/splash/' + config.splash.style + '/' + config.splash.ratio.join('-') + '.html' +
                 '?exp=' + encodeURIComponent(config.exp)
         },
         div = document.createElement('div'),

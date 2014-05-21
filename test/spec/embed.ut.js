@@ -30,6 +30,7 @@
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
+                script.setAttribute('data-splash', 'foo:1-1');
                 script.setAttribute('data-:title', btoa('Hello World!'));
                 script.setAttribute('data-:test', btoa('This is a Test!'));
 
@@ -50,18 +51,18 @@
             [
                 {
                     'data-exp': 'e-123',
-                    'data-splash': 'flavor1'
+                    'data-splash': 'flavor1:1/1'
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '100%',
                     'data-height': '300px',
-                    'data-splash': 'flavorc'
+                    'data-splash': 'flavorc:16/9'
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '150',
-                    'data-splash': 'flavor4'
+                    'data-splash': 'flavor4:3/2.5'
                 }
             ].forEach(function(config) {
                 describe('with config: ' + JSON.stringify(config), function() {
@@ -95,7 +96,10 @@
                         });
 
                         it('should put an iframe in the div', function() {
-                            var $iframe = $('div#c6embed-e-123 > iframe');
+                            var $iframe = $('div#c6embed-e-123 > iframe'),
+                                splashParts = config['data-splash'].split(':'),
+                                style = splashParts[0],
+                                ratio = splashParts[1].split('/').join('-');
 
                             expect($iframe.length).toBe(1);
                             expect($iframe.attr('width')).toBe('100%');
@@ -105,7 +109,7 @@
                             expect($iframe.attr('style')).toContain('position: absolute;');
                             expect($iframe.attr('style')).toContain('top: 0px;');
                             expect($iframe.attr('style')).toContain('left: 0px;');
-                            expect($iframe.attr('src')).toBe(window.__C6_URL_ROOT__ + '/collateral/splash/' + config['data-splash'] + '/index.html?exp=e-123');
+                            expect($iframe.attr('src')).toBe(window.__C6_URL_ROOT__ + '/collateral/splash/' + style + '/' + ratio + '.html?exp=e-123');
                         });
                     });
 
@@ -126,6 +130,7 @@
                                             result.script = $script[0];
                                             result.src = $script.attr('src');
                                             result.responsive = !result.height;
+                                            result.splash = jasmine.any(Object);
 
                                             return result;
                                         }())
@@ -142,6 +147,7 @@
 
                             script.src = '/base/src/embed.js';
                             script.setAttribute('data-exp', 'e-abc');
+                            script.setAttribute('data-splash', 'foo:1/1');
                             $($div).append(script);
                             script.onload = function() {
                                 expect(window.c6).toBe(c6);
@@ -212,6 +218,7 @@
                 var script = document.createElement('script');
 
                 script.setAttribute('data-exp', 'e-abc');
+                script.setAttribute('data-splash', 'flavorflav:3/2.5');
 
                 script.src = '/base/src/embed.js';
                 script.onload = done;
@@ -234,7 +241,7 @@
                     expect(style.fontSize).toBe('16px');
                     expect(style.minWidth).toBe('18.75em');
                     expect(style.minHeight).toBe('19.625em');
-                    expect(style.padding).toBe('8.125em 0px 63%');
+                    expect(style.padding).toBe('0px 0px ' + ((2.5 / 3) * 100) +'%');
                 });
             });
         });
@@ -246,6 +253,7 @@
                 script.setAttribute('data-exp', 'e-def');
                 script.setAttribute('data-width', '100%');
                 script.setAttribute('data-height', '300px');
+                script.setAttribute('data-splash', 'foo:1/1');
 
                 script.src = '/base/src/embed.js';
                 script.onload = done;
