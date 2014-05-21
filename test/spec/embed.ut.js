@@ -23,6 +23,30 @@
         describe('common functionality', function() {
             var $script;
 
+            it('should base64 decode any attributes that start with a :', function(done) {
+                var script = document.createElement('script');
+
+                script.src = '/base/src/embed.js';
+
+                script.setAttribute('data-exp', 'e-abc123');
+                script.setAttribute('data-width', '60%');
+                script.setAttribute('data-:title', btoa('Hello World!'));
+                script.setAttribute('data-:test', btoa('This is a Test!'));
+
+                script.onload = function() {
+                    var config = window.c6.embeds['e-abc123'].config;
+
+                    expect(config.title).toBe('Hello World!');
+                    expect(config.test).toBe('This is a Test!');
+                    expect(config[':title']).not.toBeDefined();
+                    expect(config[':test']).not.toBeDefined();
+
+                    done();
+                };
+
+                $div.append(script);
+            });
+
             [
                 {
                     'data-exp': 'e-123',

@@ -8,12 +8,21 @@
                 attributes = script.attributes,
                 length = attributes.length,
                 attribute,
+                prop,
+                value,
                 result = {};
 
             while (length--) {
                 attribute = attributes[length];
+                prop = attribute.name.replace(/^data-/, '');
+                value = attribute.value;
 
-                result[attribute.name.replace(/data-/, '')] = attribute.value;
+                if (prop.charAt(0) === ':') {
+                    prop = prop.slice(1);
+                    value = atob(value);
+                }
+
+                result[prop] = value;
             }
 
             result.script = script;
