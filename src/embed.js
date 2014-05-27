@@ -81,7 +81,7 @@
             '.html?' +
                 'exp=' + encodeURIComponent(config.exp) + '&' +
                 'title=' + encodeURIComponent(config.title) + '&' +
-                'splash=' + encodeURIComponent('/collateral/' + config.exp + '/splash.jpg')
+                'splash=' + encodeURIComponent('/collateral/' + config.exp + '/splash')
         },
         div = document.createElement('div'),
         iframe = document.createElement('iframe'),

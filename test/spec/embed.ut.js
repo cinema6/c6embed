@@ -119,7 +119,7 @@
                                 '.html' +
                                 '?exp=e-123&' +
                                 'title=' + encodeURIComponent(atob(config['data-:title'])) + '&' +
-                                'splash=' + encodeURIComponent('/collateral/' + config['data-exp'] + '/splash.jpg')
+                                'splash=' + encodeURIComponent('/collateral/' + config['data-exp'] + '/splash')
                             );
                         });
                     });
