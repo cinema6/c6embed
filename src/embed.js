@@ -76,8 +76,12 @@
             width: '100%',
             scrolling: 'no',
             style: 'border: none; position: absolute; top: 0px; left: 0px;',
-            src: base + '/collateral/splash/' + config.splash.style + '/' + config.splash.ratio.join('-') + '.html' +
-                '?exp=' + encodeURIComponent(config.exp)
+            src: base + '/collateral/splash/' +
+                config.splash.style + '/' + config.splash.ratio.join('-') +
+            '.html?' +
+                'exp=' + encodeURIComponent(config.exp) + '&' +
+                'title=' + encodeURIComponent(config.title) + '&' +
+                'splash=' + encodeURIComponent('/collateral/' + config.exp + '/splash.jpg')
         },
         div = document.createElement('div'),
         iframe = document.createElement('iframe'),

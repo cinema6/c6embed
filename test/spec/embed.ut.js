@@ -51,18 +51,21 @@
             [
                 {
                     'data-exp': 'e-123',
-                    'data-splash': 'flavor1:1/1'
+                    'data-splash': 'flavor1:1/1',
+                    'data-:title': btoa('Hello World!')
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '100%',
                     'data-height': '300px',
-                    'data-splash': 'flavorc:16/9'
+                    'data-splash': 'flavorc:16/9',
+                    'data-:title': btoa('This is a Great MiniReel.')
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '150',
-                    'data-splash': 'flavor4:3/2.5'
+                    'data-splash': 'flavor4:3/2.5',
+                    'data-:title': btoa('Last One Here!')
                 }
             ].forEach(function(config) {
                 describe('with config: ' + JSON.stringify(config), function() {
@@ -109,7 +112,15 @@
                             expect($iframe.attr('style')).toContain('position: absolute;');
                             expect($iframe.attr('style')).toContain('top: 0px;');
                             expect($iframe.attr('style')).toContain('left: 0px;');
-                            expect($iframe.attr('src')).toBe(window.__C6_URL_ROOT__ + '/collateral/splash/' + style + '/' + ratio + '.html?exp=e-123');
+                            expect($iframe.attr('src')).toBe(
+                                window.__C6_URL_ROOT__ +
+                                '/collateral/splash/' +
+                                    style + '/' + ratio +
+                                '.html' +
+                                '?exp=e-123&' +
+                                'title=' + encodeURIComponent(atob(config['data-:title'])) + '&' +
+                                'splash=' + encodeURIComponent('/collateral/' + config['data-exp'] + '/splash.jpg')
+                            );
                         });
                     });
 
@@ -131,6 +142,9 @@
                                             result.src = $script.attr('src');
                                             result.responsive = !result.height;
                                             result.splash = jasmine.any(Object);
+                                            result.title = jasmine.any(String);
+
+                                            delete result[':title'];
 
                                             return result;
                                         }())
