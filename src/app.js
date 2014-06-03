@@ -114,14 +114,26 @@ module.exports = function(deps) {
                     $splash.prop('contentWindow').postMessage(message, '*');
                 }
 
+                function getSession() {
+                    return experienceService.getSession(settings.config.exp);
+                }
+
                 if (active) {
                     $iframe.show();
                     tellSplash('hide');
+                    getSession()
+                        .then(function pingShow(session) {
+                            session.ping('show');
+                        });
 
                     this.observe('responsiveStyles', setResponsiveStyles);
                 } else {
                     $iframe.hide();
                     tellSplash('show');
+                    getSession()
+                        .then(function pingHide(session) {
+                            session.ping('hide');
+                        });
 
                     $container.revertTo(0);
                     this.ignore('responsiveStyles', setResponsiveStyles);

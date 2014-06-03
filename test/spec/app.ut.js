@@ -342,6 +342,7 @@
                             state.set('active', true);
                             $iframe.hide.calls.reset();
                             $splash.prop('contentWindow').postMessage.calls.reset();
+                            experienceService.getSession.calls.reset();
                             state.set('responsiveStyles', {
                                 padding: '20px',
                                 marginTop: '50px'
@@ -364,6 +365,11 @@
                             expect($splash.prop('contentWindow').postMessage).toHaveBeenCalledWith('show', '*');
                         });
 
+                        it('should ping a nice message to the application', function() {
+                            expect(experienceService.getSession).toHaveBeenCalledWith(settings.config.exp);
+                            expect(safeSession.ping).toHaveBeenCalledWith('hide');
+                        });
+
                         it('should revert back to the original container style', function() {
                             ['padding', 'marginTop'].forEach(function(prop) {
                                 expect(settings.embed.style[prop]).toBe('10px');
@@ -382,6 +388,11 @@
 
                         it('should post a nice message to the splash page', function() {
                             expect($splash.prop('contentWindow').postMessage).toHaveBeenCalledWith('hide', '*');
+                        });
+
+                        it('should ping a nice message to the application', function() {
+                            expect(experienceService.getSession).toHaveBeenCalledWith(settings.config.exp);
+                            expect(safeSession.ping).toHaveBeenCalledWith('show');
                         });
 
                         describe('if there are responsiveStyles', function() {
