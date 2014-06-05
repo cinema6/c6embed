@@ -1,7 +1,8 @@
 (function(win) {
     'use strict';
 
-    var appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/app.js',
+    var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
+        appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/app.js',
         config = (function(scripts) {
             var script = scripts[scripts.length - 1],
                 attributes = script.attributes,
@@ -60,15 +61,50 @@
         },
         containerStyles = (config.width && config.height) ? staticStyles : responsiveStyles,
         div = document.createElement('div'),
+        splash = document.createElement('div'),
         attr = null;
+
+    function require(src, cb) {
+        var iframe = document.createElement('iframe'),
+            body = document.getElementsByTagName('body')[0],
+            html = [
+                '<script>',
+                '(' + function(window) {
+                    window.module = {
+                        exports: {}
+                    };
+                    window.exports = window.module.exports;
+                }.toString() + '(window))',
+                '</script>',
+                '<script src="' + src + '"></script>'
+            ].join('\n');
+
+        iframe.style.display = 'none';
+        iframe.addEventListener('load', function() {
+            var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+
+            if (head.childNodes.length < 1) { return; }
+
+            cb.call(window, iframe.contentWindow.module.exports);
+            body.removeChild(iframe);
+        }, false);
+        iframe.setAttribute('src', 'javascript:\'' + html + '\';');
+
+        body.appendChild(iframe);
+    }
 
     div.setAttribute('id', 'c6embed-' + config.exp);
     div.style.position = 'relative';
+
+    require(baseUrl + '/collateral/splash/' + config.splash.style + '/' + config.splash.ratio.join('-') + '.js', function(html) {
+        console.log(html);
+    });
 
     for (attr in containerStyles) {
         div.style[attr] = containerStyles[attr];
     }
 
+    div.appendChild(splash);
     script.parentNode.insertBefore(div, script);
 
     c6.embeds[config.exp] = {

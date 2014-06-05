@@ -9,7 +9,7 @@
         var $div;
 
         beforeEach(function() {
-            window.__C6_URL_ROOT__ = 'http://staging.cinema6.com';
+            window.__C6_URL_ROOT__ = '/base/test/helpers';
             window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
 
             C6Query = require('../../lib/C6Query');
@@ -64,7 +64,7 @@
                 {
                     'data-exp': 'e-123',
                     'data-width': '150',
-                    'data-splash': 'flavor4:3/2.5',
+                    'data-splash': 'flavor4:6/5',
                     'data-:title': btoa('Last One Here!')
                 }
             ].forEach(function(config) {
@@ -96,6 +96,17 @@
                             expect($embed.length).toBe(1);
                             expect($embed[0].nextSibling).toBe($script[0]);
                             expect($embed[0].style.position).toBe('relative');
+                        });
+                    });
+
+                    describe('the splash page', function() {
+                        it('should create a div for the splash page', function() {
+                            var $div = $('div#c6embed-e-123 div'),
+                                splash = config['data-splash'].split(':'),
+                                theme = splash[0],
+                                ratio = splash[1].split('/').join('-');
+
+                            expect($div[0].innerHTML).toBe(require('../helpers/collateral/splash/' + theme + '/' + ratio + '.js'));
                         });
                     });
 
@@ -186,7 +197,7 @@
                 var script = document.createElement('script');
 
                 script.setAttribute('data-exp', 'e-abc');
-                script.setAttribute('data-splash', 'flavorflav:3/2.5');
+                script.setAttribute('data-splash', 'flavorflav:6/5');
 
                 script.src = '/base/src/embed.js';
                 script.onload = done;
