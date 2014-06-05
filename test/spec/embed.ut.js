@@ -97,31 +97,6 @@
                             expect($embed[0].nextSibling).toBe($script[0]);
                             expect($embed[0].style.position).toBe('relative');
                         });
-
-                        it('should put an iframe in the div', function() {
-                            var $iframe = $('div#c6embed-e-123 > iframe'),
-                                splashParts = config['data-splash'].split(':'),
-                                style = splashParts[0],
-                                ratio = splashParts[1].split('/').join('-');
-
-                            expect($iframe.length).toBe(1);
-                            expect($iframe.attr('width')).toBe('100%');
-                            expect($iframe.attr('height')).toBe('100%');
-                            expect($iframe.attr('scrolling')).toBe('no');
-                            expect($iframe.attr('style')).toContain('border: none;');
-                            expect($iframe.attr('style')).toContain('position: absolute;');
-                            expect($iframe.attr('style')).toContain('top: 0px;');
-                            expect($iframe.attr('style')).toContain('left: 0px;');
-                            expect($iframe.attr('src')).toBe(
-                                window.__C6_URL_ROOT__ +
-                                '/collateral/splash/' +
-                                    style + '/' + ratio +
-                                '.html' +
-                                '?exp=e-123&' +
-                                'title=' + encodeURIComponent(atob(config['data-:title'])) + '&' +
-                                'splash=' + encodeURIComponent('/collateral/' + config['data-exp'] + '/splash')
-                            );
-                        });
                     });
 
                     describe('the c6 object', function() {
@@ -202,27 +177,6 @@
                             });
                         });
                     });
-
-                    describe('when the splash is clicked', function() {
-                        beforeEach(function() {
-                            var message = document.createEvent('CustomEvent');
-
-                            message.initCustomEvent('message', false, false);
-                            message.origin = 'http://staging.cinema6.com';
-                            message.data = JSON.stringify({
-                                event: 'click',
-                                exp: 'e-123'
-                            });
-
-                            spyOn(window.c6, 'loadExperience');
-
-                            window.dispatchEvent(message);
-                        });
-
-                        it('should call loadExperience()', function() {
-                            expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds['e-123']);
-                        });
-                    });
                 });
             });
         });
@@ -249,13 +203,8 @@
                 it('should have styles for responsive sizing', function() {
                     var style = embed.style;
 
-                    expect(style.width).toBe('100%');
-                    expect(style.height).toBe('0px');
-                    expect(style.boxSizing).toBe('border-box');
-                    expect(style.fontSize).toBe('16px');
-                    expect(style.minWidth).toBe('18.75em');
-                    expect(style.minHeight).toBe('19.625em');
-                    expect(style.padding).toBe('0px 0px ' + ((2.5 / 3) * 100) +'%');
+                    expect(style.width).toBe('');
+                    expect(style.height).toBe('');
                 });
             });
         });
