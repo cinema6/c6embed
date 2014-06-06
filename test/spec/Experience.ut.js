@@ -221,6 +221,7 @@
                         expect(handshakeData.success).toBe(true);
                         expect(handshakeData.appData.experience).toBe(exp);
                         expect(handshakeData.appData.profile).toBe(browserInfo.profile);
+                        expect(handshakeData.appData.preload).toBe(false);
                     });
                 });
             });

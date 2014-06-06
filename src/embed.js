@@ -2,7 +2,7 @@
     'use strict';
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
-        appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/app.js',
+        appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/c6embed.min.js',
         config = (function(scripts) {
             var script = scripts[scripts.length - 1],
                 attributes = script.attributes,
