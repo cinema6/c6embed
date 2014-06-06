@@ -86,16 +86,7 @@
             html = [
                 '<script>',
                 '(' + function(window) {
-                    var firstChar;
-
-                    for (var prop in window) {
-                        firstChar = prop.charAt(0);
-
-                        if (firstChar.toUpperCase() === firstChar) {
-                            window[prop] = window.parent[prop];
-                        }
-                    }
-
+                    window.Text = window.parent.Text;
                     window.module = {
                         exports: {}
                     };
@@ -129,7 +120,7 @@
     div.appendChild(splash);
     script.parentNode.insertBefore(div, script);
 
-    require('//lib.cinema6.com/twobits.js/v0.0.0-0-gdf10bf2/twobits.min.js', function(tb) {
+    require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
             require(splashOf(config.splash), function(html) {
                 splash.innerHTML = html;
