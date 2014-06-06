@@ -126,7 +126,7 @@
                 splash.innerHTML = html;
                 tb.parse(splash)({
                     title: config.title,
-                    splash: baseUrl + '/collateral/experience/' + config.exp + '/splash'
+                    splash: baseUrl + '/collateral/experiences/' + config.exp + '/splash'
                 });
                 settings.splashDelegate = splashJS(c6, settings, splash);
             });

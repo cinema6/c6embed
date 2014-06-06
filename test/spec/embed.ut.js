@@ -167,7 +167,7 @@
                                 expect($div[0].innerHTML).toBe(
                                     html.replace('{{title}}', atob(config['data-:title']))
                                         .replace('{{splash}}', window.__C6_URL_ROOT__ +
-                                            '/collateral/experience/' + config['data-exp'] + '/splash')
+                                            '/collateral/experiences/' + config['data-exp'] + '/splash')
                                 );
                                 done();
                             });
