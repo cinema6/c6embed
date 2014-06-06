@@ -42,6 +42,7 @@
         c6 = win.c6 || (win.c6 = {
             embeds: {},
             app: null,
+            requireCache: {},
             loadExperience: function(embed) {
                 var app = this.app || (this.app = document.createElement('script')),
                     head = document.getElementsByTagName('head')[0];
@@ -62,14 +63,39 @@
         containerStyles = (config.width && config.height) ? staticStyles : responsiveStyles,
         div = document.createElement('div'),
         splash = document.createElement('div'),
-        attr = null;
+        attr = null,
+        settings = c6.embeds[config.exp] = {
+            embed: div,
+            splashDelegate: null,
+            load: false,
+            config: config
+        };
+
+    function splashOf(splashConfig) {
+        return baseUrl +
+            '/collateral/splash/' +
+            splashConfig.style + '/' +
+            splashConfig.ratio.join('-') + '.js';
+    }
 
     function require(src, cb) {
+        if (c6.requireCache[src]) { return cb(c6.requireCache[src]); }
+
         var iframe = document.createElement('iframe'),
-            body = document.getElementsByTagName('body')[0],
+            head = document.getElementsByTagName('head')[0],
             html = [
                 '<script>',
                 '(' + function(window) {
+                    var firstChar;
+
+                    for (var prop in window) {
+                        firstChar = prop.charAt(0);
+
+                        if (firstChar.toUpperCase() === firstChar) {
+                            window[prop] = window.parent[prop];
+                        }
+                    }
+
                     window.module = {
                         exports: {}
                     };
@@ -79,26 +105,22 @@
                 '<script src="' + src + '"></script>'
             ].join('\n');
 
-        iframe.style.display = 'none';
         iframe.addEventListener('load', function() {
             var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
 
             if (head.childNodes.length < 1) { return; }
 
-            cb.call(window, iframe.contentWindow.module.exports);
-            body.removeChild(iframe);
+            cb.call(window, (c6.requireCache[src] = iframe.contentWindow.module.exports));
         }, false);
+        /* jshint scripturl:true */
         iframe.setAttribute('src', 'javascript:\'' + html + '\';');
+        /* jshint scripturl:false */
 
-        body.appendChild(iframe);
+        head.appendChild(iframe);
     }
 
     div.setAttribute('id', 'c6embed-' + config.exp);
     div.style.position = 'relative';
-
-    require(baseUrl + '/collateral/splash/' + config.splash.style + '/' + config.splash.ratio.join('-') + '.js', function(html) {
-        console.log(html);
-    });
 
     for (attr in containerStyles) {
         div.style[attr] = containerStyles[attr];
@@ -107,10 +129,16 @@
     div.appendChild(splash);
     script.parentNode.insertBefore(div, script);
 
-    c6.embeds[config.exp] = {
-        embed: div,
-        load: false,
-        config: config
-    };
-
+    require('//lib.cinema6.com/twobits.js/v0.0.0-0-gdf10bf2/twobits.min.js', function(tb) {
+        require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
+            require(splashOf(config.splash), function(html) {
+                splash.innerHTML = html;
+                tb.parse(splash)({
+                    title: config.title,
+                    splash: baseUrl + '/collateral/experience/' + config.exp + '/splash'
+                });
+                settings.splashDelegate = splashJS(c6, config, splash);
+            });
+        });
+    });
 }(window));

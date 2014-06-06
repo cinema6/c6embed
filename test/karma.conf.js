@@ -21,6 +21,7 @@ module.exports = function(config) {
             'node_modules/q/q.js',
             'node_modules/asEvented/asevented.js',
             { pattern: 'src/embed.js', included: false },
+            { pattern: 'test/helpers/collateral/**/*.js', included: false },
             'lib/**/*.js',
             'src/**/*.js',
             'test/spec/**/*.js',
@@ -37,7 +38,7 @@ module.exports = function(config) {
             'lib/**/*.js': ['commonjs'],
             'src/**/!(embed).js': ['commonjs'],
             'test/spec/**/*.js': ['commonjs'],
-            'test/helpers/**/*.js': ['commonjs']
+            'test/helpers/*.js': ['commonjs']
         },
 
         // test results reporter to use

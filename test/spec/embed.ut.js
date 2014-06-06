@@ -8,8 +8,40 @@
 
         var $div;
 
+        function load(module, cb) {
+            var iframe = document.createElement('iframe'),
+                body = document.getElementsByTagName('body')[0],
+                html = [
+                    '<script>',
+                    '(' + function(window) {
+                        window.module = {
+                            exports: {}
+                        };
+                        window.exports = window.module.exports;
+                    }.toString() + '(window))',
+                    '</script>',
+                    '<script src="' + module + '"></script>'
+                ].join('\n');
+
+            iframe.style.display = 'none';
+            iframe.addEventListener('load', function() {
+                var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+
+                if (head.childNodes.length < 1) { return; }
+
+                cb.call(window, iframe.contentWindow.module.exports);
+                body.removeChild(iframe);
+            }, false);
+            /* jshint scripturl:true */
+            iframe.setAttribute('src', 'javascript:\'' + html + '\';');
+            /* jshint scripturl:false */
+
+            body.appendChild(iframe);
+        }
+
+
         beforeEach(function() {
-            window.__C6_URL_ROOT__ = '/base/test/helpers';
+            window.__C6_URL_ROOT__ = 'base/test/helpers';
             window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
 
             C6Query = require('../../lib/C6Query');
@@ -100,13 +132,45 @@
                     });
 
                     describe('the splash page', function() {
-                        it('should create a div for the splash page', function() {
-                            var $div = $('div#c6embed-e-123 div'),
-                                splash = config['data-splash'].split(':'),
+                        var $div, splashJS;
+
+                        beforeEach(function(done) {
+                            $div = $('div#c6embed-e-123 div');
+
+                            var intervalId = setInterval(function() {
+                                splashJS = window.c6.requireCache[
+                                    window.__C6_URL_ROOT__ +
+                                    '/collateral/splash/splash.js'
+                                ];
+
+                                if (!!$div[0].innerHTML && splashJS) {
+                                    clearInterval(intervalId);
+                                    done();
+                                }
+                            }, 50);
+                        });
+
+                        it('should call a script that will provide interactivity', function() {
+                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']].config, $div[0]);
+                        });
+
+                        it('should set settings.splashDelegate to the result of the interactivity module', function() {
+                            expect(splashJS()).toEqual(window.c6.embeds[config['data-exp']].splashDelegate);
+                        });
+
+                        it('should create a div for the splash page', function(done) {
+                            var splash = config['data-splash'].split(':'),
                                 theme = splash[0],
                                 ratio = splash[1].split('/').join('-');
 
-                            expect($div[0].innerHTML).toBe(require('../helpers/collateral/splash/' + theme + '/' + ratio + '.js'));
+                            load('base/test/helpers/collateral/splash/' + theme + '/' + ratio + '.js', function(html) {
+                                expect($div[0].innerHTML).toBe(
+                                    html.replace('{{title}}', atob(config['data-:title']))
+                                        .replace('{{splash}}', window.__C6_URL_ROOT__ +
+                                            '/collateral/experience/' + config['data-exp'] + '/splash')
+                                );
+                                done();
+                            });
                         });
                     });
 
@@ -117,6 +181,7 @@
                                     'e-123': {
                                         embed: $('#c6embed-e-123')[0],
                                         load: false,
+                                        splashDelegate: null,
                                         config: (function() {
                                             var result = {};
 
@@ -137,7 +202,8 @@
                                     }
                                 },
                                 app: null,
-                                loadExperience: jasmine.any(Function)
+                                loadExperience: jasmine.any(Function),
+                                requireCache: jasmine.any(Object)
                             });
                         });
 
