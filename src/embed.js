@@ -137,7 +137,7 @@
                     title: config.title,
                     splash: baseUrl + '/collateral/experience/' + config.exp + '/splash'
                 });
-                settings.splashDelegate = splashJS(c6, config, splash);
+                settings.splashDelegate = splashJS(c6, settings, splash);
             });
         });
     });

@@ -151,7 +151,7 @@
                         });
 
                         it('should call a script that will provide interactivity', function() {
-                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']].config, $div[0]);
+                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']], $div[0]);
                         });
 
                         it('should set settings.splashDelegate to the result of the interactivity module', function() {
