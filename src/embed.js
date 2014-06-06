@@ -66,7 +66,7 @@
         attr = null,
         settings = c6.embeds[config.exp] = {
             embed: div,
-            splashDelegate: null,
+            splashDelegate: {},
             load: false,
             config: config
         };
@@ -79,7 +79,7 @@
     }
 
     function require(src, cb) {
-        if (c6.requireCache[src]) { return cb(c6.requireCache[src]); }
+        if (c6.requireCache[src]) { return cb.call(window, c6.requireCache[src]); }
 
         var iframe = document.createElement('iframe'),
             head = document.getElementsByTagName('head')[0],

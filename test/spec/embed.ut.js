@@ -181,7 +181,7 @@
                                     'e-123': {
                                         embed: $('#c6embed-e-123')[0],
                                         load: false,
-                                        splashDelegate: null,
+                                        splashDelegate: {},
                                         config: (function() {
                                             var result = {};
 

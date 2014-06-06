@@ -165,34 +165,39 @@
                 embed1, embed2;
 
             beforeEach(function() {
-                embed1 = $('<div><iframe src="about:blank"></iframe></div>')[0];
-                embed2 = $('<div><iframe src="about:blank"></iframe></div>')[0];
+                embed1 = $('<div><div></div></div>')[0];
+                embed2 = $('<div><div></div></div>')[0];
 
                 c6 = $window.c6;
 
                 c6.embeds = {
                     'e-123': {
-                        load: false
+                        load: false,
+                        splashDelegate: {}
                     },
                     'e-abc': {
-                        load: false
+                        load: false,
+                        splashDelegate: {}
                     },
                     'e-456': {
                         load: true,
                         embed: embed1,
                         config: {
                             exp: 'e-456'
-                        }
+                        },
+                        splashDelegate: {}
                     },
                     'e-def': {
                         load: true,
                         embed: embed2,
                         config: {
                             exp: 'e-456'
-                        }
+                        },
+                        splashDelegate: {}
                     },
                     'e-789': {
-                        load: false
+                        load: false,
+                        splashDelegate: {}
                     }
                 };
 
@@ -220,10 +225,9 @@
             });
         });
 
-        describe('c6.loadExperience(embed)', function() {
+        describe('c6.loadExperience(settings)', function() {
             var settings,
                 $embed,
-                $splash,
                 promise,
                 success;
 
@@ -235,8 +239,12 @@
                 }));
 
                 settings = {
-                    embed: $('<div style="padding: 10px; margin-top: 10px;"><iframe src="about:blank"></iframe></div>')[0],
+                    embed: $('<div style="padding: 10px; margin-top: 10px;"><div></div></div>')[0],
                     load: true,
+                    splashDelegate: {
+                        didShow: jasmine.createSpy('splashDelegate.didShow()'),
+                        didHide: jasmine.createSpy('splashDelegate.didHide()')
+                    },
                     config: {
                         exp: 'e-68cde3e4177b8a',
                         responsive: true
@@ -245,8 +253,6 @@
 
                 $embed = $(settings.embed);
                 $('body').append($embed);
-                $splash = $($embed.prop('firstChild'));
-                spyOn($splash.prop('contentWindow'), 'postMessage');
 
                 run();
 
@@ -341,7 +347,7 @@
                         beforeEach(function() {
                             state.set('active', true);
                             $iframe.hide.calls.reset();
-                            $splash.prop('contentWindow').postMessage.calls.reset();
+                            settings.splashDelegate.didShow.calls.reset();
                             experienceService.getSession.calls.reset();
                             state.set('responsiveStyles', {
                                 padding: '20px',
@@ -362,7 +368,7 @@
                         });
 
                         it('should post a nice message to the splash page', function() {
-                            expect($splash.prop('contentWindow').postMessage).toHaveBeenCalledWith('show', '*');
+                            expect(settings.splashDelegate.didShow).toHaveBeenCalled();
                         });
 
                         it('should ping a nice message to the application', function() {
@@ -387,7 +393,7 @@
                         });
 
                         it('should post a nice message to the splash page', function() {
-                            expect($splash.prop('contentWindow').postMessage).toHaveBeenCalledWith('hide', '*');
+                            expect(settings.splashDelegate.didHide).toHaveBeenCalled();
                         });
 
                         it('should ping a nice message to the application', function() {

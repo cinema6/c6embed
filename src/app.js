@@ -18,7 +18,8 @@ module.exports = function(deps) {
         embeds = c6.embeds,
         id = null,
         settings = null,
-        loads = [];
+        loads = [],
+        noop = function() {};
 
     function appUrl(url) {
         return config.appBase + '/' + url;
@@ -30,7 +31,7 @@ module.exports = function(deps) {
         function bootstrap() {
             var $iframe = frameFactory(),
                 $container = $(settings.embed),
-                $splash = $($container.prop('firstChild')),
+                splashDelegate = settings.splashDelegate,
                 appConfig = {
                     kDebug: config.debug,
                     kDevice: browserInfo.profile.device,
@@ -110,8 +111,8 @@ module.exports = function(deps) {
                     $container.css(styles);
                 }
 
-                function tellSplash(message) {
-                    $splash.prop('contentWindow').postMessage(message, '*');
+                function callDelegate(method) {
+                    (splashDelegate[method] || noop)();
                 }
 
                 function getSession() {
@@ -120,7 +121,7 @@ module.exports = function(deps) {
 
                 if (active) {
                     $iframe.show();
-                    tellSplash('hide');
+                    callDelegate('didHide');
                     getSession()
                         .then(function pingShow(session) {
                             session.ping('show');
@@ -129,7 +130,7 @@ module.exports = function(deps) {
                     this.observe('responsiveStyles', setResponsiveStyles);
                 } else {
                     $iframe.hide();
-                    tellSplash('show');
+                    callDelegate('didShow');
                     getSession()
                         .then(function pingHide(session) {
                             session.ping('hide');
