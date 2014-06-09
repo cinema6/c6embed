@@ -69,8 +69,10 @@
             $window = {
                 c6: {
                     loadExperience: function() {}
-                }
+                },
+                __c6_ga__: jasmine.createSpy('window.__c6_ga__')
             };
+
 
             config = {
                 debug: true,
@@ -444,6 +446,46 @@
 
                 it('should put the session on the embed settings object', function() {
                     expect(settings.session).toBe(session);
+                });
+
+                describe('google analytics',function(){
+                    var tracker;
+
+                    beforeEach(function(){
+                        $window.c6.gaAcctId = 'abc';
+                        tracker = {
+                            get : jasmine.createSpy('tracker.get')
+                        };
+                        tracker.get.and.returnValue('fake_client_id');
+
+                        $window.__c6_ga__.getByName = jasmine.createSpy('ga.getByName')
+                            .and.returnValue(tracker);
+                    });
+
+                    it('sends a ping if it gets a clientId',function(){
+                        $window.__c6_ga__.calls.mostRecent().args[0]();
+                        expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
+                        expect(tracker.get).toHaveBeenCalledWith('clientId');
+                        expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id' } );
+                    });
+
+                    it('sends no ping if it gets no clientId',function(){
+                        tracker.get.and.returnValue(undefined);
+
+                        session.trigger('ready', true);
+                        session.ping.calls.reset();
+                        $window.__c6_ga__.calls.mostRecent().args[0]();
+                        expect(session.ping).not.toHaveBeenCalled();
+                    });
+
+                    it('sends no ping if no tracker is returned',function(){
+                        $window.__c6_ga__.getByName.and.returnValue(undefined);
+
+                        session.trigger('ready', true);
+                        session.ping.calls.reset();
+                        $window.__c6_ga__.calls.mostRecent().args[0]();
+                        expect(session.ping).not.toHaveBeenCalled();
+                    });
                 });
 
                 describe('when the app wants to open', function() {

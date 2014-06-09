@@ -203,7 +203,8 @@
                                 },
                                 app: null,
                                 loadExperience: jasmine.any(Function),
-                                requireCache: jasmine.any(Object)
+                                requireCache: jasmine.any(Object),
+                                gaAcctId: 'UA-44457821-2'
                             });
                         });
 
