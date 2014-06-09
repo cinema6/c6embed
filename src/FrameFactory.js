@@ -19,12 +19,9 @@ module.exports = function(deps) {
             var document = documentParser(html);
 
             document.injectScript(function(window) {
-                (window.history.replaceState || function() {}).call(
-                    window.history,
-                    {},
-                    'parent',
-                    window.parent.location.href
-                );
+                try {
+                    window.history.replaceState({}, 'parent', window.parent.location.href);
+                } catch (e) {}
                 window.frameElement.c6Loaded(window);
             });
 
