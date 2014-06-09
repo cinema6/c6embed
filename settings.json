@@ -14,11 +14,11 @@
     "s3": {
         "test": {
             "bucket": "c6.dev",
-            "app": "ext/<%= package.name %>/"
+            "app": "ext/<%= package.name %>/v1/"
         },
         "production": {
             "bucket": "c6.ext",
-            "app": "<%= package.name %>/"
+            "app": "<%= package.name %>/v1/"
         }
     }
 }
