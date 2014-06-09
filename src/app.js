@@ -96,6 +96,25 @@ module.exports = function(deps) {
                     });
             }
 
+            function initAnalytics(session) {
+                /* jshint camelcase:false */
+                window.__c6_ga__(function(){
+                    var tracker = window.__c6_ga__.getByName('c6'), clientId;
+                    try {
+                        clientId = tracker.get('clientId');
+                    }catch(e){
+
+                    }
+
+                    if (clientId){
+                        session.ping('initAnalytics',{
+                            accountId: window.c6.gaAcctId,
+                            clientId:   clientId
+                        });
+                    }
+                });
+            }
+
             function finish() {
                 return settings;
             }
@@ -149,6 +168,7 @@ module.exports = function(deps) {
                 .then(fetchApp)
                 .then(modifyApp)
                 .then(loadApp)
+                .then(initAnalytics)
                 .then(finish);
         }
 

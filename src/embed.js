@@ -43,6 +43,7 @@
             embeds: {},
             app: null,
             requireCache: {},
+            gaAcctId: 'UA-44457821-2',
             loadExperience: function(embed) {
                 var app = this.app || (this.app = document.createElement('script')),
                     head = document.getElementsByTagName('head')[0];
@@ -109,6 +110,28 @@
 
         head.appendChild(iframe);
     }
+
+    /* Create GA Tracker */
+    (function() {
+        /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+        /* jshint sub:false, asi:false, expr:false, indent:4 */
+
+        window.__c6_ga__('create', c6.gaAcctId, {
+            'name'       : 'c6',
+            'cookieName' : '_c6ga'
+        });
+        window.__c6_ga__('c6.require', 'displayfeatures');
+
+        window.__c6_ga__('c6.send', 'pageview', {
+            'page'  : '/embed/' + config.exp,
+            'title' : config.title
+        });
+        /* jshint camelcase:true */
+    }());
 
     div.setAttribute('id', 'c6embed-' + config.exp);
     div.style.position = 'relative';
