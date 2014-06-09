@@ -279,6 +279,10 @@
                 expect(settings.embed.childNodes[1]).toBe($iframe[0]);
             });
 
+            it('should make the container untouchable', function() {
+                expect($(settings.embed).hasClass('c6__cant-touch-this')).toBe(true);
+            });
+
             it('should fetch the experience', function() {
                 expect(c6Db.find).toHaveBeenCalledWith('experience', settings.config.exp);
             });

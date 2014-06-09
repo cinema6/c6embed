@@ -100,7 +100,8 @@ module.exports = function(deps) {
                 return settings;
             }
 
-            $container.createSnapshot();
+            $container.addClass('c6__cant-touch-this')
+                .createSnapshot();
 
             state = settings.state = new Observable({
                 responsiveStyles: null,
