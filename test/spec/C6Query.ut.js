@@ -159,7 +159,7 @@
                     it('should add the class to all the elements of the selector', function() {
                         var $c6 = $('.c6');
 
-                        $c6.addClass('team');
+                        expect($c6.addClass('team')).toBe($c6);
 
                         expect($c6[0].className).toBe('c6 howard josh evan scott team');
                         expect($c6[1].className).toBe('c6 moo steph team');
