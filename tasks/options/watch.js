@@ -7,17 +7,19 @@
                 '<%= settings.appDir %>/**/*.html',
                 'src/**/*.js',
                 'lib/**/*.js',
+                'lite/**/*.js',
             ],
             options: {
                 livereload: true
             },
-            tasks: ['browserify:server']
+            tasks: ['browserify:server', 'copy:embed']
         },
         unit: {
             files: [
                 'src/**/*.js',
                 'lib/**/*.js',
-                'test/spec/**/*.js'
+                'lite/**/*.js',
+                'test/spec/**/*.js',
             ],
             tasks: ['karma:debug:run']
         },

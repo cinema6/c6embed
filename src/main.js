@@ -86,6 +86,27 @@
     cinema6Adapter.apiBase = config.apiBase;
     c6Db.adapter = cinema6Adapter;
 
+    /* Create and Configure DocumentParser */
+    var DocumentParser = require('./DocumentParser'),
+        documentParser = new DocumentParser();
+
+    /* Create and Configure FrameFactory */
+    var FrameFactory = require('./FrameFactory'),
+        frameFactory = new FrameFactory({
+            $: c6Query,
+            documentParser: documentParser
+        });
+
+    /* Create and Configure HostDocument */
+    var HostDocument = require('./HostDocument'),
+        hostDocument = new HostDocument({
+            $: c6Query,
+            window: window
+        });
+
+    /* Create and Configure Observable */
+    var ObservableProvider = require('../lib/ObservableProvider'),
+        Observable = new ObservableProvider();
 
     /* Create GA Tracker */
     /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
@@ -109,14 +130,18 @@
 
     /* Run the Application! */
     return app({
-        config: config,
-        q: q,
-        c6Db: c6Db,
-        c6Ajax: c6Ajax,
-        experience: experience,
         window: window,
+        frameFactory: frameFactory,
         $: c6Query,
-        browserInfo: browserInfo
+        Q: q,
+        c6Db: c6Db,
+        config: config,
+        c6Ajax: c6Ajax,
+        documentParser: documentParser,
+        browserInfo: browserInfo,
+        experienceService: experience,
+        hostDocument: hostDocument,
+        Observable: Observable
     })
         .then(function(result) {
             if (!window.console) { return; }

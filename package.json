@@ -1,6 +1,6 @@
 {
   "name": "c6embed",
-  "version": "0.8.5",
+  "version": "1.0.0",
   "description": "Script to embed Cinema6 experiences.",
   "keywords": [
     "c6embed"
@@ -20,6 +20,7 @@
     "grunt-c6-util": "git+ssh://git@github.com:cinema6/c6-grunt-util",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-connect": "~0.5.0",
+    "grunt-contrib-copy": "^0.5.0",
     "grunt-contrib-jshint": "~0.7.2",
     "grunt-contrib-uglify": "~0.2.7",
     "grunt-contrib-watch": "~0.5.3",
