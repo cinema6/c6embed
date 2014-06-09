@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v1.0.0 (June 9, 2014)
+* [FEATURE]: Added support for new splash page designs with different
+  ratios
+* [FEATURE]: C6Embed now defers loading the experience/app until after
+  the splash page is clicked
+
 ## v0.8.5 (May 8, 2014)
 * [FIX]: Account for more CSS properties when shrinking down a parent
   page
