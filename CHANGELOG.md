@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.0.1 (June 10, 2014)
+* [FEATURE]: The major embed API version is now passed along with the
+  app data
+
 ## v1.0.0 (June 9, 2014)
 * [FEATURE]: Added support for new splash page designs with different
   ratios
