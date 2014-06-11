@@ -193,11 +193,16 @@
                         '    </div>',
                         '</div>'
                     ].join(''));
+                    $('article')[0].appendChild(test.contentWindow.document.createComment('TROLL'));
                 });
 
                 describe('if it should shrink', function() {
                     beforeEach(function() {
                         hostDocument.shrink(true);
+                    });
+
+                    it('should not take a snapshot of an element it is not modifying', function() {
+                        expect($('article').data('c6Snapshots')).toBeUndefined();
                     });
 
                     it('should make all the top-level elements have a height of 0', function() {
