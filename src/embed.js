@@ -38,11 +38,13 @@
 
             return result;
         }(document.getElementsByTagName('script'))),
+        head = document.getElementsByTagName('head')[0],
         script = config.script,
         c6 = win.c6 || (win.c6 = {
             embeds: {},
             app: null,
             requireCache: {},
+            branding: {},
             gaAcctId: 'UA-44457821-2',
             loadExperience: function(embed) {
                 var app = this.app || (this.app = document.createElement('script')),
@@ -62,8 +64,13 @@
             height: config.height
         },
         containerStyles = (config.width && config.height) ? staticStyles : responsiveStyles,
-        div = document.createElement('div'),
-        splash = document.createElement('div'),
+        div = new DOMElement('div', {
+            id: 'c6embed-' + config.exp,
+            style: 'position: relative'
+        }),
+        splash = new DOMElement('div', {
+            class: 'c6brand__' + config.branding
+        }),
         attr = null,
         settings = c6.embeds[config.exp] = {
             embed: div,
@@ -71,6 +78,21 @@
             load: false,
             config: config
         };
+
+    function DOMElement(tag, attrs, appendTo) {
+        var element = document.createElement(tag),
+            attr;
+
+        for (attr in attrs) {
+            element.setAttribute(attr, attrs[attr]);
+        }
+
+        if (appendTo) {
+            appendTo.appendChild(element);
+        }
+
+        return element;
+    }
 
     function splashOf(splashConfig) {
         return baseUrl +
@@ -133,8 +155,17 @@
         /* jshint camelcase:true */
     }());
 
-    div.setAttribute('id', 'c6embed-' + config.exp);
-    div.style.position = 'relative';
+    if (config.branding) {
+        /* jshint expr:true */
+        (c6.branding[config.branding] ||
+            (c6.branding[config.branding] = new DOMElement('link', {
+                id: 'c6-' + config.branding,
+                rel: 'stylesheet',
+                href: baseUrl + '/collateral/branding/' + config.branding + '/styles/splash.css'
+            }, head))
+        );
+        /* jshint expr:false */
+    }
 
     for (attr in containerStyles) {
         div.style[attr] = containerStyles[attr];
