@@ -135,7 +135,9 @@
             };
 
             hostDocument = {
-                shrink: jasmine.createSpy('hostDocument.shrink()')
+                shrink: jasmine.createSpy('hostDocument.shrink()'),
+                putInRootStackingContext: jasmine.createSpy('hostDocument.putInRootStackingContext()'),
+                reset: jasmine.createSpy('hostDocument.reset()')
             };
 
             app = require('../../src/app');
@@ -530,6 +532,26 @@
                                     });
                                 });
                             });
+
+                            describe('when true is provided', function() {
+                                beforeEach(function() {
+                                    session.emit('fullscreenMode', true);
+                                });
+
+                                it('should put the $iframe in the root stacking context', function() {
+                                    expect(hostDocument.putInRootStackingContext).toHaveBeenCalledWith($iframe);
+                                });
+                            });
+
+                            describe('when false is provided', function() {
+                                beforeEach(function() {
+                                    session.emit('fullscreenMode', false);
+                                });
+
+                                it('should reset the hostDocument', function() {
+                                    expect(hostDocument.reset).toHaveBeenCalled();
+                                });
+                            });
                         });
                     });
 
@@ -538,15 +560,23 @@
                             browserInfo.profile.device = 'phone';
                         });
 
-                        [true, false].forEach(function(bool) {
-                            describe('when ' + bool + ' is provided', function() {
-                                beforeEach(function() {
-                                    session.emit('fullscreenMode', bool);
-                                });
+                        describe('when true is provided', function() {
+                            beforeEach(function() {
+                                session.emit('fullscreenMode', true);
+                            });
 
-                                it('should shrink or unshrink the host document', function() {
-                                    expect(hostDocument.shrink).toHaveBeenCalledWith(bool);
-                                });
+                            it('should shrink the host document', function() {
+                                expect(hostDocument.shrink).toHaveBeenCalledWith(true);
+                            });
+                        });
+
+                        describe('when false is provided', function() {
+                            beforeEach(function() {
+                                session.emit('fullscreenMode', false);
+                            });
+
+                            it('should not shrink the host document', function() {
+                                expect(hostDocument.shrink).not.toHaveBeenCalled();
                             });
                         });
                     });

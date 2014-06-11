@@ -8,6 +8,39 @@ module.exports = function(deps) {
         window.scrollTo(0, 0);
     }
 
+    this.reset = function() {
+        $('.c6__greetings-from-princeton-nj').revertTo(0);
+    };
+
+    this.putInRootStackingContext = function($element) {
+        function fixup(node) {
+            var parent, style, $parent;
+
+            if (!node) { return; }
+
+            parent = node.parentNode;
+            style = parent.style;
+            $parent = $(parent);
+
+            if (parent.tagName === 'HTML') { return; }
+
+            $parent.createSnapshot();
+
+            style.setProperty('z-index', 'auto', 'important');
+            style.setProperty('opacity', '1', 'important');
+
+            if ($parent.css('position') === 'fixed') {
+                style.setProperty('position', 'static', 'important');
+            }
+
+            $parent.addClass('c6__greetings-from-princeton-nj');
+
+            fixup($parent[0]);
+        }
+
+        fixup($element[0]);
+    };
+
     this.shrink = function(shouldShrink) {
         if (shouldShrink) {
             scrollTop();
@@ -36,7 +69,7 @@ module.exports = function(deps) {
                 $node.addClass('c6__greetings-from-princeton-nj');
             });
         } else {
-            $('.c6__greetings-from-princeton-nj').revertTo(0);
+            this.reset();
             window.removeEventListener('orientationchange', scrollTop, false);
         }
     };

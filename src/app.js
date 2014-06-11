@@ -85,8 +85,14 @@ module.exports = function(deps) {
                     .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
                         $iframe.fullscreen(shouldEnterFullscreen);
 
-                        if (browserInfo.profile.device === 'phone') {
-                            hostDocument.shrink(shouldEnterFullscreen);
+                        if (shouldEnterFullscreen) {
+                            if (browserInfo.profile.device === 'phone') {
+                                hostDocument.shrink(true);
+                            }
+
+                            hostDocument.putInRootStackingContext($iframe);
+                        } else {
+                            hostDocument.reset();
                         }
                     })
                     .on('responsiveStyles', function setResponsiveStyles(styles) {

@@ -35,6 +35,85 @@
         });
 
         describe('methods', function() {
+            describe('putInRootStackingContext($element)', function() {
+                var $element;
+
+                beforeEach(function() {
+                    $('head').append([
+                        '<style>',
+                        '    .zindex-test {',
+                        '        position: fixed !important;',
+                        '    }',
+                        '    .transparent {',
+                        '        opacity: 0.5;',
+                        '    }',
+                        '    .above {',
+                        '        position: absolute; z-index: 200;',
+                        '    }',
+                        '    .sibling {',
+                        '        position: fixed; z-index: 200; opacity: 0.25;',
+                        '    }',
+                        '</style>'
+                    ].join(''));
+
+                    $('body').prop('innerHTML', [
+                        '<div class="zindex-test">',
+                        '    <div class="sibling"></div>',
+                        '    <div class="transparent">',
+                        '        Hello',
+                        '        <div class="above">',
+                        '            <div class="zindex-test-target"></div>',
+                        '        </div>',
+                        '    </div>',
+                        '</div>'
+                    ].join(''));
+
+                    $element = $('.zindex-test-target');
+
+                    hostDocument.putInRootStackingContext($element);
+                });
+
+                it('should make fixed-positioned elements static', function() {
+                    expect($('.zindex-test').css('position')).toBe('static');
+                });
+
+                it('should make every element\'s opacity 1', function() {
+                    [$('.zindex-test'), $('.transparent'), $('.above')].forEach(function($element) {
+                        expect($element.css('opacity')).toBe('1');
+                    });
+                });
+
+                it('should make every element\'s z-index auto', function() {
+                    [$('.zindex-test'), $('.transparent'), $('.above')].forEach(function($element) {
+                        expect($element.css('z-index')).toBe('auto');
+                    });
+                });
+
+                it('should not make every element positioned: static', function() {
+                    expect($('.above').css('position')).toBe('absolute');
+                });
+
+                it('should not mess with non-parents of the $element', function() {
+                    var $sibling = $('.sibling');
+
+                    expect($sibling.css('position')).toBe('fixed');
+                    expect($sibling.css('z-index')).toBe('200');
+                    expect($sibling.css('opacity')).toBe('0.25');
+                });
+
+                it('should be reversable with a call to reset()', function() {
+                    var $test = $('.zindex-test'),
+                        $transparent = $('.transparent'),
+                        $above = $('.above');
+
+                    hostDocument.reset();
+
+                    expect($test.css('position')).toBe('fixed');
+                    expect($transparent.css('opacity')).toBe('0.5');
+                    expect($above.css('z-index')).toBe('200');
+                });
+            });
+
             describe('shrink(shouldShrink)', function() {
                 function orientationchange() {
                     var event = $window.document.createEvent('CustomEvent');
@@ -67,6 +146,15 @@
                         '        bottom: 0px;',
                         '        padding: 50px;',
                         '    }',
+                        '    .zindex-test {',
+                        '        position: fixed !important;',
+                        '    }',
+                        '    .transparent {',
+                        '        opacity: 0.5;',
+                        '    }',
+                        '    .above {',
+                        '        position: absolute; z-index: 200;',
+                        '    }',
                         '</style>'
                     ].join(''));
 
@@ -95,6 +183,14 @@
                         '</div>',
                         '<div class="footer">',
                         '    <p>Here is a footer</p>',
+                        '</div>',
+                        '<div class="zindex-test">',
+                        '    <div class="transparent">',
+                        '        Hello',
+                        '        <div class="above">',
+                        '            <div class="zindex-test-target"></div>',
+                        '        </div>',
+                        '    </div>',
                         '</div>'
                     ].join(''));
                 });
