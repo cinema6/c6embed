@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.0.2 (June 11, 2014)
+* [FIX]: Fix for an issue where elements of the parent site would appear
+  above a fullscreen experience
+
 ## v1.0.1 (June 10, 2014)
 * [FEATURE]: The major embed API version is now passed along with the
   app data
