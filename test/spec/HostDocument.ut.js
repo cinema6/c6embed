@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    ddescribe('HostDocument', function() {
+    describe('HostDocument', function() {
         var HostDocument,
             C6Query;
 
