@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.1.0
+* [FEATURE]: A custom branding stylesheet is now added to the DOM to
+  allow publisher-by-publisher styling
+
 ## v1.0.2 (June 11, 2014)
 * [FIX]: Fix for an issue where elements of the parent site would appear
   above a fullscreen experience
