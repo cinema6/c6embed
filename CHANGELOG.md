@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v1.0.3 (June 11, 2014)
+* [FIX]: Fix production path to app.js
+
 ## v1.0.1 (June 10, 2014)
 * [FEATURE]: The major embed API version is now passed along with the
   app data
