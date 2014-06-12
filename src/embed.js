@@ -159,12 +159,6 @@
     div.appendChild(splash);
     script.parentNode.insertBefore(div, script);
 
-    if (config.preload) {
-        c6.loadExperience(settings, true);
-    } else {
-        splash.addEventListener('mouseenter', handleMouseenter, false);
-    }
-
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
             require(splashOf(config.splash), function(html) {
@@ -174,6 +168,12 @@
                     splash: baseUrl + '/collateral/experiences/' + config.exp + '/splash'
                 });
                 settings.splashDelegate = splashJS(c6, settings, splash);
+
+                if (config.preload) {
+                    c6.loadExperience(settings, true);
+                } else {
+                    splash.addEventListener('mouseenter', handleMouseenter, false);
+                }
             });
         });
     });

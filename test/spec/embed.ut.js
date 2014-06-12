@@ -213,8 +213,8 @@
                                 embeds: {
                                     'e-123': {
                                         embed: $('#c6embed-e-123')[0],
-                                        load: 'data-preload' in config,
-                                        preload: 'data-preload' in config,
+                                        load: false,
+                                        preload: false,
                                         splashDelegate: {},
                                         config: (function() {
                                             var result = {};
@@ -236,7 +236,7 @@
                                         }())
                                     }
                                 },
-                                app: 'data-preload' in config ? jasmine.any(Object) : null,
+                                app: null,
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
                                 gaAcctId: 'UA-44457821-2'
@@ -317,7 +317,15 @@
 
         describe('data-preload attr', function() {
             function createEmbed(preload, done) {
-                var script;
+                var script,
+                    intervalId = setInterval(function() {
+                        if (!window.c6) { return; }
+
+                        if (Object.keys(window.c6.requireCache).length === 3) {
+                            clearInterval(intervalId);
+                            done();
+                        }
+                    }, 100);
 
                 script = document.createElement('script');
                 script.src = '/base/src/embed.js';
@@ -326,7 +334,6 @@
                     script.setAttribute('data-preload');
                 }
                 script.setAttribute('data-exp', 'e-60196c3751eb52');
-                script.onload = done;
 
                 $div.append(script);
             }
