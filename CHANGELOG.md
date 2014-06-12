@@ -3,6 +3,8 @@
 * [FEATURE]: Preloading is now supported: The app will be preloaded if
   the user mouses over the splash page, or if the data-preload attribute
   is present on the embed tag
+* [FEATURE]: A custom branding stylesheet is now added to the DOM to
+  allow publisher-by-publisher styling
 
 ## v1.0.2 (June 11, 2014)
 * [FIX]: Fix for an issue where elements of the parent site would appear

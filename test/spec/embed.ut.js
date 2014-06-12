@@ -91,27 +91,29 @@
                     'data-exp': 'e-123',
                     'data-splash': 'flavor1:1/1',
                     'data-:title': btoa('Hello World!'),
-                    'data-preload': ''
+                    'data-preload': '',
+                    'data-:branding': btoa('elitedaily')
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '100%',
                     'data-height': '300px',
                     'data-splash': 'flavorc:16/9',
-                    'data-:title': btoa('This is a Great MiniReel.')
+                    'data-:title': btoa('This is a Great MiniReel.'),
+                    'data-:branding': btoa('urbantimes')
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '150',
                     'data-splash': 'flavor4:6/5',
                     'data-:title': btoa('Last One Here!'),
-                    'data-preload': ''
+                    'data-preload': '',
+                    'data-:branding': btoa('elitedaily')
                 }
             ].forEach(function(config) {
                 describe('with config: ' + JSON.stringify(config), function() {
                     beforeEach(function(done) {
                         var script = document.createElement('script');
-
 
                         script.src = '/base/src/embed.js';
                         for (var key in config) {
@@ -123,6 +125,10 @@
                         $div.append($script);
                     });
 
+                    afterEach(function() {
+                        $('link#c6-' + atob(config['data-:branding'])).remove();
+                    });
+
                     describe('the element', function() {
                         it('should create a div after the script', function() {
                             var $embed = $('div#c6embed-e-123');
@@ -130,6 +136,35 @@
                             expect($embed.length).toBe(1);
                             expect($embed[0].nextSibling).toBe($script[0]);
                             expect($embed[0].style.position).toBe('relative');
+                        });
+                    });
+
+                    describe('the branding stylesheet', function() {
+                        it('should add a branding stylesheet to the page', function() {
+                            var branding = atob(config['data-:branding']);
+
+                            expect($('link#c6-' + branding).attr('href')).toBe(
+                                'base/test/helpers/collateral/branding/' + branding + '/styles/splash.css'
+                            );
+                        });
+
+                        describe('with multiple embeds on the same page', function() {
+                            beforeEach(function(done) {
+                                var embed2 = document.createElement('script');
+
+                                embed2.src = '/base/src/embed.js';
+                                for (var key in config) {
+                                    embed2.setAttribute(key, config[key]);
+                                }
+
+                                embed2.onload = done;
+
+                                $div.append(embed2);
+                            });
+
+                            it('should not add the branding again', function() {
+                                expect($('link#c6-' + atob(config['data-:branding'])).length).toBe(1);
+                            });
                         });
                     });
 
@@ -171,6 +206,7 @@
                                         .replace('{{splash}}', window.__C6_URL_ROOT__ +
                                             '/collateral/experiences/' + config['data-exp'] + '/splash')
                                 );
+                                expect($div.hasClass('c6brand__' + atob(config['data-:branding']))).toBe(true);
                                 done();
                             });
                         });
@@ -229,8 +265,10 @@
                                             result.splash = jasmine.any(Object);
                                             result.title = jasmine.any(String);
                                             result.preload = 'data-preload' in config;
+                                            result.branding = jasmine.any(String);
 
                                             delete result[':title'];
+                                            delete result[':branding'];
 
                                             return result;
                                         }())
@@ -239,6 +277,7 @@
                                 app: null,
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
+                                branding: jasmine.any(Object),
                                 gaAcctId: 'UA-44457821-2'
                             });
                         });
@@ -364,6 +403,23 @@
                 it('should not preload the experience', function() {
                     expect(window.c6.loadExperience).not.toHaveBeenCalled();
                 });
+            });
+        });
+
+        describe('with no branding', function() {
+            beforeEach(function(done) {
+                var script = document.createElement('script');
+
+                script.setAttribute('data-exp', 'e-abc');
+                script.setAttribute('data-splash', 'flavorflav:6/5');
+
+                script.src = '/base/src/embed.js';
+                script.onload = done;
+                $div.append(script);
+            });
+
+            it('should not add a branding stylesheet', function() {
+                expect($('link#c6-undefined').length).toBe(0);
             });
         });
 
