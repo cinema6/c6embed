@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v1.1.0 (June 12, 2014)
 * [FEATURE]: Preloading is now supported: The app will be preloaded if
   the user mouses over the splash page, or if the data-preload attribute
   is present on the embed tag
