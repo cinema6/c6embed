@@ -4,6 +4,7 @@
 * [FIX]: Fix for an issue where elements of the parent site would appear
   above a fullscreen experience
 * [FIX]: A snapshot is no longer taken of every element in the DOM
+* [FIX]: Fix production path to app.js
 
 ## v1.0.1 (June 10, 2014)
 * [FEATURE]: The major embed API version is now passed along with the
