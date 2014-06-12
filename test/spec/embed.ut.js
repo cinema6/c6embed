@@ -52,6 +52,12 @@
             $('body').append($div);
         });
 
+        afterEach(function() {
+            $div.remove();
+            delete window.c6;
+            delete window.__C6_URL_ROOT__;
+        });
+
         describe('common functionality', function() {
             var $script;
 
@@ -85,6 +91,7 @@
                     'data-exp': 'e-123',
                     'data-splash': 'flavor1:1/1',
                     'data-:title': btoa('Hello World!'),
+                    'data-preload': '',
                     'data-:branding': btoa('elitedaily')
                 },
                 {
@@ -100,6 +107,7 @@
                     'data-width': '150',
                     'data-splash': 'flavor4:6/5',
                     'data-:title': btoa('Last One Here!'),
+                    'data-preload': '',
                     'data-:branding': btoa('elitedaily')
                 }
             ].forEach(function(config) {
@@ -119,9 +127,6 @@
 
                     afterEach(function() {
                         $('link#c6-' + atob(config['data-:branding'])).remove();
-                        $div.remove();
-                        delete window.c6;
-                        delete window.__C6_URL_ROOT__;
                     });
 
                     describe('the element', function() {
@@ -205,6 +210,37 @@
                                 done();
                             });
                         });
+
+                        describe('when the mouse enters it', function() {
+                            function mouseenter($element) {
+                                var event = document.createEvent('MouseEvent');
+                                event.initMouseEvent('mouseenter');
+
+                                $element[0].dispatchEvent(event);
+                            }
+
+                            beforeEach(function() {
+                                spyOn(window.c6, 'loadExperience');
+
+                                mouseenter($div);
+                            });
+
+                            if ('data-preload' in config) {
+                                it('should not preload the experience', function() {
+                                    expect(window.c6.loadExperience).not.toHaveBeenCalled();
+                                });
+                            } else {
+                                it('should preload the experience', function() {
+                                    expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds[config['data-exp']], true);
+                                });
+
+                                it('should only preload the experience on the first mouseover', function() {
+                                    mouseenter($div);
+
+                                    expect(window.c6.loadExperience.calls.count()).toBe(1);
+                                });
+                            }
+                        });
                     });
 
                     describe('the c6 object', function() {
@@ -214,6 +250,7 @@
                                     'e-123': {
                                         embed: $('#c6embed-e-123')[0],
                                         load: false,
+                                        preload: false,
                                         splashDelegate: {},
                                         config: (function() {
                                             var result = {};
@@ -227,6 +264,7 @@
                                             result.responsive = !result.height;
                                             result.splash = jasmine.any(Object);
                                             result.title = jasmine.any(String);
+                                            result.preload = 'data-preload' in config;
                                             result.branding = jasmine.any(String);
 
                                             delete result[':title'];
@@ -259,8 +297,9 @@
                         });
 
                         describe('methods', function() {
-                            describe('loadExperience(embed)', function() {
+                            describe('loadExperience(embed, preload)', function() {
                                 beforeEach(function() {
+                                    window.c6.embeds['e-123'].preload = true;
                                     window.c6.loadExperience(window.c6.embeds['e-123']);
                                 });
 
@@ -271,6 +310,26 @@
 
                                 it('should set load to true on the embed', function() {
                                     expect(window.c6.embeds['e-123'].load).toBe(true);
+                                });
+
+                                it('should set preload to false on the embed', function() {
+                                    expect(window.c6.embeds['e-123'].preload).toBe(false);
+                                });
+
+                                describe('if preload is provided as true', function() {
+                                    beforeEach(function() {
+                                        window.c6.embeds['e-123'].load = false;
+
+                                        window.c6.loadExperience(window.c6.embeds['e-123'], true);
+                                    });
+
+                                    it('should set load to true', function() {
+                                        expect(window.c6.embeds['e-123'].load).toBe(true);
+                                    });
+
+                                    it('should set preload to true', function() {
+                                        expect(window.c6.embeds['e-123'].preload).toBe(true);
+                                    });
                                 });
                             });
 
@@ -291,6 +350,58 @@
                             });
                         });
                     });
+                });
+            });
+        });
+
+        describe('data-preload attr', function() {
+            function createEmbed(preload, done) {
+                var script,
+                    intervalId = setInterval(function() {
+                        if (!window.c6) { return; }
+
+                        if (Object.keys(window.c6.requireCache).length === 3) {
+                            clearInterval(intervalId);
+                            done();
+                        }
+                    }, 100);
+
+                script = document.createElement('script');
+                script.src = '/base/src/embed.js';
+                script.setAttribute('data-splash', 'foo:1/1');
+                if (preload) {
+                    script.setAttribute('data-preload');
+                }
+                script.setAttribute('data-exp', 'e-60196c3751eb52');
+
+                $div.append(script);
+            }
+
+            beforeEach(function() {
+                window.c6 = {
+                    embeds: {},
+                    requireCache: {},
+                    loadExperience: jasmine.createSpy('c6.loadExperience()')
+                };
+            });
+
+            describe('if true', function() {
+                beforeEach(function(done) {
+                    createEmbed(true, done);
+                });
+
+                it('should preload the experience', function() {
+                    expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds['e-60196c3751eb52'], true);
+                });
+            });
+
+            describe('if preload is false', function() {
+                beforeEach(function(done) {
+                    createEmbed(false, done);
+                });
+
+                it('should not preload the experience', function() {
+                    expect(window.c6.loadExperience).not.toHaveBeenCalled();
                 });
             });
         });

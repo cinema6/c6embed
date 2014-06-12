@@ -168,7 +168,11 @@
             var c6,
                 embed1, embed2;
 
-            beforeEach(function() {
+            beforeEach(function(done) {
+                c6Ajax.get.and.returnValue(Q.when({
+                    data: indexHTML
+                }));
+
                 embed1 = $('<div><div></div></div>')[0];
                 embed2 = $('<div><div></div></div>')[0];
 
@@ -177,14 +181,17 @@
                 c6.embeds = {
                     'e-123': {
                         load: false,
+                        preload: false,
                         splashDelegate: {}
                     },
                     'e-abc': {
                         load: false,
+                        preload: false,
                         splashDelegate: {}
                     },
                     'e-456': {
                         load: true,
+                        preload: false,
                         embed: embed1,
                         config: {
                             exp: 'e-456'
@@ -193,6 +200,7 @@
                     },
                     'e-def': {
                         load: true,
+                        preload: true,
                         embed: embed2,
                         config: {
                             exp: 'e-456'
@@ -201,6 +209,7 @@
                     },
                     'e-789': {
                         load: false,
+                        preload: false,
                         splashDelegate: {}
                     }
                 };
@@ -209,7 +218,7 @@
                     $('body').append(embed);
                 });
 
-                run();
+                run().finally(done);
             });
 
             afterEach(function() {
@@ -219,17 +228,37 @@
             });
 
             it('should load all the embeds where load is true', function() {
+                var settings;
+
                 for (var id in c6.embeds) {
-                    if (c6.embeds[id].load) {
-                        expect(c6.embeds[id].state).toEqual(jasmine.any(Observable), id);
+                    settings = c6.embeds[id];
+
+                    if (settings.load) {
+                        expect(settings.state).toEqual(jasmine.any(Observable), id);
                     } else {
-                        expect(c6.embeds[id].state).not.toBeDefined(id);
+                        expect(settings.state).not.toBeDefined(id);
+                    }
+                }
+            });
+
+            it('should preload all the embeds where preload is true', function() {
+                var settings;
+
+                for (var id in c6.embeds) {
+                    settings = c6.embeds[id];
+
+                    if (settings.load) {
+                        if (settings.preload) {
+                            expect(settings.state.get('active')).toBe(false);
+                        } else {
+                            expect(settings.state.get('active')).toBe(true);
+                        }
                     }
                 }
             });
         });
 
-        describe('c6.loadExperience(settings)', function() {
+        describe('c6.loadExperience(settings, preload)', function() {
             var settings,
                 $embed,
                 promise,
@@ -321,6 +350,18 @@
 
                 it('should set active to true', function() {
                     expect(settings.state.set).toHaveBeenCalledWith('active', true);
+                });
+
+                describe('if preload is true', function() {
+                    beforeEach(function(done) {
+                        settings.state.set.calls.reset();
+
+                        $window.c6.loadExperience(settings, true).finally(done);
+                    });
+
+                    it('should not set active to true', function() {
+                        expect(settings.state.set).not.toHaveBeenCalledWith('active', jasmine.any(Boolean));
+                    });
                 });
             });
 

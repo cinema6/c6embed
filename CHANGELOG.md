@@ -1,6 +1,8 @@
 # C6Embed Changelog
 
-## v1.1.0
+* [FEATURE]: Preloading is now supported: The app will be preloaded if
+  the user mouses over the splash page, or if the data-preload attribute
+  is present on the embed tag
 * [FEATURE]: A custom branding stylesheet is now added to the DOM to
   allow publisher-by-publisher styling
 
