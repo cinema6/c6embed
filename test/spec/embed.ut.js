@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    ddescribe('embed.js', function() {
+    describe('embed.js', function() {
         var C6Query;
 
         var $;
@@ -173,6 +173,37 @@
                                 );
                                 done();
                             });
+                        });
+
+                        describe('when the mouse enters it', function() {
+                            function mouseenter($element) {
+                                var event = document.createEvent('MouseEvent');
+                                event.initMouseEvent('mouseenter');
+
+                                $element[0].dispatchEvent(event);
+                            }
+
+                            beforeEach(function() {
+                                spyOn(window.c6, 'loadExperience');
+
+                                mouseenter($div);
+                            });
+
+                            if ('data-preload' in config) {
+                                it('should not preload the experience', function() {
+                                    expect(window.c6.loadExperience).not.toHaveBeenCalled();
+                                });
+                            } else {
+                                it('should preload the experience', function() {
+                                    expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds[config['data-exp']], true);
+                                });
+
+                                it('should only preload the experience on the first mouseover', function() {
+                                    mouseenter($div);
+
+                                    expect(window.c6.loadExperience.calls.count()).toBe(1);
+                                });
+                            }
                         });
                     });
 

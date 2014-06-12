@@ -83,6 +83,11 @@
             config: config
         };
 
+    function handleMouseenter() {
+        c6.loadExperience(settings, true);
+        splash.removeEventListener('mouseenter', handleMouseenter, false);
+    }
+
     function splashOf(splashConfig) {
         return baseUrl +
             '/collateral/splash/' +
@@ -156,6 +161,8 @@
 
     if (config.preload) {
         c6.loadExperience(settings, true);
+    } else {
+        splash.addEventListener('mouseenter', handleMouseenter, false);
     }
 
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
