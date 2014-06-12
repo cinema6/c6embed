@@ -3,6 +3,7 @@
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        bools = ['preload'],
         config = (function(scripts) {
             var script = scripts[scripts.length - 1],
                 attributes = script.attributes,
@@ -25,6 +26,14 @@
                 result[prop] = value;
             }
 
+            length = bools.length;
+
+            while (length--) {
+                attribute = bools[length];
+
+                result[attribute] = attribute in result;
+            }
+
             result.script = script;
             result.responsive = !result.height;
             result.splash = (function() {
@@ -44,11 +53,12 @@
             app: null,
             requireCache: {},
             gaAcctId: 'UA-44457821-2',
-            loadExperience: function(embed) {
+            loadExperience: function(embed, preload) {
                 var app = this.app || (this.app = document.createElement('script')),
                     head = document.getElementsByTagName('head')[0];
 
                 embed.load = true;
+                embed.preload = !!preload;
 
                 if (!app.parentNode) {
                     app.src = appJs;
@@ -69,6 +79,7 @@
             embed: div,
             splashDelegate: {},
             load: false,
+            preload: false,
             config: config
         };
 
@@ -142,6 +153,10 @@
 
     div.appendChild(splash);
     script.parentNode.insertBefore(div, script);
+
+    if (config.preload) {
+        c6.loadExperience(settings, true);
+    }
 
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
