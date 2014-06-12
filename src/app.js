@@ -193,7 +193,7 @@ module.exports = function(deps) {
         settings = embeds[id];
 
         if (settings.load) {
-            loads.push(c6.loadExperience(settings));
+            loads.push(c6.loadExperience(settings, settings.preload));
         }
     }
 
