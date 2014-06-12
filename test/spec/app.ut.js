@@ -229,7 +229,7 @@
             });
         });
 
-        describe('c6.loadExperience(settings)', function() {
+        describe('c6.loadExperience(settings, preload)', function() {
             var settings,
                 $embed,
                 promise,
@@ -321,6 +321,18 @@
 
                 it('should set active to true', function() {
                     expect(settings.state.set).toHaveBeenCalledWith('active', true);
+                });
+
+                describe('if preload is true', function() {
+                    beforeEach(function(done) {
+                        settings.state.set.calls.reset();
+
+                        $window.c6.loadExperience(settings, true).finally(done);
+                    });
+
+                    it('should not set active to true', function() {
+                        expect(settings.state.set).not.toHaveBeenCalledWith('active', jasmine.any(Boolean));
+                    });
                 });
             });
 

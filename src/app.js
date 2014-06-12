@@ -25,7 +25,7 @@ module.exports = function(deps) {
         return config.appBase + '/' + url;
     }
 
-    c6.loadExperience = function(settings) {
+    c6.loadExperience = function(settings, preload) {
         var promise;
 
         function bootstrap() {
@@ -180,9 +180,11 @@ module.exports = function(deps) {
 
         promise = settings.promise || (settings.promise = bootstrap());
 
-        promise.then(function(settings) {
-            settings.state.set('active', true);
-        });
+        if (!preload) {
+            promise.then(function(settings) {
+                settings.state.set('active', true);
+            });
+        }
 
         return promise;
     };
