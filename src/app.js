@@ -40,6 +40,10 @@ module.exports = function(deps) {
                 appFolder = null,
                 state = null;
 
+            function insertIframe() {
+                $container.append($iframe);
+            }
+
             function fetchExperience() {
                 return c6Db.find('experience', settings.config.exp);
             }
@@ -167,9 +171,13 @@ module.exports = function(deps) {
                 }
             });
 
-            $container.append($iframe);
-
-            return fetchExperience()
+            // The iframe must be inserted asynchronously here because, on iOS, if the method is
+            // called from a mouse hover event, click event handlers will not execute becasue
+            // this method modifies the DOM (by adding the iframe.) So, we make sure to do all of
+            // our work asynchronously in the next event loop.
+            return Q.delay(0)
+                .then(insertIframe)
+                .then(fetchExperience)
                 .then(scrapeConfiguration)
                 .then(fetchApp)
                 .then(modifyApp)

@@ -6,6 +6,9 @@
   is present on the embed tag
 * [FEATURE]: A custom branding stylesheet is now added to the DOM to
   allow publisher-by-publisher styling
+* [FIX]: Fix for an issue where (if the larger app.js embed script had
+  already been downloaded) launching an experience requried two taps on
+  iOS.
 
 ## v1.0.2 (June 11, 2014)
 * [FIX]: Fix for an issue where elements of the parent site would appear
