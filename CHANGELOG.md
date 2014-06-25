@@ -5,6 +5,8 @@
   of the article and replace it with the MiniReel (to enable, add the
   "data-replace-image" attribute to the embed script
 * [FIX]: Fix for an issue that caused the embed not to work in IE
+* [FIX]: Fix for an issue that caused the iframe not to appear above
+  other content when fullscreened in IE
 
 ## v1.1.0 (June 12, 2014)
 * [FEATURE]: Preloading is now supported: The app will be preloaded if
