@@ -94,6 +94,7 @@
 
                 beforeEach(function() {
                     cb = jasmine.createSpy('callback()');
+                    spyOn($result, 'prop').and.callThrough();
 
                     $result.load(mockHtml, cb);
                 });
@@ -150,6 +151,7 @@
 
                 it('should set the src to a jsurl that will load the document', function() {
                     /* jshint scripturl:true */
+                    expect($result.prop).toHaveBeenCalledWith('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
                     expect($iframe.attr('src')).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
                     /* jshint scripturl:false */
                 });
