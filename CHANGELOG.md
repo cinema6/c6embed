@@ -1,9 +1,9 @@
 # C6Embed Changelog
 
 ## v1.2.0 (June 25, 2014)
-* [FEATURE]: Pulling the MiniReel via the [Open Graph Protocol](http://ogp.me) 
-  is now supported: Add the "data-open-graph" attribute to the embed
-  code to enable
+* [FEATURE]: The embed script can now attempt to find the "main image"
+  of the article and replace it with the MiniReel (to enable, add the
+  "data-replace-image" attribute to the embed script
 
 ## v1.1.0 (June 12, 2014)
 * [FEATURE]: Preloading is now supported: The app will be preloaded if
