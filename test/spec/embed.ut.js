@@ -6,7 +6,8 @@
 
         var $;
 
-        var $div;
+        var $div,
+            $ogImage;
 
         function load(module, cb) {
             var iframe = document.createElement('iframe'),
@@ -49,11 +50,14 @@
             $ = new C6Query({ window: window, document: document });
 
             $div = $('<div id="test"></div>');
+            $ogImage = $('<meta property="og:image" content="http://www.cinema6.com/collateral/custom.jpg">');
+            $('head').append($ogImage);
             $('body').append($div);
         });
 
         afterEach(function() {
             $div.remove();
+            $ogImage.remove();
             delete window.c6;
             delete window.__C6_URL_ROOT__;
         });
@@ -139,6 +143,130 @@
                         });
                     });
 
+                    describe('if replaceImage is true', function() {
+                        var $embed;
+
+                        function create(done) {
+                            var script = document.createElement('script');
+
+                            script.src = '/base/src/embed.js';
+                            script.setAttribute('data-replace-image', '');
+                            script.setAttribute('data-exp', 'e-abc');
+                            script.setAttribute('data-splash', 'flavor1:1/1');
+
+                            script.onload = function() {
+                                var intervalId = setInterval(function() {
+                                    if (!!$('div#c6embed-e-abc div')[0].innerHTML) {
+                                        clearInterval(intervalId);
+                                        done();
+                                    }
+                                }, 50);
+                            };
+
+                            $div.append(script);
+
+                            return script;
+                        }
+
+                        afterEach(function() {
+                            if ($embed) {
+                                $embed.remove();
+                            }
+                        });
+
+                        describe('with one image on the page', function() {
+                            var $img;
+
+                            beforeEach(function(done) {
+                                $img = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
+                                $('body').append($img);
+                                create(function() {
+                                    $embed = $('div#c6embed-e-abc');
+                                    done();
+                                });
+                            });
+
+                            it('should insert the embed after the image', function() {
+                                expect($embed[0].nextSibling).toBe($img[0]);
+                            });
+
+                            it('should hide the image', function() {
+                                expect($img.css('display')).toBe('none');
+                            });
+
+                            it('should use the featured image for the splash', function() {
+                                expect($embed[0].innerHTML).toContain('Splash: http://www.cinema6.com/collateral/custom.jpg');
+                            });
+
+                            afterEach(function() {
+                                $img.remove();
+                            });
+                        });
+
+                        describe('with more than one image on the page', function() {
+                            var $img1, $img2, script;
+
+                            beforeEach(function(done) {
+                                $img1 = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
+                                $img2 = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
+
+                                $('body').append($img1);
+                                $('body').append($img2);
+                                script = create(function() {
+                                    $embed = $('div#c6embed-e-abc');
+                                    done();
+                                });
+                            });
+
+                            afterEach(function() {
+                                $img1.remove();
+                                $img2.remove();
+                            });
+
+                            it('should insert the embed after the script', function() {
+                                expect($embed[0].nextSibling).toBe(script);
+                                expect($embed[0].nextSibling.tagName).toBe('SCRIPT');
+                            });
+                        });
+
+                        describe('with no images on the page', function() {
+                            var script;
+
+                            beforeEach(function(done) {
+                                script = create(function() {
+                                    $embed = $('div#c6embed-e-abc');
+                                    done();
+                                });
+                            });
+
+                            it('should insert the embed after the script', function() {
+                                expect($embed[0].nextSibling).toBe(script);
+                                expect($embed[0].nextSibling.tagName).toBe('SCRIPT');
+                            });
+                        });
+
+                        describe('if there is no open graph meta tag', function() {
+                            var script;
+
+                            beforeEach(function(done) {
+                                $ogImage.remove();
+                                script = create(function() {
+                                    $embed = $('div#c6embed-e-abc');
+                                    done();
+                                });
+                            });
+
+                            afterEach(function() {
+                                $('head').append($ogImage);
+                            });
+
+                            it('should insert the embed after the script', function() {
+                                expect($embed[0].nextSibling).toBe(script);
+                                expect($embed[0].nextSibling.tagName).toBe('SCRIPT');
+                            });
+                        });
+                    });
+
                     describe('the branding stylesheet', function() {
                         it('should add a branding stylesheet to the page', function() {
                             var branding = atob(config['data-:branding']);
@@ -169,10 +297,10 @@
                     });
 
                     describe('the splash page', function() {
-                        var $div, splashJS;
+                        var $splash, splashJS;
 
                         beforeEach(function(done) {
-                            $div = $('div#c6embed-e-123 div');
+                            $splash = $('div#c6embed-e-123 div');
 
                             var intervalId = setInterval(function() {
                                 splashJS = window.c6.requireCache[
@@ -180,15 +308,16 @@
                                     '/collateral/splash/splash.js'
                                 ];
 
-                                if (!!$div[0].innerHTML && splashJS) {
+                                if (!!$splash[0].innerHTML && splashJS) {
                                     clearInterval(intervalId);
                                     done();
                                 }
                             }, 50);
                         });
 
+
                         it('should call a script that will provide interactivity', function() {
-                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']], $div[0]);
+                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']], $splash[0]);
                         });
 
                         it('should set settings.splashDelegate to the result of the interactivity module', function() {
@@ -201,12 +330,12 @@
                                 ratio = splash[1].split('/').join('-');
 
                             load('base/test/helpers/collateral/splash/' + theme + '/' + ratio + '.js', function(html) {
-                                expect($div[0].innerHTML).toBe(
+                                expect($splash[0].innerHTML).toBe(
                                     html.replace('{{title}}', atob(config['data-:title']))
                                         .replace('{{splash}}', window.__C6_URL_ROOT__ +
                                             '/collateral/experiences/' + config['data-exp'] + '/splash')
                                 );
-                                expect($div.hasClass('c6brand__' + atob(config['data-:branding']))).toBe(true);
+                                expect($splash.hasClass('c6brand__' + atob(config['data-:branding']))).toBe(true);
                                 done();
                             });
                         });
@@ -222,7 +351,7 @@
                             beforeEach(function() {
                                 spyOn(window.c6, 'loadExperience');
 
-                                mouseenter($div);
+                                mouseenter($splash);
                             });
 
                             if ('data-preload' in config) {
@@ -235,7 +364,7 @@
                                 });
 
                                 it('should only preload the experience on the first mouseover', function() {
-                                    mouseenter($div);
+                                    mouseenter($splash);
 
                                     expect(window.c6.loadExperience.calls.count()).toBe(1);
                                 });
@@ -265,6 +394,7 @@
                                             result.splash = jasmine.any(Object);
                                             result.title = jasmine.any(String);
                                             result.preload = 'data-preload' in config;
+                                            result.replaceImage = false;
                                             result.branding = jasmine.any(String);
 
                                             delete result[':title'];
