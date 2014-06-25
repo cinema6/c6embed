@@ -96,8 +96,7 @@
                     'data-splash': 'flavor1:1/1',
                     'data-:title': btoa('Hello World!'),
                     'data-preload': '',
-                    'data-:branding': btoa('elitedaily'),
-                    'data-ignore-open-graph': ''
+                    'data-:branding': btoa('elitedaily')
                 },
                 {
                     'data-exp': 'e-123',
@@ -105,8 +104,7 @@
                     'data-height': '300px',
                     'data-splash': 'flavorc:16/9',
                     'data-:title': btoa('This is a Great MiniReel.'),
-                    'data-:branding': btoa('urbantimes'),
-                    'data-ignore-open-graph': ''
+                    'data-:branding': btoa('urbantimes')
                 },
                 {
                     'data-exp': 'e-123',
@@ -114,8 +112,7 @@
                     'data-splash': 'flavor4:6/5',
                     'data-:title': btoa('Last One Here!'),
                     'data-preload': '',
-                    'data-:branding': btoa('elitedaily'),
-                    'data-ignore-open-graph': ''
+                    'data-:branding': btoa('elitedaily')
                 }
             ].forEach(function(config) {
                 describe('with config: ' + JSON.stringify(config), function() {
@@ -194,11 +191,12 @@
                             }, 50);
                         });
 
-                        describe('if data-ignore-open-graph is false', function() {
+                        describe('if open-graph is true', function() {
                             beforeEach(function(done) {
                                 var script = document.createElement('script');
 
                                 script.src = '/base/src/embed.js';
+                                script.setAttribute('data-open-graph', '');
                                 script.setAttribute('data-exp', 'e-abc');
                                 script.setAttribute('data-splash', 'flavor1:1/1');
 
@@ -225,6 +223,7 @@
                                     var script = document.createElement('script');
 
                                     script.src = '/base/src/embed.js';
+                                    script.setAttribute('data-open-graph', '');
                                     script.setAttribute('data-exp', 'e-abc123');
                                     script.setAttribute('data-splash', 'flavor1:1/1');
 
@@ -331,12 +330,11 @@
                                             result.splash = jasmine.any(Object);
                                             result.title = jasmine.any(String);
                                             result.preload = 'data-preload' in config;
-                                            result.ignoreOpenGraph = 'data-ignore-open-graph' in config;
+                                            result.openGraph = false;
                                             result.branding = jasmine.any(String);
 
                                             delete result[':title'];
                                             delete result[':branding'];
-                                            delete result['ignore-open-graph'];
 
                                             return result;
                                         }())

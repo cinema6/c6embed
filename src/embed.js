@@ -3,7 +3,7 @@
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
-        bools = ['preload', 'ignoreOpenGraph'],
+        bools = ['preload', 'openGraph'],
         config = (function(scripts) {
             var script = scripts[scripts.length - 1],
                 attributes = script.attributes,
@@ -203,7 +203,7 @@
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
             require(splashOf(config.splash), function(html) {
                 var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
-                    splashImage = !config.ignoreOpenGraph && ogImage ?
+                    splashImage = config.openGraph && ogImage ?
                         (ogImage.getAttribute('content') || c6SplashImage) : c6SplashImage;
 
                 splash.innerHTML = html;
