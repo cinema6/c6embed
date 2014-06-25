@@ -28,7 +28,9 @@ module.exports = function(deps) {
             this.prop('c6Loaded', cb);
             this.attr('data-srcdoc', document.toString());
             /* jshint scripturl:true */
-            this.attr('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
+            // NOTE: It is very important that the "prop()" method and not the "attr()" method is
+            // used here. Using "attr()" will cause this to fail in IE.
+            this.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
             /* jshint scripturl:false */
         };
 
