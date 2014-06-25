@@ -3,7 +3,7 @@
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
-        bools = ['preload'],
+        bools = ['preload', 'ignoreOpenGraph'],
         config = (function(scripts) {
             var script = scripts[scripts.length - 1],
                 attributes = script.attributes,
@@ -12,6 +12,12 @@
                 prop,
                 value,
                 result = {};
+
+            function camelcase(word, index) {
+                if (index === 0) { return word; }
+
+                return word.charAt(0).toUpperCase() + word.substr(1);
+            }
 
             while (length--) {
                 attribute = attributes[length];
@@ -22,6 +28,8 @@
                     prop = prop.slice(1);
                     value = atob(value);
                 }
+
+                prop = prop.split('-').map(camelcase).join('');
 
                 result[prop] = value;
             }
@@ -48,6 +56,7 @@
             return result;
         }(document.getElementsByTagName('script'))),
         head = document.getElementsByTagName('head')[0],
+        ogImage = document.querySelectorAll('meta[property="og:image"]')[0],
         script = config.script,
         c6 = win.c6 || (win.c6 = {
             embeds: {},
@@ -193,10 +202,14 @@
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
             require(splashOf(config.splash), function(html) {
+                var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
+                    splashImage = !config.ignoreOpenGraph && ogImage ?
+                        (ogImage.getAttribute('content') || c6SplashImage) : c6SplashImage;
+
                 splash.innerHTML = html;
                 tb.parse(splash)({
                     title: config.title,
-                    splash: baseUrl + '/collateral/experiences/' + config.exp + '/splash'
+                    splash: splashImage
                 });
                 settings.splashDelegate = splashJS(c6, settings, splash);
 

@@ -1,12 +1,13 @@
 (function() {
     'use strict';
 
-    describe('embed.js', function() {
+    ddescribe('embed.js', function() {
         var C6Query;
 
         var $;
 
-        var $div;
+        var $div,
+            $ogImage;
 
         function load(module, cb) {
             var iframe = document.createElement('iframe'),
@@ -49,11 +50,14 @@
             $ = new C6Query({ window: window, document: document });
 
             $div = $('<div id="test"></div>');
+            $ogImage = $('<meta property="og:image" content="http://www.cinema6.com/collateral/custom.jpg">');
+            $('head').append($ogImage);
             $('body').append($div);
         });
 
         afterEach(function() {
             $div.remove();
+            $ogImage.remove();
             delete window.c6;
             delete window.__C6_URL_ROOT__;
         });
@@ -92,7 +96,8 @@
                     'data-splash': 'flavor1:1/1',
                     'data-:title': btoa('Hello World!'),
                     'data-preload': '',
-                    'data-:branding': btoa('elitedaily')
+                    'data-:branding': btoa('elitedaily'),
+                    'data-ignore-open-graph': ''
                 },
                 {
                     'data-exp': 'e-123',
@@ -100,7 +105,8 @@
                     'data-height': '300px',
                     'data-splash': 'flavorc:16/9',
                     'data-:title': btoa('This is a Great MiniReel.'),
-                    'data-:branding': btoa('urbantimes')
+                    'data-:branding': btoa('urbantimes'),
+                    'data-ignore-open-graph': ''
                 },
                 {
                     'data-exp': 'e-123',
@@ -108,7 +114,8 @@
                     'data-splash': 'flavor4:6/5',
                     'data-:title': btoa('Last One Here!'),
                     'data-preload': '',
-                    'data-:branding': btoa('elitedaily')
+                    'data-:branding': btoa('elitedaily'),
+                    'data-ignore-open-graph': ''
                 }
             ].forEach(function(config) {
                 describe('with config: ' + JSON.stringify(config), function() {
@@ -169,10 +176,10 @@
                     });
 
                     describe('the splash page', function() {
-                        var $div, splashJS;
+                        var $splash, splashJS;
 
                         beforeEach(function(done) {
-                            $div = $('div#c6embed-e-123 div');
+                            $splash = $('div#c6embed-e-123 div');
 
                             var intervalId = setInterval(function() {
                                 splashJS = window.c6.requireCache[
@@ -180,15 +187,74 @@
                                     '/collateral/splash/splash.js'
                                 ];
 
-                                if (!!$div[0].innerHTML && splashJS) {
+                                if (!!$splash[0].innerHTML && splashJS) {
                                     clearInterval(intervalId);
                                     done();
                                 }
                             }, 50);
                         });
 
+                        describe('if data-ignore-open-graph is false', function() {
+                            beforeEach(function(done) {
+                                var script = document.createElement('script');
+
+                                script.src = '/base/src/embed.js';
+                                script.setAttribute('data-exp', 'e-abc');
+                                script.setAttribute('data-splash', 'flavor1:1/1');
+
+                                script.onload = function() {
+                                    var intervalId = setInterval(function() {
+                                        if (!!$div[0].innerHTML) {
+                                            clearInterval(intervalId);
+                                            done();
+                                        }
+                                    }, 50);
+
+                                    $splash = $('div#c6embed-e-abc div');
+                                };
+
+                                $div.append(script);
+                            });
+
+                            it('should set the image to the open graph image', function() {
+                                expect($splash[0].innerHTML).toContain('Splash: http://www.cinema6.com/collateral/custom.jpg');
+                            });
+
+                            describe('if there is no open graph meta tag', function() {
+                                beforeEach(function(done) {
+                                    var script = document.createElement('script');
+
+                                    script.src = '/base/src/embed.js';
+                                    script.setAttribute('data-exp', 'e-abc123');
+                                    script.setAttribute('data-splash', 'flavor1:1/1');
+
+                                    script.onload = function() {
+                                        var intervalId = setInterval(function() {
+                                            if (!!$div[0].innerHTML) {
+                                                clearInterval(intervalId);
+                                                done();
+                                            }
+                                        }, 50);
+
+                                        $splash = $('div#c6embed-e-abc123 div');
+                                    };
+
+                                    $ogImage.remove();
+                                    $div.append(script);
+                                });
+
+                                afterEach(function() {
+                                    $('head').append($ogImage);
+                                });
+
+                                it('should not fail if there is no open graph image', function() {
+                                    expect($splash[0].innerHTML).toContain('Splash: ' + window.__C6_URL_ROOT__ + '/collateral/experiences/e-abc123/splash');
+                                });
+                            });
+                        });
+
                         it('should call a script that will provide interactivity', function() {
-                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']], $div[0]);
+                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']], $splash[0]);
                         });
 
                         it('should set settings.splashDelegate to the result of the interactivity module', function() {
@@ -201,12 +267,12 @@
                                 ratio = splash[1].split('/').join('-');
 
                             load('base/test/helpers/collateral/splash/' + theme + '/' + ratio + '.js', function(html) {
-                                expect($div[0].innerHTML).toBe(
+                                expect($splash[0].innerHTML).toBe(
                                     html.replace('{{title}}', atob(config['data-:title']))
                                         .replace('{{splash}}', window.__C6_URL_ROOT__ +
                                             '/collateral/experiences/' + config['data-exp'] + '/splash')
                                 );
-                                expect($div.hasClass('c6brand__' + atob(config['data-:branding']))).toBe(true);
+                                expect($splash.hasClass('c6brand__' + atob(config['data-:branding']))).toBe(true);
                                 done();
                             });
                         });
@@ -222,7 +288,7 @@
                             beforeEach(function() {
                                 spyOn(window.c6, 'loadExperience');
 
-                                mouseenter($div);
+                                mouseenter($splash);
                             });
 
                             if ('data-preload' in config) {
@@ -235,7 +301,7 @@
                                 });
 
                                 it('should only preload the experience on the first mouseover', function() {
-                                    mouseenter($div);
+                                    mouseenter($splash);
 
                                     expect(window.c6.loadExperience.calls.count()).toBe(1);
                                 });
@@ -265,10 +331,12 @@
                                             result.splash = jasmine.any(Object);
                                             result.title = jasmine.any(String);
                                             result.preload = 'data-preload' in config;
+                                            result.ignoreOpenGraph = 'data-ignore-open-graph' in config;
                                             result.branding = jasmine.any(String);
 
                                             delete result[':title'];
                                             delete result[':branding'];
+                                            delete result['ignore-open-graph'];
 
                                             return result;
                                         }())
