@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v1.2.0 (June 25, 2014)
+* [FEATURE]: MiniReel will now pull the splash image via the [Open
+  Graph Protocol](http://ogp.me) if possible (can be disabled by
+  adding the "data-ignore-open-graph" attribute to the embed tag
+
 ## v1.1.0 (June 12, 2014)
 * [FEATURE]: Preloading is now supported: The app will be preloaded if
   the user mouses over the splash page, or if the data-preload attribute
