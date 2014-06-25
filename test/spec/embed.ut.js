@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    ddescribe('embed.js', function() {
+    describe('embed.js', function() {
         var C6Query;
 
         var $;
@@ -156,7 +156,7 @@
 
                             script.onload = function() {
                                 var intervalId = setInterval(function() {
-                                    if (!!$div[0].innerHTML) {
+                                    if (!!$('div#c6embed-e-abc div')[0].innerHTML) {
                                         clearInterval(intervalId);
                                         done();
                                     }
