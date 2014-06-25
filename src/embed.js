@@ -56,12 +56,14 @@
             return result;
         }(document.getElementsByTagName('script'))),
         head = document.getElementsByTagName('head')[0],
-        ogImage = $('meta[property="og:image"]')[0],
-        mainImageSrc = ogImage && ogImage.getAttribute('content'),
-        mainImages = $('img[src="' + mainImageSrc + '"]'),
         script = config.script,
-        target = config.replaceImage && mainImages.length === 1 ?
-            mainImages[0] : script,
+        target = config.replaceImage ? (function() {
+            var ogImage = $('meta[property="og:image"]')[0],
+                mainImageSrc = ogImage && ogImage.getAttribute('content'),
+                mainImages = (mainImageSrc || []) && $('img[src="' + mainImageSrc + '"]');
+
+            return mainImages.length === 1 ? mainImages[0] : script;
+        }()) : script,
         c6 = win.c6 || (win.c6 = {
             embeds: {},
             app: null,
@@ -215,7 +217,7 @@
             require(splashOf(config.splash), function(html) {
                 var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
                     splashImage = target.tagName === 'IMG' ?
-                        mainImageSrc : c6SplashImage;
+                        target.getAttribute('src') : c6SplashImage;
 
                 splash.innerHTML = html;
                 tb.parse(splash)({
