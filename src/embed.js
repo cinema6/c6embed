@@ -3,7 +3,7 @@
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
-        bools = ['preload', 'openGraph'],
+        bools = ['preload', 'replaceImage'],
         config = (function(scripts) {
             var script = scripts[scripts.length - 1],
                 attributes = script.attributes,
@@ -56,8 +56,12 @@
             return result;
         }(document.getElementsByTagName('script'))),
         head = document.getElementsByTagName('head')[0],
-        ogImage = document.querySelectorAll('meta[property="og:image"]')[0],
+        ogImage = $('meta[property="og:image"]')[0],
+        mainImageSrc = ogImage && ogImage.getAttribute('content'),
+        mainImages = $('img[src="' + mainImageSrc + '"]'),
         script = config.script,
+        target = config.replaceImage && mainImages.length === 1 ?
+            mainImages[0] : script,
         c6 = win.c6 || (win.c6 = {
             embeds: {},
             app: null,
@@ -98,6 +102,10 @@
             preload: false,
             config: config
         };
+
+    function $() {
+        return document.querySelectorAll.apply(document, arguments);
+    }
 
     function DOMElement(tag, attrs, appendTo) {
         var element = document.createElement(tag),
@@ -197,14 +205,17 @@
     }
 
     div.appendChild(splash);
-    script.parentNode.insertBefore(div, script);
+    target.parentNode.insertBefore(div, target);
+    if (target !== script) {
+        target.style.display = 'none';
+    }
 
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
             require(splashOf(config.splash), function(html) {
                 var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
-                    splashImage = config.openGraph && ogImage ?
-                        (ogImage.getAttribute('content') || c6SplashImage) : c6SplashImage;
+                    splashImage = target.tagName === 'IMG' ?
+                        mainImageSrc : c6SplashImage;
 
                 splash.innerHTML = html;
                 tb.parse(splash)({
