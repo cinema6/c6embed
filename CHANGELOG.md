@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.2.1 (July 1, 2014)
+* [FEATURE]: Added custom11 dimension for ga (href) of page containing
+  the embed.
+
 ## v1.2.0 (June 25, 2014)
 * [FEATURE]: The embed script can now attempt to find the "main image"
   of the article and replace it with the MiniReel (to enable, add the
