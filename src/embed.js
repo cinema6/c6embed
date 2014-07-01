@@ -183,6 +183,10 @@
         });
         window.__c6_ga__('c6.require', 'displayfeatures');
 
+        window.__c6_ga__('c6.set',{
+            'dimension11' : window.location.href
+        });
+
         window.__c6_ga__('c6.send', 'pageview', {
             'page'  : '/embed/' + config.exp,
             'title' : config.title
