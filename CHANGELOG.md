@@ -1,6 +1,6 @@
 # C6Embed Changelog
 
-## v1.3.0 (July 2, 2014)
+## v1.3.0 (July 9, 2014)
 * [FEATURE]: Added support for asynchronous loading of the embed
 
 ## v1.2.1 (July 2, 2014)

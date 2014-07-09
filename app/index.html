@@ -7,6 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
         <meta property="og:image" content="http://cdn.cnwimg.com/wp-content/uploads/2010/02/jimmy-fallon.jpg">
+        <script src="//lib.cinema6.com/jquery/2.0.3-0-gf576d00/jquery.js"></script>
         <script>
             window.__C6_DEBUG__     = true;
             window.__C6_URL_ROOT__  = 'http://staging.cinema6.com';
@@ -22,7 +23,18 @@
             </div>
             <script src="embed.js" data-exp="e-bf18056163ea3e" data-:title="VGhlIDE1IE1vc3QgQW1hemluZyBHb1BybyBWaWRlb3MgRXZlciBSZWNvcmRlZA==" data-splash="img-only:16/9" data-:branding="ZWxpdGVkYWlseQ=="></script>
             <script src="embed.js" data-exp="e-b581faf0436e05" data-splash="img-text-overlay:16/9" data-:title="SGVsbG8gV29ybGQh" data-preload></script>
-            <script src="embed.js" data-exp="e-1236f792a2eec6" data-:title="QmVzdCBvZiBUaGUgVG9uaWdodCBTaG93IFN0YXJyaW5nIEppbW15IEZhbGxvbg==" data-splash="img-only:16/9" data-replace-image></script>
+            <script>
+                (function(attrs) {
+                    var c6 = (window.c6 || (window.c6 = {})),
+                    pending = c6.pending || (c6.pending = []);
+                    pending.push(attrs['data-exp']);
+                    document.write('<script src="embed.js"' +
+                        Object.keys(attrs).reduce(function(html, attr) {
+                            return html + ' ' + attr + '="' + attrs[attr] + '"';
+                        }, '') +
+                    '></scr' + 'ipt>');
+                }({'data-exp':'e-1236f792a2eec6','data-:title':'QmVzdCBvZiBUaGUgVG9uaWdodCBTaG93IFN0YXJyaW5nIEppbW15IEZhbGxvbg==','data-splash':'img-only:16/9','data-replace-image':''}));
+            </script>
         </article>
     </body>
 </html>
