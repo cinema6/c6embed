@@ -1,9 +1,11 @@
 # C6Embed Changelog
 
+## v1.3.0 (July 9, 2014)
+* [FEATURE]: Added support for asynchronous loading of the embed
+
 ## v1.2.1 (July 2, 2014)
 * [FEATURE]: Added custom11 dimension for ga (href) of page containing
   the embed.
-* *[/v1.2.1]*
 
 ## v1.2.0 (June 25, 2014)
 * [FEATURE]: The embed script can now attempt to find the "main image"
