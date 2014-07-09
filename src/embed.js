@@ -1,11 +1,24 @@
-(function(win) {
+(function(win, readyState) {
     'use strict';
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
         bools = ['preload', 'replaceImage'],
         config = (function(scripts) {
-            var script = scripts[scripts.length - 1],
+            var script = (readyState !== 'loading') ? (function() {
+                    var expId;
+
+                    if (!window.c6 || !window.c6.pending) {
+                        throw new Error([
+                            'Cinema6 embed was loaded asynchronously without ',
+                            'the async helper script!'
+                        ].join(''));
+                    }
+
+                    expId = window.c6.pending.shift();
+
+                    return $('script[data-exp="' + expId + '"]')[0];
+                }()) : scripts[scripts.length - 1],
                 attributes = script.attributes,
                 length = attributes.length,
                 attribute,
@@ -64,7 +77,7 @@
 
             return mainImages.length === 1 ? mainImages[0] : script;
         }()) : script,
-        c6 = win.c6 || (win.c6 = {
+        c6 = win.c6 = complete(win.c6 || {}, {
             embeds: {},
             app: null,
             requireCache: {},
@@ -104,6 +117,17 @@
             preload: false,
             config: config
         };
+
+    function complete(object, defaults) {
+        var key;
+
+        for (key in defaults) {
+            if (!object.hasOwnProperty(key)) {
+                object[key] = defaults[key];
+            }
+        }
+        return object;
+    }
 
     function $() {
         return document.querySelectorAll.apply(document, arguments);
@@ -238,4 +262,4 @@
             });
         });
     });
-}(window));
+}(window, window.mockReadyState || document.readyState));

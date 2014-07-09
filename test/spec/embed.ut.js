@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    describe('embed.js', function() {
+    ddescribe('embed.js', function() {
         var C6Query;
 
         var $;
@@ -42,6 +42,7 @@
 
 
         beforeEach(function() {
+            window.mockReadyState = 'loading';
             window.__C6_URL_ROOT__ = 'base/test/helpers';
             window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
 
@@ -424,6 +425,59 @@
                                 expect(window.c6).toBe(c6);
                                 done();
                             };
+                        });
+
+                        it('should fill in any missing props on the c6 object if they are missing', function(done) {
+                            var c6 = window.c6 = { blah: 'foo' },
+                                script = document.createElement('script');
+
+                            script.src = '/base/src/embed.js';
+                            script.setAttribute('data-exp', 'e-abc');
+                            script.setAttribute('data-splash', 'foo:1/1');
+                            $($div).append(script);
+                            script.onload = function() {
+                                expect(c6).toEqual(jasmine.objectContaining({
+                                    blah: 'foo',
+                                    embeds: jasmine.any(Object),
+                                    app: null,
+                                    loadExperience: jasmine.any(Function),
+                                    requireCache: jasmine.any(Object),
+                                    branding: jasmine.any(Object),
+                                    gaAcctId: 'UA-44457821-2'
+                                }));
+                                done();
+                            };
+                        });
+
+                        ['interactive', 'complete'].forEach(function(readyState) {
+                            describe('if the document is ' + readyState, function() {
+                                beforeEach(function(done) {
+                                    var actualScript = document.createElement('script'),
+                                        configScript = document.createElement('script');
+
+                                    window.mockReadyState = readyState;
+                                    window.c6 = {
+                                        pending: ['e-456']
+                                    };
+
+                                    actualScript.src = '/base/src/embed.js';
+                                    configScript.setAttribute('data-exp', 'e-456');
+                                    configScript.setAttribute('data-splash', 'flavorflav:6/5');
+
+                                    actualScript.onload = done;
+
+                                    $div.append(configScript);
+                                    $div.append(actualScript);
+                                });
+
+                                it('should find the script by the global exp id', function() {
+                                    expect(window.c6.embeds['e-456']).toEqual(jasmine.any(Object));
+                                });
+
+                                it('should remove the pending experience id', function() {
+                                    expect(window.c6.pending).toEqual([]);
+                                });
+                            });
                         });
 
                         describe('methods', function() {
