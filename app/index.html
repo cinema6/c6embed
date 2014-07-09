@@ -26,9 +26,12 @@
             <script>
                 (function(attrs) {
                     var c6 = (window.c6 || (window.c6 = {})),
-                    pending = c6.pending || (c6.pending = []);
-                    pending.push(attrs['data-exp']);
-                    document.write('<script src="embed.js"' +
+                    pending = c6.pending || (c6.pending = []),
+                    id = 'c6embed-' + (Math.random() + 1).toString(36).substring(2);
+                    if (document.readyState !== 'loading') {
+                        pending.push(id);
+                    }
+                    document.write('<script id="' + id + '" src="embed.js"' +
                         Object.keys(attrs).reduce(function(html, attr) {
                             return html + ' ' + attr + '="' + attrs[attr] + '"';
                         }, '') +

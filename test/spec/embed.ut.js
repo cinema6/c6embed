@@ -457,10 +457,11 @@
 
                                     window.mockReadyState = readyState;
                                     window.c6 = {
-                                        pending: ['e-456']
+                                        pending: ['c6embed-q9h6dda4']
                                     };
 
                                     actualScript.src = '/base/src/embed.js';
+                                    configScript.setAttribute('id', 'c6embed-q9h6dda4');
                                     configScript.setAttribute('data-exp', 'e-456');
                                     configScript.setAttribute('data-splash', 'flavorflav:6/5');
 
