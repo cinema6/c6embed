@@ -6,8 +6,6 @@
         bools = ['preload', 'replaceImage'],
         config = (function(scripts) {
             var script = (readyState !== 'loading') ? (function() {
-                    var expId;
-
                     if (!window.c6 || !window.c6.pending) {
                         throw new Error([
                             'Cinema6 embed was loaded asynchronously without ',
@@ -15,9 +13,7 @@
                         ].join(''));
                     }
 
-                    expId = window.c6.pending.shift();
-
-                    return $('script[data-exp="' + expId + '"]')[0];
+                    return document.getElementById(window.c6.pending.shift());
                 }()) : scripts[scripts.length - 1],
                 attributes = script.attributes,
                 length = attributes.length,
