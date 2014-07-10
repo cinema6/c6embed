@@ -2,6 +2,7 @@ module.exports = function(deps) {
     'use strict';
 
     var $ = deps.$,
+        q = deps.q,
         documentParser = deps.documentParser;
 
     return function() {
@@ -16,7 +17,8 @@ module.exports = function(deps) {
         ].join(''));
 
         $result.load = function(html, cb) {
-            var document = documentParser(html);
+            var document = documentParser(html),
+                deferred = q.defer();
 
             document.injectScript(function(window) {
                 try {
@@ -25,13 +27,17 @@ module.exports = function(deps) {
                 window.frameElement.c6Loaded(window);
             });
 
-            this.prop('c6Loaded', cb);
+            this.prop('c6Loaded', function(win) {
+                deferred.resolve(cb(win));
+            });
             this.attr('data-srcdoc', document.toString());
             /* jshint scripturl:true */
             // NOTE: It is very important that the "prop()" method and not the "attr()" method is
             // used here. Using "attr()" will cause this to fail in IE.
             this.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
             /* jshint scripturl:false */
+
+            return deferred.promise;
         };
 
         $result.fullscreen = function(enterFullscreen) {

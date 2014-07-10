@@ -9,6 +9,12 @@
         var $div,
             $ogImage;
 
+        function settingsByExp(exp) {
+            return window.c6.embeds.reduce(function(result, settings) {
+                return settings.config.exp === exp ? settings : result;
+            }, null);
+        }
+
         function load(module, cb) {
             var iframe = document.createElement('iframe'),
                 body = document.getElementsByTagName('body')[0],
@@ -78,7 +84,7 @@
                 script.setAttribute('data-:test', btoa('This is a Test!'));
 
                 script.onload = function() {
-                    var config = window.c6.embeds['e-abc123'].config;
+                    var config = window.c6.embeds[0].config;
 
                     expect(config.title).toBe('Hello World!');
                     expect(config.test).toBe('This is a Test!');
@@ -136,7 +142,7 @@
 
                     describe('the element', function() {
                         it('should create a div after the script', function() {
-                            var $embed = $('div#c6embed-e-123');
+                            var $embed = $('div.c6embed-e-123');
 
                             expect($embed.length).toBe(1);
                             expect($embed[0].nextSibling).toBe($script[0]);
@@ -157,7 +163,7 @@
 
                             script.onload = function() {
                                 var intervalId = setInterval(function() {
-                                    if (!!$('div#c6embed-e-abc div')[0].innerHTML) {
+                                    if (!!$('div.c6embed-e-abc div')[0].innerHTML) {
                                         clearInterval(intervalId);
                                         done();
                                     }
@@ -182,7 +188,7 @@
                                 $img = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
                                 $('body').append($img);
                                 create(function() {
-                                    $embed = $('div#c6embed-e-abc');
+                                    $embed = $('div.c6embed-e-abc');
                                     done();
                                 });
                             });
@@ -214,7 +220,7 @@
                                 $('body').append($img1);
                                 $('body').append($img2);
                                 script = create(function() {
-                                    $embed = $('div#c6embed-e-abc');
+                                    $embed = $('div.c6embed-e-abc');
                                     done();
                                 });
                             });
@@ -235,7 +241,7 @@
 
                             beforeEach(function(done) {
                                 script = create(function() {
-                                    $embed = $('div#c6embed-e-abc');
+                                    $embed = $('div.c6embed-e-abc');
                                     done();
                                 });
                             });
@@ -252,7 +258,7 @@
                             beforeEach(function(done) {
                                 $ogImage.remove();
                                 script = create(function() {
-                                    $embed = $('div#c6embed-e-abc');
+                                    $embed = $('div.c6embed-e-abc');
                                     done();
                                 });
                             });
@@ -301,7 +307,7 @@
                         var $splash, splashJS;
 
                         beforeEach(function(done) {
-                            $splash = $('div#c6embed-e-123 div');
+                            $splash = $('div.c6embed-e-123 div');
 
                             var intervalId = setInterval(function() {
                                 splashJS = window.c6.requireCache[
@@ -318,11 +324,11 @@
 
 
                         it('should call a script that will provide interactivity', function() {
-                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[config['data-exp']], $splash[0]);
+                            expect(splashJS).toHaveBeenCalledWith(window.c6, window.c6.embeds[0], $splash[0]);
                         });
 
                         it('should set settings.splashDelegate to the result of the interactivity module', function() {
-                            expect(splashJS()).toEqual(window.c6.embeds[config['data-exp']].splashDelegate);
+                            expect(splashJS()).toEqual(window.c6.embeds[0].splashDelegate);
                         });
 
                         it('should create a div for the splash page', function(done) {
@@ -361,7 +367,7 @@
                                 });
                             } else {
                                 it('should preload the experience', function() {
-                                    expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds[config['data-exp']], true);
+                                    expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds[0], true);
                                 });
 
                                 it('should only preload the experience on the first mouseover', function() {
@@ -376,9 +382,9 @@
                     describe('the c6 object', function() {
                         it('should exist', function() {
                             expect(window.c6).toEqual({
-                                embeds: {
-                                    'e-123': {
-                                        embed: $('#c6embed-e-123')[0],
+                                embeds: [
+                                    {
+                                        embed: $('.c6embed-e-123')[0],
                                         load: false,
                                         preload: false,
                                         splashDelegate: {},
@@ -404,7 +410,7 @@
                                             return result;
                                         }())
                                     }
-                                },
+                                ],
                                 app: null,
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
@@ -438,7 +444,7 @@
                             script.onload = function() {
                                 expect(c6).toEqual(jasmine.objectContaining({
                                     blah: 'foo',
-                                    embeds: jasmine.any(Object),
+                                    embeds: jasmine.any(Array),
                                     app: null,
                                     loadExperience: jasmine.any(Function),
                                     requireCache: jasmine.any(Object),
@@ -472,7 +478,7 @@
                                 });
 
                                 it('should find the script by the global exp id', function() {
-                                    expect(window.c6.embeds['e-456']).toEqual(jasmine.any(Object));
+                                    expect(settingsByExp('e-456')).toEqual(jasmine.any(Object));
                                 });
 
                                 it('should remove the pending experience id', function() {
@@ -484,8 +490,8 @@
                         describe('methods', function() {
                             describe('loadExperience(embed, preload)', function() {
                                 beforeEach(function() {
-                                    window.c6.embeds['e-123'].preload = true;
-                                    window.c6.loadExperience(window.c6.embeds['e-123']);
+                                    window.c6.embeds[0].preload = true;
+                                    window.c6.loadExperience(window.c6.embeds[0]);
                                 });
 
                                 it('should pull down the full embed app', function() {
@@ -494,26 +500,26 @@
                                 });
 
                                 it('should set load to true on the embed', function() {
-                                    expect(window.c6.embeds['e-123'].load).toBe(true);
+                                    expect(window.c6.embeds[0].load).toBe(true);
                                 });
 
                                 it('should set preload to false on the embed', function() {
-                                    expect(window.c6.embeds['e-123'].preload).toBe(false);
+                                    expect(window.c6.embeds[0].preload).toBe(false);
                                 });
 
                                 describe('if preload is provided as true', function() {
                                     beforeEach(function() {
-                                        window.c6.embeds['e-123'].load = false;
+                                        window.c6.embeds[0].load = false;
 
-                                        window.c6.loadExperience(window.c6.embeds['e-123'], true);
+                                        window.c6.loadExperience(window.c6.embeds[0], true);
                                     });
 
                                     it('should set load to true', function() {
-                                        expect(window.c6.embeds['e-123'].load).toBe(true);
+                                        expect(window.c6.embeds[0].load).toBe(true);
                                     });
 
                                     it('should set preload to true', function() {
-                                        expect(window.c6.embeds['e-123'].preload).toBe(true);
+                                        expect(window.c6.embeds[0].preload).toBe(true);
                                     });
                                 });
                             });
@@ -564,7 +570,7 @@
 
             beforeEach(function() {
                 window.c6 = {
-                    embeds: {},
+                    embeds: [],
                     requireCache: {},
                     loadExperience: jasmine.createSpy('c6.loadExperience()')
                 };
@@ -576,7 +582,7 @@
                 });
 
                 it('should preload the experience', function() {
-                    expect(window.c6.loadExperience).toHaveBeenCalledWith(window.c6.embeds['e-60196c3751eb52'], true);
+                    expect(window.c6.loadExperience).toHaveBeenCalledWith(settingsByExp('e-60196c3751eb52'), true);
                 });
             });
 
@@ -624,7 +630,7 @@
                 var embed;
 
                 beforeEach(function() {
-                    embed = window.c6.embeds['e-abc'].embed;
+                    embed = settingsByExp('e-abc').embed;
                 });
 
                 it('should have styles for responsive sizing', function() {
@@ -654,7 +660,7 @@
                 var embed;
 
                 beforeEach(function() {
-                    embed = window.c6.embeds['e-def'].embed;
+                    embed = settingsByExp('e-def').embed;
                 });
 
                 it('should have styles for static sizing', function() {

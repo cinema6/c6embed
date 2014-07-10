@@ -94,7 +94,8 @@
     var FrameFactory = require('./FrameFactory'),
         frameFactory = new FrameFactory({
             $: c6Query,
-            documentParser: documentParser
+            documentParser: documentParser,
+            q: q
         });
 
     /* Create and Configure HostDocument */

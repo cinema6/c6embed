@@ -4,7 +4,8 @@
     describe('FrameFactory', function() {
         var FrameFactory,
             DocumentParser,
-            C6Query;
+            C6Query,
+            q;
 
         var frameFactory,
             documentParser,
@@ -17,6 +18,7 @@
         beforeEach(function() {
             mockHtml = require('../helpers/mock_index.js');
 
+            q = require('../../node_modules/q/q');
             C6Query = require('../../lib/C6Query');
             FrameFactory = require('../../src/FrameFactory');
             DocumentParser = require('../../src/DocumentParser');
@@ -32,7 +34,7 @@
                 });
             $ = new C6Query({ window: window, document: document });
 
-            frameFactory = new FrameFactory({ $: $, documentParser: fakeDocumentParser });
+            frameFactory = new FrameFactory({ $: $, documentParser: fakeDocumentParser, q: q });
         });
 
         it('should exist', function() {
@@ -90,21 +92,23 @@
             });
 
             describe('load(html, cb)', function() {
-                var cb;
+                var cb,
+                    success;
 
                 beforeEach(function() {
-                    cb = jasmine.createSpy('callback()');
+                    success = jasmine.createSpy('success');
+                    cb = jasmine.createSpy('callback()').and.returnValue(true);
                     spyOn($result, 'prop').and.callThrough();
 
-                    $result.load(mockHtml, cb);
+                    $result.load(mockHtml, cb).then(success);
                 });
 
                 it('should parse the document', function() {
                     expect(fakeDocumentParser).toHaveBeenCalledWith(mockHtml);
                 });
 
-                it('should attach the callback to the iframe', function() {
-                    expect($iframe[0].c6Loaded).toBe(cb);
+                it('should attach a callback to the iframe', function() {
+                    expect($iframe[0].c6Loaded).toEqual(jasmine.any(Function));
                 });
 
                 describe('script injection', function() {
@@ -114,7 +118,7 @@
                         fn = parsedDoc.injectScript.calls.mostRecent().args[0];
                         win = {
                             frameElement: {
-                                c6Loaded: cb
+                                c6Loaded: $iframe[0].c6Loaded
                             },
                             parent: {
                                 location: {
@@ -125,10 +129,14 @@
                         };
                     });
 
-                    it('should inject a script that calls the callback function', function() {
-                        fn(win);
+                    it('should inject a script that calls the callback function and resolves the promise with the callback return value', function(done) {
+                        win.frameElement.c6Loaded(win);
 
                         expect(cb).toHaveBeenCalledWith(win);
+                        setTimeout(function() {
+                            expect(success).toHaveBeenCalledWith(true);
+                            done();
+                        }, 10);
                     });
 
                     describe('if the browser supports "replaceState"', function() {

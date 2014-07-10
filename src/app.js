@@ -16,10 +16,15 @@ module.exports = function(deps) {
 
     var c6 = window.c6,
         embeds = c6.embeds,
-        id = null,
-        settings = null,
-        loads = [],
         noop = function() {};
+
+    function initialize(embeds) {
+        return Q.all(embeds.map(function(settings) {
+            return settings.load ?
+                c6.loadExperience(settings, settings.preload) :
+                settings;
+        }));
+    }
 
     function appUrl(url) {
         return config.appBase + '/' + url;
@@ -68,19 +73,17 @@ module.exports = function(deps) {
             }
 
             function loadApp(document) {
-                $iframe.load(document.toString(), communicateWithApp);
-
-                return experienceService.getSession(settings.config.exp);
+                return $iframe.load(document.toString(), communicateWithApp)
+                    .then(function(session) {
+                        return session.ensureReadiness();
+                    });
             }
 
             function communicateWithApp(appWindow) {
-                var session = settings.session = experienceService.registerExperience(
-                    settings.experience,
-                    appWindow
-                );
-
-                session
-                    .on('open', function openApp() {
+                var session = experienceService.registerExperience(
+                        settings.experience,
+                        appWindow
+                    ).on('open', function openApp() {
                         state.set('active', true);
                     })
                     .on('close', function closeApp() {
@@ -104,6 +107,10 @@ module.exports = function(deps) {
                             settings.state.set('responsiveStyles', styles);
                         }
                     });
+
+                settings._getSessionDeferred.resolve(session);
+
+                return session;
             }
 
             function initAnalytics(session) {
@@ -129,6 +136,11 @@ module.exports = function(deps) {
                 return settings;
             }
 
+            settings._getSessionDeferred = Q.defer();
+            settings.getSession = function() {
+                return this._getSessionDeferred.promise;
+            };
+
             $container.addClass('c6__cant-touch-this')
                 .createSnapshot();
 
@@ -146,7 +158,10 @@ module.exports = function(deps) {
                 }
 
                 function getSession() {
-                    return experienceService.getSession(settings.config.exp);
+                    return settings.getSession()
+                        .then(function(session) {
+                            return session.ensureReadiness();
+                        });
                 }
 
                 if (active) {
@@ -197,13 +212,5 @@ module.exports = function(deps) {
         return promise;
     };
 
-    for (id in embeds) {
-        settings = embeds[id];
-
-        if (settings.load) {
-            loads.push(c6.loadExperience(settings, settings.preload));
-        }
-    }
-
-    return Q.all(loads);
+    return initialize(embeds);
 };
