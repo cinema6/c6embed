@@ -43,7 +43,8 @@ module.exports = function(deps) {
                     kEnvUrlRoot: config.urlRoot
                 },
                 appFolder = null,
-                state = null;
+                state = null,
+                getSessionDeferred = Q.defer();
 
             function insertIframe() {
                 $container.append($iframe);
@@ -108,7 +109,7 @@ module.exports = function(deps) {
                         }
                     });
 
-                settings._getSessionDeferred.resolve(session);
+                getSessionDeferred.resolve(session);
 
                 return session;
             }
@@ -136,9 +137,8 @@ module.exports = function(deps) {
                 return settings;
             }
 
-            settings._getSessionDeferred = Q.defer();
             settings.getSession = function() {
-                return this._getSessionDeferred.promise;
+                return getSessionDeferred.promise;
             };
 
             $container.addClass('c6__cant-touch-this')
