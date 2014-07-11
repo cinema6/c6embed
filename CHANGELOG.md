@@ -2,6 +2,7 @@
 
 ## v1.3.0 (July 9, 2014)
 * [FEATURE]: Added support for asynchronous loading of the embed
+* [FEATURE]: New GA property for splash page, some new pageviews for the splash
 
 ## v1.2.1 (July 2, 2014)
 * [FEATURE]: Added custom11 dimension for ga (href) of page containing
