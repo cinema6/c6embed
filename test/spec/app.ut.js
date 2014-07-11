@@ -33,7 +33,8 @@
             AsEvented.call(this);
         }
         Session.prototype = {
-            ping: jasmine.createSpy('session.ping()')
+            ping: jasmine.createSpy('session.ping()'),
+            ensureReadiness: jasmine.createSpy('session.ensureReadiness()')
         };
 
         function run() {
@@ -68,7 +69,8 @@
 
             $window = {
                 c6: {
-                    loadExperience: function() {}
+                    loadExperience: function() {},
+                    embeds: []
                 },
                 __c6_ga__: jasmine.createSpy('window.__c6_ga__')
             };
@@ -92,7 +94,7 @@
             frameFactory = function() {
                 $iframe = $('<iframe src="about:blank"></iframe>');
 
-                $iframe.load = jasmine.createSpy('$iframe.load()');
+                $iframe.load = jasmine.createSpy('$iframe.load()').and.returnValue(Q.when(session));
                 $iframe.fullscreen = jasmine.createSpy('$iframe.fullscreen()');
                 $iframe.show = jasmine.createSpy('$iframe.show()');
                 $iframe.hide = jasmine.createSpy('$iframe.hide()');
@@ -124,14 +126,13 @@
             };
 
             session = new Session();
-
             safeSession = new Session();
+            session.ensureReadiness.and.returnValue(Q.when(safeSession));
+            safeSession.ensureReadiness.and.returnValue(Q.when(safeSession));
 
             experienceService = {
                 registerExperience: jasmine.createSpy('experienceService.registerExperience()')
-                    .and.returnValue(session),
-                getSession: jasmine.createSpy('experienceService.getSession()')
-                    .and.returnValue(Q.when(safeSession))
+                    .and.returnValue(session)
             };
 
             hostDocument = {
@@ -178,18 +179,18 @@
 
                 c6 = $window.c6;
 
-                c6.embeds = {
-                    'e-123': {
+                c6.embeds = [
+                    {
                         load: false,
                         preload: false,
                         splashDelegate: {}
                     },
-                    'e-abc': {
+                    {
                         load: false,
                         preload: false,
                         splashDelegate: {}
                     },
-                    'e-456': {
+                    {
                         load: true,
                         preload: false,
                         embed: embed1,
@@ -198,7 +199,7 @@
                         },
                         splashDelegate: {}
                     },
-                    'e-def': {
+                    {
                         load: true,
                         preload: true,
                         embed: embed2,
@@ -207,12 +208,12 @@
                         },
                         splashDelegate: {}
                     },
-                    'e-789': {
+                    {
                         load: false,
                         preload: false,
                         splashDelegate: {}
                     }
-                };
+                ];
 
                 [embed1, embed2].forEach(function(embed) {
                     $('body').append(embed);
@@ -228,25 +229,17 @@
             });
 
             it('should load all the embeds where load is true', function() {
-                var settings;
-
-                for (var id in c6.embeds) {
-                    settings = c6.embeds[id];
-
+                c6.embeds.forEach(function(settings, index) {
                     if (settings.load) {
-                        expect(settings.state).toEqual(jasmine.any(Observable), id);
+                        expect(settings.state).toEqual(jasmine.any(Observable), index);
                     } else {
-                        expect(settings.state).not.toBeDefined(id);
+                        expect(settings.state).not.toBeDefined(index);
                     }
-                }
+                });
             });
 
             it('should preload all the embeds where preload is true', function() {
-                var settings;
-
-                for (var id in c6.embeds) {
-                    settings = c6.embeds[id];
-
+                c6.embeds.forEach(function(settings) {
                     if (settings.load) {
                         if (settings.preload) {
                             expect(settings.state.get('active')).toBe(false);
@@ -254,7 +247,7 @@
                             expect(settings.state.get('active')).toBe(true);
                         }
                     }
-                }
+                });
             });
         });
 
@@ -329,7 +322,7 @@
             });
 
             it('should resolve to the settings object', function() {
-                expect(experienceService.getSession).toHaveBeenCalledWith(settings.config.exp);
+                expect(session.ensureReadiness).toHaveBeenCalled();
                 expect(success).toHaveBeenCalledWith(settings);
             });
 
@@ -388,22 +381,24 @@
                 beforeEach(function() {
                     state = settings.state;
 
+                    spyOn(settings, 'getSession').and.returnValue(Q.when(session));
                     spyOn(state, 'observe').and.callThrough();
                 });
 
                 describe('active', function() {
                     describe('when false', function() {
-                        beforeEach(function() {
+                        beforeEach(function(done) {
                             state.set('active', true);
                             $iframe.hide.calls.reset();
                             settings.splashDelegate.didShow.calls.reset();
-                            experienceService.getSession.calls.reset();
+                            session.ensureReadiness.calls.reset();
                             state.set('responsiveStyles', {
                                 padding: '20px',
                                 marginTop: '50px'
                             });
 
                             state.set('active', false);
+                            setTimeout(done, 20);
                         });
 
                         it('should hide the iframe', function() {
@@ -421,7 +416,7 @@
                         });
 
                         it('should ping a nice message to the application', function() {
-                            expect(experienceService.getSession).toHaveBeenCalledWith(settings.config.exp);
+                            expect(session.ensureReadiness).toHaveBeenCalled();
                             expect(safeSession.ping).toHaveBeenCalledWith('hide');
                         });
 
@@ -433,8 +428,10 @@
                     });
 
                     describe('when true', function() {
-                        beforeEach(function() {
+                        beforeEach(function(done) {
+                            state.set('active', false);
                             state.set('active', true);
+                            setTimeout(done, 20);
                         });
 
                         it('should show the iframe', function() {
@@ -446,7 +443,7 @@
                         });
 
                         it('should ping a nice message to the application', function() {
-                            expect(experienceService.getSession).toHaveBeenCalledWith(settings.config.exp);
+                            expect(session.ensureReadiness).toHaveBeenCalled();
                             expect(safeSession.ping).toHaveBeenCalledWith('show');
                         });
 
@@ -473,22 +470,33 @@
             });
 
             describe('when the app loads', function() {
-                var appWindow;
+                var appWindow,
+                    result, getSessionSuccess;
 
                 beforeEach(function() {
                     var cb = $iframe.load.calls.mostRecent().args[1];
 
+                    getSessionSuccess = jasmine.createSpy('getSession() success');
+                    settings.getSession().then(getSessionSuccess);
+
                     appWindow = {};
 
-                    cb(appWindow);
+                    result = cb(appWindow);
                 });
 
                 it('should start a session with the app', function() {
                     expect(experienceService.registerExperience).toHaveBeenCalledWith(experience, appWindow);
                 });
 
-                it('should put the session on the embed settings object', function() {
-                    expect(settings.session).toBe(session);
+                it('should resolve the settings.getSession() method\'s promise', function(done) {
+                    setTimeout(function() {
+                        expect(getSessionSuccess).toHaveBeenCalledWith(session);
+                        done();
+                    }, 10);
+                });
+
+                it('should return the session', function() {
+                    expect(result).toBe(session);
                 });
 
                 describe('google analytics',function(){

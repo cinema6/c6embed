@@ -74,7 +74,7 @@
             return mainImages.length === 1 ? mainImages[0] : script;
         }()) : script,
         c6 = win.c6 = complete(win.c6 || {}, {
-            embeds: {},
+            embeds: [],
             app: null,
             requireCache: {},
             branding: {},
@@ -99,20 +99,20 @@
         },
         containerStyles = (config.width && config.height) ? staticStyles : responsiveStyles,
         div = new DOMElement('div', {
-            id: 'c6embed-' + config.exp,
+            class: 'c6embed-' + config.exp,
             style: 'position: relative'
         }),
         splash = new DOMElement('div', {
             class: 'c6brand__' + config.branding
         }),
         attr = null,
-        settings = c6.embeds[config.exp] = {
+        settings = c6.embeds[c6.embeds.push({
             embed: div,
             splashDelegate: {},
             load: false,
             preload: false,
             config: config
-        };
+        }) - 1];
 
     function complete(object, defaults) {
         var key;

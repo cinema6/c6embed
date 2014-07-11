@@ -71,54 +71,11 @@
         });
 
         describe('@public methods', function() {
-            describe('getSession(expId)', function() {
-                var resolveHandlerSpy;
-
-                beforeEach(function() {
-                    resolveHandlerSpy = jasmine.createSpy('resolve handler');
-                });
-
-                it('should return a promise', function() {
-                    expect(experience.getSession('e1').then).toEqual(jasmine.any(Function));
-                });
-
-                describe('if the session is not available', function() {
-                    var result;
-
-                    beforeEach(function() {
-                        result = experience.getSession('e1');
-                    });
-
-                    it('should add a deferred to the sessions hash', function() {
-                        expect(_private.sessions.e1.promise).toBeDefined();
-                    });
-
-                    it('should return the promise of the deferred it created', function() {
-                        expect(result).toBe(_private.sessions.e1.promise);
-                    });
-                });
-
-                describe('if the session is already available', function() {
-                    var result,
-                        deferred;
-
-                    beforeEach(function() {
-                        deferred = _private.sessions.e1 = q.defer();
-
-                        result = experience.getSession('e1');
-                    });
-
-                    it('should return the existing promise', function() {
-                        expect(result).toBe(deferred.promise);
-                    });
-                });
-            });
-
             describe('registerExperience(experience, expWindow)', function() {
                 var returnedSession;
 
                 beforeEach(function() {
-                    spyOn(_private, 'decorateSession');
+                    spyOn(_private, 'decorateSession').and.callThrough();
 
                     returnedSession = experience.registerExperience(exp, expWindow);
                 });
@@ -143,18 +100,13 @@
                     expect(session.once).toHaveBeenCalledWith('ready', jasmine.any(Function));
                 });
 
-                it('should not resolve any promises right away', function() {
-                    var spy = jasmine.createSpy('promise spy'),
-                        deferred = _private.sessions.e1 = q.defer();
-
-                    experience.registerExperience(exp, expWindow);
-                    deferred.promise.then(spy);
-
-                    expect(spy).not.toHaveBeenCalled();
-                });
-
                 describe('when the session is ready', function() {
-                    beforeEach(function() {
+                    var ensureReadinessSpy;
+
+                    beforeEach(function(done) {
+                        ensureReadinessSpy = jasmine.createSpy('ensureReadiness() success');
+
+                        session.ensureReadiness().then(ensureReadinessSpy).finally(done);
                         session.trigger('ready', true);
                     });
 
@@ -162,47 +114,8 @@
                         expect(session.ready).toBe(true);
                     });
 
-                    describe('if the session has not yet been requested', function() {
-                        var sessionHandler;
-
-                        beforeEach(function(done) {
-                            sessionHandler = jasmine.createSpy('session promise handler');
-
-                            _private.sessions = {};
-
-                            returnedSession = experience.registerExperience(exp, expWindow);
-                            session.trigger('ready', true);
-
-                            _private.sessions.e1.promise.then(sessionHandler);
-                            setTimeout(done, 0);
-                        });
-
-                        it('should add a deferred that resolves to the session to the sessions hash', function() {
-                            expect(sessionHandler).toHaveBeenCalledWith(session);
-                            expect(_private.sessions.e1).toBeDefined();
-                        });
-                    });
-
-                    describe('if the session has already been requested', function() {
-                        var sessionHandler;
-
-                        beforeEach(function(done) {
-                            sessionHandler = jasmine.createSpy('session promise handler');
-
-                            _private.sessions = {
-                                e1: q.defer()
-                            };
-
-                            _private.sessions.e1.promise.then(sessionHandler);
-
-                            returnedSession = experience.registerExperience(exp, expWindow);
-                            session.trigger('ready', true);
-                            setTimeout(done, 0);
-                        });
-
-                        it('should resolve the existing promise with the session', function() {
-                            expect(sessionHandler).toHaveBeenCalledWith(session);
-                        });
+                    it('should resolve the promise returned by ensureReadiness()', function() {
+                        expect(ensureReadinessSpy).toHaveBeenCalledWith(session);
                     });
                 });
 
@@ -225,27 +138,12 @@
                     });
                 });
             });
-
-            describe('deregisterExperience(expId)', function() {
-                beforeEach(function() {
-                    _private.sessions.e1 = session;
-
-                    experience.deregisterExperience('e1');
-                });
-
-                it('should destroy the session', function() {
-                    expect(postmessage.destroySession).toHaveBeenCalledWith(0);
-                });
-
-                it('should remove the session from the hash', function() {
-                    expect(_private.sessions.hasOwnProperty('e1')).toBe(false);
-                });
-            });
         });
 
         describe('_private methods', function() {
             describe('decorateSession(session, experience)', function() {
                 beforeEach(function() {
+                    asEvented.call(session);
                     _private.decorateSession(session, exp);
                 });
 
@@ -255,6 +153,32 @@
 
                 it('should decorate the session with a false ready property', function() {
                     expect(session.ready).toBe(false);
+                });
+
+                describe('the ensureReadiness() method', function() {
+                    it('should exist', function() {
+                        expect(session.ensureReadiness).toEqual(jasmine.any(Function));
+                    });
+
+                    it('should return a promise', function() {
+                        var Promise = q.defer().promise.constructor;
+
+                        expect(session.ensureReadiness()).toEqual(jasmine.any(Promise));
+                    });
+
+                    it('should return the same promise every time', function() {
+                        expect(session.ensureReadiness()).toBe(session.ensureReadiness());
+                    });
+                });
+
+                describe('the destroy() method', function() {
+                    beforeEach(function() {
+                        session.destroy();
+                    });
+
+                    it('should call postMessage.destroySession() with the session id', function() {
+                        expect(postmessage.destroySession).toHaveBeenCalledWith(session.id);
+                    });
                 });
             });
         });
