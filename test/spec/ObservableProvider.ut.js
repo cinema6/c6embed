@@ -92,56 +92,42 @@
                         .observe('mother.mother.name', motherMotherName);
                 });
 
-                afterEach(function() {
-                    [name, addressZip, motherName, motherMotherName, name2].forEach(function(spy) {
-                        expect(spy.calls.mostRecent().object).toBe(object);
-                    });
-                });
-
-                it('should initialize all of the observers', function() {
-                    expect(name).toHaveBeenCalledWith(object.name);
-                    expect(name2).toHaveBeenCalledWith(object.name);
-                    expect(addressZip).toHaveBeenCalledWith(object.address.zip);
-                    expect(motherName).toHaveBeenCalledWith(object.mother.name);
-                    expect(motherMotherName).toHaveBeenCalledWith(object.mother.mother.name);
-                });
-
                 it('should notify the observers when the property changes', function() {
                     object.set('name', 'Jessica');
                     [name, name2].forEach(function(observer) {
-                        expect(observer).toHaveBeenCalledWith('Jessica');
+                        expect(observer).toHaveBeenCalledWith('Jessica','Josh');
                     });
 
                     object.set('address.zip', '08542');
-                    expect(addressZip).toHaveBeenCalledWith('08542');
+                    expect(addressZip).toHaveBeenCalledWith('08542','08867');
 
                     object.set('mother.name', 'Louisean');
-                    expect(motherName).toHaveBeenCalledWith('Louisean');
+                    expect(motherName).toHaveBeenCalledWith('Louisean','Louan');
 
                     object.set('mother.mother.name', 'Ella');
-                    expect(motherMotherName).toHaveBeenCalledWith('Ella');
+                    expect(motherMotherName).toHaveBeenCalledWith('Ella','Virginia');
 
                     object.set('name', 'Dan');
                     [name, name2].forEach(function(observer) {
-                        expect(observer).toHaveBeenCalledWith('Dan');
+                        expect(observer).toHaveBeenCalledWith('Dan','Jessica');
                     });
                 });
 
                 it('should only notify the observer if the value actually changes', function() {
                     object.set('name', 'Josh');
+                    expect(name.calls.count()).toBe(0);
+                    expect(name2.calls.count()).toBe(0);
+
+                    object.set('name', 'Audrey');
                     expect(name.calls.count()).toBe(1);
                     expect(name2.calls.count()).toBe(1);
 
                     object.set('name', 'Audrey');
-                    expect(name.calls.count()).toBe(2);
-                    expect(name2.calls.count()).toBe(2);
-
-                    object.set('name', 'Audrey');
-                    expect(name.calls.count()).toBe(2);
-                    expect(name2.calls.count()).toBe(2);
+                    expect(name.calls.count()).toBe(1);
+                    expect(name2.calls.count()).toBe(1);
 
                     object.set('mother.mother.name', 'Virginia');
-                    expect(motherMotherName.calls.count()).toBe(1);
+                    expect(motherMotherName.calls.count()).toBe(0);
                 });
             });
 
@@ -166,7 +152,7 @@
                 it('should stop tiggering the callback when the property changes', function() {
                     object.set('name', 'Jessica');
 
-                    expect(name).toHaveBeenCalledWith('Jessica');
+                    expect(name).toHaveBeenCalledWith('Jessica','Josh');
                     expect(name2).not.toHaveBeenCalled();
                 });
 

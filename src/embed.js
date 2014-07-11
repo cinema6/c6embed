@@ -78,7 +78,8 @@
             app: null,
             requireCache: {},
             branding: {},
-            gaAcctId: 'UA-44457821-2',
+            gaAcctIdPlayer: 'UA-44457821-2',
+            gaAcctIdEmbed: 'UA-44457821-3',
             loadExperience: function(embed, preload) {
                 var app = this.app || (this.app = document.createElement('script')),
                     head = document.getElementsByTagName('head')[0];
@@ -197,19 +198,35 @@
         })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
         /* jshint sub:false, asi:false, expr:false, indent:4 */
 
-        window.__c6_ga__('create', c6.gaAcctId, {
+        var embedTracker = config.exp.replace(/e-/,'');
+
+        window.__c6_ga__('create', c6.gaAcctIdPlayer, {
             'name'       : 'c6',
             'cookieName' : '_c6ga'
         });
+        /*
         window.__c6_ga__('c6.require', 'displayfeatures');
 
         window.__c6_ga__('c6.set',{
             'dimension11' : window.location.href
         });
+        */
+        
+        window.__c6_ga__('create', c6.gaAcctIdEmbed, {
+            'name'       : embedTracker,
+            'cookieName' : '_c6ga'
+        });
+        window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
-        window.__c6_ga__('c6.send', 'pageview', {
-            'page'  : '/embed/' + config.exp,
-            'title' : config.title
+        window.__c6_ga__(embedTracker + '.set',{
+            'dimension1' : window.location.href,
+            'campaignId' : config.exp
+        });
+
+        window.__c6_ga__(embedTracker + '.send', 'pageview', {
+            'page'  : '/embed/' + config.exp + '/',
+            'title' : config.title,
+            'sessionControl' : 'start'
         });
         /* jshint camelcase:true */
     }());
