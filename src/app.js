@@ -118,7 +118,7 @@ module.exports = function(deps) {
 
                     if (clientId){
                         session.ping('initAnalytics',{
-                            accountId: window.c6.gaAcctId,
+                            accountId: window.c6.gaAcctIdPlayer,
                             clientId:   clientId
                         });
                     }
@@ -149,7 +149,13 @@ module.exports = function(deps) {
                     return experienceService.getSession(settings.config.exp);
                 }
 
+                var embedTracker = settings.config.exp.replace(/e-/,'');
+                /* jshint camelcase:false */
                 if (active) {
+                    window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                        'page'  : '/embed/' + settings.config.exp + '/open',
+                        'title' : settings.config.title + ' - Open'
+                    });
                     $iframe.show();
                     callDelegate('didHide');
                     getSession()
@@ -159,6 +165,10 @@ module.exports = function(deps) {
 
                     this.observe('responsiveStyles', setResponsiveStyles);
                 } else {
+                    window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                        'page'  : '/embed/' + settings.config.exp + '/close',
+                        'title' : settings.config.title + ' - Close'
+                    });
                     $iframe.hide();
                     callDelegate('didShow');
                     getSession()
@@ -169,6 +179,7 @@ module.exports = function(deps) {
                     $container.revertTo(0);
                     this.ignore('responsiveStyles', setResponsiveStyles);
                 }
+                /* jshint camelcase:true */
             });
 
             // The iframe must be inserted asynchronously here because, on iOS, if the method is

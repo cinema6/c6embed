@@ -8,5 +8,6 @@ module.exports = function(deps) {
         ($window.location.protocol + '//portal.cinema6.com'));
     this.appBase        = (this.urlRoot + '/apps');
     this.apiBase        = (this.urlRoot + '/api');
-    this.gaAcctId       = 'UA-44457821-2';
+    this.gaAcctIdPlayer = 'UA-44457821-2';
+    this.gaAcctIdEmbed  = 'UA-44457821-3';
 };

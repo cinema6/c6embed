@@ -409,7 +409,8 @@
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
                                 branding: jasmine.any(Object),
-                                gaAcctId: 'UA-44457821-2'
+                                gaAcctIdPlayer: 'UA-44457821-2',
+                                gaAcctIdEmbed: 'UA-44457821-3'
                             });
                         });
 
@@ -443,7 +444,8 @@
                                     loadExperience: jasmine.any(Function),
                                     requireCache: jasmine.any(Object),
                                     branding: jasmine.any(Object),
-                                    gaAcctId: 'UA-44457821-2'
+                                    gaAcctIdPlayer: 'UA-44457821-2',
+                                    gaAcctIdEmbed: 'UA-44457821-3'
                                 }));
                                 done();
                             };

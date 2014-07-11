@@ -495,7 +495,7 @@
                     var tracker;
 
                     beforeEach(function(){
-                        $window.c6.gaAcctId = 'abc';
+                        $window.c6.gaAcctIdPlayer = 'abc';
                         tracker = {
                             get : jasmine.createSpy('tracker.get')
                         };
@@ -506,7 +506,7 @@
                     });
 
                     it('sends a ping if it gets a clientId',function(){
-                        $window.__c6_ga__.calls.mostRecent().args[0]();
+                        $window.__c6_ga__.calls.first().args[0]();
                         expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
                         expect(tracker.get).toHaveBeenCalledWith('clientId');
                         expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id' } );
@@ -517,7 +517,7 @@
 
                         session.trigger('ready', true);
                         session.ping.calls.reset();
-                        $window.__c6_ga__.calls.mostRecent().args[0]();
+                        $window.__c6_ga__.calls.first().args[0]();
                         expect(session.ping).not.toHaveBeenCalled();
                     });
 
@@ -526,7 +526,7 @@
 
                         session.trigger('ready', true);
                         session.ping.calls.reset();
-                        $window.__c6_ga__.calls.mostRecent().args[0]();
+                        $window.__c6_ga__.calls.first().args[0]();
                         expect(session.ping).not.toHaveBeenCalled();
                     });
                 });
