@@ -148,7 +148,9 @@ module.exports = function(deps) {
                 responsiveStyles: null,
                 active: false
             })
-            .observe('active', function(active) {
+            .observe('active', function(active, wasActive) {
+                var embedTracker = settings.config.exp.replace(/e-/,'');
+
                 function setResponsiveStyles(styles) {
                     $container.css(styles);
                 }
@@ -164,7 +166,8 @@ module.exports = function(deps) {
                         });
                 }
 
-                var embedTracker = settings.config.exp.replace(/e-/,'');
+                if (active === wasActive) { return; }
+
                 /* jshint camelcase:false */
                 if (active) {
                     window.__c6_ga__(embedTracker + '.send', 'pageview', {

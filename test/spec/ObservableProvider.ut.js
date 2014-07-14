@@ -92,6 +92,15 @@
                         .observe('mother.mother.name', motherMotherName);
                 });
 
+                it('should initialize the observers', function() {
+                    [name, name2].forEach(function(spy) {
+                        expect(spy).toHaveBeenCalledWith('Josh', 'Josh');
+                    });
+                    expect(addressZip).toHaveBeenCalledWith('08867', '08867');
+                    expect(motherName).toHaveBeenCalledWith('Louan', 'Louan');
+                    expect(motherMotherName).toHaveBeenCalledWith('Virginia', 'Virginia');
+                });
+
                 it('should notify the observers when the property changes', function() {
                     object.set('name', 'Jessica');
                     [name, name2].forEach(function(observer) {
@@ -114,6 +123,10 @@
                 });
 
                 it('should only notify the observer if the value actually changes', function() {
+                    [name, name2, motherMotherName].forEach(function(spy) {
+                        spy.calls.reset();
+                    });
+
                     object.set('name', 'Josh');
                     expect(name.calls.count()).toBe(0);
                     expect(name2.calls.count()).toBe(0);
