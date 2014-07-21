@@ -181,9 +181,12 @@ module.exports = function(deps) {
 
                 /* jshint camelcase:false */
                 if (active) {
-                    window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                        'page'  : '/embed/' + settings.config.exp + '/open',
-                        'title' : settings.config.title + ' - Open'
+                    window.__c6_ga__(embedTracker + '.send', 'event', {
+                        'eventCategory' : 'Display',
+                        'eventAction'   : 'Show',
+                        'eventLabel'    : settings.config.title,
+                        'page'  : '/embed/' + settings.config.exp + '/',
+                        'title' : settings.config.title
                     });
                     $iframe.show();
                     callDelegate('didHide');
@@ -194,10 +197,6 @@ module.exports = function(deps) {
 
                     this.observe('responsiveStyles', setResponsiveStyles);
                 } else {
-                    window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                        'page'  : '/embed/' + settings.config.exp + '/close',
-                        'title' : settings.config.title + ' - Close'
-                    });
                     $iframe.hide();
                     callDelegate('didShow');
                     getSession()

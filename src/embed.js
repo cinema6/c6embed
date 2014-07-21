@@ -219,8 +219,7 @@
         window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
         window.__c6_ga__(embedTracker + '.set',{
-            'dimension1' : window.location.href,
-            'campaignId' : config.exp
+            'dimension1' : window.location.href
         });
 
         window.__c6_ga__(embedTracker + '.send', 'pageview', {
