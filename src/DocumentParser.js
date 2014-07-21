@@ -26,9 +26,16 @@ module.exports = function() {
             return this;
         },
         setBase: function(base) {
+            var currentBase = (this.html.match(/<base .+?>/) || [null])[0],
+                current = (currentBase || '') && currentBase.match(/href="(.*?)"/)[1];
+
+            if (currentBase) {
+                this.html = this.html.replace(currentBase, '');
+            }
+
             this.html = appendAfterHead(
                 this.html,
-                '<base href="' + base + '">'
+                '<base href="' + base + current + '"/>'
             );
 
             return this;

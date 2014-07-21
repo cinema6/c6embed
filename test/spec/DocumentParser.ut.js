@@ -92,11 +92,28 @@
                     it('should inject a base tag into the HTML', function() {
                         expect(document.html.match(/<head>/).length).toBe(1);
                         expect(document.html.match(/<\/head>/).length).toBe(1);
-                        expect(document.html).toContain('<head><base href="' + base + '">');
+                        expect(document.html).toContain('<head><base href="' + base + '"/>');
                     });
 
                     it('should be chainable', function() {
                         expect(result).toBe(document);
+                    });
+
+                    describe('if the document already has a base', function() {
+                        beforeEach(function() {
+                            document.html = document.html.replace(/<base .+?>/, '');
+
+                            document.setBase('assets/');
+                            document.setBase('http://www.apple.com/');
+                        });
+
+                        it('should concat the new base to the existing one', function() {
+                            expect(document.html).toContain('<base href="http://www.apple.com/assets/"/>');
+                        });
+
+                        it('should replace the existing base tag', function() {
+                            expect(document.html.match(/<base .+?>/g).length).toBe(1);
+                        });
                     });
                 });
 
