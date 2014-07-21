@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v1.3.1 (July 21, 2014)
+* [FEATURE]: Added support for the new AMD-ified MR player
+
 ## v1.3.0 (July 11, 2014)
 * [FEATURE]: Added support for asynchronous loading of the embed
 * [FEATURE]: New GA property for splash page, some new pageviews for the splash

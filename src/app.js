@@ -55,13 +55,24 @@ module.exports = function(deps) {
             }
 
             function scrapeConfiguration(experience) {
-                appConfig.kMode = experience.data.mode;
+                appConfig.kMode = browserInfo.profile.device !== 'phone' ?
+                    experience.data.mode : 'mobile';
                 appFolder = appUrl(experience.appUri + '/');
                 settings.experience = experience;
             }
 
             function fetchApp() {
-                return c6Ajax.get(appFolder + 'index.html')
+                return c6Ajax.get(appFolder + 'meta.json')
+                    .catch(function() {
+                        return {};
+                    })
+                    .then(function getHTML(meta) {
+                        if (meta.version) {
+                            return c6Ajax.get(appFolder + appConfig.kMode + '.html');
+                        } else {
+                            return c6Ajax.get(appFolder + 'index.html');
+                        }
+                    })
                     .then(function parse(response) {
                         return documentParser(response.data);
                     });

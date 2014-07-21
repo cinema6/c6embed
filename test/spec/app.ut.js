@@ -121,7 +121,7 @@
 
             browserInfo = {
                 profile: {
-                    device: 'phone'
+                    device: 'desktop'
                 }
             };
 
@@ -260,9 +260,20 @@
             beforeEach(function(done) {
                 success = jasmine.createSpy('success()');
 
-                c6Ajax.get.and.returnValue(Q.when({
+                c6Ajax.get.and.callFake(Q.when({
                     data: indexHTML
                 }));
+
+                c6Ajax.get.and.callFake(function(path) {
+                    switch (path) {
+                    case config.appBase + '/' + experience.appUri + '/index.html':
+                        return Q.when({
+                            data: indexHTML
+                        });
+                    default:
+                        return Q.reject('404 NOT FOUND!');
+                    }
+                });
 
                 settings = {
                     embed: $('<div style="padding: 10px; margin-top: 10px;"><div></div></div>')[0],
@@ -315,6 +326,47 @@
 
             it('should fetch index.html', function() {
                 expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/index.html');
+            });
+
+            describe('if the app has a specified version', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+
+                    c6Ajax.get.and.callFake(function(path) {
+                        switch (path) {
+                        case config.appBase + '/' + experience.appUri + '/lightbox-ads.html':
+                            return Q.when({
+                                data: indexHTML
+                            });
+                        case config.appBase + '/' + experience.appUri + '/meta.json':
+                            return Q.when({
+                                version: 'beta17-0-f84fn4'
+                            });
+                        default:
+                            return Q.reject('404 NOT FOUND!');
+                        }
+                    });
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should load the app for the specific mode', function() {
+                    expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
+                });
+
+                describe('if the device is a phone', function() {
+                    beforeEach(function(done) {
+                        delete settings.promise;
+
+                        browserInfo.profile.device = 'phone';
+
+                        $window.c6.loadExperience(settings).finally(done);
+                    });
+
+                    it('should load the mobile version', function() {
+                        expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/mobile.html');
+                    });
+                });
             });
 
             it('should parse the document', function() {
