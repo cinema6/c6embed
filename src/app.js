@@ -63,6 +63,9 @@ module.exports = function(deps) {
 
             function fetchApp() {
                 return c6Ajax.get(appFolder + 'meta.json')
+                    .then(function(response) {
+                        return response.data;
+                    })
                     .catch(function() {
                         return {};
                     })
