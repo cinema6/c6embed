@@ -340,7 +340,9 @@
                             });
                         case config.appBase + '/' + experience.appUri + '/meta.json':
                             return Q.when({
-                                version: 'beta17-0-f84fn4'
+                                data: {
+                                    version: 'beta17-0-f84fn4'
+                                }
                             });
                         default:
                             return Q.reject('404 NOT FOUND!');
