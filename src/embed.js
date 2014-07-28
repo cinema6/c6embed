@@ -295,8 +295,6 @@
         target.style.display = 'none';
     }
 
-    splash.removeEventListener('mouseenter', handleMouseenter, false);
-
     document.addEventListener('readystatechange', readyHandler);
 
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
