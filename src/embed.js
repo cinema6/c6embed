@@ -154,16 +154,18 @@
         var viewportWidth = window.innerWidth,
             viewportHeight = window.innerHeight,
             splashBounds = splash.getBoundingClientRect(),
-            xOverlap = Math.max(0, Math.min(viewportWidth, splashBounds.left + splashBounds.width)
-                - Math.max(0, splashBounds.left)),
-            yOverlap = Math.max(0, Math.min(viewportHeight, splashBounds.top + splashBounds.height)
-                - Math.max(0, splashBounds.top)),
+            xOverlap = Math.max(0, Math.min(viewportWidth, splashBounds.left +
+                splashBounds.width) - Math.max(0, splashBounds.left)),
+            yOverlap = Math.max(0, Math.min(viewportHeight, splashBounds.top +
+                splashBounds.height) - Math.max(0, splashBounds.top)),
             areaOverlap = xOverlap * yOverlap,
             splashArea = splashBounds.width * splashBounds.height;
         return areaOverlap/splashArea >= 0.5;
     }
 
     function visibleEvent() {
+        var embedTracker = config.exp.replace(/e-/,'');
+        /* jshint camelcase:false */
         window.__c6_ga__(embedTracker + '.send', 'event', {
             'eventCategory' : 'Display',
             'eventAction'   : 'Visible',
@@ -182,7 +184,7 @@
             }
         }
         
-        if(document.readyState == 'complete') {
+        if(document.readyState === 'complete') {
             document.removeEventListener('readystatechange', readyHandler);
             if (splashVisible()) {
                 visibleEvent();
