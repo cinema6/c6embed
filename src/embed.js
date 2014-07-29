@@ -175,23 +175,27 @@
         });
     }
 
-    function readyHandler() {
-        function viewChangeHandler() {
-            if (splashVisible()) {
-                window.removeEventListener('scroll', viewChangeHandler);
-                window.removeEventListener('resize', viewChangeHandler);
-                visibleEvent();
-            }
+    function viewChangeHandler() {
+        if (splashVisible()) {
+            window.removeEventListener('scroll', viewChangeHandler);
+            window.removeEventListener('resize', viewChangeHandler);
+            visibleEvent();
         }
-        
+    }
+
+    function readyHandler() {
         if(document.readyState === 'complete') {
             document.removeEventListener('readystatechange', readyHandler);
-            if (splashVisible()) {
-                visibleEvent();
-            } else {
-                window.addEventListener('scroll', viewChangeHandler);
-                window.addEventListener('resize', viewChangeHandler);
-            }
+            documentComplete();
+        }
+    }
+
+    function documentComplete() {
+        if (splashVisible()) {
+            visibleEvent();
+        } else {
+            window.addEventListener('scroll', viewChangeHandler);
+            window.addEventListener('resize', viewChangeHandler);
         }
     }
 
@@ -297,7 +301,12 @@
         target.style.display = 'none';
     }
 
-    document.addEventListener('readystatechange', readyHandler);
+    if(document.readyState === 'complete') {
+        documentComplete();
+    } else {
+        document.addEventListener('readystatechange', readyHandler);
+    }
+
 
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
