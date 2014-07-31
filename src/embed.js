@@ -150,6 +150,55 @@
         splash.removeEventListener('mouseenter', handleMouseenter, false);
     }
 
+    function splashVisible() {
+        var viewportWidth = window.innerWidth,
+            viewportHeight = window.innerHeight,
+            splashBounds = splash.getBoundingClientRect(),
+            xOverlap = Math.max(0, Math.min(viewportWidth, splashBounds.left +
+                splashBounds.width) - Math.max(0, splashBounds.left)),
+            yOverlap = Math.max(0, Math.min(viewportHeight, splashBounds.top +
+                splashBounds.height) - Math.max(0, splashBounds.top)),
+            areaOverlap = xOverlap * yOverlap,
+            splashArea = splashBounds.width * splashBounds.height;
+        return areaOverlap/splashArea >= 0.5;
+    }
+
+    function visibleEvent() {
+        var embedTracker = config.exp.replace(/e-/,'');
+        /* jshint camelcase:false */
+        window.__c6_ga__(embedTracker + '.send', 'event', {
+            'eventCategory' : 'Display',
+            'eventAction'   : 'Visible',
+            'eventLabel'    : settings.config.title,
+            'page'  : '/embed/' + settings.config.exp + '/',
+            'title' : settings.config.title
+        });
+    }
+
+    function viewChangeHandler() {
+        if (splashVisible()) {
+            window.removeEventListener('scroll', viewChangeHandler);
+            window.removeEventListener('resize', viewChangeHandler);
+            visibleEvent();
+        }
+    }
+
+    function readyHandler() {
+        if(document.readyState === 'complete') {
+            document.removeEventListener('readystatechange', readyHandler);
+            documentComplete();
+        }
+    }
+
+    function documentComplete() {
+        if (splashVisible()) {
+            visibleEvent();
+        } else {
+            window.addEventListener('scroll', viewChangeHandler);
+            window.addEventListener('resize', viewChangeHandler);
+        }
+    }
+
     function splashOf(splashConfig) {
         return baseUrl +
             '/collateral/splash/' +
@@ -251,6 +300,13 @@
     if (target !== script) {
         target.style.display = 'none';
     }
+
+    if(document.readyState === 'complete') {
+        documentComplete();
+    } else {
+        document.addEventListener('readystatechange', readyHandler);
+    }
+
 
     require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
         require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {

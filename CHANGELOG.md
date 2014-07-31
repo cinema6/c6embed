@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Added ga tracking for when the splash page is viewed.
+
 ## v1.3.1 (July 22, 2014)
 * [FEATURE]: Added support for the new AMD-ified MR player
 * [FIX]: Replacing ga pageviews for open + close with event for open only.
