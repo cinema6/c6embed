@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+* [FIX]: Fix for checking readyState breaking IE10. Better load for async check.
 * [FEATURE]: Added ga tracking for when the splash page is viewed.
 
 ## v1.3.1 (July 22, 2014)
