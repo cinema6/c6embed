@@ -457,7 +457,7 @@
                             };
                         });
 
-                        ['interactive', 'complete'].forEach(function(readyState) {
+                        ['complete'].forEach(function(readyState) {
                             describe('if the document is ' + readyState, function() {
                                 beforeEach(function(done) {
                                     var actualScript = document.createElement('script'),

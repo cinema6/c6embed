@@ -5,7 +5,7 @@
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
         bools = ['preload', 'replaceImage'],
         config = (function(scripts) {
-            var script = (readyState !== 'loading') ? (function() {
+            var script = (readyState === 'complete') ? (function() {
                     if (!window.c6 || !window.c6.pending) {
                         throw new Error([
                             'Cinema6 embed was loaded asynchronously without ',
