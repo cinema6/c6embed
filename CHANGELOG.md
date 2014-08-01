@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+* [FEATURE]: The embed script can now be valid HTML5.
 * [FIX]: Fix for an issue that caused the splash page not to show in IE10.
 * [FEATURE]: Added ga tracking for when the splash page is viewed.
 

@@ -33,7 +33,7 @@
                 prop = attribute.name.replace(/^data-/, '');
                 value = attribute.value;
 
-                if (prop.charAt(0) === ':') {
+                if (prop.charAt(0) === '-' || prop.charAt(0) === ':') {
                     prop = prop.slice(1);
                     value = atob(value);
                 }
@@ -173,6 +173,7 @@
             'page'  : '/embed/' + settings.config.exp + '/',
             'title' : settings.config.title
         });
+        //console.warn(settings.config.title);
     }
 
     function viewChangeHandler() {
