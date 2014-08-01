@@ -173,7 +173,6 @@
             'page'  : '/embed/' + settings.config.exp + '/',
             'title' : settings.config.title
         });
-        //console.warn(settings.config.title);
     }
 
     function viewChangeHandler() {
