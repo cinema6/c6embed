@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+* [FIX]: Fix for an issue that caused the splash page not to show in IE10.
 * [FEATURE]: Added ga tracking for when the splash page is viewed.
 
 ## v1.3.1 (July 22, 2014)
