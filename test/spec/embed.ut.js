@@ -194,7 +194,7 @@
 
                             script.onload = function() {
                                 var intervalId = setInterval(function() {
-                                    if (Object.keys(window.c6.requireCache).length >= 4) {
+                                    if (Object.keys(window.c6.requireCache).length >= 5) {
                                         clearInterval(intervalId);
                                         done();
                                     }
