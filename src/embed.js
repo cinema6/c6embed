@@ -206,36 +206,50 @@
             splashConfig.ratio.join('-') + '.js';
     }
 
-    function require(src, cb) {
-        if (c6.requireCache[src]) { return cb.call(window, c6.requireCache[src]); }
+    function require(srcs, cb) {
+        var modules = [];
 
-        var iframe = document.createElement('iframe'),
-            head = document.getElementsByTagName('head')[0],
-            html = [
-                '<script>',
-                '(' + function(window) {
-                    window.Text = window.parent.Text;
-                    window.module = {
-                        exports: {}
-                    };
-                    window.exports = window.module.exports;
-                }.toString() + '(window))',
-                '</script>',
-                '<script src="' + src + '"></script>'
-            ].join('\n');
+        function load(module, index) {
+            modules[index] = module;
 
-        iframe.addEventListener('load', function() {
-            var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+            if (modules.length === srcs.length) {
+                cb.apply(window, modules);
+            }
+        }
 
-            if (head.childNodes.length < 1) { return; }
+        srcs.forEach(function(src, index) {
+            if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
 
-            cb.call(window, (c6.requireCache[src] = iframe.contentWindow.module.exports));
-        }, false);
-        /* jshint scripturl:true */
-        iframe.setAttribute('src', 'javascript:\'' + html + '\';');
-        /* jshint scripturl:false */
+            var iframe = document.createElement('iframe'),
+                head = document.getElementsByTagName('head')[0],
+                html = [
+                    '<script>',
+                    '(' + function(window) {
+                        window.Text = window.parent.Text;
+                        window.module = {
+                            exports: {}
+                        };
+                        window.exports = window.module.exports;
+                    }.toString() + '(window))',
+                    '</script>',
+                    '<script src="' + src + '"></script>'
+                ].join('\n');
 
-        head.appendChild(iframe);
+            iframe.addEventListener('load', function() {
+                var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+
+                if (head.childNodes.length < 1) { return; }
+
+                load((c6.requireCache[src] = iframe.contentWindow.module.exports), index);
+            }, false);
+            /* jshint scripturl:true */
+            iframe.setAttribute('src', 'javascript:\'' + html + '\';');
+            /* jshint scripturl:false */
+
+            head.appendChild(iframe);
+        });
+
+        return modules;
     }
 
     /* Create GA Tracker */
@@ -308,26 +322,30 @@
     }
 
 
-    require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
-        require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
-            require(splashOf(config.splash), function(html) {
-                var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
-                    splashImage = target.tagName === 'IMG' ?
-                        target.getAttribute('src') : c6SplashImage;
+    require([
+        '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
+        baseUrl + '/collateral/splash/splash.js',
+        splashOf(config.splash)
+    ], function(
+        tb,
+        splashJS,
+        html
+    ) {
+        var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
+            splashImage = target.tagName === 'IMG' ?
+                target.getAttribute('src') : c6SplashImage;
 
-                splash.innerHTML = html;
-                tb.parse(splash)({
-                    title: config.title,
-                    splash: splashImage
-                });
-                settings.splashDelegate = splashJS(c6, settings, splash);
-
-                if (config.preload) {
-                    c6.loadExperience(settings, true);
-                } else {
-                    splash.addEventListener('mouseenter', handleMouseenter, false);
-                }
-            });
+        splash.innerHTML = html;
+        tb.parse(splash)({
+            title: config.title,
+            splash: splashImage
         });
+        settings.splashDelegate = splashJS(c6, settings, splash);
+
+        if (config.preload) {
+            c6.loadExperience(settings, true);
+        } else {
+            splash.addEventListener('mouseenter', handleMouseenter, false);
+        }
     });
 }(window, window.mockReadyState || document.readyState));
