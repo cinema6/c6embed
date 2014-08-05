@@ -14,7 +14,6 @@
 
         var $window,
             frameFactory,
-            c6Db,
             c6Ajax,
             config,
             mockDocumentParser,
@@ -43,7 +42,6 @@
                 frameFactory: frameFactory,
                 $: $,
                 Q: Q,
-                c6Db: c6Db,
                 config: config,
                 c6Ajax: c6Ajax,
                 documentParser: mockDocumentParser,
@@ -100,11 +98,6 @@
                 $iframe.hide = jasmine.createSpy('$iframe.hide()');
 
                 return $iframe;
-            };
-
-            c6Db = {
-                find: jasmine.createSpy('c6Db.find()')
-                    .and.returnValue(Q.when(experience))
             };
 
             c6Ajax = jasmine.createSpy('c6Ajax()');
@@ -197,6 +190,7 @@
                         config: {
                             exp: 'e-456'
                         },
+                        experience: experience,
                         splashDelegate: {}
                     },
                     {
@@ -206,6 +200,7 @@
                         config: {
                             exp: 'e-456'
                         },
+                        experience: experience,
                         splashDelegate: {}
                     },
                     {
@@ -278,6 +273,7 @@
                 settings = {
                     embed: $('<div style="padding: 10px; margin-top: 10px;"><div></div></div>')[0],
                     load: true,
+                    experience: experience,
                     splashDelegate: {
                         didShow: jasmine.createSpy('splashDelegate.didShow()'),
                         didHide: jasmine.createSpy('splashDelegate.didHide()')
@@ -318,10 +314,6 @@
 
             it('should make the container untouchable', function() {
                 expect($(settings.embed).hasClass('c6__cant-touch-this')).toBe(true);
-            });
-
-            it('should fetch the experience', function() {
-                expect(c6Db.find).toHaveBeenCalledWith('experience', settings.config.exp);
             });
 
             it('should fetch index.html', function() {

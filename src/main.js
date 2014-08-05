@@ -73,19 +73,6 @@
             location: $location
         });
 
-    /* Create and Configure C6DB */
-    var Cinema6Adapter = require('../lib/c6db/adapters/Cinema6'),
-        C6DB = require('../lib/c6db/C6DB'),
-        cinema6Adapter = new Cinema6Adapter({
-            c6Ajax: c6Ajax,
-            q: q
-        }),
-        c6Db = new C6DB({
-            q: q
-        });
-    cinema6Adapter.apiBase = config.apiBase;
-    c6Db.adapter = cinema6Adapter;
-
     /* Create and Configure DocumentParser */
     var DocumentParser = require('./DocumentParser'),
         documentParser = new DocumentParser();
@@ -115,7 +102,6 @@
         frameFactory: frameFactory,
         $: c6Query,
         Q: q,
-        c6Db: c6Db,
         config: config,
         c6Ajax: c6Ajax,
         documentParser: documentParser,

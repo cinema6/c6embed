@@ -4,7 +4,6 @@ module.exports = function(deps) {
     var window = deps.window,
         frameFactory = deps.frameFactory,
         $ = deps.$,
-        c6Db = deps.c6Db,
         c6Ajax = deps.c6Ajax,
         config = deps.config,
         documentParser = deps.documentParser,
@@ -34,31 +33,23 @@ module.exports = function(deps) {
         var promise;
 
         function bootstrap() {
-            var $iframe = frameFactory(),
+            var experience = settings.experience,
+                $iframe = frameFactory(),
                 $container = $(settings.embed),
                 splashDelegate = settings.splashDelegate,
                 appConfig = {
                     kDebug: config.debug,
                     kDevice: browserInfo.profile.device,
-                    kEnvUrlRoot: config.urlRoot
+                    kEnvUrlRoot: config.urlRoot,
+                    kMode: browserInfo.profile.device !== 'phone' ?
+                        experience.data.mode : 'mobile'
                 },
-                appFolder = null,
+                appFolder = appUrl(experience.appUri + '/'),
                 state = null,
                 getSessionDeferred = Q.defer();
 
             function insertIframe() {
                 $container.append($iframe);
-            }
-
-            function fetchExperience() {
-                return c6Db.find('experience', settings.config.exp);
-            }
-
-            function scrapeConfiguration(experience) {
-                appConfig.kMode = browserInfo.profile.device !== 'phone' ?
-                    experience.data.mode : 'mobile';
-                appFolder = appUrl(experience.appUri + '/');
-                settings.experience = experience;
             }
 
             function fetchApp() {
@@ -95,10 +86,8 @@ module.exports = function(deps) {
             }
 
             function communicateWithApp(appWindow) {
-                var session = experienceService.registerExperience(
-                        settings.experience,
-                        appWindow
-                    ).on('open', function openApp() {
+                var session = experienceService.registerExperience(experience, appWindow)
+                    .on('open', function openApp() {
                         state.set('active', true);
                     })
                     .on('close', function closeApp() {
@@ -219,8 +208,6 @@ module.exports = function(deps) {
             // our work asynchronously in the next event loop.
             return Q.delay(0)
                 .then(insertIframe)
-                .then(fetchExperience)
-                .then(scrapeConfiguration)
                 .then(fetchApp)
                 .then(modifyApp)
                 .then(loadApp)
