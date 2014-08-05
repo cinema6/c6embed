@@ -103,9 +103,7 @@
             class: 'c6embed-' + config.exp,
             style: 'position: relative'
         }),
-        splash = new DOMElement('div', {
-            class: 'c6brand__' + config.branding
-        }),
+        splash = new DOMElement('div'),
         attr = null,
         settings = c6.embeds[c6.embeds.push({
             embed: div,
@@ -293,18 +291,6 @@
         /* jshint camelcase:true */
     }());
 
-    if (config.branding) {
-        /* jshint expr:true */
-        (c6.branding[config.branding] ||
-            (c6.branding[config.branding] = new DOMElement('link', {
-                id: 'c6-' + config.branding,
-                rel: 'stylesheet',
-                href: baseUrl + '/collateral/branding/' + config.branding + '/styles/splash.css'
-            }, head))
-        );
-        /* jshint expr:false */
-    }
-
     for (attr in containerStyles) {
         div.style[attr] = containerStyles[attr];
     }
@@ -321,26 +307,42 @@
         document.addEventListener('readystatechange', readyHandler);
     }
 
-
     require([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
         baseUrl + '/collateral/splash/splash.js',
-        splashOf(config.splash)
+        splashOf(config.splash),
+        baseUrl + '/api/public/content/experience/' + config.exp + '.js'
     ], function(
         tb,
         splashJS,
-        html
+        html,
+        experience
     ) {
-        var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
+        var branding = experience.data.branding,
+            c6SplashImage = baseUrl + experience.data.collateral.splash,
             splashImage = target.tagName === 'IMG' ?
                 target.getAttribute('src') : c6SplashImage;
 
+        if (branding) {
+            /* jshint expr:true */
+            (c6.branding[branding] ||
+                (c6.branding[branding] = new DOMElement('link', {
+                    id: 'c6-' + branding,
+                    rel: 'stylesheet',
+                    href: baseUrl + '/collateral/branding/' + branding + '/styles/splash.css'
+                }, head))
+            );
+            /* jshint expr:false */
+        }
+
         splash.innerHTML = html;
+        splash.setAttribute('class', 'c6brand__' + branding);
         tb.parse(splash)({
-            title: config.title,
+            title: experience.data.title,
             splash: splashImage
         });
         settings.splashDelegate = splashJS(c6, settings, splash);
+        settings.experience = experience;
 
         if (config.preload) {
             c6.loadExperience(settings, true);
