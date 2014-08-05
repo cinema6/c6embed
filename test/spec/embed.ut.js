@@ -79,7 +79,7 @@
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
-                script.setAttribute('data-splash', 'foo:1-1');
+                script.setAttribute('data-splash', 'foo:1/1');
                 script.setAttribute('data-:title', btoa('Hello World!'));
                 script.setAttribute('data-:test', btoa('This is a Test!'));
 
@@ -104,7 +104,7 @@
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
-                script.setAttribute('data-splash', 'foo:1-1');
+                script.setAttribute('data-splash', 'foo:1/1');
                 script.setAttribute('data--title', btoa('Hello World!'));
                 script.setAttribute('data--test', btoa('This is a Test!'));
 
@@ -194,7 +194,7 @@
 
                             script.onload = function() {
                                 var intervalId = setInterval(function() {
-                                    if (!!$('div.c6embed-e-abc div')[0].innerHTML) {
+                                    if (Object.keys(window.c6.requireCache).length >= 4) {
                                         clearInterval(intervalId);
                                         done();
                                     }

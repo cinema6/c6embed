@@ -205,12 +205,13 @@
     }
 
     function require(srcs, cb) {
-        var modules = [];
+        var modules = [],
+            loaded = 0;
 
         function load(module, index) {
             modules[index] = module;
 
-            if (modules.length === srcs.length) {
+            if (++loaded === srcs.length) {
                 cb.apply(window, modules);
             }
         }
