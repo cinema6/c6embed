@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* Title, branding and splash image are now fetched from the database and
+  no longer need to be placed in the embed tag
+
 ## v1.4.0 (July 22, 2014)
 * [FEATURE]: The embed script can now be valid HTML5.
 * [FIX]: Fix for an issue that caused the splash page not to show in IE10.
