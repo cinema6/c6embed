@@ -103,9 +103,7 @@
             class: 'c6embed-' + config.exp,
             style: 'position: relative'
         }),
-        splash = new DOMElement('div', {
-            class: 'c6brand__' + config.branding
-        }),
+        splash = new DOMElement('div'),
         attr = null,
         settings = c6.embeds[c6.embeds.push({
             embed: div,
@@ -206,36 +204,51 @@
             splashConfig.ratio.join('-') + '.js';
     }
 
-    function require(src, cb) {
-        if (c6.requireCache[src]) { return cb.call(window, c6.requireCache[src]); }
+    function require(srcs, cb) {
+        var modules = [],
+            loaded = 0;
 
-        var iframe = document.createElement('iframe'),
-            head = document.getElementsByTagName('head')[0],
-            html = [
-                '<script>',
-                '(' + function(window) {
-                    window.Text = window.parent.Text;
-                    window.module = {
-                        exports: {}
-                    };
-                    window.exports = window.module.exports;
-                }.toString() + '(window))',
-                '</script>',
-                '<script src="' + src + '"></script>'
-            ].join('\n');
+        function load(module, index) {
+            modules[index] = module;
 
-        iframe.addEventListener('load', function() {
-            var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+            if (++loaded === srcs.length) {
+                cb.apply(window, modules);
+            }
+        }
 
-            if (head.childNodes.length < 1) { return; }
+        srcs.forEach(function(src, index) {
+            if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
 
-            cb.call(window, (c6.requireCache[src] = iframe.contentWindow.module.exports));
-        }, false);
-        /* jshint scripturl:true */
-        iframe.setAttribute('src', 'javascript:\'' + html + '\';');
-        /* jshint scripturl:false */
+            var iframe = document.createElement('iframe'),
+                head = document.getElementsByTagName('head')[0],
+                html = [
+                    '<script>',
+                    '(' + function(window) {
+                        window.Text = window.parent.Text;
+                        window.module = {
+                            exports: {}
+                        };
+                        window.exports = window.module.exports;
+                    }.toString() + '(window))',
+                    '</script>',
+                    '<script src="' + src + '"></script>'
+                ].join('\n');
 
-        head.appendChild(iframe);
+            iframe.addEventListener('load', function() {
+                var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+
+                if (head.childNodes.length < 1) { return; }
+
+                load((c6.requireCache[src] = iframe.contentWindow.module.exports), index);
+            }, false);
+            /* jshint scripturl:true */
+            iframe.setAttribute('src', 'javascript:\'' + html + '\';');
+            /* jshint scripturl:false */
+
+            head.appendChild(iframe);
+        });
+
+        return modules;
     }
 
     /* Create GA Tracker */
@@ -279,18 +292,6 @@
         /* jshint camelcase:true */
     }());
 
-    if (config.branding) {
-        /* jshint expr:true */
-        (c6.branding[config.branding] ||
-            (c6.branding[config.branding] = new DOMElement('link', {
-                id: 'c6-' + config.branding,
-                rel: 'stylesheet',
-                href: baseUrl + '/collateral/branding/' + config.branding + '/styles/splash.css'
-            }, head))
-        );
-        /* jshint expr:false */
-    }
-
     for (attr in containerStyles) {
         div.style[attr] = containerStyles[attr];
     }
@@ -307,27 +308,47 @@
         document.addEventListener('readystatechange', readyHandler);
     }
 
+    require([
+        '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
+        baseUrl + '/collateral/splash/splash.js',
+        splashOf(config.splash),
+        baseUrl + '/api/public/content/experience/' + config.exp + '.js'
+    ], function(
+        tb,
+        splashJS,
+        html,
+        experience
+    ) {
+        var branding = experience.data.branding,
+            c6SplashImage = baseUrl + experience.data.collateral.splash,
+            splashImage = target.tagName === 'IMG' ?
+                target.getAttribute('src') : c6SplashImage;
 
-    require('//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js', function(tb) {
-        require(baseUrl + '/collateral/splash/splash.js', function(splashJS) {
-            require(splashOf(config.splash), function(html) {
-                var c6SplashImage = baseUrl + '/collateral/experiences/' + config.exp + '/splash',
-                    splashImage = target.tagName === 'IMG' ?
-                        target.getAttribute('src') : c6SplashImage;
+        if (branding) {
+            /* jshint expr:true */
+            (c6.branding[branding] ||
+                (c6.branding[branding] = new DOMElement('link', {
+                    id: 'c6-' + branding,
+                    rel: 'stylesheet',
+                    href: baseUrl + '/collateral/branding/' + branding + '/styles/splash.css'
+                }, head))
+            );
+            /* jshint expr:false */
+        }
 
-                splash.innerHTML = html;
-                tb.parse(splash)({
-                    title: config.title,
-                    splash: splashImage
-                });
-                settings.splashDelegate = splashJS(c6, settings, splash);
-
-                if (config.preload) {
-                    c6.loadExperience(settings, true);
-                } else {
-                    splash.addEventListener('mouseenter', handleMouseenter, false);
-                }
-            });
+        splash.innerHTML = html;
+        splash.setAttribute('class', 'c6brand__' + branding);
+        tb.parse(splash)({
+            title: experience.data.title,
+            splash: splashImage
         });
+        settings.splashDelegate = splashJS(c6, settings, splash);
+        settings.experience = experience;
+
+        if (config.preload) {
+            c6.loadExperience(settings, true);
+        } else {
+            splash.addEventListener('mouseenter', handleMouseenter, false);
+        }
     });
 }(window, window.mockReadyState || document.readyState));

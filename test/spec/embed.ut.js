@@ -79,7 +79,7 @@
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
-                script.setAttribute('data-splash', 'foo:1-1');
+                script.setAttribute('data-splash', 'foo:1/1');
                 script.setAttribute('data-:title', btoa('Hello World!'));
                 script.setAttribute('data-:test', btoa('This is a Test!'));
 
@@ -104,7 +104,7 @@
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
-                script.setAttribute('data-splash', 'foo:1-1');
+                script.setAttribute('data-splash', 'foo:1/1');
                 script.setAttribute('data--title', btoa('Hello World!'));
                 script.setAttribute('data--test', btoa('This is a Test!'));
 
@@ -126,43 +126,49 @@
                 {
                     'data-exp': 'e-123',
                     'data-splash': 'flavor1:1/1',
-                    'data-:title': btoa('Hello World!'),
-                    'data-preload': '',
-                    'data-:branding': btoa('elitedaily')
+                    'data-preload': ''
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '100%',
                     'data-height': '300px',
-                    'data-splash': 'flavorc:16/9',
-                    'data-:title': btoa('This is a Great MiniReel.'),
-                    'data-:branding': btoa('urbantimes')
+                    'data-splash': 'flavorc:16/9'
                 },
                 {
                     'data-exp': 'e-123',
                     'data-width': '150',
                     'data-splash': 'flavor4:6/5',
-                    'data-:title': btoa('Last One Here!'),
-                    'data-preload': '',
-                    'data-:branding': btoa('elitedaily')
+                    'data-preload': ''
                 }
             ].forEach(function(config) {
                 describe('with config: ' + JSON.stringify(config), function() {
+                    var experience;
+
                     beforeEach(function(done) {
-                        var script = document.createElement('script');
+                        load('base/test/helpers/api/public/content/experience/' + config['data-exp'] + '.js', function(exp) {
+                            var script = document.createElement('script');
 
-                        script.src = '/base/src/embed.js';
-                        for (var key in config) {
-                            script.setAttribute(key, config[key]);
-                        }
+                            experience = exp;
+                            script.src = '/base/src/embed.js';
+                            for (var key in config) {
+                                script.setAttribute(key, config[key]);
+                            }
 
-                        $script = $(script);
-                        $script[0].onload = done;
-                        $div.append($script);
+                            $script = $(script);
+                            $script[0].onload = function() {
+                                var intervalId = setInterval(function() {
+                                    if (Object.keys(window.c6.requireCache).length === 4) {
+                                        clearInterval(intervalId);
+                                        done();
+                                    }
+                                }, 50);
+                            };
+                            $div.append($script);
+                        });
                     });
 
                     afterEach(function() {
-                        $('link#c6-' + atob(config['data-:branding'])).remove();
+                        $('link#c6-' + experience.data.branding).remove();
                     });
 
                     describe('the element', function() {
@@ -188,7 +194,7 @@
 
                             script.onload = function() {
                                 var intervalId = setInterval(function() {
-                                    if (!!$('div.c6embed-e-abc div')[0].innerHTML) {
+                                    if (Object.keys(window.c6.requireCache).length >= 5) {
                                         clearInterval(intervalId);
                                         done();
                                     }
@@ -301,7 +307,7 @@
 
                     describe('the branding stylesheet', function() {
                         it('should add a branding stylesheet to the page', function() {
-                            var branding = atob(config['data-:branding']);
+                            var branding = experience.data.branding;
 
                             expect($('link#c6-' + branding).attr('href')).toBe(
                                 'base/test/helpers/collateral/branding/' + branding + '/styles/splash.css'
@@ -323,7 +329,7 @@
                             });
 
                             it('should not add the branding again', function() {
-                                expect($('link#c6-' + atob(config['data-:branding'])).length).toBe(1);
+                                expect($('link#c6-' + experience.data.branding).length).toBe(1);
                             });
                         });
                     });
@@ -363,11 +369,11 @@
 
                             load('base/test/helpers/collateral/splash/' + theme + '/' + ratio + '.js', function(html) {
                                 expect($splash[0].innerHTML).toBe(
-                                    html.replace('{{title}}', atob(config['data-:title']))
+                                    html.replace('{{title}}', experience.data.title)
                                         .replace('{{splash}}', window.__C6_URL_ROOT__ +
-                                            '/collateral/experiences/' + config['data-exp'] + '/splash')
+                                            experience.data.collateral.splash)
                                 );
-                                expect($splash.hasClass('c6brand__' + atob(config['data-:branding']))).toBe(true);
+                                expect($splash.hasClass('c6brand__' + experience.data.branding)).toBe(true);
                                 done();
                             });
                         });
@@ -410,8 +416,9 @@
                                 embeds: [
                                     {
                                         embed: $('.c6embed-e-123')[0],
-                                        load: false,
-                                        preload: false,
+                                        load: 'data-preload' in config,
+                                        preload: 'data-preload' in config,
+                                        experience: experience,
                                         splashDelegate: {},
                                         config: (function() {
                                             var result = {};
@@ -424,19 +431,14 @@
                                             result.src = $script.attr('src');
                                             result.responsive = !result.height;
                                             result.splash = jasmine.any(Object);
-                                            result.title = jasmine.any(String);
                                             result.preload = 'data-preload' in config;
                                             result.replaceImage = false;
-                                            result.branding = jasmine.any(String);
-
-                                            delete result[':title'];
-                                            delete result[':branding'];
 
                                             return result;
                                         }())
                                     }
                                 ],
-                                app: null,
+                                app: 'data-preload' in config ? jasmine.any(Object) : null,
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
                                 branding: jasmine.any(Object),
@@ -578,7 +580,7 @@
                     intervalId = setInterval(function() {
                         if (!window.c6) { return; }
 
-                        if (Object.keys(window.c6.requireCache).length === 3) {
+                        if (Object.keys(window.c6.requireCache).length === 4) {
                             clearInterval(intervalId);
                             done();
                         }
