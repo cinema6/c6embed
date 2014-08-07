@@ -248,11 +248,14 @@
 
                 load((c6.requireCache[src] = iframe.contentWindow.module.exports), index);
             }, false);
-            /* jshint scripturl:true */
-            iframe.setAttribute('src', 'javascript:\'' + html + '\';');
-            /* jshint scripturl:false */
 
+            iframe.setAttribute('src', 'about:blank');
             head.appendChild(iframe);
+
+            // The iframe must have its contents written using document.write(), otherwise the
+            // browser will not send the "referer" header when requesting the script.
+            iframe.contentWindow.document.write(html);
+            iframe.contentWindow.document.close();
         });
 
         return modules;

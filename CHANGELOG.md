@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.5.1 (August 7, 2014)
+* [FIX]: Fix for an issue that could cause the MiniReel preview page on
+  cinema6.com not to work
+
 ## v1.5.0 (August 6, 2014)
 * Title, branding and splash image are now fetched from the database and
   no longer need to be placed in the embed tag
