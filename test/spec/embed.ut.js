@@ -485,7 +485,7 @@
                             };
                         });
 
-                        ['complete'].forEach(function(readyState) {
+                        ['interactive', 'complete'].forEach(function(readyState) {
                             describe('if the document is ' + readyState, function() {
                                 beforeEach(function(done) {
                                     var actualScript = document.createElement('script'),
@@ -513,6 +513,30 @@
 
                                 it('should remove the pending experience id', function() {
                                     expect(window.c6.pending).toEqual([]);
+                                });
+
+                                describe('if there is nothing in the pending array', function() {
+                                    var actualScript;
+
+                                    beforeEach(function(done) {
+                                        actualScript = document.createElement('script');
+
+                                        window.c6 = {
+                                            pending: []
+                                        };
+
+                                        actualScript.src = '/base/src/embed.js';
+                                        actualScript.setAttribute('data-exp', 'e-def');
+                                        actualScript.setAttribute('data-splash', 'flavorflav:6/5');
+
+                                        actualScript.onload = done;
+
+                                        $div.append(actualScript);
+                                    });
+
+                                    it('should try to use the last script on the page', function() {
+                                        expect(settingsByExp('e-def').config.script).toBe(actualScript);
+                                    });
                                 });
                             });
                         });

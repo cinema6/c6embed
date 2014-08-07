@@ -3,6 +3,8 @@
 ## v1.5.0 (August 6, 2014)
 * Title, branding and splash image are now fetched from the database and
   no longer need to be placed in the embed tag
+* [FIX]: Fixed an issue that could cause an asynchronously-loaded embed
+  tag not to load
 
 ## v1.4.0 (July 22, 2014)
 * [FEATURE]: The embed script can now be valid HTML5.
