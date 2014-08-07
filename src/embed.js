@@ -3,17 +3,44 @@
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        c6 = win.c6 = complete(win.c6 || {}, {
+            embeds: [],
+            app: null,
+            requireCache: {},
+            branding: {},
+            gaAcctIdPlayer: 'UA-44457821-2',
+            gaAcctIdEmbed: 'UA-44457821-3',
+            loadExperience: function(embed, preload) {
+                var app = this.app || (this.app = document.createElement('script')),
+                    head = document.getElementsByTagName('head')[0];
+
+                embed.load = true;
+                embed.preload = !!preload;
+
+                if (!app.parentNode) {
+                    app.src = appJs;
+                    head.appendChild(app);
+                }
+            }
+        }),
         bools = ['preload', 'replaceImage'],
         config = (function(scripts) {
-            var script = (readyState === 'complete') ? (function() {
-                    if (!window.c6 || !window.c6.pending) {
-                        throw new Error([
-                            'Cinema6 embed was loaded asynchronously without ',
-                            'the async helper script!'
-                        ].join(''));
+            var script = (readyState !== 'loading') ? (function() {
+                var pending = c6.pending || [],
+                    id = pending.shift();
+
+                    // There is a bug in IE10 and below where the document.readyState is reported
+                    // as "interactive" sooner than it should. In this circumstance, it could
+                    // appear that the embed script was loaded asynchronously, when in reality, it
+                    // was loaded synchronously. To try to make the embed as fool-proof as possible,
+                    // even if it appears as though the script was loaded asynchronously, we
+                    // fallback to trying to find the script tag if there are no pending async
+                    // embeds to load.
+                    if (!id) {
+                        return scripts[scripts.length - 1];
                     }
 
-                    return document.getElementById(window.c6.pending.shift());
+                    return document.getElementById(id);
                 }()) : scripts[scripts.length - 1],
                 attributes = script.attributes,
                 length = attributes.length,
@@ -73,26 +100,6 @@
 
             return mainImages.length === 1 ? mainImages[0] : script;
         }()) : script,
-        c6 = win.c6 = complete(win.c6 || {}, {
-            embeds: [],
-            app: null,
-            requireCache: {},
-            branding: {},
-            gaAcctIdPlayer: 'UA-44457821-2',
-            gaAcctIdEmbed: 'UA-44457821-3',
-            loadExperience: function(embed, preload) {
-                var app = this.app || (this.app = document.createElement('script')),
-                    head = document.getElementsByTagName('head')[0];
-
-                embed.load = true;
-                embed.preload = !!preload;
-
-                if (!app.parentNode) {
-                    app.src = appJs;
-                    head.appendChild(app);
-                }
-            }
-        }),
         responsiveStyles = {},
         staticStyles = {
             width: config.width,
