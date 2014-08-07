@@ -187,6 +187,7 @@
                         function create(done) {
                             var script = document.createElement('script');
 
+                            window.c6.requireCache = {};
                             script.src = '/base/src/embed.js';
                             script.setAttribute('data-replace-image', '');
                             script.setAttribute('data-exp', 'e-abc');
@@ -194,7 +195,7 @@
 
                             script.onload = function() {
                                 var intervalId = setInterval(function() {
-                                    if (Object.keys(window.c6.requireCache).length >= 5) {
+                                    if (Object.keys(window.c6.requireCache).length === 4) {
                                         clearInterval(intervalId);
                                         done();
                                     }
