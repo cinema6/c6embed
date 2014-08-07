@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.5.2 (August 7, 2014)
+* [FIX]: Fix for an issue that caused the MiniReel preview page on
+  cinema6.com not to work in Safari
+
 ## v1.5.1 (August 7, 2014)
 * [FIX]: Fix for an issue that could cause the MiniReel preview page on
   cinema6.com not to work

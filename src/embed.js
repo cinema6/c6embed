@@ -231,6 +231,11 @@
                 html = [
                     '<script>',
                     '(' + function(window) {
+                        try {
+                            // This hack is needed in order for the browser to send the
+                            // "referer" header in Safari.
+                            window.history.replaceState(null, null, window.document.referrer);
+                        } catch(e) {}
                         window.Text = window.parent.Text;
                         window.module = {
                             exports: {}
