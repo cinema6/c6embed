@@ -29,19 +29,19 @@
                 var pending = c6.pending || [],
                     id = pending.shift();
 
-                    // There is a bug in IE10 and below where the document.readyState is reported
-                    // as "interactive" sooner than it should. In this circumstance, it could
-                    // appear that the embed script was loaded asynchronously, when in reality, it
-                    // was loaded synchronously. To try to make the embed as fool-proof as possible,
-                    // even if it appears as though the script was loaded asynchronously, we
-                    // fallback to trying to find the script tag if there are no pending async
-                    // embeds to load.
-                    if (!id) {
-                        return scripts[scripts.length - 1];
-                    }
+                // There is a bug in IE10 and below where the document.readyState is reported
+                // as "interactive" sooner than it should. In this circumstance, it could
+                // appear that the embed script was loaded asynchronously, when in reality, it
+                // was loaded synchronously. To try to make the embed as fool-proof as possible,
+                // even if it appears as though the script was loaded asynchronously, we
+                // fallback to trying to find the script tag if there are no pending async
+                // embeds to load.
+                if (!id) {
+                    return scripts[scripts.length - 1];
+                }
 
-                    return document.getElementById(id);
-                }()) : scripts[scripts.length - 1],
+                return document.getElementById(id);
+            }()) : scripts[scripts.length - 1],
                 attributes = script.attributes,
                 length = attributes.length,
                 attribute,
