@@ -234,7 +234,7 @@
                         try {
                             // This hack is needed in order for the browser to send the
                             // "referer" header in Safari.
-                            window.history.replaceState(null, null, window.document.referrer);
+                            window.history.replaceState(null, null, window.parent.location.href);
                         } catch(e) {}
                         window.Text = window.parent.Text;
                         window.module = {

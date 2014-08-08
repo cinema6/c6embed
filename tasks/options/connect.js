@@ -9,7 +9,8 @@
             options: {
                 port: '<%= settings.sandboxPort %>',
                 base: 'app',
-                livereload: true
+                livereload: true,
+                protocol: 'https'
             }
         }
     };
