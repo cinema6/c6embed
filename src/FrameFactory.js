@@ -11,7 +11,7 @@ module.exports = function(deps) {
             '    width="100%"',
             '    height="0"',
             '    scrolling="no"',
-            '    style="border: none; position: absolute; top: 0px; left: 0px;"',
+            '    style="border: none; position: absolute; top: 0px; left: 0px; z-index: 100;"',
             '    class="c6__cant-touch-this">',
             '</iframe>'
         ].join(''));
