@@ -69,6 +69,10 @@
                 expect($iframe.attr('style')).toContain('left: 0px;');
             });
 
+            it('should have a z-index of 100', function() {
+                expect($iframe.attr('style')).toContain('z-index: 100;');
+            });
+
             it('should not be scrollable', function() {
                 expect($iframe.attr('scrolling')).toBe('no');
             });

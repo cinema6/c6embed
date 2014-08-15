@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.5.4 (August 15, 2014)
+* [FIX]: Fix for an issue that caused the "Play" button to cover up the
+  MR Player
+
 ## v1.5.3 (August 7, 2014)
 * [FIX]: Actual fix for an issue that caused the MiniReel preview page on
   cinema6.com not to work in Safari
