@@ -71,6 +71,7 @@ module.exports = function(deps) {
                     });
                     style.setProperty('position', 'relative', 'important');
                     style.setProperty('overflow', 'hidden', 'important');
+                    style.setProperty('z-index', 'auto', 'important');
                 }
 
             });
