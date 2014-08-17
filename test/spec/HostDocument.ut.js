@@ -140,6 +140,7 @@
                         '        min-height: 500px !important;',
                         '        overflow: visible !important;',
                         '        margin: 100px;',
+                        '        z-index: 3 !important;',
                         '    }',
                         '    .footer {',
                         '        position: fixed !important;',
@@ -216,6 +217,7 @@
                             expect(height).toBe(0);
                             expect($(node).css('position')).toBe('relative');
                             expect($(node).css('overflow')).toBe('hidden');
+                            expect($(node).css('z-index')).toBe('auto');
                         });
                     });
 

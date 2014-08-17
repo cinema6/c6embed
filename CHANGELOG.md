@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.5.5 (August 16, 2014)
+* [FIX]: Fix for an issue that could cause the MR Player to be covered
+  up when going fullscreen on some sites
+
 ## v1.5.4 (August 15, 2014)
 * [FIX]: Fix for an issue that caused the "Play" button to cover up the
   MR Player
