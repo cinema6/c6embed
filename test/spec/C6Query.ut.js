@@ -143,6 +143,8 @@
                 testBox.innerHTML = [
                     '<div class="c6 howard josh evan scott" style="position: relative; height: 10%; width: 10px;"></div>',
                     '<div class="c6 moo steph"></div>',
+                    '<svg version="1.1" class="svg cinema6"></svg>',
+                    '<svg version="1.1" id="svg"></svg>',
                     '<section>',
                     '    <h1>Title</h1>',
                     '    <ul>',
@@ -155,6 +157,19 @@
             });
 
             describe('methods', function() {
+                describe('toArray()', function() {
+                    it('should convert the C6Query object to an array', function() {
+                        var $c6 = $('.c6'),
+                            result = [];
+
+                        $c6.forEach(function(node) {
+                            result.push(node);
+                        });
+
+                        expect($c6.toArray()).toEqual(result);
+                    });
+                });
+
                 describe('addClass', function() {
                     it('should add the class to all the elements of the selector', function() {
                         var $c6 = $('.c6');
@@ -189,6 +204,14 @@
 
                         expect($div.classes()).toEqual([]);
                     });
+
+                    it('should support svgs', function() {
+                        var $svg = $('.svg'),
+                            $classlessSvg = $('#svg');
+
+                        expect($svg.classes()).toEqual(['svg', 'cinema6']);
+                        expect($classlessSvg.classes()).toEqual([]);
+                    });
                 });
 
                 describe('forEach(iterator(node, index))', function() {
@@ -210,6 +233,8 @@
 
                         var team1 = $('.c6.howard')[0],
                             team2 = $('.c6.moo')[0],
+                            svg = $('.svg')[0],
+                            classlessSvg = $('#svg')[0],
                             section = $('section')[0],
                             h1 = $('h1')[0],
                             ul = $('ul')[0],
@@ -223,6 +248,8 @@
                             testBox,
                             team1,
                             team2,
+                            svg,
+                            classlessSvg,
                             section,
                             h1,
                             ul,
@@ -234,9 +261,12 @@
 
                         $testBox.forEachNode(iterator);
 
-                        expect(iterator.calls.count()).toBe(10);
-                        nodes.forEach(function(node) {
-                            expect(iterator).toHaveBeenCalledWith(node, node.parentNode);
+                        expect(iterator.calls.count()).toBe(nodes.length);
+                        nodes.forEach(function(node, index) {
+                            var callArgs = iterator.calls.all()[index].args;
+
+                            expect(callArgs[0]).toBe(node);
+                            expect(callArgs[1]).toBe(node.parentNode);
                         });
                     });
                 });

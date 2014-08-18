@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v1.5.6 (August 18, 2014)
+* [FIX]: Fix for an issue that caused scrolling behind the MiniReel
+  Player due to the animated play button
+
 ## v1.5.5 (August 16, 2014)
 * [FIX]: Fix for an issue that could cause the MR Player to be covered
   up when going fullscreen on some sites
