@@ -178,6 +178,10 @@
             'page'  : '/embed/' + settings.config.exp + '/',
             'title' : settings.config.title
         });
+        /* jshint devel:true */
+        if(console) {
+            console.log(embedTracker + ' sent visible event');
+        }
     }
 
     function viewChangeHandler() {
