@@ -3,7 +3,7 @@
 
     module.exports = {
         server: {
-            url: 'https://localhost:<%= settings.sandboxPort %>/',
+            url: 'http://localhost:<%= settings.sandboxPort %>/',
             app: '<%= settings.openBrowser %>'
         }
     };

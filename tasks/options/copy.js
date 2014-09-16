@@ -4,6 +4,22 @@ module.exports = {
             {
                 src: 'src/embed.js',
                 dest: 'app/embed.js'
+            },
+            {
+                src: 'app/embed.html',
+                dest: 'app/index.html'
+            }
+        ]
+    },
+    widget: {
+        files: [
+            {
+                src: 'src/widget.js',
+                dest: 'app/widget.js'
+            },
+            {
+                src: 'app/widget.html',
+                dest: 'app/index.html'
             }
         ]
     },
