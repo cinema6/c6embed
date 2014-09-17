@@ -21,6 +21,7 @@ module.exports = function(config) {
             'node_modules/q/q.js',
             'node_modules/asEvented/asevented.js',
             { pattern: 'src/embed.js', included: false },
+            { pattern: 'src/widget.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
             'lib/**/*.js',
@@ -37,7 +38,7 @@ module.exports = function(config) {
             'node_modules/q/q.js': ['commonjs'],
             'node_modules/asEvented/asevented.js': ['commonjs'],
             'lib/**/*.js': ['commonjs'],
-            'src/**/!(embed).js': ['commonjs'],
+            'src/**/!(embed|widget).js': ['commonjs'],
             'test/spec/**/*.js': ['commonjs'],
             'test/helpers/*.js': ['commonjs']
         },

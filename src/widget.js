@@ -2,11 +2,12 @@
     'use strict';
 
     //TODO: Handle multiple widgets against same placementId?
+    //TODO: Handle widget + one or more embeds on same page
     //
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
-        appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
-        c6 = win.c6 = complete(win.c6 || {}, {
-            adTechLoaded    : false,
+        appJs   = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        c6      = win.c6 = complete(win.c6 || {}, {
+            widgetRunOnce   : true,
             app             : null,
             embeds          : [],
             branding        : {},
@@ -14,15 +15,8 @@
             contentCache    : {},
             gaAcctIdPlayer  : 'UA-44457821-2',
             gaAcctIdEmbed   : 'UA-44457821-3',
-            addReel         : function(expId,placementId,clickUrl){
-                if (!this.contentCache[placementId]){
-                    this.contentCache[placementId] = [];
-                }
-                this.contentCache[placementId].push({
-                    expId    : expId,
-                    clickUrl : clickUrl
-                });
-            },
+
+            //loads a miniReel
             loadExperience  : function(embed,preload) {
                 var app = this.app || (this.app = doc.createElement('script')),
                     head = doc.getElementsByTagName('head')[0];
@@ -35,12 +29,50 @@
                     head.appendChild(app);
                 }
             },
+
+            //addReel will be called by code dynamically injected via adserver
+            addReel         : function(expId,placementId,clickUrl){
+                if (!this.contentCache[placementId]){
+                    this.contentCache[placementId] = [];
+                }
+                this.contentCache[placementId].push({
+                    expId    : expId,
+                    clickUrl : clickUrl
+                });
+            },
+
+            //createWidget will be called via code injected by adServer or via
+            //custom integration
             createWidget    : widgetFactory
         });
 
-    if (!c6.adTechLoaded){
-        c6.adTechLoaded = true;
+    
+    /*****************************************************************
+     * Init code to run one time (in case there is more than one widget
+     * being loaded on the page)
+     */
+    
+    if (c6.widgetRunOnce){
+        c6.widgetRunOnce = false;
         doc.write('<script src="//aka-cdn.adtechus.com/dt/common/DAC.js"></scr' + 'ipt>');
+    
+        /* Create GA Tracker */
+        (function() {
+            /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+            /* jshint sub:false, asi:false, expr:false, indent:4 */
+
+            window.__c6_ga__('create', c6.gaAcctIdPlayer, {
+                'name'       : 'c6',
+                'cookieName' : '_c6ga'
+            });
+            
+            /* jshint camelcase:true */
+        }());
+
     }
 
     /*****************************************************************
@@ -128,23 +160,11 @@
 
         return modules;
     }
-    /* Create GA Tracker */
-    (function() {
-        /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
-        /* jshint sub:false, asi:false, expr:false, indent:4 */
 
-        window.__c6_ga__('create', c6.gaAcctIdPlayer, {
-            'name'       : 'c6',
-            'cookieName' : '_c6ga'
-        });
-        
-        /* jshint camelcase:true */
-    }());
-
+    /*****************************************************************
+     * Widget Work Starts Here
+     */
+    
     function widgetFactory(cfg){
         var widgetDef = complete({ }, cfg),
             widgetDiv = (function(){
