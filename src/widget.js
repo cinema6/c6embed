@@ -78,6 +78,16 @@
     /*****************************************************************
      * Helpers
      */
+
+    function genRandomId(result,len){
+        result  = result || '';
+        len     = len || 10;
+        while(len-- > 0){
+            var n = (Math.floor(Math.random() * 999999999)) % 35;
+            result += String.fromCharCode(((n <= 25) ? 97 : 22) + n);
+        }
+        return result;
+    }
     
     function complete(object, defaults) {
         var key;
@@ -163,18 +173,22 @@
 
     /*****************************************************************
      * Widget Work Starts Here
+     * Cfg Object with these params:
+     *  placementId - Used to retrieve MR's from Ad Server
+     *  template    - Template file for formatting the Mr2 Widget
+     *  branding    - Branding to apply to the MR2 Widget Container
      */
     
     function widgetFactory(cfg){
         var widgetDef = complete({ }, cfg),
             widgetDiv = (function(){
-            var div, widgetId = 'c6::' + 'lskdfjl'; // make random 
-            doc.write('<div id="' + widgetId + '"></di' + 'v>');
-            // adtech needs a dummy div
-            doc.write('<div id="' + widgetId + '-ad"></di' + 'v>');
-            div = doc.getElementById(widgetId);
-            return div;
-        }());
+                var div, widgetId =  genRandomId('c6_');
+                doc.write('<div id="' + widgetId + '"></di' + 'v>');
+                // adtech needs a dummy div
+                doc.write('<div id="' + widgetId + '_ad"></di' + 'v>');
+                div = doc.getElementById(widgetId);
+                return div;
+            }());
 
         require([
             '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
@@ -195,7 +209,7 @@
             };
             
             adtech.config.placements[widgetDef.placementId] = {
-                adContainerId   : widgetDiv.id + '-ad',
+                adContainerId   : widgetDiv.id + '_ad',
                 complete: function(){
                     c6.contentCache[widgetDef.placementId].forEach(function(o,index){
                         require([
@@ -213,7 +227,8 @@
                                     (c6.branding[branding] = new DOMElement('link', {
                                         id: 'c6-' + branding,
                                         rel: 'stylesheet',
-                                        href: baseUrl + '/collateral/branding/' + branding + '/styles/splash.css'
+                                        href: baseUrl + '/collateral/branding/' +
+                                            branding + '/styles/splash.css'
                                     }, head))
                                 );
                                 /* jshint expr:false */

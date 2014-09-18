@@ -47,7 +47,8 @@
             it('should only ad adtech once',function(done){
                 expect(document.write.calls.count()).toEqual(1);
                 expect(document.write)
-                .toHaveBeenCalledWith('<script src="//aka-cdn.adtechus.com/dt/common/DAC.js"></script>');
+                .toHaveBeenCalledWith(
+                    '<script src="//aka-cdn.adtechus.com/dt/common/DAC.js"></script>');
 
                 var script;
                 script = document.createElement('script');
