@@ -43,24 +43,6 @@
                 expect(c6.gaAcctIdPlayer).toEqual('UA-44457821-2');
                 expect(c6.gaAcctIdEmbed).toEqual('UA-44457821-3');
             });
-
-            it('should only ad adtech once',function(done){
-                expect(document.write.calls.count()).toEqual(1);
-                expect(document.write)
-                .toHaveBeenCalledWith(
-                    '<script src="//aka-cdn.adtechus.com/dt/common/DAC.js"></script>');
-
-                var script;
-                script = document.createElement('script');
-                script.src = '/base/src/widget.js';
-                script.onload = function() {
-                    expect(document.write.calls.count()).toEqual(1);
-                    done();
-                };
-                $div.append(script);
-
-            });
-
         });
 
         describe('c6.addReel',function(){

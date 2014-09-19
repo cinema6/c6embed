@@ -54,7 +54,6 @@
     
     if (c6.widgetRunOnce){
         c6.widgetRunOnce = false;
-        doc.write('<script src="//aka-cdn.adtechus.com/dt/common/DAC.js"></scr' + 'ipt>');
     
         /* Create GA Tracker */
         (function() {
@@ -118,7 +117,10 @@
 
     function require(srcs, cb) {
         var modules = [],
-            loaded = 0;
+            loaded = 0,
+            config = require.config || {},
+            paths = config.paths || {},
+            shims = config.shim || {};
 
         function load(module, index) {
             modules[index] = module;
@@ -128,7 +130,12 @@
             }
         }
 
-        srcs.forEach(function(src, index) {
+        srcs.forEach(function(_src, index) {
+            var src = paths[_src] || _src,
+                shim = shims[_src] || {},
+                exports = shim.exports,
+                onCreateFrame = shim.onCreateFrame || function() {};
+
             if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
 
             var iframe = document.createElement('iframe'),
@@ -148,15 +155,22 @@
                         window.exports = window.module.exports;
                     }.toString() + '(window))',
                     '</script>',
+                    '<script>(' + onCreateFrame.toString() + '(window))</script>',
                     '<script src="' + src + '"></script>'
                 ].join('\n');
 
             iframe.addEventListener('load', function() {
-                var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+                var frameWindow = iframe.contentWindow,
+                    head = frameWindow.document.getElementsByTagName('head')[0];
 
                 if (head.childNodes.length < 1) { return; }
 
-                load((c6.requireCache[src] = iframe.contentWindow.module.exports), index);
+                load(
+                    (c6.requireCache[src] =
+                        (exports ? frameWindow[exports] : frameWindow.module.exports)
+                    ),
+                    index
+                );
             }, false);
 
             iframe.setAttribute('src', 'about:blank');
@@ -171,6 +185,25 @@
         return modules;
     }
 
+    require.config = {
+        paths: {
+            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
+        },
+        shim: {
+            adtech: {
+                exports: 'ADTECH',
+                onCreateFrame: function(window) {
+                    var document = window.document;
+
+                    window.c6 = window.parent.c6;
+
+                    /* jshint evil:true */
+                    document.write('<div id="ad"></div>');
+                }
+            }
+        }
+    };
+
     /*****************************************************************
      * Widget Work Starts Here
      * Cfg Object with these params:
@@ -184,19 +217,18 @@
             widgetDiv = (function(){
                 var div, widgetId =  genRandomId('c6_');
                 doc.write('<div id="' + widgetId + '"></di' + 'v>');
-                // adtech needs a dummy div
-                doc.write('<div id="' + widgetId + '_ad"></di' + 'v>');
                 div = doc.getElementById(widgetId);
                 return div;
             }());
 
         require([
+            'adtech',
             '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
             baseUrl + '/collateral/splash/splash.js',
             widgetDef.template
-        ], function(tb, splashJS, html) {
+        ], function(adtech, tb, splashJS, html) {
             //todo get widget branding..
-            var splashTemplates, adtech = win.ADTECH, i,
+            var splashTemplates, i,
                 head = doc.getElementsByTagName('head')[0];
             widgetDiv.innerHTML = html;
 
@@ -209,7 +241,7 @@
             };
             
             adtech.config.placements[widgetDef.placementId] = {
-                adContainerId   : widgetDiv.id + '_ad',
+                adContainerId   : 'ad',
                 complete: function(){
                     c6.contentCache[widgetDef.placementId].forEach(function(o,index){
                         require([
