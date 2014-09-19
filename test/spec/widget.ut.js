@@ -88,5 +88,10 @@
                 ]);
             });
         });
+
+        describe('c6.loadExperience',function(){
+
+
+        });
     });
 }());

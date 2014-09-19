@@ -19,7 +19,7 @@
             //loads a miniReel
             loadExperience  : function(embed,preload) {
                 var app = this.app || (this.app = doc.createElement('script')),
-                    head = doc.getElementsByTagName('head')[0];
+                    head = doc.head;
 
                 embed.load = true;
                 embed.preload = !!preload;
@@ -175,20 +175,33 @@
      * Widget Work Starts Here
      * Cfg Object with these params:
      *  placementId - Used to retrieve MR's from Ad Server
-     *  template    - Template file for formatting the Mr2 Widget
-     *  branding    - Branding to apply to the MR2 Widget Container
+     *  template    - Template file for formatting the MR2 Widget
+     *  branding    - Branding to apply to the MR2 Widget
      */
     
     function widgetFactory(cfg){
-        var widgetDef = complete({ }, cfg),
+        var head = doc.head,
+            widgetDef = complete({ branding : 'default'}, cfg),
             widgetDiv = (function(){
                 var div, widgetId =  genRandomId('c6_');
-                doc.write('<div id="' + widgetId + '"></di' + 'v>');
+                doc.write('<div id="' + widgetId + '" class="c6widget c6brand__' +
+                    widgetDef.branding + '"></di' + 'v>');
                 // adtech needs a dummy div
                 doc.write('<div id="' + widgetId + '_ad"></di' + 'v>');
                 div = doc.getElementById(widgetId);
                 return div;
             }());
+
+        /* jshint expr:true */
+        (c6.branding[widgetDef.branding] ||
+            (c6.branding[widgetDef.branding] = new DOMElement('link', {
+                id: 'c6-' + widgetDef.branding,
+                rel: 'stylesheet',
+                href: baseUrl + '/collateral/branding/' +
+                    widgetDef.branding + '/styles/splash.css'
+            }, head))
+        );
+        /* jshint expr:false */
 
         require([
             '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
@@ -196,20 +209,19 @@
             widgetDef.template
         ], function(tb, splashJS, html) {
             //todo get widget branding..
-            var splashTemplates, adtech = win.ADTECH, i,
-                head = doc.getElementsByTagName('head')[0];
+            var splashTemplates, adtech = win.ADTECH, i;
             widgetDiv.innerHTML = html;
 
             splashTemplates = doc.querySelectorAll('.c6-mr2__mr-splash');
 
             adtech.config.page = {
-                network         : '5473.1',
-                server          : 'adserver.adtechus.com',
                 enableMultiAd   : true
             };
             
             adtech.config.placements[widgetDef.placementId] = {
                 adContainerId   : widgetDiv.id + '_ad',
+                network         : '5473.1',
+                server          : 'adserver.adtechus.com',
                 complete: function(){
                     c6.contentCache[widgetDef.placementId].forEach(function(o,index){
                         require([
