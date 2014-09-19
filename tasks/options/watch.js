@@ -33,7 +33,7 @@
                 'lite/**/*.js',
                 'test/spec/**/*.js',
             ],
-            tasks: ['jshint:all','karma:debug:run']
+            tasks: ['karma:debug:run', 'jshint:all']
         },
         e2e: {
             files: [
