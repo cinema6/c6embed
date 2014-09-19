@@ -24,6 +24,7 @@ module.exports = function(config) {
             { pattern: 'src/widget.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
+            { pattern: 'test/helpers/**/*.html', included: false },
             'lib/**/*.js',
             'src/**/*.js',
             'test/spec/**/*.js',

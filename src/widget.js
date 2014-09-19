@@ -1,119 +1,30 @@
-(function(win, doc/*, readyState*/) {
+(function($window, $document/*, readyState*/) {
     'use strict';
 
     //TODO: Handle multiple widgets against same placementId?
     //TODO: Handle widget + one or more embeds on same page
     //
-    var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
-        appJs   = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
-        c6      = win.c6 = complete(win.c6 || {}, {
-            widgetRunOnce   : true,
-            app             : null,
-            embeds          : [],
-            branding        : {},
-            requireCache    : {},
-            contentCache    : {},
-            gaAcctIdPlayer  : 'UA-44457821-2',
-            gaAcctIdEmbed   : 'UA-44457821-3',
+    var baseUrl = $window.__C6_URL_ROOT__ || '//portal.cinema6.com',
+        appJs   = $window.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        c6 = $window.c6 = complete($window.c6 || {}, {
+            app: null,
+            embeds: [],
+            branding: {},
+            requireCache: {},
+            widgetContentCache: {},
+            gaAcctIdPlayer: 'UA-44457821-2',
+            gaAcctIdEmbed: 'UA-44457821-3',
 
-            //loads a miniReel
-            loadExperience  : function(embed,preload) {
-                var app = this.app || (this.app = doc.createElement('script')),
-                    head = doc.head;
+            loadExperience: function() {
 
-                embed.load = true;
-                embed.preload = !!preload;
-
-                if (!app.parentNode) {
-                    app.src = appJs;
-                    head.appendChild(app);
-                }
             },
 
-            //addReel will be called by code dynamically injected via adserver
-            addReel         : function(expId,placementId,clickUrl){
-                if (!this.contentCache[placementId]){
-                    this.contentCache[placementId] = [];
-                }
-                this.contentCache[placementId].push({
-                    expId    : expId,
-                    clickUrl : clickUrl
-                });
+            addReel: function() {
+
             },
 
-            //createWidget will be called via code injected by adServer or via
-            //custom integration
-            createWidget    : widgetFactory
+            createWidget: createWidget
         });
-
-    
-    /*****************************************************************
-     * Init code to run one time (in case there is more than one widget
-     * being loaded on the page)
-     */
-    
-    if (c6.widgetRunOnce){
-        c6.widgetRunOnce = false;
-    
-        /* Create GA Tracker */
-        (function() {
-            /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
-            /* jshint sub:false, asi:false, expr:false, indent:4 */
-
-            window.__c6_ga__('create', c6.gaAcctIdPlayer, {
-                'name'       : 'c6',
-                'cookieName' : '_c6ga'
-            });
-            
-            /* jshint camelcase:true */
-        }());
-
-    }
-
-    /*****************************************************************
-     * Helpers
-     */
-
-    function genRandomId(result,len){
-        result  = result || '';
-        len     = len || 10;
-        while(len-- > 0){
-            var n = (Math.floor(Math.random() * 999999999)) % 35;
-            result += String.fromCharCode(((n <= 25) ? 97 : 22) + n);
-        }
-        return result;
-    }
-    
-    function complete(object, defaults) {
-        var key;
-
-        for (key in defaults) {
-            if (!object.hasOwnProperty(key)) {
-                object[key] = defaults[key];
-            }
-        }
-        return object;
-    }
-    
-    function DOMElement(tag, attrs, appendTo) {
-        var element = document.createElement(tag),
-            attr;
-
-        for (attr in attrs) {
-            element.setAttribute(attr, attrs[attr]);
-        }
-
-        if (appendTo) {
-            appendTo.appendChild(element);
-        }
-
-        return element;
-    }
-
 
     function require(srcs, cb) {
         var modules = [],
@@ -185,9 +96,133 @@
         return modules;
     }
 
+    function complete(object, defaults) {
+        var key;
+
+        for (key in defaults) {
+            if (!object.hasOwnProperty(key)) {
+                object[key] = defaults[key];
+            }
+        }
+        return object;
+    }
+
+    function DOMElement(tag, attrs, appendTo) {
+        var element = document.createElement(tag),
+            attr;
+
+        for (attr in attrs) {
+            element.setAttribute(attr, attrs[attr]);
+        }
+
+        if (appendTo) {
+            appendTo.appendChild(element);
+        }
+
+        return element;
+    }
+
+    function genRandomId(result,len){
+        result  = result || '';
+        len     = len || 10;
+        while(len-- > 0){
+            var n = (Math.floor(Math.random() * 999999999)) % 35;
+            result += String.fromCharCode(((n <= 25) ? 97 : 22) + n);
+        }
+        return result;
+    }
+
+    function createWidget(config) {
+        var container = (function() {
+            var id = genRandomId('c6_');
+
+            /* jshint evil:true */
+            $document.write(
+                '<div id="' + id + '" class="' +
+                    ['c6_widget', 'c6brand__' + config.branding].join(' ') +
+                '"></div>'
+            );
+            /* jshint evil:false */
+
+            return $document.getElementById(id);
+        }());
+
+        /* jshint expr:true */
+        (c6.branding[config.branding] ||
+            (c6.branding[config.branding] = new DOMElement('link', {
+                id: 'c6-' + config.branding,
+                rel: 'stylesheet',
+                href: baseUrl + '/collateral/branding/' + config.branding + '/styles/splash.css'
+            }, $document.head))
+        );
+        /* jshint expr:false */
+
+        require([
+            'adtech',
+            '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
+            baseUrl + '/collateral/splash/splash.js',
+            baseUrl + '/' + config.template + '.js'
+        ], function(
+            adtech,
+            twobits,
+            splashJS,
+            template
+        ) {
+            var splashPages = (function() {
+                container.innerHTML = template;
+
+                return Array.prototype.slice.call(
+                    container.querySelectorAll('.c6-mr2__mr-splash')
+                );
+            }());
+
+            adtech.config.page = {
+                network: '5473.1',
+                server: 'adserver.adtechus.com',
+                enableMultiAd: true
+            };
+
+            adtech.config.placements[config.placementId] = {
+                adContainerId: 'ad',
+                complete: function() {
+
+                }
+            };
+
+            splashPages.forEach(function() {
+                adtech.enqueueAd(parseInt(config.placementId));
+            });
+
+            adtech.executeQueue({
+                multiAd: {
+                    disableAdInjection: true,
+                    readyCallback: function() {
+                        adtech.showAd(config.placementId);
+                    }
+                }
+            });
+        });
+    }
+
+    /* Create GA Tracker */
+    (function() {
+        /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+        /* jshint sub:false, asi:false, expr:false, indent:4 */
+
+        window.__c6_ga__('create', c6.gaAcctIdPlayer, {
+            'name'       : 'c6',
+            'cookieName' : '_c6ga'
+        });
+        /* jshint camelcase:true */
+    }());
+
     require.config = {
         paths: {
-            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
+            adtech: 'http://aka-cdn.adtechus.com/dt/common/DAC.js'
         },
         shim: {
             adtech: {
@@ -204,6 +239,74 @@
         }
     };
 
+        /*c6      = win.c6 = complete(win.c6 || {}, {
+            widgetRunOnce   : true,
+            app             : null,
+            embeds          : [],
+            branding        : {},
+            requireCache    : {},
+            contentCache    : {},
+            gaAcctIdPlayer  : 'UA-44457821-2',
+            gaAcctIdEmbed   : 'UA-44457821-3',
+
+            //loads a miniReel
+            loadExperience  : function(embed,preload) {
+                var app = this.app || (this.app = doc.createElement('script')),
+                    head = doc.head;
+
+                embed.load = true;
+                embed.preload = !!preload;
+
+                if (!app.parentNode) {
+                    app.src = appJs;
+                    head.appendChild(app);
+                }
+            },
+
+            //addReel will be called by code dynamically injected via adserver
+            addReel         : function(expId,placementId,clickUrl){
+                if (!this.contentCache[placementId]){
+                    this.contentCache[placementId] = [];
+                }
+                this.contentCache[placementId].push({
+                    expId    : expId,
+                    clickUrl : clickUrl
+                });
+            },
+
+            //createWidget will be called via code injected by adServer or via
+            //custom integration
+            createWidget    : widgetFactory
+        });
+
+    
+    /*****************************************************************
+     * Init code to run one time (in case there is more than one widget
+     * being loaded on the page)
+     */
+    
+    /*if (c6.widgetRunOnce){
+        c6.widgetRunOnce = false;
+    
+        /* Create GA Tracker */
+        /*(function() {
+            /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
+            /*(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+            /* jshint sub:false, asi:false, expr:false, indent:4 */
+
+            /*window.__c6_ga__('create', c6.gaAcctIdPlayer, {
+                'name'       : 'c6',
+                'cookieName' : '_c6ga'
+            });
+            
+            /* jshint camelcase:true */
+        /*}());
+
+    }
+
     /*****************************************************************
      * Widget Work Starts Here
      * Cfg Object with these params:
@@ -212,7 +315,7 @@
      *  branding    - Branding to apply to the MR2 Widget
      */
     
-    function widgetFactory(cfg){
+    /*function widgetFactory(cfg){
         var head = doc.head,
             widgetDef = complete({ branding : 'default'}, cfg),
             widgetDiv = (function(){
@@ -224,7 +327,7 @@
             }());
 
         /* jshint expr:true */
-        (c6.branding[widgetDef.branding] ||
+        /*(c6.branding[widgetDef.branding] ||
             (c6.branding[widgetDef.branding] = new DOMElement('link', {
                 id: 'c6-' + widgetDef.branding,
                 rel: 'stylesheet',
@@ -234,7 +337,7 @@
         );
         /* jshint expr:false */
 
-        require([
+        /*require([
             'adtech',
             '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
             baseUrl + '/collateral/splash/splash.js',
@@ -267,7 +370,7 @@
                             //TODO:  remove c6ads filter (c6ads dont play nice)
                             if ((branding) && (branding !== 'c6ads')){
                                 /* jshint expr:true */
-                                (c6.branding[branding] ||
+                                /*(c6.branding[branding] ||
                                     (c6.branding[branding] = new DOMElement('link', {
                                         id: 'c6-' + branding,
                                         rel: 'stylesheet',
@@ -276,7 +379,7 @@
                                     }, head))
                                 );
                                 /* jshint expr:false */
-                                splashElt.setAttribute('class', 'c6brand__' + branding);
+                                /*splashElt.setAttribute('class', 'c6brand__' + branding);
                             }
                             tb.parse(splashElt)({
                                 title : experience.data.title,
@@ -297,7 +400,7 @@
                             var embedTracker = minireel.config.exp.replace(/e-/,'');
 
                             /* jshint camelcase:false */
-                            win.__c6_ga__('create', c6.gaAcctIdEmbed, {
+                            /*win.__c6_ga__('create', c6.gaAcctIdEmbed, {
                                 'name'       : embedTracker,
                                 'cookieName' : '_c6ga'
                             });
@@ -314,7 +417,7 @@
                             });
                             /* jshint camelcase:true */
 
-                        });
+                        /*});
                     });
                 }
             };
