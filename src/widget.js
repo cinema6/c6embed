@@ -15,12 +15,22 @@
             gaAcctIdPlayer: 'UA-44457821-2',
             gaAcctIdEmbed: 'UA-44457821-3',
 
-            loadExperience: function() {
+            loadExperience: function(embed, preload) {
+                embed.load = true;
+                embed.preload = !!preload;
 
+                /* jshint expr:true */
+                this.app || (this.app = new DOMElement('script', {
+                    src: appJs
+                }, $document.head));
             },
 
-            addReel: function() {
-
+            addReel: function(expId, placementId, clickUrl) {
+                return (this.widgetContentCache[placementId] ||
+                    (this.widgetContentCache[placementId] = [])).push({
+                        expId: expId,
+                        clickUrl: clickUrl
+                    });
             },
 
             createWidget: createWidget
@@ -49,7 +59,10 @@
 
             if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
 
-            var iframe = document.createElement('iframe'),
+            var iframe = new DOMElement('iframe', {
+                    src: 'about:blank',
+                    'data-module': _src
+                }),
                 head = document.getElementsByTagName('head')[0],
                 html = [
                     '<script>',
@@ -84,7 +97,6 @@
                 );
             }, false);
 
-            iframe.setAttribute('src', 'about:blank');
             head.appendChild(iframe);
 
             // The iframe must have its contents written using document.write(), otherwise the
@@ -122,6 +134,28 @@
         return element;
     }
 
+    function toQueryParams(object) {
+        return Object.keys(object)
+            .map(function(key) {
+                return [key, object[key]]
+                    .map(encodeURIComponent)
+                    .join('=');
+            })
+            .join('&');
+    }
+
+    function loadBrandingStyles(branding) {
+        if (!branding) { return null; }
+
+        return (c6.branding[branding] ||
+            (c6.branding[branding] = new DOMElement('link', {
+                id: 'c6-' + branding,
+                rel: 'stylesheet',
+                href: baseUrl + '/collateral/branding/' + branding + '/styles/splash.css'
+            }, $document.head))
+        );
+    }
+
     function genRandomId(result,len){
         result  = result || '';
         len     = len || 10;
@@ -147,15 +181,7 @@
             return $document.getElementById(id);
         }());
 
-        /* jshint expr:true */
-        (c6.branding[config.branding] ||
-            (c6.branding[config.branding] = new DOMElement('link', {
-                id: 'c6-' + config.branding,
-                rel: 'stylesheet',
-                href: baseUrl + '/collateral/branding/' + config.branding + '/styles/splash.css'
-            }, $document.head))
-        );
-        /* jshint expr:false */
+        loadBrandingStyles(config.branding);
 
         require([
             'adtech',
@@ -176,6 +202,21 @@
                 );
             }());
 
+            function MiniReelConfig(experience, splash) {
+                this.load = false;
+                this.preload = false;
+
+                this.embed = splash;
+                this.splashDelegate = splashJS(c6, this, splash);
+                this.experience = experience;
+
+                this.config = {
+                    exp: experience.id,
+                    title: experience.data.title
+                };
+            }
+
+
             adtech.config.page = {
                 network: '5473.1',
                 server: 'adserver.adtechus.com',
@@ -185,7 +226,48 @@
             adtech.config.placements[config.placementId] = {
                 adContainerId: 'ad',
                 complete: function() {
+                    require(c6.widgetContentCache[config.placementId].map(function(item) {
+                        return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
+                            toQueryParams({
+                                context: 'mr2',
+                                branding: config.branding,
+                                placementId: config.placementId
+                            });
+                    }), function() {
+                        Array.prototype.slice.call(arguments)
+                            .forEach(function(experience, index) {
+                                var splash = splashPages[index],
+                                    embedTracker = experience.id.replace(/^e-/, '');
 
+                                loadBrandingStyles(experience.data.branding);
+                                splash.className += ' c6brand__' + experience.data.branding;
+
+                                twobits.parse(splash)({
+                                    title: experience.data.title,
+                                    splash: baseUrl + experience.data.collateral.splash
+                                });
+
+                                c6.embeds.push(new MiniReelConfig(experience, splash));
+
+                                /* jshint camelcase:false */
+                                $window.__c6_ga__('create', c6.gaAcctIdEmbed, {
+                                    'name'       : embedTracker,
+                                    'cookieName' : '_c6ga'
+                                });
+                                $window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
+
+                                $window.__c6_ga__(embedTracker + '.set',{
+                                    'dimension1' : $window.location.href
+                                });
+
+                                $window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                                    'page'  : '/embed/' + experience.id + '/',
+                                    'title' : experience.data.title,
+                                    'sessionControl' : 'start'
+                                });
+                                /* jshint camelcase:true */
+                            });
+                    });
                 }
             };
 
@@ -238,264 +320,4 @@
             }
         }
     };
-
-        /*c6      = win.c6 = complete(win.c6 || {}, {
-            widgetRunOnce   : true,
-            app             : null,
-            embeds          : [],
-            branding        : {},
-            requireCache    : {},
-            contentCache    : {},
-            gaAcctIdPlayer  : 'UA-44457821-2',
-            gaAcctIdEmbed   : 'UA-44457821-3',
-
-            //loads a miniReel
-            loadExperience  : function(embed,preload) {
-                var app = this.app || (this.app = doc.createElement('script')),
-                    head = doc.head;
-
-                embed.load = true;
-                embed.preload = !!preload;
-
-                if (!app.parentNode) {
-                    app.src = appJs;
-                    head.appendChild(app);
-                }
-            },
-
-            //addReel will be called by code dynamically injected via adserver
-            addReel         : function(expId,placementId,clickUrl){
-                if (!this.contentCache[placementId]){
-                    this.contentCache[placementId] = [];
-                }
-                this.contentCache[placementId].push({
-                    expId    : expId,
-                    clickUrl : clickUrl
-                });
-            },
-
-            //createWidget will be called via code injected by adServer or via
-            //custom integration
-            createWidget    : widgetFactory
-        });
-
-    
-    /*****************************************************************
-     * Init code to run one time (in case there is more than one widget
-     * being loaded on the page)
-     */
-    
-    /*if (c6.widgetRunOnce){
-        c6.widgetRunOnce = false;
-    
-        /* Create GA Tracker */
-        /*(function() {
-            /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
-            /*(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
-            /* jshint sub:false, asi:false, expr:false, indent:4 */
-
-            /*window.__c6_ga__('create', c6.gaAcctIdPlayer, {
-                'name'       : 'c6',
-                'cookieName' : '_c6ga'
-            });
-            
-            /* jshint camelcase:true */
-        /*}());
-
-    }
-
-    /*****************************************************************
-     * Widget Work Starts Here
-     * Cfg Object with these params:
-     *  placementId - Used to retrieve MR's from Ad Server
-     *  template    - Template file for formatting the MR2 Widget
-     *  branding    - Branding to apply to the MR2 Widget
-     */
-    
-    /*function widgetFactory(cfg){
-        var head = doc.head,
-            widgetDef = complete({ branding : 'default'}, cfg),
-            widgetDiv = (function(){
-                var div, widgetId =  genRandomId('c6_');
-                doc.write('<div id="' + widgetId + '" class="c6widget c6brand__' +
-                    widgetDef.branding + '"></di' + 'v>');
-                div = doc.getElementById(widgetId);
-                return div;
-            }());
-
-        /* jshint expr:true */
-        /*(c6.branding[widgetDef.branding] ||
-            (c6.branding[widgetDef.branding] = new DOMElement('link', {
-                id: 'c6-' + widgetDef.branding,
-                rel: 'stylesheet',
-                href: baseUrl + '/collateral/branding/' +
-                    widgetDef.branding + '/styles/splash.css'
-            }, head))
-        );
-        /* jshint expr:false */
-
-        /*require([
-            'adtech',
-            '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
-            baseUrl + '/collateral/splash/splash.js',
-            widgetDef.template
-        ], function(adtech, tb, splashJS, html) {
-            //todo get widget branding..
-            var splashTemplates, i;
-            widgetDiv.innerHTML = html;
-
-            splashTemplates = doc.querySelectorAll('.c6-mr2__mr-splash');
-
-            adtech.config.page = {
-                network         : '5473.1',
-                server          : 'adserver.adtechus.com',
-                enableMultiAd   : true
-            };
-            
-            adtech.config.placements[widgetDef.placementId] = {
-                adContainerId   : 'ad',
-                complete: function(){
-                    c6.contentCache[widgetDef.placementId].forEach(function(o,index){
-                        require([
-                            baseUrl + '/api/public/content/experience/' + o.expId + '.js'
-                        ], function( experience) {
-                            var branding = experience.data.branding,
-                                splashImage = baseUrl + experience.data.collateral.splash,
-                                splashElt = splashTemplates[index],
-                                minireel = {};
-
-                            //TODO:  remove c6ads filter (c6ads dont play nice)
-                            if ((branding) && (branding !== 'c6ads')){
-                                /* jshint expr:true */
-                                /*(c6.branding[branding] ||
-                                    (c6.branding[branding] = new DOMElement('link', {
-                                        id: 'c6-' + branding,
-                                        rel: 'stylesheet',
-                                        href: baseUrl + '/collateral/branding/' +
-                                            branding + '/styles/splash.css'
-                                    }, head))
-                                );
-                                /* jshint expr:false */
-                                /*splashElt.setAttribute('class', 'c6brand__' + branding);
-                            }
-                            tb.parse(splashElt)({
-                                title : experience.data.title,
-                                splash: splashImage
-                            });
-
-                            minireel.embed = splashElt;
-                            minireel.splashDelegate = splashJS(c6, minireel, splashElt);
-                            minireel.experience = experience;
-                            minireel.load = false;
-                            minireel.preload =  false;
-                            minireel.config = {
-                                exp : experience.id,
-                                title: experience.data.title
-                            };
-                            c6.embeds.push(minireel);
-                            
-                            var embedTracker = minireel.config.exp.replace(/e-/,'');
-
-                            /* jshint camelcase:false */
-                            /*win.__c6_ga__('create', c6.gaAcctIdEmbed, {
-                                'name'       : embedTracker,
-                                'cookieName' : '_c6ga'
-                            });
-                            win.__c6_ga__(embedTracker + '.require', 'displayfeatures');
-
-                            win.__c6_ga__(embedTracker + '.set',{
-                                'dimension1' : win.location.href
-                            });
-
-                            win.__c6_ga__(embedTracker + '.send', 'pageview', {
-                                'page'  : '/embed/' + minireel.config.exp + '/',
-                                'title' : minireel.config.title,
-                                'sessionControl' : 'start'
-                            });
-                            /* jshint camelcase:true */
-
-                        /*});
-                    });
-                }
-            };
-            
-            for (i = 0; i < splashTemplates.length; i++){
-                adtech.enqueueAd(parseInt(widgetDef.placementId,10));
-            }
-           
-            adtech.executeQueue({
-                multiAd: {
-                    disableAdInjection: true,
-                    readyCallback : function(){
-                        adtech.showAd(widgetDef.placementId);
-                    }
-                }
-            });
-        });
-    }
-
-   
-    /*****************************************************************
-     * Viewport detection
-     */
-    
-//     function visibleEvent() {
-// //        var embedTracker = config.exp.replace(/e-/,'');
-// //        /* jshint camelcase:false */
-// //        win.__c6_ga__(embedTracker + '.send', 'event', {
-// //            'eventCategory' : 'Display',
-// //            'eventAction'   : 'Visible',
-// //            'eventLabel'    : settings.config.title,
-// //            'page'  : '/embed/' + settings.config.exp + '/',
-// //            'title' : settings.config.title
-// //        });
-//         c6.loadExperience();
-//     }
-// 
-//     function splashVisible() {
-//         var viewportWidth = win.innerWidth,
-//             viewportHeight = win.innerHeight,
-//             splashBounds = widgetSplash.getBoundingClientRect(),
-//             xOverlap = Math.max(0, Math.min(viewportWidth, splashBounds.left +
-//                 splashBounds.width) - Math.max(0, splashBounds.left)),
-//             yOverlap = Math.max(0, Math.min(viewportHeight, splashBounds.top +
-//                 splashBounds.height) - Math.max(0, splashBounds.top)),
-//             areaOverlap = xOverlap * yOverlap,
-//             splashArea = splashBounds.width * splashBounds.height;
-//         return areaOverlap/splashArea >= 0.5;
-//     }
-//     
-//     function viewChangeHandler() {
-//         if (splashVisible()) {
-//             win.removeEventListener('scroll', viewChangeHandler);
-//             win.removeEventListener('resize', viewChangeHandler);
-//             visibleEvent();
-//         }
-//     }
-// 
-//     function readyHandler() {
-//         if(doc.readyState === 'complete') {
-//             doc.removeEventListener('readystatechange', readyHandler);
-//             documentComplete();
-//         }
-//     }
-// 
-//     function documentComplete() {
-//         if (splashVisible()) {
-//             visibleEvent();
-//         } else {
-//             win.addEventListener('scroll', viewChangeHandler);
-//             win.addEventListener('resize', viewChangeHandler);
-//         }
-//     }
-//     
-//     if(readyState === 'complete') {
-//         documentComplete();
-//     } else {
-//         doc.addEventListener('readystatechange', readyHandler);
-//     }
-// 
 }(window, document, window.mockReadyState || document.readyState));
