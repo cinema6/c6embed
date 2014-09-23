@@ -28,6 +28,10 @@ module.exports = {
             {
                 src: 'src/embed.js',
                 dest: '<%= settings.distDir %>/c6embed.js'
+            },
+            {
+                src: 'src/widget.js',
+                dest: '<%= settings.distDir %>/mr2.js'
             }
         ]
     }
