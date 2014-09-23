@@ -1,9 +1,6 @@
 (function($window, $document/*, readyState*/) {
     'use strict';
 
-    //TODO: Handle multiple widgets against same placementId?
-    //TODO: Handle widget + one or more embeds on same page
-    //
     /**
      * Initialize some default configuration. Set up the c6 object (if it still needs to be set
      * up.)
@@ -342,7 +339,10 @@
             adtech.config.placements[config.placementId] = {
                 adContainerId: 'ad',
                 complete: function() {
-                    return populateWidget(c6.widgetContentCache[config.placementId]);
+                    return populateWidget(
+                        c6.widgetContentCache[config.placementId]
+                            .splice(0, splashPages.length)
+                    );
                 }
             };
 

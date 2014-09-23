@@ -286,6 +286,61 @@
                                 });
                             });
 
+                            describe('if multiple MR2s are using the same placement ID', function() {
+                                var minireelIds, minireels;
+
+                                beforeEach(function() {
+                                    // Simulate another MR2 with our placement ID by adding more MiniReels than we asked for
+                                    minireelIds = ['e-fcb95ef54b22f5', 'e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed', 'e-123', 'e-456', 'e-abc'];
+
+                                    minireelIds.forEach(function(id) {
+                                        c6.addReel(id, '3330799', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                    });
+                                });
+
+                                describe('after the first MR2 loads its stuff', function() {
+                                    beforeEach(function(done) {
+                                        adtech.config.placements['3330799'].complete();
+
+                                        waitForDeps(minireelIds.slice(0, 3).map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should create embeds for the first round', function() {
+                                        expect(c6.embeds.length).toBe(3);
+                                        minireels.forEach(function(experience, index) {
+                                            expect(c6.embeds[index].experience).toBe(experience);
+                                        });
+                                    });
+
+                                    describe('after the second MR2 loads its stuff', function() {
+                                        beforeEach(function(done) {
+                                            adtech.config.placements['3330799'].complete();
+
+                                            waitForDeps(minireelIds.map(function(id) {
+                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                            }), function(_minireels) {
+                                                minireels = _minireels;
+
+                                                done();
+                                            });
+                                        });
+
+                                        it('should create embeds for the next round', function() {
+                                            expect(c6.embeds.length).toBe(6);
+                                            minireels.forEach(function(experience, index) {
+                                                expect(c6.embeds[index].experience).toBe(experience);
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+
                             describe('after the reels have been added', function() {
                                 var minireelIds, minireels, embeds,
                                     splashDelegate;
@@ -349,6 +404,9 @@
 
                                     function retrigger(css) {
                                         $getLastWidget().css(css);
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330799', 'foo.jpg');
+                                        });
                                         adtech.config.placements['3330799'].complete();
                                     }
 
@@ -371,6 +429,9 @@
                                             baseUrl + '/collateral/mr2/templates/test.js'
                                         ], function() {
                                             c6.embeds.length = 0;
+                                            minireelIds.forEach(function(id) {
+                                                c6.addReel(id, '3330799', 'foo.jpg');
+                                            });
                                             adtech.config.placements['3330799'].complete();
 
                                             waitForDeps(minireelIds.map(function(id) {
