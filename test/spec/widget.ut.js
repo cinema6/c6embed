@@ -20,11 +20,11 @@
 
         function waitForDeps(deps, done) {
             var c6 = $window.c6,
-                id = setInterval(function() {
+                id = $window.setInterval(function() {
                     if (deps.every(function(dep) {
                         return !!c6.requireCache[dep];
                     })) {
-                        clearInterval(id);
+                        $window.clearInterval(id);
                         done(deps.map(function(dep) {
                             return c6.requireCache[dep];
                         }));
@@ -37,11 +37,16 @@
 
             $ = new C6Query({ window: window, document: document });
 
-            $env = $('<iframe src="/base/test/helpers/dummy.html"></iframe>');
+            $env = $('<iframe src="/base/test/helpers/dummy.html" style="width: 800px; height: 600px; overflow: auto;" scrolling="yes"></iframe>');
             $env[0].onload = function() {
                 $window = $env.prop('contentWindow');
                 $document = $window.document;
                 $ = new C6Query({ window: $window, document: $document });
+
+                $('body').css({
+                    margin: 0,
+                    padding: 0
+                });
 
                 baseUrl = $window.__C6_URL_ROOT__ = '/base/test/helpers';
                 appJs = $window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
@@ -157,6 +162,10 @@
                         it('should have a class for its branding', function() {
                             expect($div.hasClass('c6brand__digitaljournal')).toBe(true);
                         });
+
+                        it('should be an inline-block element', function() {
+                            expect($div.css('display')).toBe('inline-block');
+                        });
                     });
 
                     it('should create a reference to a stylesheet for the branding', function() {
@@ -242,6 +251,8 @@
                                 spyOn(adtech, 'enqueueAd');
                                 spyOn(adtech, 'executeQueue');
 
+                                $('div.c6_widget').remove();
+
                                 c6.createWidget({
                                     branding: 'digitaljournal',
                                     template: 'collateral/mr2/templates/test',
@@ -276,15 +287,15 @@
                             });
 
                             describe('after the reels have been added', function() {
-                                var minireels,
+                                var minireelIds, minireels, embeds,
                                     splashDelegate;
 
                                 function splashAtIndex(index) {
-                                    return $($('div.c6_widget')[1].querySelectorAll('.c6-mr2__mr-splash'))[index];
+                                    return $($('div.c6_widget')[0].querySelectorAll('.c6-mr2__mr-splash'))[index];
                                 }
 
                                 beforeEach(function(done) {
-                                    var minireelIds = ['e-fcb95ef54b22f5', 'e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed'];
+                                    minireelIds = ['e-fcb95ef54b22f5', 'e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed'];
 
                                     splashDelegate = {};
                                     splashJS.and.returnValue(splashDelegate);
@@ -297,27 +308,160 @@
                                         spyOn($window, '__c6_ga__');
                                     }
 
+                                    c6.embeds.push({}, {}, {});
+
+                                    spyOn(c6, 'loadExperience').and.callThrough();
+
                                     adtech.config.placements['3330799'].complete();
 
                                     waitForDeps(minireelIds.map(function(id) {
                                         return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
                                     }), function(_minireels) {
+                                        var splashPages = Array.prototype.slice.call($('div.c6_widget')[0].querySelectorAll('.c6-mr2__mr-splash'));
+
                                         minireels = _minireels;
+                                        embeds = c6.embeds.filter(function(config) {
+                                            return splashPages.indexOf(config.embed) > -1;
+                                        });
 
                                         done();
                                     });
                                 });
 
+                                describe('if the widget is visible', function() {
+                                    it('should preload all of its minireels', function() {
+                                        expect(c6.loadExperience.calls.count()).toBe(3);
+                                        embeds.forEach(function(embed, index) {
+                                            var args = c6.loadExperience.calls.argsFor(index);
+
+                                            expect(args[0]).toBe(embed);
+                                            expect(args[1]).toBe(true);
+                                        });
+                                    });
+                                });
+
+                                describe('if the widget is not visible', function() {
+                                    function $getLastWidget() {
+                                        var $widgets = $('div.c6_widget');
+
+                                        return $($widgets[$widgets.length - 1]);
+                                    }
+
+                                    function retrigger(css) {
+                                        $getLastWidget().css(css);
+                                        adtech.config.placements['3330799'].complete();
+                                    }
+
+                                    beforeEach(function(done) {
+                                        c6.loadExperience.calls.reset();
+
+                                        c6.createWidget({
+                                            branding: 'off-page',
+                                            template: 'collateral/mr2/templates/off-page',
+                                            placementId: '3330799'
+                                        });
+
+                                        $getLastWidget().css({
+                                            position: 'fixed',
+                                            top: '601px',
+                                            left: '0px'
+                                        });
+
+                                        waitForDeps([
+                                            baseUrl + '/collateral/mr2/templates/test.js'
+                                        ], function() {
+                                            c6.embeds.length = 0;
+                                            adtech.config.placements['3330799'].complete();
+
+                                            waitForDeps(minireelIds.map(function(id) {
+                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=off-page&placementId=3330799';
+                                            }), function(_minireels) {
+                                                minireels = _minireels;
+
+                                                done();
+                                            });
+                                        });
+                                    });
+
+                                    it('should not preload any experiences', function() {
+                                        expect(c6.loadExperience).not.toHaveBeenCalled();
+
+                                        retrigger({
+                                            top: '-101px'
+                                        });
+                                        expect(c6.loadExperience).not.toHaveBeenCalled();
+
+                                        retrigger({
+                                            top: '0px',
+                                            left: '-401px'
+                                        });
+                                        expect(c6.loadExperience).not.toHaveBeenCalled();
+
+                                        retrigger({
+                                            left: '801px'
+                                        });
+                                        expect(c6.loadExperience).not.toHaveBeenCalled();
+                                    });
+
+                                    describe('if scrolled into view', function() {
+                                        function scroll() {
+                                            var event = document.createEvent('Event');
+                                            event.initEvent('scroll', true, true);
+
+                                            $window.scrollTo.apply($window, arguments);
+                                            $window.dispatchEvent(event);
+                                        }
+
+                                        beforeEach(function() {
+                                            $getLastWidget().css({
+                                                position: 'static',
+                                                marginTop: '505px'
+                                            });
+                                            scroll(0, 15);
+                                        });
+
+                                        it('should preload', function() {
+                                            c6.embeds.forEach(function(embed) {
+                                                expect(c6.loadExperience).toHaveBeenCalledWith(embed, true);
+                                            });
+                                        });
+                                    });
+
+                                    describe('if resized into view', function() {
+                                        beforeEach(function() {
+                                            var event = document.createEvent('Event');
+                                            event.initEvent('resize', true, true);
+
+                                            $getLastWidget().css({
+                                                position: 'static',
+                                                marginLeft: '801px'
+                                            });
+                                            $env.css({
+                                                width: '1024px',
+                                                height: '768px'
+                                            });
+                                            $window.dispatchEvent(event);
+                                        });
+
+                                        it('should preload', function() {
+                                            expect(c6.loadExperience.calls.count()).toBe(3);
+                                            c6.embeds.forEach(function(embed) {
+                                                expect(c6.loadExperience).toHaveBeenCalledWith(embed, true);
+                                            });
+                                        });
+                                    });
+                                });
+
                                 it('should add embed objects to the c6 object for every minireel', function() {
                                     minireels.forEach(function(experience, index) {
-                                        var minireel = c6.embeds[index],
+                                        var minireel = embeds[index],
                                             splash = splashAtIndex(index);
 
                                         expect(minireel.embed).toBe(splash);
                                         expect(minireel.splashDelegate).toBe(splashDelegate);
                                         expect(minireel.experience).toBe(experience);
-                                        expect(minireel.load).toBe(false);
-                                        expect(minireel.preload).toBe(false);
+                                        expect(minireel.load).toEqual(jasmine.any(Boolean));
+                                        expect(minireel.preload).toEqual(jasmine.any(Boolean));
                                         expect(minireel.config).toEqual({
                                             exp: experience.id,
                                             title: experience.data.title
@@ -338,7 +482,30 @@
 
                                 it('should set up a splash delegate for every page', function() {
                                     minireels.forEach(function(experience, index) {
-                                        expect(splashJS).toHaveBeenCalledWith(c6, c6.embeds[index], splashAtIndex(index));
+                                        expect(splashJS).toHaveBeenCalledWith({
+                                            loadExperience: jasmine.any(Function)
+                                        }, embeds[index], splashAtIndex(index));
+                                    });
+                                });
+
+                                it('should pass a loadExperience() method that proxies to the c6 object and fires the correct tracking pixel', function() {
+                                    var images = [],
+                                        createElement = $document.createElement;
+
+                                    c6.loadExperience.calls.reset();
+                                    spyOn($document, 'createElement')
+                                        .and.callFake(function() {
+                                            return images[images.push(createElement.apply($document, arguments)) - 1];
+                                        });
+
+                                    c6.widgetContentCache['3330799'].forEach(function(config, index) {
+                                        var delegate = splashJS.calls.argsFor(index)[0],
+                                            minireel = embeds[index];
+
+                                        delegate.loadExperience(minireel);
+
+                                        expect(c6.loadExperience).toHaveBeenCalledWith(minireel);
+                                        expect(images[index].src).toBe(config.clickUrl);
                                     });
                                 });
 

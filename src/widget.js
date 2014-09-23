@@ -4,6 +4,10 @@
     //TODO: Handle multiple widgets against same placementId?
     //TODO: Handle widget + one or more embeds on same page
     //
+    /**
+     * Initialize some default configuration. Set up the c6 object (if it still needs to be set
+     * up.)
+     */
     var baseUrl = $window.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs   = $window.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
         c6 = $window.c6 = complete($window.c6 || {}, {
@@ -36,6 +40,9 @@
             createWidget: createWidget
         });
 
+    /**********************************************************************************************
+     * Helper/Utility Functions
+     *********************************************************************************************/
     function require(srcs, cb) {
         var modules = [],
             loaded = 0,
@@ -144,6 +151,23 @@
             .join('&');
     }
 
+    function elementIsOnScreen(element) {
+        var elementBounds = element.getBoundingClientRect(),
+            windowBounds = {
+                top: 0,
+                right: $window.innerWidth,
+                bottom: $window.innerHeight,
+                left: 0,
+                width: $window.innerWidth,
+                height: $window.innerHeight
+            };
+
+        return elementBounds.top < windowBounds.bottom &&
+            elementBounds.bottom > windowBounds.top &&
+            elementBounds.right > windowBounds.left &&
+            elementBounds.left < windowBounds.right;
+    }
+
     function loadBrandingStyles(branding) {
         if (!branding) { return null; }
 
@@ -166,6 +190,11 @@
         return result;
     }
 
+    /**********************************************************************************************
+     * Function to Create an MR2 Embed.
+     *
+     * This get attached to the c6 object as c6.createWidget().
+     *********************************************************************************************/
     function createWidget(config) {
         var container = (function() {
             var id = genRandomId('c6_');
@@ -174,7 +203,7 @@
             $document.write(
                 '<div id="' + id + '" class="' +
                     ['c6_widget', 'c6brand__' + config.branding].join(' ') +
-                '"></div>'
+                '" style="display: inline-block;"></div>'
             );
             /* jshint evil:false */
 
@@ -202,12 +231,21 @@
                 );
             }());
 
-            function MiniReelConfig(experience, splash) {
+            function MiniReelConfig(experience, splash, trackingUrl) {
                 this.load = false;
                 this.preload = false;
 
                 this.embed = splash;
-                this.splashDelegate = splashJS(c6, this, splash);
+                this.splashDelegate = splashJS({
+                    loadExperience: function() {
+                        // Fire a tracking pixel when this MiniReel is opened.
+                        (new DOMElement('img', {
+                            src: trackingUrl
+                        }));
+
+                        return c6.loadExperience.apply(c6, arguments);
+                    }
+                }, this, splash);
                 this.experience = experience;
 
                 this.config = {
@@ -216,6 +254,84 @@
                 };
             }
 
+            /**
+             * This function will populate the MR2 widget with MiniReels. It is called by adtech
+             * after all of the MiniReels have been pulled down from the ad server.
+             */
+            function populateWidget(configs) {
+                require(configs.map(function(item) {
+                    return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
+                        toQueryParams({
+                            context: 'mr2',
+                            branding: config.branding,
+                            placementId: config.placementId
+                        });
+                }), function() {
+                    var experiences = Array.prototype.slice.call(arguments),
+                        minireels = experiences.map(function(experience, index) {
+                            return new MiniReelConfig(
+                                experience,
+                                splashPages[index],
+                                configs[index].clickUrl
+                            );
+                        });
+
+                    function handleViewportShift() {
+                        if (elementIsOnScreen(container)) {
+                            preloadWidget();
+                            $window.removeEventListener('scroll', handleViewportShift, false);
+                            $window.removeEventListener('resize', handleViewportShift, false);
+                        }
+                    }
+
+                    function preloadWidget() {
+                        minireels.forEach(function(embed) {
+                            c6.loadExperience(embed, true);
+                        });
+                    }
+
+                    minireels.forEach(function(minireel) {
+                        var experience = minireel.experience,
+                            splash = minireel.embed,
+                            embedTracker = experience.id.replace(/^e-/, '');
+
+                        loadBrandingStyles(experience.data.branding);
+                        splash.className += ' c6brand__' + experience.data.branding;
+
+                        twobits.parse(splash)({
+                            title: experience.data.title,
+                            splash: baseUrl + experience.data.collateral.splash
+                        });
+
+                        /* jshint camelcase:false */
+                        $window.__c6_ga__('create', c6.gaAcctIdEmbed, {
+                            'name'       : embedTracker,
+                            'cookieName' : '_c6ga'
+                        });
+                        $window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
+
+                        $window.__c6_ga__(embedTracker + '.set',{
+                            'dimension1' : $window.location.href
+                        });
+
+                        $window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                            'page'  : '/embed/' + experience.id + '/',
+                            'title' : experience.data.title,
+                            'sessionControl' : 'start'
+                        });
+                        /* jshint camelcase:true */
+                    });
+
+                    c6.embeds.push.apply(c6.embeds, minireels);
+
+                    if (elementIsOnScreen(container)) {
+                        preloadWidget();
+                    } else {
+                        $window.addEventListener('scroll', handleViewportShift, false);
+                        $window.addEventListener('resize', handleViewportShift, false);
+                    }
+                });
+            }
 
             adtech.config.page = {
                 network: '5473.1',
@@ -226,51 +342,11 @@
             adtech.config.placements[config.placementId] = {
                 adContainerId: 'ad',
                 complete: function() {
-                    require(c6.widgetContentCache[config.placementId].map(function(item) {
-                        return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
-                            toQueryParams({
-                                context: 'mr2',
-                                branding: config.branding,
-                                placementId: config.placementId
-                            });
-                    }), function() {
-                        Array.prototype.slice.call(arguments)
-                            .forEach(function(experience, index) {
-                                var splash = splashPages[index],
-                                    embedTracker = experience.id.replace(/^e-/, '');
-
-                                loadBrandingStyles(experience.data.branding);
-                                splash.className += ' c6brand__' + experience.data.branding;
-
-                                twobits.parse(splash)({
-                                    title: experience.data.title,
-                                    splash: baseUrl + experience.data.collateral.splash
-                                });
-
-                                c6.embeds.push(new MiniReelConfig(experience, splash));
-
-                                /* jshint camelcase:false */
-                                $window.__c6_ga__('create', c6.gaAcctIdEmbed, {
-                                    'name'       : embedTracker,
-                                    'cookieName' : '_c6ga'
-                                });
-                                $window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
-
-                                $window.__c6_ga__(embedTracker + '.set',{
-                                    'dimension1' : $window.location.href
-                                });
-
-                                $window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                                    'page'  : '/embed/' + experience.id + '/',
-                                    'title' : experience.data.title,
-                                    'sessionControl' : 'start'
-                                });
-                                /* jshint camelcase:true */
-                            });
-                    });
+                    return populateWidget(c6.widgetContentCache[config.placementId]);
                 }
             };
 
+            // Request a MiniReel for every MiniReel placeholder in the widget
             splashPages.forEach(function() {
                 adtech.enqueueAd(parseInt(config.placementId));
             });
