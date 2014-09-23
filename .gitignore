@@ -17,3 +17,4 @@ dist/
 .tmp/
 reports/
 app/*.js
+app/index.html

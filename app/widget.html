@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>My Awesome Blog</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+        <meta property="og:image" content="http://cdn.cnwimg.com/wp-content/uploads/2010/02/jimmy-fallon.jpg">
+        <script src="//lib.cinema6.com/jquery/2.0.3-0-gf576d00/jquery.js"></script>
+        <style>
+            .c6_widget {
+                width: 100%;
+            }
+        </style>
+        <script>
+            window.__C6_DEBUG__     = true;
+            //window.__C6_URL_ROOT__  = window.location.protocol + '//staging.cinema6.com';
+            window.__C6_APP_JS__    = 'c6embed.js';
+        </script>
+    </head>
+    <body>
+        <article>
+            <div>
+                <span>
+                    <img src="http://cdn.cnwimg.com/wp-content/uploads/2010/02/jimmy-fallon.jpg">
+                </span>
+            </div>
+            <script type="text/javascript">
+                document.write('<script src="widget.js"></scr' + 'ipt>');
+            </script>
+            <script type="text/javascript">
+                c6.createWidget({
+                    placementId : '3330799',
+                    template    : 'collateral/mr2/templates/demo'
+                });
+            </script>
+
+            <script type="text/javascript">
+                document.write('<script src="widget.js"></scr' + 'ipt>');
+            </script>
+            <script type="text/javascript">
+                c6.createWidget({
+                    //placementId : '3348852',
+                    placementId : '3330799',
+                    template    : 'collateral/mr2/templates/demo'
+                });
+            </script>
+        </article>
+    </body>
+</html>

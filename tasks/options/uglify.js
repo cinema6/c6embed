@@ -11,6 +11,10 @@
                 {
                     src: ['<%= settings.distDir %>/c6embed.js'],
                     dest: '<%= settings.distDir %>/c6embed.min.js'
+                },
+                {
+                    src: ['<%= settings.distDir %>/mr2.js'],
+                    dest: '<%= settings.distDir %>/mr2.min.js'
                 }
             ]
         }

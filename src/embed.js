@@ -179,9 +179,9 @@
             'title' : settings.config.title
         });
         /* jshint devel:true */
-        if(console) {
-            console.log(embedTracker + ' sent visible event');
-        }
+        //if(console) {
+        //    console.log(embedTracker + ' sent visible event');
+        //}
     }
 
     function viewChangeHandler() {
@@ -193,7 +193,7 @@
     }
 
     function readyHandler() {
-        if(document.readyState === 'complete') {
+        if(readyState === 'complete') {
             document.removeEventListener('readystatechange', readyHandler);
             documentComplete();
         }
@@ -321,7 +321,7 @@
         target.style.display = 'none';
     }
 
-    if(document.readyState === 'complete') {
+    if(readyState === 'complete') {
         documentComplete();
     } else {
         document.addEventListener('readystatechange', readyHandler);

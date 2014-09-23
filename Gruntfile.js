@@ -42,14 +42,16 @@ module.exports = function(grunt) {
      * SERVER TASKS
      *
      *********************************************************************************************/
-
-    grunt.registerTask('server', 'start a development server', [
-        'connect:server',
-        'browserify:server',
-        'copy:embed',
-        'open:server',
-        'watch:livereload'
-    ]);
+    grunt.registerTask('server', 'start a development server', function(target) {
+        if (target !== 'widget'){
+            target = 'embed';
+        }
+        grunt.task.run('connect:server');
+        grunt.task.run('browserify:server');
+        grunt.task.run('copy:' + target);
+        grunt.task.run('open');
+        grunt.task.run('watch:' + target);
+    });
 
     /*********************************************************************************************
      *
