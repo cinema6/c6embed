@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    ddescribe('widget.js', function() {
+    describe('widget.js', function() {
         var baseUrl, appJs,
             $window, $document,
             $, $env;
