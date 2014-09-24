@@ -383,6 +383,37 @@
                                     });
                                 });
 
+                                describe('if no branding is specified', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            placementId: '3330710'
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&placementId=3330710';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should load MiniReels without specifying a branding', function() {
+                                        minireels.forEach(function(experience) {
+                                            expect(experience.data).toEqual(jasmine.any(Object));
+                                        });
+                                    });
+                                });
+
                                 describe('if the widget is visible', function() {
                                     it('should preload all of its minireels', function() {
                                         expect(c6.loadExperience.calls.count()).toBe(3);

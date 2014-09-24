@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+* [FEATURE]: Added an MR2 embed script that can be used to embed
+  multiple MiniReels in a widget, delivered through an ad server
+* [FIX]: Fix for an issue that could cause MR2s without brandings
+  to behave strangely
+
 ## v1.5.6 (August 18, 2014)
 * [FIX]: Fix for an issue that caused scrolling behind the MiniReel
   Player due to the animated play button

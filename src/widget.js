@@ -140,6 +140,9 @@
 
     function toQueryParams(object) {
         return Object.keys(object)
+            .filter(function(key) {
+                return !!object[key];
+            })
             .map(function(key) {
                 return [key, object[key]]
                     .map(encodeURIComponent)
@@ -256,13 +259,15 @@
              * after all of the MiniReels have been pulled down from the ad server.
              */
             function populateWidget(configs) {
+                var queryParams = toQueryParams({
+                    context: 'mr2',
+                    branding: config.branding,
+                    placementId: config.placementId
+                });
+
                 require(configs.map(function(item) {
                     return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
-                        toQueryParams({
-                            context: 'mr2',
-                            branding: config.branding,
-                            placementId: config.placementId
-                        });
+                        queryParams;
                 }), function() {
                     var experiences = Array.prototype.slice.call(arguments),
                         minireels = experiences.map(function(experience, index) {
