@@ -10,6 +10,8 @@
 * [FIX]: Fix for an issue that could cause one missing MiniReel
   to break the entire MR2 widget
 * Added additional tracking that will come in handy for A/B testing
+* [FIX] Fixed an issue that caused the MR player not to show display
+  ads from within the MR2 widget
 
 ## v1.5.6 (August 18, 2014)
 * [FIX]: Fix for an issue that caused scrolling behind the MiniReel
