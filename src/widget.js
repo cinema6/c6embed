@@ -203,7 +203,7 @@
             $document.write(
                 '<div id="' + id + '" class="' +
                     ['c6_widget', 'c6brand__' + config.branding].join(' ') +
-                '" style="display: inline-block;"></div>'
+                '" style="display: none;"></div>'
             );
             /* jshint evil:false */
 
@@ -325,6 +325,8 @@
                     });
 
                     c6.embeds.push.apply(c6.embeds, minireels);
+
+                    container.style.display = 'inline-block';
 
                     if (elementIsOnScreen(container)) {
                         preloadWidget();

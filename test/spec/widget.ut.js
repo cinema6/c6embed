@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    describe('widget.js', function() {
+    ddescribe('widget.js', function() {
         var baseUrl, appJs,
             $window, $document,
             $, $env;
@@ -164,7 +164,7 @@
                         });
 
                         it('should be an inline-block element', function() {
-                            expect($div.css('display')).toBe('inline-block');
+                            expect($div.css('display')).toBe('none');
                         });
                     });
 
@@ -381,6 +381,10 @@
 
                                         done();
                                     });
+                                });
+
+                                it('should display the widget', function() {
+                                    expect($('div.c6_widget').css('display')).toBe('inline-block');
                                 });
 
                                 describe('if no branding is specified', function() {
