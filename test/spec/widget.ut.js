@@ -256,7 +256,8 @@
                                 c6.createWidget({
                                     branding: 'digitaljournal',
                                     template: 'collateral/mr2/templates/test',
-                                    placementId: '3330799'
+                                    placementId: '3330799',
+                                    tracking: 'http://cinema6.com/tracking/foo.jpg'
                                 });
                             });
 
@@ -378,7 +379,7 @@
                             });
 
                             describe('after the reels have been added', function() {
-                                var minireelIds, minireels, embeds,
+                                var minireelIds, minireels, embeds, content,
                                     splashDelegate;
 
                                 function splashAtIndex(index) {
@@ -394,6 +395,7 @@
                                     minireelIds.forEach(function(id) {
                                         c6.addReel(id, '3330799', 'http://www.cinema6.com/track/' + id + '.jpg');
                                     });
+                                    content = c6.widgetContentCache['3330799'].slice();
 
                                     if (!$window.__c6_ga__.calls) {
                                         spyOn($window, '__c6_ga__');
@@ -630,14 +632,15 @@
                                             return images[images.push(createElement.apply($document, arguments)) - 1];
                                         });
 
-                                    c6.widgetContentCache['3330799'].forEach(function(config, index) {
+                                    content.forEach(function(config, index) {
                                         var delegate = splashJS.calls.argsFor(index)[0],
                                             minireel = embeds[index];
 
                                         delegate.loadExperience(minireel);
 
                                         expect(c6.loadExperience).toHaveBeenCalledWith(minireel);
-                                        expect(images[index].src).toBe(config.clickUrl);
+                                        expect(images[index * 2].src).toBe(config.clickUrl);
+                                        expect(images[(index * 2) + 1].src).toBe('http://cinema6.com/tracking/foo.jpg');
                                     });
                                 });
 
