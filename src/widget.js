@@ -203,7 +203,7 @@
             $document.write(
                 '<div id="' + id + '" class="' +
                     ['c6_widget', 'c6brand__' + config.branding].join(' ') +
-                '" style="display: inline-block;"></div>'
+                '" style="display: none;"></div>'
             );
             /* jshint evil:false */
 
@@ -238,10 +238,12 @@
                 this.embed = splash;
                 this.splashDelegate = splashJS({
                     loadExperience: function() {
-                        // Fire a tracking pixel when this MiniReel is opened.
-                        (new DOMElement('img', {
-                            src: trackingUrl
-                        }));
+                        // Fire tracking pixels when this MiniReel is opened.
+                        [trackingUrl, config.tracking].forEach(function(url) {
+                            (new DOMElement('img', {
+                                src: url
+                            }));
+                        });
 
                         return c6.loadExperience.apply(c6, arguments);
                     }
@@ -270,13 +272,19 @@
                         queryParams;
                 }), function() {
                     var experiences = Array.prototype.slice.call(arguments),
-                        minireels = experiences.map(function(experience, index) {
-                            return new MiniReelConfig(
-                                experience,
-                                splashPages[index],
-                                configs[index].clickUrl
-                            );
-                        });
+                        minireels = experiences
+                            .filter(function(experience) {
+                                return !!experience.data;
+                            })
+                            .map(function(experience, index) {
+                                return new MiniReelConfig(
+                                    experience,
+                                    splashPages[index],
+                                    configs[index].clickUrl
+                                );
+                            }),
+                        extraSplashPages = (minireels.length === splashPages.length) ?
+                            [] : splashPages.slice(minireels.length - splashPages.length);
 
                     function handleViewportShift() {
                         if (elementIsOnScreen(container)) {
@@ -324,7 +332,13 @@
                         /* jshint camelcase:true */
                     });
 
+                    extraSplashPages.forEach(function(splash) {
+                        splash.style.display = 'none';
+                    });
+
                     c6.embeds.push.apply(c6.embeds, minireels);
+
+                    container.style.display = 'inline-block';
 
                     if (elementIsOnScreen(container)) {
                         preloadWidget();

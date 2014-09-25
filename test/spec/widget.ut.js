@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    describe('widget.js', function() {
+    ddescribe('widget.js', function() {
         var baseUrl, appJs,
             $window, $document,
             $, $env;
@@ -164,7 +164,7 @@
                         });
 
                         it('should be an inline-block element', function() {
-                            expect($div.css('display')).toBe('inline-block');
+                            expect($div.css('display')).toBe('none');
                         });
                     });
 
@@ -256,7 +256,8 @@
                                 c6.createWidget({
                                     branding: 'digitaljournal',
                                     template: 'collateral/mr2/templates/test',
-                                    placementId: '3330799'
+                                    placementId: '3330799',
+                                    tracking: 'http://cinema6.com/tracking/foo.jpg'
                                 });
                             });
 
@@ -283,6 +284,42 @@
 
                                 it('should show the ad', function() {
                                     expect(adtech.showAd).toHaveBeenCalledWith('3330799');
+                                });
+                            });
+
+                            describe('if an experience 404s', function() {
+                                var minireelIds, minireels;
+
+                                function splashAtIndex(index) {
+                                    return $($('div.c6_widget')[0].querySelectorAll('.c6-mr2__mr-splash'))[index];
+                                }
+
+                                beforeEach(function(done) {
+                                    minireelIds = ['e-badegg1', 'e-badegg2', 'e-fcb95ef54b22f5'];
+
+                                    minireelIds.forEach(function(id) {
+                                        c6.addReel(id, '3330799', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                    });
+
+                                    adtech.config.placements['3330799'].complete();
+
+                                    waitForDeps(minireelIds.slice(0, 3).map(function(id) {
+                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                    }), function(_minireels) {
+                                        minireels = _minireels;
+
+                                        done();
+                                    });
+                                });
+
+                                it('should still render the MiniReels it can render', function() {
+                                    expect(splashAtIndex(0).querySelector('h1').firstChild.nodeValue).toBe(minireels[2].data.title);
+                                });
+
+                                it('should hide the splash pages it can\'t fill', function() {
+                                    [1, 2].forEach(function(index) {
+                                        expect($(splashAtIndex(index)).css('display')).toBe('none');
+                                    });
                                 });
                             });
 
@@ -342,7 +379,7 @@
                             });
 
                             describe('after the reels have been added', function() {
-                                var minireelIds, minireels, embeds,
+                                var minireelIds, minireels, embeds, content,
                                     splashDelegate;
 
                                 function splashAtIndex(index) {
@@ -358,6 +395,7 @@
                                     minireelIds.forEach(function(id) {
                                         c6.addReel(id, '3330799', 'http://www.cinema6.com/track/' + id + '.jpg');
                                     });
+                                    content = c6.widgetContentCache['3330799'].slice();
 
                                     if (!$window.__c6_ga__.calls) {
                                         spyOn($window, '__c6_ga__');
@@ -381,6 +419,10 @@
 
                                         done();
                                     });
+                                });
+
+                                it('should display the widget', function() {
+                                    expect($('div.c6_widget').css('display')).toBe('inline-block');
                                 });
 
                                 describe('if no branding is specified', function() {
@@ -590,14 +632,15 @@
                                             return images[images.push(createElement.apply($document, arguments)) - 1];
                                         });
 
-                                    c6.widgetContentCache['3330799'].forEach(function(config, index) {
+                                    content.forEach(function(config, index) {
                                         var delegate = splashJS.calls.argsFor(index)[0],
                                             minireel = embeds[index];
 
                                         delegate.loadExperience(minireel);
 
                                         expect(c6.loadExperience).toHaveBeenCalledWith(minireel);
-                                        expect(images[index].src).toBe(config.clickUrl);
+                                        expect(images[index * 2].src).toBe(config.clickUrl);
+                                        expect(images[(index * 2) + 1].src).toBe('http://cinema6.com/tracking/foo.jpg');
                                     });
                                 });
 
