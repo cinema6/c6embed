@@ -5,6 +5,11 @@
   multiple MiniReels in a widget, delivered through an ad server
 * [FIX]: Fix for an issue that could cause MR2s without brandings
   to behave strangely
+* [FIX]: Fixed an issue that caused the MR2 to look broken until
+  all the MiniReels had loaded
+* [FIX]: Fix for an issue that could cause one missing MiniReel
+  to break the entire MR2 widget
+* Added additional tracking that will come in handy for A/B testing
 
 ## v1.5.6 (August 18, 2014)
 * [FIX]: Fix for an issue that caused scrolling behind the MiniReel
