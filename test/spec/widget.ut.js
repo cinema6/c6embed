@@ -286,6 +286,42 @@
                                 });
                             });
 
+                            describe('if an experience 404s', function() {
+                                var minireelIds, minireels;
+
+                                function splashAtIndex(index) {
+                                    return $($('div.c6_widget')[0].querySelectorAll('.c6-mr2__mr-splash'))[index];
+                                }
+
+                                beforeEach(function(done) {
+                                    minireelIds = ['e-badegg1', 'e-badegg2', 'e-fcb95ef54b22f5'];
+
+                                    minireelIds.forEach(function(id) {
+                                        c6.addReel(id, '3330799', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                    });
+
+                                    adtech.config.placements['3330799'].complete();
+
+                                    waitForDeps(minireelIds.slice(0, 3).map(function(id) {
+                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                    }), function(_minireels) {
+                                        minireels = _minireels;
+
+                                        done();
+                                    });
+                                });
+
+                                it('should still render the MiniReels it can render', function() {
+                                    expect(splashAtIndex(0).querySelector('h1').firstChild.nodeValue).toBe(minireels[2].data.title);
+                                });
+
+                                it('should hide the splash pages it can\'t fill', function() {
+                                    [1, 2].forEach(function(index) {
+                                        expect($(splashAtIndex(index)).css('display')).toBe('none');
+                                    });
+                                });
+                            });
+
                             describe('if multiple MR2s are using the same placement ID', function() {
                                 var minireelIds, minireels;
 
