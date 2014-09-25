@@ -264,7 +264,7 @@
                 var queryParams = toQueryParams({
                     context: 'mr2',
                     branding: config.branding,
-                    placementId: config.placementId
+                    placementId: config.adPlacementId
                 });
 
                 require(configs.map(function(item) {
@@ -355,11 +355,11 @@
                 enableMultiAd: true
             };
 
-            adtech.config.placements[config.placementId] = {
+            adtech.config.placements[config.id] = {
                 adContainerId: 'ad',
                 complete: function() {
                     return populateWidget(
-                        c6.widgetContentCache[config.placementId]
+                        c6.widgetContentCache[config.id]
                             .splice(0, splashPages.length)
                     );
                 }
@@ -367,14 +367,14 @@
 
             // Request a MiniReel for every MiniReel placeholder in the widget
             splashPages.forEach(function() {
-                adtech.enqueueAd(parseInt(config.placementId));
+                adtech.enqueueAd(parseInt(config.id));
             });
 
             adtech.executeQueue({
                 multiAd: {
                     disableAdInjection: true,
                     readyCallback: function() {
-                        adtech.showAd(config.placementId);
+                        adtech.showAd(config.id);
                     }
                 }
             });

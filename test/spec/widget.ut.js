@@ -136,7 +136,7 @@
                         c6.createWidget({
                             branding: 'digitaljournal',
                             template: 'collateral/mr2/templates/test',
-                            placementId: '3330799'
+                            id: '3330799'
                         });
                     });
 
@@ -180,7 +180,7 @@
                             c6.createWidget({
                                 branding: 'digitaljournal',
                                 template: 'collateral/mr2/templates/test',
-                                placementId: '3330799'
+                                id: '3330799'
                             });
                         });
 
@@ -256,7 +256,7 @@
                                 c6.createWidget({
                                     branding: 'digitaljournal',
                                     template: 'collateral/mr2/templates/test',
-                                    placementId: '3330799',
+                                    id: '3330799',
                                     tracking: 'http://cinema6.com/tracking/foo.jpg'
                                 });
                             });
@@ -304,7 +304,7 @@
                                     adtech.config.placements['3330799'].complete();
 
                                     waitForDeps(minireelIds.slice(0, 3).map(function(id) {
-                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
                                     }), function(_minireels) {
                                         minireels = _minireels;
 
@@ -340,7 +340,7 @@
                                         adtech.config.placements['3330799'].complete();
 
                                         waitForDeps(minireelIds.slice(0, 3).map(function(id) {
-                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
                                         }), function(_minireels) {
                                             minireels = _minireels;
 
@@ -360,7 +360,7 @@
                                             adtech.config.placements['3330799'].complete();
 
                                             waitForDeps(minireelIds.map(function(id) {
-                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
                                             }), function(_minireels) {
                                                 minireels = _minireels;
 
@@ -408,7 +408,7 @@
                                     adtech.config.placements['3330799'].complete();
 
                                     waitForDeps(minireelIds.map(function(id) {
-                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal&placementId=3330799';
+                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
                                     }), function(_minireels) {
                                         var splashPages = Array.prototype.slice.call($('div.c6_widget')[0].querySelectorAll('.c6-mr2__mr-splash'));
 
@@ -431,7 +431,7 @@
 
                                         c6.createWidget({
                                             template: 'collateral/mr2/templates/test',
-                                            placementId: '3330710'
+                                            id: '3330710'
                                         });
 
                                         minireelIds.forEach(function(id) {
@@ -441,7 +441,7 @@
                                         adtech.config.placements['3330710'].complete();
 
                                         waitForDeps(minireelIds.map(function(id) {
-                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&placementId=3330710';
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2';
                                         }), function(_minireels) {
                                             minireels = _minireels;
 
@@ -450,6 +450,38 @@
                                     });
 
                                     it('should load MiniReels without specifying a branding', function() {
+                                        minireels.forEach(function(experience) {
+                                            expect(experience.data).toEqual(jasmine.any(Object));
+                                        });
+                                    });
+                                });
+
+                                describe('if an adPlacementId is specified', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710',
+                                            adPlacementId: '3330123'
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&placementId=3330123';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should load MiniReels with a placementId', function() {
                                         minireels.forEach(function(experience) {
                                             expect(experience.data).toEqual(jasmine.any(Object));
                                         });
@@ -489,7 +521,7 @@
                                         c6.createWidget({
                                             branding: 'off-page',
                                             template: 'collateral/mr2/templates/off-page',
-                                            placementId: '3330799'
+                                            id: '3330799'
                                         });
 
                                         $getLastWidget().css({
@@ -508,7 +540,7 @@
                                             adtech.config.placements['3330799'].complete();
 
                                             waitForDeps(minireelIds.map(function(id) {
-                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=off-page&placementId=3330799';
+                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=off-page';
                                             }), function(_minireels) {
                                                 minireels = _minireels;
 
