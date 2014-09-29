@@ -53,20 +53,7 @@ module.exports = function(deps) {
             }
 
             function fetchApp() {
-                return c6Ajax.get(appFolder + 'meta.json')
-                    .then(function(response) {
-                        return response.data;
-                    })
-                    .catch(function() {
-                        return {};
-                    })
-                    .then(function getHTML(meta) {
-                        if (meta.version) {
-                            return c6Ajax.get(appFolder + appConfig.kMode + '.html');
-                        } else {
-                            return c6Ajax.get(appFolder + 'index.html');
-                        }
-                    })
+                return c6Ajax.get(appFolder + appConfig.kMode + '.html')
                     .then(function parse(response) {
                         return documentParser(response.data);
                     });

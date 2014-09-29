@@ -261,7 +261,7 @@
 
                 c6Ajax.get.and.callFake(function(path) {
                     switch (path) {
-                    case config.appBase + '/' + experience.appUri + '/index.html':
+                    case config.appBase + '/' + experience.appUri + '/lightbox-ads.html':
                         return Q.when({
                             data: indexHTML
                         });
@@ -317,49 +317,20 @@
             });
 
             it('should fetch index.html', function() {
-                expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/index.html');
+                expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
             });
 
-            describe('if the app has a specified version', function() {
+            describe('if the device is a phone', function() {
                 beforeEach(function(done) {
                     delete settings.promise;
 
-                    c6Ajax.get.and.callFake(function(path) {
-                        switch (path) {
-                        case config.appBase + '/' + experience.appUri + '/lightbox-ads.html':
-                            return Q.when({
-                                data: indexHTML
-                            });
-                        case config.appBase + '/' + experience.appUri + '/meta.json':
-                            return Q.when({
-                                data: {
-                                    version: 'beta17-0-f84fn4'
-                                }
-                            });
-                        default:
-                            return Q.reject('404 NOT FOUND!');
-                        }
-                    });
+                    browserInfo.profile.device = 'phone';
 
                     $window.c6.loadExperience(settings).finally(done);
                 });
 
-                it('should load the app for the specific mode', function() {
-                    expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
-                });
-
-                describe('if the device is a phone', function() {
-                    beforeEach(function(done) {
-                        delete settings.promise;
-
-                        browserInfo.profile.device = 'phone';
-
-                        $window.c6.loadExperience(settings).finally(done);
-                    });
-
-                    it('should load the mobile version', function() {
-                        expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/mobile.html');
-                    });
+                it('should load the mobile version', function() {
+                    expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/mobile.html');
                 });
             });
 
