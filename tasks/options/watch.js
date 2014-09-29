@@ -26,6 +26,15 @@
             },
             tasks: ['browserify:server', 'copy:widget']
         },
+        standalone: {
+            files: [
+                'src/standalone.html'
+            ],
+            options: {
+                livereload: true
+            },
+            tasks: ['copy:standalone']
+        },
         unit: {
             files: [
                 'src/**/*.js',

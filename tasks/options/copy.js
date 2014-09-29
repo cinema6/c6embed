@@ -23,6 +23,14 @@ module.exports = {
             }
         ]
     },
+    standalone: {
+        files: [
+            {
+                src: 'src/standalone.html',
+                dest: 'app/index.html'
+            }
+        ]
+    },
     dist: {
         files: [
             {

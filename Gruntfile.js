@@ -42,10 +42,9 @@ module.exports = function(grunt) {
      * SERVER TASKS
      *
      *********************************************************************************************/
-    grunt.registerTask('server', 'start a development server', function(target) {
-        if (target !== 'widget'){
-            target = 'embed';
-        }
+    grunt.registerTask('server', 'start a development server', function(_target) {
+        var target = _target || 'embed';
+
         grunt.task.run('connect:server');
         grunt.task.run('browserify:server');
         grunt.task.run('copy:' + target);
