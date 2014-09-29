@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [PERFORMANCE]: Remove an unnecessary AJAX call to improve MR load
+  time
+
 ## v2.0.0 (September 24, 2014)
 * [FEATURE]: Added an MR2 embed script that can be used to embed
   multiple MiniReels in a widget, delivered through an ad server
