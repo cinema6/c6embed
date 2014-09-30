@@ -6,24 +6,31 @@
             (function() {
                 'use strict';
 
-                var params = window.location.search.replace(/^\?/, '')
-                    .split('&')
-                    .reduce(function(params, segment) {
-                        var pair = segment.split('=')
-                            .map(decodeURIComponent),
-                            key = pair[0], value = pair[1];
+                var isProduction = (/^(www\.)?cinema6\.com$/).test(window.location.hostname),
+                    base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
+                    params = window.location.search.replace(/^\?/, '')
+                        .split('&')
+                        .reduce(function(params, segment) {
+                            var pair = segment.split('=')
+                                .map(decodeURIComponent),
+                                key = pair[0], value = pair[1];
 
-                        if (key) {
-                            params[key] = value;
-                        }
+                            if (key) {
+                                params[key] = value;
+                            }
 
-                        return params;
-                    }, {}),
+                            return params;
+                        }, {}),
                     c6 = window.c6 = {
+                        isProduction: isProduction,
                         embeds: [],
                         gaAcctIdPlayer: 'UA-44457821-2',
                         gaAcctIdEmbed: 'UA-44457821-3'
                     };
+
+                function writeScript(src) {
+                    document.write('<script src="' + src +'"><\/script>');
+                }
 
                 /* Create GA Tracker */
                 (function() {
@@ -45,10 +52,19 @@
                     exports: {}
                 };
 
-                document.write('<script src="//portal.cinema6.com/api/public/content/experience/' + params.id + '.js?context=standalone"><' + '/script>');
+                window.writeScript = writeScript;
+
+                writeScript(base + '/api/public/content/experience/' + params.id + '.js?context=standalone');
             }());
         </script>
         <script src="//lib.cinema6.com/c6embed/v1/app.min.js"></script>
+        <script>
+            if (window.c6.isProduction) {
+                writeScript('//lib.cinema6.com/c6embed/v1/app.min.js');
+            } else {
+                writeScript('http://s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
+            }
+        </script>
     </head>
     <body>
         <script>
