@@ -72,6 +72,10 @@
                 'use strict';
                 var experience = window.module.exports;
 
+                if (!experience.data) { //e.g. 404
+                    window.location.href = '/404.html';
+                }
+
                 document.write('<title>' + experience.data.title + '<' + '/title>');
 
                 c6.loadExperience(c6.embeds[c6.embeds.push({
