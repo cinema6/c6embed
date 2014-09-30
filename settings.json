@@ -16,9 +16,17 @@
             "bucket": "c6.dev",
             "app": "ext/<%= package.name %>/v1/"
         },
+        "testStandalone": {
+            "bucket": "com.cinema6.staging.glickm",
+            "app": "solo"
+        },
         "production": {
             "bucket": "c6.ext",
             "app": "<%= package.name %>/v1/"
+        },
+        "productionStandalone": {
+            "bucket": "com.cinema6",
+            "app": "solo"
         }
     }
 }
