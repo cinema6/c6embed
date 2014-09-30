@@ -109,7 +109,8 @@ module.exports = function(grunt) {
         'copy:dist',
         'browserify:dist',
         'uglify:dist',
-        'usebanner:dist'
+        'usebanner:dist',
+        'htmlmin:dist'
     ]);
 
     /*********************************************************************************************
@@ -121,5 +122,6 @@ module.exports = function(grunt) {
     grunt.registerTask('publish', 'build and upload the application to s3', function(target) {
         grunt.task.run('build');
         grunt.task.run('s3:' + target);
+        grunt.task.run('s3:' + target + '-standalone');
     });
 };
