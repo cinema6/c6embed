@@ -2,6 +2,8 @@
 
 * [PERFORMANCE]: Remove an unnecessary AJAX call to improve MR load
   time
+* [FIX]: Fix for an issue that could cause the visibility of the splash
+  not to be sent to Google Analytics
 
 ## v2.0.0 (September 24, 2014)
 * [FEATURE]: Added an MR2 embed script that can be used to embed

@@ -178,10 +178,6 @@
             'page'  : '/embed/' + settings.config.exp + '/',
             'title' : settings.config.title
         });
-        /* jshint devel:true */
-        //if(console) {
-        //    console.log(embedTracker + ' sent visible event');
-        //}
     }
 
     function viewChangeHandler() {
@@ -189,22 +185,6 @@
             window.removeEventListener('scroll', viewChangeHandler);
             window.removeEventListener('resize', viewChangeHandler);
             visibleEvent();
-        }
-    }
-
-    function readyHandler() {
-        if(readyState === 'complete') {
-            document.removeEventListener('readystatechange', readyHandler);
-            documentComplete();
-        }
-    }
-
-    function documentComplete() {
-        if (splashVisible()) {
-            visibleEvent();
-        } else {
-            window.addEventListener('scroll', viewChangeHandler);
-            window.addEventListener('resize', viewChangeHandler);
         }
     }
 
@@ -321,12 +301,6 @@
         target.style.display = 'none';
     }
 
-    if(readyState === 'complete') {
-        documentComplete();
-    } else {
-        document.addEventListener('readystatechange', readyHandler);
-    }
-
     require([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
         baseUrl + '/collateral/splash/splash.js',
@@ -363,6 +337,13 @@
         });
         settings.splashDelegate = splashJS(c6, settings, splash);
         settings.experience = experience;
+
+        if (splashVisible()) {
+            visibleEvent();
+        } else {
+            window.addEventListener('scroll', viewChangeHandler);
+            window.addEventListener('resize', viewChangeHandler);
+        }
 
         if (config.preload) {
             c6.loadExperience(settings, true);
