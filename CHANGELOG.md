@@ -1,9 +1,11 @@
 # C6Embed Changelog
 
+## v2.1.0 (October 1, 2014)
 * [PERFORMANCE]: Remove an unnecessary AJAX call to improve MR load
   time
 * [FIX]: Fix for an issue that could cause the visibility of the splash
   not to be sent to Google Analytics
+* [FEATURE]: Added a page for viewing MiniReels by themselves
 
 ## v2.0.0 (September 24, 2014)
 * [FEATURE]: Added an MR2 embed script that can be used to embed
