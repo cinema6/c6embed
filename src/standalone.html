@@ -72,9 +72,29 @@
                 'use strict';
                 var experience = window.module.exports;
 
-                if (!experience.data) { //e.g. 404
-                    window.location.href = '/404.html';
+                if (!experience.id) { //e.g. 404
+                    return window.location.href = '/404.html';
                 }
+
+                (function() {
+                    var embedTracker = experience.id.replace(/^e-/, '');
+
+                    window.__c6_ga__('create', c6.gaAcctIdEmbed, {
+                        'name'       : embedTracker,
+                        'cookieName' : '_c6ga'
+                    });
+                    window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
+
+                    window.__c6_ga__(embedTracker + '.set',{
+                        'dimension1' : window.location.href
+                    });
+
+                    window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                        'page'  : '/embed/' + experience.id + '/',
+                        'title' : experience.data.title,
+                        'sessionControl' : 'start'
+                    });
+                }());
 
                 experience.data.mode = 'full';
 
