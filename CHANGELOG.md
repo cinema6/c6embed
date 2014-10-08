@@ -6,6 +6,8 @@
 * Started sending a page view to GA when the standalone page loads
 * [FIX]: Fix for an issue that caused the production player to be loaded
   in the staging/development environment
+* [FIX]: Fix for an issue that caused the mobile standalone page to look
+  zoomed-in in landscape mode
 
 ## v2.1.0 (October 1, 2014)
 * [PERFORMANCE]: Remove an unnecessary AJAX call to improve MR load
