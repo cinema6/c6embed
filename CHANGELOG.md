@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.2.0 (October 8, 2014)
 * Added configuration data necessary for telling the MR Player if it
   is in a standalone configuration
 * Started sending a page view to GA when the standalone page loads
