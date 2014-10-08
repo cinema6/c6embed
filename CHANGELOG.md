@@ -4,6 +4,8 @@
 * Added configuration data necessary for telling the MR Player if it
   is in a standalone configuration
 * Started sending a page view to GA when the standalone page loads
+* [FIX]: Fix for an issue that caused the production player to be loaded
+  in the staging/development environment
 
 ## v2.1.0 (October 1, 2014)
 * [PERFORMANCE]: Remove an unnecessary AJAX call to improve MR load

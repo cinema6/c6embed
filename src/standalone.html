@@ -57,11 +57,12 @@
                 writeScript(base + '/api/public/content/experience/' + params.id + '.js?context=standalone');
             }());
         </script>
-        <script src="//lib.cinema6.com/c6embed/v1/app.min.js"></script>
         <script>
             if (window.c6.isProduction) {
                 writeScript('//lib.cinema6.com/c6embed/v1/app.min.js');
             } else {
+                window.__C6_DEBUG__ = true;
+                window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
                 writeScript('http://s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
             }
         </script>
