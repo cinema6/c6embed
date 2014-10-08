@@ -8,6 +8,8 @@
   in the staging/development environment
 * [FIX]: Fix for an issue that caused the mobile standalone page to look
   zoomed-in in landscape mode
+* [FIX]: Fix for an issue that caused the page not to load in the
+  staging environment
 
 ## v2.1.0 (October 1, 2014)
 * [PERFORMANCE]: Remove an unnecessary AJAX call to improve MR load
