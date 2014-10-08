@@ -628,6 +628,7 @@
                                         expect(minireel.experience).toBe(experience);
                                         expect(minireel.load).toEqual(jasmine.any(Boolean));
                                         expect(minireel.preload).toEqual(jasmine.any(Boolean));
+                                        expect(minireel.standalone).toBe(false);
                                         expect(minireel.config).toEqual({
                                             exp: experience.id,
                                             title: experience.data.title

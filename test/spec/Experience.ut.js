@@ -71,13 +71,48 @@
         });
 
         describe('@public methods', function() {
-            describe('registerExperience(experience, expWindow)', function() {
+            describe('registerExperience(experience, expWindow, appData)', function() {
                 var returnedSession;
 
                 beforeEach(function() {
                     spyOn(_private, 'decorateSession').and.callThrough();
 
                     returnedSession = experience.registerExperience(exp, expWindow);
+                });
+
+                describe('if called with some appData', function() {
+                    var appData;
+
+                    beforeEach(function() {
+                        appData = {
+                            mode: 'full',
+                            standalone: true,
+                            test: 'foo'
+                        };
+
+                        experience.registerExperience(exp, expWindow, appData);
+                    });
+
+                    describe('when the handshake is requested', function() {
+                        var respondSpy, sentAppData;
+
+                        beforeEach(function() {
+                            respondSpy = jasmine.createSpy('respond()');
+
+                            session.trigger('handshake', {}, respondSpy);
+
+                            sentAppData = respondSpy.calls.mostRecent().args[0].appData;
+                        });
+
+                        it('should send app data that is extended with the provided data', function() {
+                            expect(sentAppData).toEqual(jasmine.objectContaining({
+                                experience: exp,
+                                profile: browserInfo.profile,
+                                version: 1
+                            }));
+                            expect(sentAppData).toEqual(jasmine.objectContaining(appData));
+                        });
+                    });
                 });
 
                 it('should create a postmessage session with the window', function() {

@@ -73,31 +73,32 @@ module.exports = function(deps) {
             }
 
             function communicateWithApp(appWindow) {
-                var session = experienceService.registerExperience(experience, appWindow)
-                    .on('open', function openApp() {
-                        state.set('active', true);
-                    })
-                    .on('close', function closeApp() {
-                        state.set('active', false);
-                    })
-                    .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
-                        $iframe.fullscreen(shouldEnterFullscreen);
+                var session = experienceService.registerExperience(experience, appWindow, {
+                    standalone: settings.standalone
+                }).on('open', function openApp() {
+                    state.set('active', true);
+                })
+                .on('close', function closeApp() {
+                    state.set('active', false);
+                })
+                .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
+                    $iframe.fullscreen(shouldEnterFullscreen);
 
-                        if (shouldEnterFullscreen) {
-                            if (browserInfo.profile.device === 'phone') {
-                                hostDocument.shrink(true);
-                            }
+                    if (shouldEnterFullscreen) {
+                        if (browserInfo.profile.device === 'phone') {
+                            hostDocument.shrink(true);
+                        }
 
-                            hostDocument.putInRootStackingContext($iframe);
-                        } else {
-                            hostDocument.reset();
-                        }
-                    })
-                    .on('responsiveStyles', function setResponsiveStyles(styles) {
-                        if (settings.config.responsive) {
-                            settings.state.set('responsiveStyles', styles);
-                        }
-                    });
+                        hostDocument.putInRootStackingContext($iframe);
+                    } else {
+                        hostDocument.reset();
+                    }
+                })
+                .on('responsiveStyles', function setResponsiveStyles(styles) {
+                    if (settings.config.responsive) {
+                        settings.state.set('responsiveStyles', styles);
+                    }
+                });
 
                 getSessionDeferred.resolve(session);
 

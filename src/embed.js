@@ -115,6 +115,7 @@
         settings = c6.embeds[c6.embeds.push({
             embed: div,
             splashDelegate: {},
+            standalone: false,
             load: false,
             preload: false,
             config: config
