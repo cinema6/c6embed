@@ -76,10 +76,13 @@
                     window.location.href = '/404.html';
                 }
 
+                experience.data.mode = 'full';
+
                 document.write('<title>' + experience.data.title + '<' + '/title>');
 
                 c6.loadExperience(c6.embeds[c6.embeds.push({
                     load: true,
+                    standalone: true,
                     experience: window.module.exports,
                     embed: document.body,
                     splashDelegate: {},

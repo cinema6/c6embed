@@ -235,6 +235,8 @@
                 this.load = false;
                 this.preload = false;
 
+                this.standalone = false;
+
                 this.embed = splash;
                 this.splashDelegate = splashJS({
                     loadExperience: function() {

@@ -272,6 +272,7 @@
 
                 settings = {
                     embed: $('<div style="padding: 10px; margin-top: 10px;"><div></div></div>')[0],
+                    standalone: true,
                     load: true,
                     experience: experience,
                     splashDelegate: {
@@ -502,7 +503,9 @@
                 });
 
                 it('should start a session with the app', function() {
-                    expect(experienceService.registerExperience).toHaveBeenCalledWith(experience, appWindow);
+                    expect(experienceService.registerExperience).toHaveBeenCalledWith(experience, appWindow, {
+                        standalone: settings.standalone
+                    });
                 });
 
                 it('should resolve the settings.getSession() method\'s promise', function(done) {

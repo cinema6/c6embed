@@ -419,6 +419,7 @@
                                         embed: $('.c6embed-e-123')[0],
                                         load: 'data-preload' in config,
                                         preload: 'data-preload' in config,
+                                        standalone: false,
                                         experience: experience,
                                         splashDelegate: {},
                                         config: (function() {
