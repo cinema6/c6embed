@@ -110,6 +110,7 @@ module.exports = function(grunt) {
         'browserify:dist',
         'uglify:dist',
         'usebanner:dist',
+        'inline:dist',
         'htmlmin:dist'
     ]);
 
@@ -123,5 +124,6 @@ module.exports = function(grunt) {
         grunt.task.run('build');
         grunt.task.run('s3:' + target);
         grunt.task.run('s3:' + target + '-standalone');
+        grunt.task.run('s3:' + target + '-preview');
     });
 };

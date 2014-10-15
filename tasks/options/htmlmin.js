@@ -16,6 +16,10 @@ module.exports = {
             {
                 src: 'src/standalone.html',
                 dest: '<%= settings.distDir %>/standalone.html'
+            },
+            {
+                src: 'app/preview.html',
+                dest: '<%= settings.distDir %>/preview.html'
             }
         ]
     }
