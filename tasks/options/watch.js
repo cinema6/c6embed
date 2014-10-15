@@ -35,6 +35,15 @@
             },
             tasks: ['copy:standalone']
         },
+        preview: {
+            files: [
+                'src/preview.html'
+            ],
+            options: {
+                livereload: true
+            },
+            tasks: ['copy:preview']
+        },
         unit: {
             files: [
                 'src/**/*.js',

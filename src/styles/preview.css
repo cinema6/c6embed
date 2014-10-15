@@ -1,0 +1,302 @@
+/*** uncss> filename: app/styles/c6main.css ***/
+
+/*  ======================================================
+    global styles
+    ====================================================== */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'museo-sans', Arial, Helvetica, sans-serif;
+  font-size: 100%;
+  font-weight: 300;
+  line-height: 1.5;
+  background: #fff;
+  color: #626262;
+  margin: 0;
+}
+
+::-moz-selection {
+  background: #328efe;
+  text-shadow: none;
+  color: #fff;
+}
+
+::selection {
+  background: #328efe;
+  text-shadow: none;
+  color: #fff;
+}
+
+/*  ======================================================
+    c6-copy classes : general type & color styles
+    ====================================================== */
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('fonts/fontawesome-webfont.eot?v=4.1.0');
+  src: url('fonts/fontawesome-webfont.eot?#iefix&v=4.1.0') format('embedded-opentype'), url('fonts/fontawesome-webfont.woff?v=4.1.0') format('woff'), url('fonts/fontawesome-webfont.ttf?v=4.1.0') format('truetype'), url('fonts/fontawesome-webfont.svg?v=4.1.0#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/*  ======================================================
+    Helper classes
+    ====================================================== */
+
+.ir {
+  background-color: transparent;
+  border: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  display: block;
+  position: absolute;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: ' ';
+  display: table;
+}
+
+.clearfix:after {
+  clear: both;
+}
+
+.c6Sprite--alpha {
+  background: url('../img/sprite--alpha@2x.png') 0 0 / 25rem 6.25rem no-repeat;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.container {
+  max-width: 70.5rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: block;
+}
+
+/*  ======================================================
+    ui classes
+    ====================================================== */
+
+.ui__previewHolder {
+  max-width: 54em;
+  margin: 4em auto;
+  padding: 0 4em;
+}
+
+@media only screen and (max-device-width : 30em) {
+  /* screen < 480px */
+
+  .ui__previewHolder {
+    margin: 2em auto;
+    padding: 0 0.5em;
+  }
+}
+
+/*  buttons: default  */
+
+/*  buttons: default  */
+
+/*  buttons : default : groups;  */
+
+@media screen and (max-width:55em) {
+  /* width: 880px */
+}
+
+/*  buttons: key action  */
+
+/*  tabs: filters  */
+
+/*  tabs: sideTabs  */
+
+/*  menu: clickDrop  */
+
+/*  ======================================================
+    modal styles
+    ====================================================== */
+
+@media screen and (max-width:65em), screen and (max-height:39.375em) {
+  /* w:1040px
+           h: 630px */
+}
+
+/*  ======================================================
+    page layout styles
+    ====================================================== */
+
+/*  ======================================================
+    table styles
+    ====================================================== */
+
+@media screen and (max-width:58.125em) {
+  /* width: 930px */
+}
+
+/*  ======================================================
+    viewLoader styles
+    ====================================================== */
+
+/*  ======================================================
+    branding styles
+    ====================================================== */
+
+.c6Brand {
+  width: 11.5em;
+  height: 2.75em;
+  display: block;
+  font-size: 1em;
+  background-position: 0 0;
+  border: 0;
+}
+
+.c6Brand--logo {
+  width: 3.375em;
+}
+
+/*  ======================================================
+    generic form styles
+    ====================================================== */
+
+/*  ======================================================
+    masthead navigation
+    ====================================================== */
+
+.mast__group {
+  min-height: 2.8125em;
+  background: #eee;
+  color: #626262;
+  border-bottom: 1px solid #dddddd;
+}
+
+.mast__title {
+  font-size: 1em;
+  margin: 2px 0 0 1.5em;
+  text-align: center;
+  font-weight: 300;
+}
+
+/* active states */
+
+/* hovers */
+
+.mast__group--previewMode .c6Brand {
+  position: absolute;
+  top: 0.125em;
+  left: 0.125em;
+}
+
+.mast__group--previewMode .mast__title {
+  margin: 0.75em 4em;
+}
+
+@media screen and (max-width:55em) {
+  /* width: 880px */
+}
+
+/*  ======================================================
+    login styles
+    ====================================================== */
+
+/*  ======================================================
+    error page styles
+    ====================================================== */
+
+/*  ======================================================
+    footer
+    ====================================================== */
+
+.footer__group {
+  padding: 1.1667em 0 1.08333em 0;
+  margin: 5em 0 0 0;
+  color: #949494;
+  text-align: center;
+  font-size: 0.75em;
+}
+
+/*** uncss> filename: app/styles/c6studio.css ***/
+
+/*  ======================================================
+    general styles
+    ====================================================== */
+
+/*  ======================================================
+    .miniReels__group
+    ====================================================== */
+
+@media screen and (max-width:55em) {
+  /* width: 880px */
+}
+
+/*  ======================================================
+    .miniReel__group
+    ====================================================== */
+
+<script type="text/javascript" src="jquery-2.1.0.min.js"></script>
+        <script type="text/javascript" src="wireframes.js"></script>
+    Editor custom styles
+    ====================================================== */
+    .pageHeader--editor {
+  margin-top: 1.125em;
+}
+
+/*  ======================================================
+    miniReel editor styles
+    ====================================================== */
+
+/*  new card 
+    ====================================================== */
+
+/*  recap card
+    ====================================================== */
+
+/*  create new slide 
+    ====================================================== */
+
+/*  preview panel
+    ====================================================== */
+
+@media screen and (max-height:46em) {
+  /* height: 736px */
+}
+
+/*  ======================================================
+    <video-trimmer> styles
+    ====================================================== */
+
+/*  ======================================================
+    custom modal styles
+    ====================================================== */
+
+/*  image settings / uploader
+    ====================================================== */
+
+/*  ======================================================
+    video search panel styles
+    ====================================================== */
+
+/*  ======================================================
+    minireel wizard styles
+    ====================================================== */
+
+/*  ======================================================
+    embed__group
+    ====================================================== */
+
+/*  ======================================================
+    account settings pages
+    ====================================================== */
+
+/*  ======================================================
+    preloader animation
+    ====================================================== */
+
