@@ -31,6 +31,22 @@ body {
   color: #fff;
 }
 
+a {
+    text-decoration: none;
+    color: #2398db;
+    -webkit-transition: color 0.25s;
+    transition: color 0.25s;
+}
+
+a:hover {
+    color: #00a2ff;
+}
+
+a:focus, button:focus, input:focus, textarea:focus {
+    outline: none;
+    border: 0;
+}
+
 /*  ======================================================
     c6-copy classes : general type & color styles
     ====================================================== */
@@ -253,13 +269,13 @@ body {
     miniReel editor styles
     ====================================================== */
 
-/*  new card 
+/*  new card
     ====================================================== */
 
 /*  recap card
     ====================================================== */
 
-/*  create new slide 
+/*  create new slide
     ====================================================== */
 
 /*  preview panel
@@ -299,4 +315,3 @@ body {
 /*  ======================================================
     preloader animation
     ====================================================== */
-
