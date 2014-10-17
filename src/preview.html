@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>Preview Page</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+        <link rel="stylesheet" href="styles/preview.css?__inline=true">
+        <script type="text/javascript" src="//use.typekit.net/xuz8gem.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+        <script>
+            (function() {
+                'use strict';
+
+                var isProduction = (/^(www\.)?cinema6\.com$/).test(window.location.hostname),
+                    base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
+                    params = window.location.search.replace(/^\?/, '')
+                        .split('&')
+                        .reduce(function(params, segment) {
+                            var pair = segment.split('=')
+                                .map(decodeURIComponent),
+                                key = pair[0], value = pair[1];
+
+                            if (key) {
+                                params[key] = value;
+                            }
+
+                            return params;
+                        }, {}),
+                    c6 = window.c6 = {
+                        isProduction: isProduction,
+                        embeds: [],
+                        gaAcctIdPlayer: 'UA-44457821-2',
+                        gaAcctIdEmbed: 'UA-44457821-3'
+                    };
+
+                function writeScript(src) {
+                    document.write('<script src="' + src +'"><\/script>');
+                }
+
+                window.module = {
+                    exports: {}
+                };
+
+                window.writeScript = writeScript;
+                window.src = base + '/api/public/content/experience/' + params.id + '.js';
+                writeScript(src);
+            }());
+        </script>
+        <script>
+            var embedSrc;
+            if (window.c6.isProduction) {
+                embedSrc = '//lib.cinema6.com/c6embed/v1/c6embed.min.js';
+            } else {
+                window.__C6_DEBUG__ = true;
+                window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
+                embedSrc = '//s3.amazonaws.com/c6.dev/ext/c6embed/v1/c6embed.js';
+            }
+        </script>
+        <script>
+            var experience = window.module.exports;
+            window.c6 = {
+                requireCache: {}
+            };
+            window.c6.requireCache[src] = experience;
+        </script>
+    </head>
+    <body>
+        <div class="ui__viewHolder clearfix">
+            <div class="mast__group mast__group--previewMode">
+                <header class="mast clearfix">
+                    <div class="c6Brand c6Brand--logo c6Sprite--alpha">
+                        <span class="ir">Cinema6</span>
+                    </div>
+                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+experience.data.title+'</strong>')</script></em>&rdquo;</h1>
+                </header>
+            </div>
+
+            <div class="ui__previewHolder clearfix">
+                <script>
+                    var experience = window.module.exports,
+                        splashData = experience.data.splash,
+                        splashString = splashData.theme + ':' + splashData.ratio.replace('-', '/');
+                    document.write('<script src="' + embedSrc + '" data-exp="'+experience.id+'" data-splash="'+splashString+'"></scrip'+'t>');
+                </script>
+            </div>
+
+            <div class="footer__group">
+                <footer class="footer__main container">
+                    &copy; Copyright 2014 Cinema6. All Rights Reserved.
+                </footer>
+            </div>
+        </div>
+    </body>
+</html>

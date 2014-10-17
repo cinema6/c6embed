@@ -273,7 +273,7 @@
             'dimension11' : window.location.href
         });
         */
-        
+
         window.__c6_ga__('create', c6.gaAcctIdEmbed, {
             'name'       : embedTracker,
             'cookieName' : '_c6ga'

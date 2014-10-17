@@ -20,6 +20,10 @@
             "bucket": "com.cinema6.staging.glickm",
             "app": "solo"
         },
+        "testPreview": {
+            "bucket": "com.cinema6.staging.glickm",
+            "app": "preview"
+        },
         "production": {
             "bucket": "c6.ext",
             "app": "<%= package.name %>/v1/"
@@ -27,6 +31,10 @@
         "productionStandalone": {
             "bucket": "com.cinema6",
             "app": "solo"
+        },
+        "productionPreview": {
+            "bucket": "com.cinema6",
+            "app": "preview"
         }
     }
 }

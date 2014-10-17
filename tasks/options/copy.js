@@ -31,6 +31,26 @@ module.exports = {
             }
         ]
     },
+    preview: {
+        files: [
+            {
+                src: 'src/preview.html',
+                dest: 'app/index.html'
+            },
+            {
+                src: 'styles/**',
+                dest: 'app/',
+                expand: true,
+                cwd: 'src'
+            },
+            {
+                src: 'img/**',
+                dest: 'app/',
+                expand: true,
+                cwd: 'src'
+            }
+        ]
+    },
     dist: {
         files: [
             {
@@ -40,6 +60,22 @@ module.exports = {
             {
                 src: 'src/widget.js',
                 dest: '<%= settings.distDir %>/mr2.js'
+            },
+            {
+                src: 'src/preview.html',
+                dest: 'app/preview.html'
+            },
+            {
+                src: 'styles/**',
+                dest: 'app/',
+                expand: true,
+                cwd: 'src'
+            },
+            {
+                src: 'img/**',
+                dest: 'app/',
+                expand: true,
+                cwd: 'src'
             }
         ]
     }

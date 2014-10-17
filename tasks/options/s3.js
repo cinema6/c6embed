@@ -38,6 +38,22 @@
                 }
             ]
         },
+        'test-preview': {
+            options: {
+                bucket: '<%= settings.s3.testPreview.bucket %>'
+            },
+            upload: [
+                {
+                    src: '<%= settings.distDir %>/preview.html',
+                    dest: '<%= settings.s3.testPreview.app %>',
+                    rel : '<%= settings.distDir %>/',
+                    options: {
+                        CacheControl: 'max-age=60',
+                        ContentType: 'text/html'
+                    }
+                }
+            ]
+        },
         production: {
             options: {
                 bucket: '<%= settings.s3.production.bucket %>'
@@ -69,5 +85,21 @@
                 }
             ]
         },
+        'production-preview': {
+            options: {
+                bucket: '<%= settings.s3.productionPreview.bucket %>'
+            },
+            upload: [
+                {
+                    src: '<%= settings.distDir %>/preview.html',
+                    dest: '<%= settings.s3.productionPreview.app %>',
+                    rel : '<%= settings.distDir %>/',
+                    options: {
+                        CacheControl: 'max-age=60',
+                        ContentType: 'text/html'
+                    }
+                }
+            ]
+        }
     };
 }());
