@@ -11,11 +11,6 @@
         <script type="text/javascript" src="//use.typekit.net/xuz8gem.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
         <script>
-            window.__C6_DEBUG__     = true;
-            window.__C6_URL_ROOT__  = '//staging.cinema6.com';
-            window.__C6_APP_JS__    = 'c6embed.js';
-        </script>
-        <script>
             (function() {
                 'use strict';
 
@@ -55,6 +50,16 @@
             }());
         </script>
         <script>
+            var embedSrc;
+            if (window.c6.isProduction) {
+                embedSrc = '//lib.cinema6.com/c6embed/v1/c6embed.min.js';
+            } else {
+                window.__C6_DEBUG__ = true;
+                window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
+                embedSrc = '//s3.amazonaws.com/c6.dev/ext/c6embed/v1/c6embed.js';
+            }
+        </script>
+        <script>
             var experience = window.module.exports;
             window.c6 = {
                 requireCache: {}
@@ -78,7 +83,7 @@
                     var experience = window.module.exports,
                         splashData = experience.data.splash,
                         splashString = splashData.theme + ':' + splashData.ratio.replace('-', '/');
-                    document.write('<script src="//s3.amazonaws.com/c6.dev/ext/c6embed/v1/c6embed.js" data-exp="'+experience.id+'" data-splash="'+splashString+'"></scrip'+'t>');
+                    document.write('<script src="' + embedSrc + '" data-exp="'+experience.id+'" data-splash="'+splashString+'"></scrip'+'t>');
                 </script>
             </div>
 
