@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.3.0 (October 21, 2014)
+* Added a page for previewing non-active MiniReels
+
 ## v2.2.0 (October 8, 2014)
 * Added configuration data necessary for telling the MR Player if it
   is in a standalone configuration
