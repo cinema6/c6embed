@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* Added support for the single-video player to the standalone page
+
 ## v2.3.0 (October 21, 2014)
 * Added a page for previewing non-active MiniReels
 
