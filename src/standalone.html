@@ -97,7 +97,15 @@
                     });
                 }());
 
-                experience.data.mode = 'full';
+                experience.data.mode = (function() {
+                    switch (experience.data.deck.length) {
+                    case 1:
+                        return experience.data.deck[0].modules.indexOf('displayAd') > -1 ?
+                            'solo-ads' : 'solo';
+                    default:
+                        return 'full';
+                    }
+                }());
 
                 document.write('<title>' + experience.data.title + '<' + '/title>');
 
