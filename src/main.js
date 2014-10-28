@@ -59,6 +59,7 @@
     /* Create Experience */
     var Experience = require('../lib/Experience'),
         experience = new Experience({
+            window: window,
             postmessage: postmessage,
             q: q,
             browserInfo: browserInfo

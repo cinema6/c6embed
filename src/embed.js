@@ -196,9 +196,12 @@
             splashConfig.ratio.join('-') + '.js';
     }
 
-    function require(srcs, cb) {
+    function require(srcs, cb) { //TODO: update unit tests
         var modules = [],
-            loaded = 0;
+            loaded = 0,
+            config = require.config || {},
+            paths = config.paths || {},
+            shims = config.shim || {};
 
         function load(module, index) {
             modules[index] = module;
@@ -208,10 +211,18 @@
             }
         }
 
-        srcs.forEach(function(src, index) {
+        srcs.forEach(function(_src, index) {
+            var src = paths[_src] || _src,
+                shim = shims[_src] || {},
+                exports = shim.exports,
+                onCreateFrame = shim.onCreateFrame || function() {};
+
             if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
 
-            var iframe = document.createElement('iframe'),
+            var iframe = new DOMElement('iframe', {
+                    src: 'about:blank',
+                    'data-module': _src
+                }),
                 head = document.getElementsByTagName('head')[0],
                 html = [
                     '<script>',
@@ -228,18 +239,24 @@
                         window.exports = window.module.exports;
                     }.toString() + '(window))',
                     '</script>',
+                    '<script>(' + onCreateFrame.toString() + '(window))</script>',
                     '<script src="' + src + '"></script>'
                 ].join('\n');
 
             iframe.addEventListener('load', function() {
-                var head = iframe.contentWindow.document.getElementsByTagName('head')[0];
+                var frameWindow = iframe.contentWindow,
+                    head = frameWindow.document.getElementsByTagName('head')[0];
 
                 if (head.childNodes.length < 1) { return; }
 
-                load((c6.requireCache[src] = iframe.contentWindow.module.exports), index);
+                load(
+                    (c6.requireCache[src] =
+                        (exports ? frameWindow[exports] : frameWindow.module.exports)
+                    ),
+                    index
+                );
             }, false);
 
-            iframe.setAttribute('src', 'about:blank');
             head.appendChild(iframe);
 
             // The iframe must have its contents written using document.write(), otherwise the
@@ -250,6 +267,8 @@
 
         return modules;
     }
+    
+    c6.require = require;
 
     /* Create GA Tracker */
     (function() {
@@ -302,7 +321,7 @@
         target.style.display = 'none';
     }
 
-    require([
+    c6.require([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
         baseUrl + '/collateral/splash/splash.js',
         splashOf(config.splash),

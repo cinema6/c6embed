@@ -47,6 +47,10 @@ module.exports = function(deps) {
                 appFolder = appUrl(experience.appUri + '/'),
                 state = null,
                 getSessionDeferred = Q.defer();
+                
+            function getSponsoredCards() {
+                return experienceService.makeAdCalls(experience);
+            }
 
             function insertIframe() {
                 $container.append($iframe);
@@ -195,6 +199,7 @@ module.exports = function(deps) {
             // this method modifies the DOM (by adding the iframe.) So, we make sure to do all of
             // our work asynchronously in the next event loop.
             return Q.delay(0)
+                .then(getSponsoredCards)
                 .then(insertIframe)
                 .then(fetchApp)
                 .then(modifyApp)
