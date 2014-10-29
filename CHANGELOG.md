@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.4.0 (October 29, 2014)
 * Added support for the single-video player to the standalone page
 
 ## v2.3.0 (October 21, 2014)
