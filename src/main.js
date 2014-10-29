@@ -64,6 +64,13 @@
             q: q,
             browserInfo: browserInfo
         });
+        
+    /* Create SponsoredCards */
+    var SponsoredCards = require('../lib/SponsoredCards'),
+        spCards = new SponsoredCards({
+            window: window,
+            q: q
+        });
 
     /* Create C6AJAX */
     var C6AJAX = require('../lib/c6ajax/C6AJAX'),
@@ -108,6 +115,7 @@
         documentParser: documentParser,
         browserInfo: browserInfo,
         experienceService: experience,
+        spCardService: spCards,
         hostDocument: hostDocument,
         Observable: Observable
     })

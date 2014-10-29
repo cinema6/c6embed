@@ -9,6 +9,7 @@ module.exports = function(deps) {
         documentParser = deps.documentParser,
         browserInfo = deps.browserInfo,
         experienceService = deps.experienceService,
+        spCardService = deps.spCardService,
         hostDocument = deps.hostDocument,
         Observable = deps.Observable,
         Q = deps.Q;
@@ -49,7 +50,7 @@ module.exports = function(deps) {
                 getSessionDeferred = Q.defer();
                 
             function getSponsoredCards() {
-                return experienceService.makeAdCalls(experience);
+                return spCardService.fetchSponsoredCards(experience);
             }
 
             function insertIframe() {
