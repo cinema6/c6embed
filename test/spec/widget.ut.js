@@ -86,6 +86,7 @@
                 expect(c6.embeds).toEqual([]);
                 expect(c6.branding).toEqual({});
                 expect(c6.requireCache).toEqual({});
+                expect(c6.require).toEqual(jasmine.any(Function));
                 expect(c6.widgetContentCache).toEqual({});
                 expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2');
                 expect(c6.gaAcctIdEmbed).toBe('UA-44457821-3');
@@ -118,6 +119,7 @@
                     expect(c6.embeds).toEqual([]);
                     expect(c6.branding).toEqual({});
                     expect(c6.requireCache).toEqual({});
+                    expect(c6.require).toEqual(jasmine.any(Function));
                     expect(c6.widgetContentCache).toEqual({});
                     expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2');
                     expect(c6.gaAcctIdEmbed).toBe('UA-44457821-3');

@@ -443,6 +443,7 @@
                                 app: 'data-preload' in config ? jasmine.any(Object) : null,
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
+                                require: jasmine.any(Function),
                                 branding: jasmine.any(Object),
                                 gaAcctIdPlayer: 'UA-44457821-2',
                                 gaAcctIdEmbed: 'UA-44457821-3'

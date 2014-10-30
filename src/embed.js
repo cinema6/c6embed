@@ -196,7 +196,7 @@
             splashConfig.ratio.join('-') + '.js';
     }
 
-    function require(srcs, cb) { //TODO: update unit tests
+    function require(srcs, cb) {
         var modules = [],
             loaded = 0,
             config = require.config || {},

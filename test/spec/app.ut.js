@@ -18,6 +18,7 @@
             config,
             mockDocumentParser,
             browserInfo,
+            spCardService,
             experienceService,
             hostDocument;
 
@@ -46,6 +47,7 @@
                 c6Ajax: c6Ajax,
                 documentParser: mockDocumentParser,
                 browserInfo: browserInfo,
+                spCardService: spCardService,
                 experienceService: experienceService,
                 hostDocument: hostDocument,
                 Observable: Observable
@@ -126,6 +128,11 @@
             experienceService = {
                 registerExperience: jasmine.createSpy('experienceService.registerExperience()')
                     .and.returnValue(session)
+            };
+            
+            spCardService = {
+                fetchSponsoredCards: jasmine.createSpy('spCardService.fetchSponsoredCards()')
+                    .and.returnValue(Q())
             };
 
             hostDocument = {
@@ -319,6 +326,10 @@
 
             it('should fetch index.html', function() {
                 expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
+            });
+            
+            it('should fetch the sponsoredCards', function() {
+                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience);
             });
 
             describe('if the device is a phone', function() {
