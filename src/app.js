@@ -30,7 +30,7 @@ module.exports = function(deps) {
         return config.appBase + '/' + url;
     }
 
-    c6.loadExperience = function(settings, preload) {
+    c6.loadExperience = function(settings, preload) { //TODO: fix unit tests
         var promise;
 
         function bootstrap() {
@@ -49,10 +49,6 @@ module.exports = function(deps) {
                 state = null,
                 getSessionDeferred = Q.defer();
                 
-            function getSponsoredCards() {
-                return spCardService.fetchSponsoredCards(experience);
-            }
-
             function insertIframe() {
                 $container.append($iframe);
             }
@@ -68,6 +64,10 @@ module.exports = function(deps) {
                 return document
                     .setGlobalObject('c6', appConfig)
                     .setBase(appFolder);
+            }
+
+            function getSponsoredCards(document) {
+                return spCardService.fetchSponsoredCards(experience).thenResolve(document);
             }
 
             function loadApp(document) {
@@ -200,10 +200,10 @@ module.exports = function(deps) {
             // this method modifies the DOM (by adding the iframe.) So, we make sure to do all of
             // our work asynchronously in the next event loop.
             return Q.delay(0)
-                .then(getSponsoredCards)
                 .then(insertIframe)
                 .then(fetchApp)
                 .then(modifyApp)
+                .then(getSponsoredCards)
                 .then(loadApp)
                 .then(initAnalytics)
                 .then(finish);
