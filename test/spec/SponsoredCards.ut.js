@@ -31,7 +31,7 @@
             experience = {
                 id: 'e1',
                 data: {
-                    placementId: '1234',
+                    wildCardPlacement: '1234',
                     deck: [
                         { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                         { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
@@ -86,7 +86,7 @@
                 
                 it('should return early if the placement is missing or invalid', function(done) {
                     q([undefined, 'p1234'].map(function(placement) {
-                        experience.data.placementId = placement;
+                        experience.data.wildCardPlacement = placement;
                         return spCards.fetchSponsoredCards(experience);
                     })).then(function() {
                         expect(_private.loadAdtech).not.toHaveBeenCalled();
