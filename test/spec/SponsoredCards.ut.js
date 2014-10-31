@@ -69,8 +69,7 @@
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(adtech.config.page).toEqual({
                             network: '5473.1',
-                            server: 'adserver.adtechus.com',
-                            enableMultiAd: true
+                            server: 'adserver.adtechus.com'
                         });
                         expect(adtech.config.placements[1234]).toEqual({ adContainerId: 'ad' });
                         
