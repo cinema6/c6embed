@@ -30,7 +30,7 @@ module.exports = function(deps) {
         return config.appBase + '/' + url;
     }
 
-    c6.loadExperience = function(settings, preload) { //TODO: fix unit tests
+    c6.loadExperience = function(settings, preload) {
         var promise;
 
         function bootstrap() {

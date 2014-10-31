@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    ddescribe('SponsoredCards', function() {
+    describe('SponsoredCards', function() {
         var SponsoredCards,
             q,
             spCards,
@@ -159,10 +159,10 @@
                     _private.loadAdtech().then(function(resp) {
                         expect(resp).not.toBeDefined();
                     }).catch(function(error) {
-                        expect(error).toEqual(new Error('Timed out after 3000ms loading adtech library'));
+                        expect(error).toEqual(new Error('Timed out after 5000ms loading adtech library'));
                     }).done(done);
 
-                    jasmine.clock().tick(3001);
+                    jasmine.clock().tick(5001);
                 });
                 
                 describe('creates onCreateFrame in require.config that', function(done) {
@@ -208,7 +208,59 @@
             });
             
             describe('makeAdCall', function() {
-                //TODO
+                beforeEach(function() {
+                    adtech.loadAd.and.callFake(function(opts) {
+                        window.c6.cardCache = {1234: {camp1: {clickUrl: 'click.me', countUrl: 'count.me'}}};
+                        opts.complete();
+                    });
+                    spyOn(_private, 'decorateCard').and.callThrough();
+                    spyOn(_private, 'trimCard').and.callThrough();
+                });
+
+                it('should call adtech.loadAd', function(done) {
+                    _private.makeAdCall(experience.data.deck[0], experience, 1234, adtech).then(function() {
+                        expect(experience.data.deck[0]).toEqual({ id: 'rc1', sponsored: true,
+                            campaign: { campaignId: 'camp1', clickUrl: 'click.me', countUrl: 'count.me' } });
+                        expect(adtech.loadAd).toHaveBeenCalledWith({ placement: 1234,
+                            params: { target: '_blank', adid: 'camp1', bnid: '1' }, complete: jasmine.any(Function) });
+                        expect(_private.decorateCard).toHaveBeenCalledWith(experience.data.deck[0], experience, 1234);
+                        expect(_private.trimCard).not.toHaveBeenCalled();
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should use the card\'s configured bannerId, if it exists', function(done) {
+                    experience.data.deck[0].campaign.bannerId = '2';
+                    _private.makeAdCall(experience.data.deck[0], experience, 1234, adtech).then(function() {
+                        expect(experience.data.deck[0]).toEqual({ id: 'rc1', sponsored: true,
+                            campaign: { campaignId: 'camp1', clickUrl: 'click.me', countUrl: 'count.me', bannerId: '2' } });
+                        expect(adtech.loadAd).toHaveBeenCalledWith({ placement: 1234,
+                            params: { target: '_blank', adid: 'camp1', bnid: '2' }, complete: jasmine.any(Function) });
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should timeout and trim the card if adtech takes too long', function(done) {
+                    adtech.loadAd.and.callFake(function(opts) {
+                        window.c6.cardCache = {1234: {camp1: {clickUrl: 'click.me', countUrl: 'count.me'}}};
+                        setTimeout(opts.complete, 4000);
+                    });
+                    _private.makeAdCall(experience.data.deck[0], experience, 1234, adtech).then(function() {
+                        expect(experience.data.deck).toEqual([
+                            { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
+                            { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
+                        ]);
+                        expect(adtech.loadAd).toHaveBeenCalled();
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
+                        expect(_private.decorateCard).not.toHaveBeenCalled();
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                    
+                    jasmine.clock().tick(3001);
+                });
             });
             
             describe('decorateCard', function() {
@@ -222,8 +274,13 @@
                         campaign: { campaignId: 'camp1', clickUrl: 'click.me', countUrl: 'count.me' } });
                 });
                 
-                xit('should call trimCard if there\'s no entry in the cardCache', function() {
-                    //TODO
+                it('should call trimCard if there\'s no entry in the cardCache', function() {
+                    spyOn(_private, 'trimCard').and.callThrough();
+                    _private.decorateCard(experience.data.deck[2], experience, 1234);
+                    expect(experience.data.deck).toEqual([
+                        { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
+                        { id: 'rc2', sponsored: false, campaign: { campaignId: null } }
+                    ]);
                 });
             });
             
