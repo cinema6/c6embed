@@ -13,7 +13,7 @@
             (function() {
                 'use strict';
 
-                var isProduction = (/^(www\.)?cinema6\.com$/).test(window.location.hostname),
+                var isProduction = (/^(www\.)?(cinema6\.com|ci6\.co)$/).test(window.location.hostname),
                     base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
                     params = window.location.search.replace(/^\?/, '')
                         .split('&')
