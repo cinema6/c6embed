@@ -242,12 +242,10 @@
                 this.embed = splash;
                 this.splashDelegate = splashJS({
                     loadExperience: function() {
-                        // Fire tracking pixels when this MiniReel is opened.
-                        [trackingUrl, config.tracking].forEach(function(url) {
-                            (new DOMElement('img', {
-                                src: url
-                            }));
-                        });
+                        // Fire tracking pixel when this MiniReel is opened.
+                        (new DOMElement('img', {
+                            src: trackingUrl
+                        }));
 
                         return c6.loadExperience.apply(c6, arguments);
                     }
