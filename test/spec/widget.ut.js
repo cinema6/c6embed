@@ -86,6 +86,7 @@
                 expect(c6.embeds).toEqual([]);
                 expect(c6.branding).toEqual({});
                 expect(c6.requireCache).toEqual({});
+                expect(c6.require).toEqual(jasmine.any(Function));
                 expect(c6.widgetContentCache).toEqual({});
                 expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2');
                 expect(c6.gaAcctIdEmbed).toBe('UA-44457821-3');
@@ -118,6 +119,7 @@
                     expect(c6.embeds).toEqual([]);
                     expect(c6.branding).toEqual({});
                     expect(c6.requireCache).toEqual({});
+                    expect(c6.require).toEqual(jasmine.any(Function));
                     expect(c6.widgetContentCache).toEqual({});
                     expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2');
                     expect(c6.gaAcctIdEmbed).toBe('UA-44457821-3');
@@ -256,8 +258,7 @@
                                 c6.createWidget({
                                     branding: 'digitaljournal',
                                     template: 'collateral/mr2/templates/test',
-                                    id: '3330799',
-                                    tracking: 'http://cinema6.com/tracking/foo.jpg'
+                                    id: '3330799'
                                 });
                             });
 
@@ -672,8 +673,7 @@
                                         delegate.loadExperience(minireel);
 
                                         expect(c6.loadExperience).toHaveBeenCalledWith(minireel);
-                                        expect(images[index * 2].src).toBe(config.clickUrl);
-                                        expect(images[(index * 2) + 1].src).toBe('http://cinema6.com/tracking/foo.jpg');
+                                        expect(images[index].src).toBe(config.clickUrl);
                                     });
                                 });
 

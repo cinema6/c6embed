@@ -111,6 +111,8 @@
 
         return modules;
     }
+    
+    c6.require = require;
 
     function complete(object, defaults) {
         var key;
@@ -212,7 +214,7 @@
 
         loadBrandingStyles(config.branding);
 
-        require([
+        c6.require([
             'adtech',
             '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
             baseUrl + '/collateral/splash/splash.js',
@@ -240,12 +242,10 @@
                 this.embed = splash;
                 this.splashDelegate = splashJS({
                     loadExperience: function() {
-                        // Fire tracking pixels when this MiniReel is opened.
-                        [trackingUrl, config.tracking].forEach(function(url) {
-                            (new DOMElement('img', {
-                                src: url
-                            }));
-                        });
+                        // Fire tracking pixel when this MiniReel is opened.
+                        (new DOMElement('img', {
+                            src: trackingUrl
+                        }));
 
                         return c6.loadExperience.apply(c6, arguments);
                     }
@@ -269,7 +269,7 @@
                     placementId: config.adPlacementId
                 });
 
-                require(configs.map(function(item) {
+                c6.require(configs.map(function(item) {
                     return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
                         queryParams;
                 }), function() {
@@ -399,7 +399,7 @@
         /* jshint camelcase:true */
     }());
 
-    require.config = {
+    c6.require.config = {
         paths: {
             adtech: 'http://aka-cdn.adtechus.com/dt/common/DAC.js'
         },

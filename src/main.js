@@ -59,9 +59,17 @@
     /* Create Experience */
     var Experience = require('../lib/Experience'),
         experience = new Experience({
+            window: window,
             postmessage: postmessage,
             q: q,
             browserInfo: browserInfo
+        });
+        
+    /* Create SponsoredCards */
+    var SponsoredCards = require('../lib/SponsoredCards'),
+        spCards = new SponsoredCards({
+            window: window,
+            q: q
         });
 
     /* Create C6AJAX */
@@ -107,6 +115,7 @@
         documentParser: documentParser,
         browserInfo: browserInfo,
         experienceService: experience,
+        spCardService: spCards,
         hostDocument: hostDocument,
         Observable: Observable
     })

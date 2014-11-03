@@ -9,6 +9,7 @@ module.exports = function(deps) {
         documentParser = deps.documentParser,
         browserInfo = deps.browserInfo,
         experienceService = deps.experienceService,
+        spCardService = deps.spCardService,
         hostDocument = deps.hostDocument,
         Observable = deps.Observable,
         Q = deps.Q;
@@ -47,7 +48,7 @@ module.exports = function(deps) {
                 appFolder = appUrl(experience.appUri + '/'),
                 state = null,
                 getSessionDeferred = Q.defer();
-
+                
             function insertIframe() {
                 $container.append($iframe);
             }
@@ -63,6 +64,10 @@ module.exports = function(deps) {
                 return document
                     .setGlobalObject('c6', appConfig)
                     .setBase(appFolder);
+            }
+
+            function getSponsoredCards(document) {
+                return spCardService.fetchSponsoredCards(experience).thenResolve(document);
             }
 
             function loadApp(document) {
@@ -198,6 +203,7 @@ module.exports = function(deps) {
                 .then(insertIframe)
                 .then(fetchApp)
                 .then(modifyApp)
+                .then(getSponsoredCards)
                 .then(loadApp)
                 .then(initAnalytics)
                 .then(finish);
