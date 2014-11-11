@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v2.5.0 (November 11, 2014)
+* Fetch ClickUrl and AdCountUrl from ADTECH for sponsored cards
+* [FIX]: Fix for an issue that caused preview pages on the new short
+  URLs in production to look for MiniReels in the staging environment
+
 ## v2.4.0 (October 29, 2014)
 * Added support for the single-video player to the standalone page
 
