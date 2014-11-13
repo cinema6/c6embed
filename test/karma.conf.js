@@ -22,6 +22,7 @@ module.exports = function(config) {
             'node_modules/asEvented/asevented.js',
             { pattern: 'src/embed.js', included: false },
             { pattern: 'src/widget.js', included: false },
+            { pattern: 'src/cinema6-jsonp.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
             { pattern: 'test/helpers/**/*.html', included: false },
@@ -39,7 +40,7 @@ module.exports = function(config) {
             'node_modules/q/q.js': ['commonjs'],
             'node_modules/asEvented/asevented.js': ['commonjs'],
             'lib/**/*.js': ['commonjs'],
-            'src/**/!(embed|widget).js': ['commonjs'],
+            'src/**/!(embed|widget|cinema6-jsonp).js': ['commonjs'],
             'test/spec/**/*.js': ['commonjs'],
             'test/helpers/*.js': ['commonjs']
         },
