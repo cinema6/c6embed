@@ -130,11 +130,8 @@
 
             return document.getElementById(id) || new DOMElement('div', {
                 id: id
-            }, document.body).appendChild(new DOMElement('span', {
-                id: 'c6-sibling-anchor'
-            }));
+            }, document.body);
         }()),
-        anchor = container.querySelector('#c6-sibling-anchor'),
         callback = window[params.callback];
 
     /**********************************************************************************************
@@ -208,7 +205,7 @@
 
         this.standalone = false;
 
-        this.embed = anchor;
+        this.embed = container;
         this.splashDelegate = {};
         this.experience = experience;
 

@@ -1,4 +1,4 @@
-describe('cinema6-jsonp.js', function() {
+ddescribe('cinema6-jsonp.js', function() {
     'use strict';
 
     var C6Query;
@@ -89,7 +89,6 @@ describe('cinema6-jsonp.js', function() {
     it('should put one container in the DOM', function(done) {
         load(function() {
             expect($('div#c6-lightbox-container').length).toBe(1);
-            expect($('div#c6-lightbox-container span#c6-sibling-anchor').length).toBe(1);
             done();
         });
     });
@@ -452,7 +451,7 @@ describe('cinema6-jsonp.js', function() {
 
                         expect(config.standalone).toBe(false);
 
-                        expect(config.embed).toBe($('div#c6-lightbox-container span#c6-sibling-anchor')[0]);
+                        expect(config.embed).toBe($('div#c6-lightbox-container')[0]);
                         expect(config.splashDelegate).toEqual({});
                         expect(config.experience).toBe(exp);
 
