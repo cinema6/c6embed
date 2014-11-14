@@ -407,7 +407,7 @@ describe('cinema6-jsonp.js', function() {
 
                 it('should fetch minireels from the content service with additional params', function(done) {
                     waitForDeps(expIds.map(function(id) {
-                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=jsonp&branding=techcrunch&placementId=12345';
+                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=techcrunch&placementId=12345';
                     }), function(experiences) {
                         expect(experiences.length).toBe(3);
 
@@ -421,7 +421,7 @@ describe('cinema6-jsonp.js', function() {
 
                 beforeEach(function(done) {
                     waitForDeps(expIds.map(function(id) {
-                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=jsonp';
+                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2';
                     }), function(experiences) {
                         exps = experiences;
 

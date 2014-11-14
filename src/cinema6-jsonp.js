@@ -224,7 +224,7 @@
      */
     function sendResponse(items) {
         var query = toQueryParams({
-            context: 'jsonp',
+            context: 'mr2',
             branding: params.branding,
             placementId: params.adPlacementId
         });
