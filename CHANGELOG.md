@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.6.0 (November 14, 2014)
 * [FEATURE]: Added a script to function as a JSONP endpoint for fetching
   MiniReels based on an Ad Server recommendation
 
