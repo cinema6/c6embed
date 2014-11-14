@@ -1,4 +1,5 @@
 module.exports = {
+    id: 'e-60196c3751eb52',
     data: {
         branding: 'elitedaily',
         title: 'Hello World!',

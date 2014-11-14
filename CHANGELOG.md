@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Added a script to function as a JSONP endpoint for fetching
+  MiniReels based on an Ad Server recommendation
+
 ## v2.5.0 (November 11, 2014)
 * Fetch ClickUrl and AdCountUrl from ADTECH for sponsored cards
 * [FIX]: Fix for an issue that caused preview pages on the new short

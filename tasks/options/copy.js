@@ -51,6 +51,18 @@ module.exports = {
             }
         ]
     },
+    jsonp: {
+        files: [
+            {
+                src: 'src/cinema6-jsonp.js',
+                dest: 'app/cinema6-jsonp.js'
+            },
+            {
+                src: 'app/jsonp.html',
+                dest: 'app/index.html'
+            }
+        ]
+    },
     dist: {
         files: [
             {
@@ -60,6 +72,10 @@ module.exports = {
             {
                 src: 'src/widget.js',
                 dest: '<%= settings.distDir %>/mr2.js'
+            },
+            {
+                src: 'src/cinema6-jsonp.js',
+                dest: '<%= settings.distDir %>/cinema6-jsonp.js'
             },
             {
                 src: 'src/preview.html',
