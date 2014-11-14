@@ -1,4 +1,4 @@
-ddescribe('cinema6-jsonp.js', function() {
+describe('cinema6-jsonp.js', function() {
     'use strict';
 
     var C6Query;
@@ -319,6 +319,26 @@ ddescribe('cinema6-jsonp.js', function() {
 
             it('should call enqueueAd once', function() {
                 expect(adtech.enqueueAd.calls.count()).toBe(1);
+            });
+        });
+
+        describe('if the script is minified', function() {
+            beforeEach(function(done) {
+                var script = document.createElement('script');
+
+                $workspace.append(script);
+                $('<script src="/base/src/cinema6-jsonp.min.js?id=12345678"></script>').insertAfter(script);
+
+                script.onload = done;
+
+                script.src = '/base/src/cinema6-jsonp.js';
+            });
+
+            it('should still work', function() {
+                expect(adtech.config.placements['12345678']).toEqual({
+                    adContainerId: 'ad',
+                    complete: jasmine.any(Function)
+                });
             });
         });
 

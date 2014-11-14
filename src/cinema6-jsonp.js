@@ -120,7 +120,7 @@
         params = complete((function() {
             var jsonpScripts = Array.prototype.slice.call(document.getElementsByTagName('script'))
                 .filter(function(script) {
-                    return (/\/cinema6-jsonp\.js/).test(script.src);
+                    return (/\/cinema6-jsonp(.min)?\.js/).test(script.src);
                 });
 
             return getParams(jsonpScripts[jsonpScripts.length - 1].src);
