@@ -74,6 +74,10 @@ module.exports = {
                 dest: '<%= settings.distDir %>/mr2.js'
             },
             {
+                src: 'src/cinema6-jsonp.js',
+                dest: '<%= settings.distDir %>/cinema6-jsonp.js'
+            },
+            {
                 src: 'src/preview.html',
                 dest: 'app/preview.html'
             },
