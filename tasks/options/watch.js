@@ -44,6 +44,18 @@
             },
             tasks: ['copy:preview']
         },
+        jsonp: {
+            files: [
+                '<%= settings.appDir %>/jsonp.html',
+                'src/**/*.js',
+                'lib/**/*.js',
+                'lite/**/*.js',
+            ],
+            options: {
+                livereload: true
+            },
+            tasks: ['copy:jsonp']
+        },
         unit: {
             files: [
                 'src/**/*.js',
