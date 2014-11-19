@@ -260,13 +260,17 @@
                 /* jshint camelcase:true */
             });
 
-            callback(experiences.map(function(experience) {
-                return {
-                    id: experience.id,
-                    title: experience.data.title,
-                    image: baseUrl + experience.data.collateral.splash
-                };
-            }));
+
+            callback({
+                params: params,
+                items: experiences.map(function(experience) {
+                    return {
+                        id: experience.id,
+                        title: experience.data.title,
+                        image: baseUrl + experience.data.collateral.splash
+                    };
+                })
+            });
         });
     }
 
