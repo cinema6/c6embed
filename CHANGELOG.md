@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Added the provided query params to the JSONP response
+* Experiences are now preloaded when fetched via JSONP
+
 ## v2.6.0 (November 14, 2014)
 * [FEATURE]: Added a script to function as a JSONP endpoint for fetching
   MiniReels based on an Ad Server recommendation
