@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.7.0 (November 19, 2014)
 * [FEATURE]: Added the provided query params to the JSONP response
 * Experiences are now preloaded when fetched via JSONP
 
