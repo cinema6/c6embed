@@ -260,6 +260,9 @@
                 /* jshint camelcase:true */
             });
 
+            c6.embeds.forEach(function(embed) {
+                c6.loadExperience(embed, true);
+            });
 
             callback({
                 params: params,

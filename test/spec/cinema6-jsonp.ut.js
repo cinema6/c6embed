@@ -394,6 +394,8 @@ describe('cinema6-jsonp.js', function() {
                     c6.addReel(id, '108542', 'http://www.cinema6.com/track/' + id + '.jpg');
                 });
 
+                spyOn(c6, 'loadExperience');
+
                 adtech.config.placements['108542'].complete();
             });
 
@@ -488,6 +490,14 @@ describe('cinema6-jsonp.js', function() {
                             exp: exp.id,
                             title: exp.data.title
                         });
+                    });
+                });
+
+                it('should preload all of the experiences', function() {
+                    expect(c6.embeds.length).toBeGreaterThan(0);
+
+                    c6.embeds.forEach(function(embed) {
+                        expect(c6.loadExperience).toHaveBeenCalledWith(embed, true);
                     });
                 });
             });
