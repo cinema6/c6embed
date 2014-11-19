@@ -394,6 +394,8 @@ describe('cinema6-jsonp.js', function() {
                     c6.addReel(id, '108542', 'http://www.cinema6.com/track/' + id + '.jpg');
                 });
 
+                spyOn(c6, 'loadExperience');
+
                 adtech.config.placements['108542'].complete();
             });
 
@@ -453,13 +455,21 @@ describe('cinema6-jsonp.js', function() {
                 });
 
                 it('should callback the jsonp function with a result', function() {
-                    expect($window.onC6AdLoad).toHaveBeenCalledWith(exps.map(function(exp) {
-                        return {
-                            id: exp.id,
-                            title: exp.data.title,
-                            image: baseUrl + exp.data.collateral.splash
-                        };
-                    }));
+                    expect($window.onC6AdLoad).toHaveBeenCalledWith({
+                        params: {
+                            callback: 'onC6AdLoad',
+                            id: 108542,
+                            count: 3,
+                            cb: jasmine.any(Number)
+                        },
+                        items: exps.map(function(exp) {
+                            return {
+                                id: exp.id,
+                                title: exp.data.title,
+                                image: baseUrl + exp.data.collateral.splash
+                            };
+                        })
+                    });
                 });
 
                 it('should push configuration into the emebds array', function() {
@@ -480,6 +490,14 @@ describe('cinema6-jsonp.js', function() {
                             exp: exp.id,
                             title: exp.data.title
                         });
+                    });
+                });
+
+                it('should preload all of the experiences', function() {
+                    expect(c6.embeds.length).toBeGreaterThan(0);
+
+                    c6.embeds.forEach(function(embed) {
+                        expect(c6.loadExperience).toHaveBeenCalledWith(embed, true);
                     });
                 });
             });

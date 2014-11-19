@@ -260,13 +260,20 @@
                 /* jshint camelcase:true */
             });
 
-            callback(experiences.map(function(experience) {
-                return {
-                    id: experience.id,
-                    title: experience.data.title,
-                    image: baseUrl + experience.data.collateral.splash
-                };
-            }));
+            c6.embeds.forEach(function(embed) {
+                c6.loadExperience(embed, true);
+            });
+
+            callback({
+                params: params,
+                items: experiences.map(function(experience) {
+                    return {
+                        id: experience.id,
+                        title: experience.data.title,
+                        image: baseUrl + experience.data.collateral.splash
+                    };
+                })
+            });
         });
     }
 
