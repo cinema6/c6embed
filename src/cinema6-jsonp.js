@@ -226,7 +226,8 @@
         var query = toQueryParams({
             context: 'mr2',
             branding: params.branding,
-            placementId: params.adPlacementId
+            placementId: params.adPlacementId,
+            container: params.src
         });
 
         require(items.map(function(item) {
