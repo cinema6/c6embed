@@ -28,6 +28,19 @@
                         gaAcctIdEmbed: 'UA-44457821-3'
                     };
 
+                function toQueryParams(object) {
+                    return Object.keys(object)
+                        .filter(function(key) {
+                            return object[key] !== undefined;
+                        })
+                        .map(function(key) {
+                            return [key, object[key]]
+                                .map(encodeURIComponent)
+                                .join('=');
+                        })
+                        .join('&');
+                }
+
                 function writeScript(src) {
                     document.write('<script src="' + src +'"><\/script>');
                 }
@@ -54,7 +67,10 @@
 
                 window.writeScript = writeScript;
 
-                writeScript(base + '/api/public/content/experience/' + params.id + '.js?context=standalone');
+                writeScript(base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
+                    context: 'standalone',
+                    wildCardPlacement: params.wp
+                }));
             }());
         </script>
         <script>
