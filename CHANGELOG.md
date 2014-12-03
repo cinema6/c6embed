@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.8.0 (December 3, 2014)
 * [FEATURE] Added ability to override sponsored card tracking behavior
   on standalone player via special URL parameters
 * Started passing container parameter to content service from JSONP
