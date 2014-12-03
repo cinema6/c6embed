@@ -2,6 +2,8 @@
 
 * [FEATURE] Added ability to override sponsored card tracking behavior
   on standalone player via special URL parameters
+* Started passing container parameter to content service from JSONP
+  endpoint script
 
 ## v2.7.0 (November 19, 2014)
 * [FEATURE]: Added the provided query params to the JSONP response
