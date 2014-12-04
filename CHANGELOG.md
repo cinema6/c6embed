@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.8.1 (December 4, 2014)
+* [FIX]: Fixed an issue that caused sponsored cards to remain in MR if no placement is found.
+
 ## v2.8.0 (December 3, 2014)
 * [FEATURE] Added ability to override sponsored card tracking behavior
   on standalone player via special URL parameters
