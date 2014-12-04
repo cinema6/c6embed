@@ -401,7 +401,7 @@
 
     c6.require.config = {
         paths: {
-            adtech: 'http://aka-cdn.adtechus.com/dt/common/DAC.js'
+            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
         },
         shim: {
             adtech: {

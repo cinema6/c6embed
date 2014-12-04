@@ -196,7 +196,7 @@
 
                         beforeEach(function(done) {
                             waitForDeps([
-                                'http://aka-cdn.adtechus.com/dt/common/DAC.js',
+                                '//aka-cdn.adtechus.com/dt/common/DAC.js',
                                 '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
                                 baseUrl + '/collateral/splash/splash.js',
                                 baseUrl + '/collateral/mr2/templates/test.js'

@@ -141,7 +141,7 @@
                         expect(resp).toBe(adtech);
                         expect(window.c6.require).toHaveBeenCalledWith(['adtech'], jasmine.any(Function));
                         expect(window.c6.require.config).toEqual({
-                            paths: { adtech: 'http://aka-cdn.adtechus.com/dt/common/DAC.js' },
+                            paths: { adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js' },
                             shim: { adtech: {
                                 exports: 'ADTECH',
                                 onCreateFrame: jasmine.any(Function)

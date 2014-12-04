@@ -282,7 +282,7 @@ describe('cinema6-jsonp.js', function() {
 
         beforeEach(function(done) {
             waitForDeps([
-                'http://aka-cdn.adtechus.com/dt/common/DAC.js'
+                '//aka-cdn.adtechus.com/dt/common/DAC.js'
             ], function(deps) {
                 adtech = deps[0];
 

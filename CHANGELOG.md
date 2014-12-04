@@ -5,6 +5,8 @@
   on standalone player via special URL parameters
 * Started passing container parameter to content service from JSONP
   endpoint script
+* [FIX]: Fixed an issue that caused MRs with sponsored cards not to work
+  on secure webpages
 
 ## v2.7.0 (November 19, 2014)
 * [FEATURE]: Added the provided query params to the JSONP response
