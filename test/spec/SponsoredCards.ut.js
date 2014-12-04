@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    ddescribe('SponsoredCards', function() {
+    describe('SponsoredCards', function() {
         var SponsoredCards,
             q,
             spCards,
