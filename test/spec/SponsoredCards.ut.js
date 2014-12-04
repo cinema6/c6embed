@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    describe('SponsoredCards', function() {
+    ddescribe('SponsoredCards', function() {
         var SponsoredCards,
             q,
             spCards,
@@ -58,6 +58,7 @@
                     spyOn(_private, 'getCardConfigs').and.callThrough();
                     spyOn(_private, 'loadAdtech').and.returnValue(q(adtech));
                     spyOn(_private, 'makeAdCall').and.returnValue(q());
+                    spyOn(_private, 'trimCard').and.callThrough();
                 });
                 
                 it('should load adtech and make ad calls for each sponsored card', function(done) {
@@ -83,13 +84,29 @@
                     }).done(done);
                 });
                 
-                it('should return early if the placement is missing or invalid', function(done) {
-                    q([undefined, 'p1234'].map(function(placement) {
-                        experience.data.wildCardPlacement = placement;
-                        return spCards.fetchSponsoredCards(experience);
-                    })).then(function() {
+                it('should return early and trim sponsored cards if the placement is missing', function(done) {
+                    delete experience.data.wildCardPlacement;
+                    spCards.fetchSponsoredCards(experience).then(function() {
                         expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
+                        expect(_private.trimCard.calls.count()).toBe(2);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
+                        expect(experience.data.deck.length).toBe(1);
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should return early and trim sponsored cards if the placement is invalid', function(done) {
+                    experience.data.wildCardPlacement = 'p1234';
+                    spCards.fetchSponsoredCards(experience).then(function() {
+                        expect(_private.loadAdtech).not.toHaveBeenCalled();
+                        expect(_private.makeAdCall).not.toHaveBeenCalled();
+                        expect(_private.trimCard.calls.count()).toBe(2);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
+                        expect(experience.data.deck.length).toBe(1);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -100,6 +117,7 @@
                     spCards.fetchSponsoredCards(experience).then(function() {
                         expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
+                        expect(_private.trimCard).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -115,6 +133,10 @@
                     }).done(function() {
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
+                        expect(_private.trimCard.calls.count()).toBe(2);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
+                        expect(experience.data.deck.length).toBe(1);
                         done();
                     });
                 });
