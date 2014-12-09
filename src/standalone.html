@@ -25,7 +25,80 @@
                         isProduction: isProduction,
                         embeds: [],
                         gaAcctIdPlayer: 'UA-44457821-2',
-                        gaAcctIdEmbed: 'UA-44457821-3'
+                        gaAcctIdEmbed: 'UA-44457821-3',
+
+                        requireCache: {},
+                        require: function(srcs, cb) {
+                            var modules = [],
+                                loaded = 0,
+                                config = this.require.config || {},
+                                paths = config.paths || {},
+                                shims = config.shim || {};
+
+                            function load(module, index) {
+                                modules[index] = module;
+
+                                if (++loaded === srcs.length) {
+                                    cb.apply(window, modules);
+                                }
+                            }
+
+                            srcs.forEach(function(_src, index) {
+                                var src = paths[_src] || _src,
+                                    shim = shims[_src] || {},
+                                    exports = shim.exports,
+                                    onCreateFrame = shim.onCreateFrame || function() {};
+
+                                if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
+
+                                var iframe = new DOMElement('iframe', {
+                                        src: 'about:blank',
+                                        'data-module': _src
+                                    }),
+                                    head = document.getElementsByTagName('head')[0],
+                                    html = [
+                                        '<script>',
+                                        '(' + function(window) {
+                                            try {
+                                                // This hack is needed in order for the browser to send the
+                                                // "referer" header in Safari.
+                                                window.history.replaceState(null, null, window.parent.location.href);
+                                            } catch(e) {}
+                                            window.Text = window.parent.Text;
+                                            window.module = {
+                                                exports: {}
+                                            };
+                                            window.exports = window.module.exports;
+                                        }.toString() + '(window))',
+                                        '<\/script>',
+                                        '<script>(' + onCreateFrame.toString() + '(window))<\/script>',
+                                        '<script src="' + src + '"><\/script>'
+                                    ].join('\n');
+
+                                iframe.addEventListener('load', function() {
+                                    var frameWindow = iframe.contentWindow,
+                                        head = frameWindow.document.getElementsByTagName('head')[0];
+
+                                    if (head.childNodes.length < 1) { return; }
+
+                                    load(
+                                        (c6.requireCache[src] =
+                                            (exports ? frameWindow[exports] : frameWindow.module.exports)
+                                        ),
+                                        index
+                                    );
+                                }, false);
+
+                                head.appendChild(iframe);
+
+                                // The iframe must have its contents written using document.write(), otherwise the
+                                // browser will not send the "referer" header when requesting the script.
+                                iframe.contentWindow.document.write(html);
+                                iframe.contentWindow.document.close();
+                            });
+
+                            return modules;
+                        }
                     };
 
                 function toQueryParams(object) {
@@ -43,6 +116,21 @@
 
                 function writeScript(src) {
                     document.write('<script src="' + src +'"><\/script>');
+                }
+
+                function DOMElement(tag, attrs, appendTo) {
+                    var element = document.createElement(tag),
+                        attr;
+
+                    for (attr in attrs) {
+                        element.setAttribute(attr, attrs[attr]);
+                    }
+
+                    if (appendTo) {
+                        appendTo.appendChild(element);
+                    }
+
+                    return element;
                 }
 
                 /* Create GA Tracker */
