@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.8.2 (December 9, 2014)
+* [FIX]: Fix for an issue that caused MiniReels with sponsored cards not
+  to load.
+
 ## v2.8.1 (December 4, 2014)
 * [FIX]: Fixed an issue that caused sponsored cards to remain in MR if no placement is found.
 
