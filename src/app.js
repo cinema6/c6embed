@@ -206,7 +206,20 @@ module.exports = function(deps) {
                 .then(getSponsoredCards)
                 .then(loadApp)
                 .then(initAnalytics)
-                .then(finish);
+                .then(finish)
+                .catch(function(err){
+                    /* jshint camelcase:false */
+                    var embedTracker = settings.config.exp.replace(/e-/,'');
+                    window.__c6_ga__(embedTracker + '.send', 'event', {
+                        'eventCategory' : 'Error',
+                        'eventAction'   : 'Embed.App',
+                        'eventLabel'    : err.message,
+                        'page'  : '/embed/' + settings.config.exp + '/',
+                        'title' : (experience.data && experience.data.title) || 'Error'
+                    });
+                    return Q.reject(err);
+                    /* jshint camelcase:true */
+                });
         }
 
         promise = settings.promise || (settings.promise = bootstrap());
