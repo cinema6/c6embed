@@ -170,8 +170,8 @@
     }
 
     function visibleEvent() {
-        var embedTracker = config.exp.replace(/e-/,'');
         /* jshint camelcase:false */
+        var embedTracker = config.exp.replace(/e-/,'');
         window.__c6_ga__(embedTracker + '.send', 'event', {
             'eventCategory' : 'Display',
             'eventAction'   : 'Visible',
@@ -179,6 +179,7 @@
             'page'  : '/embed/' + settings.config.exp + '/',
             'title' : settings.config.title
         });
+        /* jshint camelcase:true */
     }
 
     function viewChangeHandler() {
@@ -332,43 +333,58 @@
         html,
         experience
     ) {
-        var branding = experience.data.branding,
-            c6SplashImage = baseUrl + experience.data.collateral.splash,
-            splashImage = target.tagName === 'IMG' ?
-                target.getAttribute('src') : c6SplashImage;
+        try {
+            var branding = experience.data.branding,
+                c6SplashImage = baseUrl + experience.data.collateral.splash,
+                splashImage = target.tagName === 'IMG' ?
+                    target.getAttribute('src') : c6SplashImage;
 
-        if (branding) {
-            /* jshint expr:true */
-            (c6.branding[branding] ||
-                (c6.branding[branding] = new DOMElement('link', {
-                    id: 'c6-' + branding,
-                    rel: 'stylesheet',
-                    href: baseUrl + '/collateral/branding/' + branding + '/styles/splash.css'
-                }, head))
-            );
-            /* jshint expr:false */
+            if (branding) {
+                /* jshint expr:true */
+                (c6.branding[branding] ||
+                    (c6.branding[branding] = new DOMElement('link', {
+                        id: 'c6-' + branding,
+                        rel: 'stylesheet',
+                        href: baseUrl + '/collateral/branding/' + branding + '/styles/splash.css'
+                    }, head))
+                );
+                /* jshint expr:false */
+            }
+
+            splash.innerHTML = html;
+            splash.setAttribute('class', 'c6brand__' + branding);
+            tb.parse(splash)({
+                title: experience.data.title,
+                splash: splashImage
+            });
+            settings.splashDelegate = splashJS(c6, settings, splash);
+            settings.experience = experience;
+
+            if (splashVisible()) {
+                visibleEvent();
+            } else {
+                window.addEventListener('scroll', viewChangeHandler);
+                window.addEventListener('resize', viewChangeHandler);
+            }
+
+            if (config.preload) {
+                c6.loadExperience(settings, true);
+            } else {
+                splash.addEventListener('mouseenter', handleMouseenter, false);
+            }
         }
-
-        splash.innerHTML = html;
-        splash.setAttribute('class', 'c6brand__' + branding);
-        tb.parse(splash)({
-            title: experience.data.title,
-            splash: splashImage
-        });
-        settings.splashDelegate = splashJS(c6, settings, splash);
-        settings.experience = experience;
-
-        if (splashVisible()) {
-            visibleEvent();
-        } else {
-            window.addEventListener('scroll', viewChangeHandler);
-            window.addEventListener('resize', viewChangeHandler);
-        }
-
-        if (config.preload) {
-            c6.loadExperience(settings, true);
-        } else {
-            splash.addEventListener('mouseenter', handleMouseenter, false);
+        catch (err) {
+            /* jshint camelcase:false */
+            var embedTracker = settings.config.exp.replace(/e-/,'');
+            window.__c6_ga__(embedTracker + '.send', 'event', {
+                'eventCategory' : 'Error',
+                'eventAction'   : 'Embed',
+                'eventLabel'    : err.message,
+                'page'  : '/embed/' + settings.config.exp + '/',
+                'title' : settings.config.title || 'Error'
+            });
+            /* jshint camelcase:true */
+            throw err;
         }
     });
 }(window, window.mockReadyState || document.readyState));

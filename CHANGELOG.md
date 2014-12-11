@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v2.9.0
+* [FEATURE]: New GA account ids for embeds.
+* [FEATURE]: Sending some errors to GA.
+
+
 ## v2.8.2 (December 9, 2014)
 * [FIX]: Fix for an issue that caused MiniReels with sponsored cards not
   to load.
