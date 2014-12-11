@@ -3,7 +3,7 @@
 ## v2.9.0
 * [FEATURE]: New GA account ids for embeds.
 * [FEATURE]: Sending some errors to GA.
-
+* [FEAUTRE]: Support autoplaying videos on the first slide in mobile
 
 ## v2.8.2 (December 9, 2014)
 * [FIX]: Fix for an issue that caused MiniReels with sponsored cards not
