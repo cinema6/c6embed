@@ -413,8 +413,8 @@
 
                     describe('the c6 object', function() {
                         it('should exist', function() {
-                            expect(window.c6).toEqual({
-                                embeds: [
+                            expect(window.c6).toEqual(jasmine.objectContaining({
+                                embeds : [
                                     {
                                         embed: $('.c6embed-e-123')[0],
                                         load: 'data-preload' in config,
@@ -445,9 +445,9 @@
                                 requireCache: jasmine.any(Object),
                                 require: jasmine.any(Function),
                                 branding: jasmine.any(Object),
-                                gaAcctIdPlayer: 'UA-44457821-2',
-                                gaAcctIdEmbed: 'UA-44457821-3'
-                            });
+                                gaAcctIdPlayer: 'UA-44457821-2'
+                            }));
+                            expect(window.c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
                         });
 
                         it('should be reused if there are multiple embed instances', function(done) {
@@ -480,9 +480,9 @@
                                     loadExperience: jasmine.any(Function),
                                     requireCache: jasmine.any(Object),
                                     branding: jasmine.any(Object),
-                                    gaAcctIdPlayer: 'UA-44457821-2',
-                                    gaAcctIdEmbed: 'UA-44457821-3'
+                                    gaAcctIdPlayer: 'UA-44457821-2'
                                 }));
+                                expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
                                 done();
                             };
                         });

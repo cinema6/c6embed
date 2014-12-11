@@ -9,7 +9,9 @@
             requireCache: {},
             branding: {},
             gaAcctIdPlayer: 'UA-44457821-2',
-            gaAcctIdEmbed: 'UA-44457821-3',
+            gaAcctIdEmbed: (function(acc,mi,mx){
+                return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
+            }('UA-44457821',6,30)),
             loadExperience: function(embed, preload) {
                 var app = this.app || (this.app = document.createElement('script')),
                     head = document.getElementsByTagName('head')[0];
