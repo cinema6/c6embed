@@ -1,6 +1,6 @@
 # C6Embed Changelog
 
-## v2.9.0
+## v2.9.0 (December 11, 2014)
 * [FEATURE]: New GA account ids for embeds.
 * [FEATURE]: Sending some errors to GA.
 * [FEAUTRE]: Support autoplaying videos on the first slide in mobile
