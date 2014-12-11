@@ -48,7 +48,7 @@ module.exports = function(deps) {
                 appFolder = appUrl(experience.appUri + '/'),
                 state = null,
                 getSessionDeferred = Q.defer();
-                
+
             function insertIframe() {
                 $container.append($iframe);
             }
@@ -107,6 +107,11 @@ module.exports = function(deps) {
 
                 getSessionDeferred.resolve(session);
 
+                return session;
+            }
+
+            function setAppDefines(session) {
+                settings.appDefines = session.window.c6;
                 return session;
             }
 
@@ -205,6 +210,7 @@ module.exports = function(deps) {
                 .then(modifyApp)
                 .then(getSponsoredCards)
                 .then(loadApp)
+                .then(setAppDefines)
                 .then(initAnalytics)
                 .then(finish)
                 .catch(function(err){
@@ -220,6 +226,12 @@ module.exports = function(deps) {
                     return Q.reject(err);
                     /* jshint camelcase:true */
                 });
+        }
+
+        if (settings.appDefines) {
+            settings.appDefines.html5Videos.forEach(function(video) {
+                video.load();
+            });
         }
 
         promise = settings.promise || (settings.promise = bootstrap());

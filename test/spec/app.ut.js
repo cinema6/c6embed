@@ -31,6 +31,7 @@
 
         function Session() {
             AsEvented.call(this);
+            this.window = {};
         }
         Session.prototype = {
             ping: jasmine.createSpy('session.ping()'),
@@ -122,6 +123,9 @@
 
             session = new Session();
             safeSession = new Session();
+            safeSession.window.c6 = {
+                html5Videos: []
+            };
             session.ensureReadiness.and.returnValue(Q.when(safeSession));
             safeSession.ensureReadiness.and.returnValue(Q.when(safeSession));
 
@@ -306,6 +310,28 @@
 
             afterEach(function() {
                 $embed.remove();
+            });
+
+            describe('if there appDefines', function() {
+                var videos;
+
+                beforeEach(function(done) {
+                    videos = [1, 2, 3].map(function(number) {
+                        return jasmine.createSpyObj('video' + number, ['load']);
+                    });
+
+                    settings.appDefines = {
+                        html5Videos: videos
+                    };
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should load each video', function() {
+                    videos.forEach(function(video) {
+                        expect(video.load).toHaveBeenCalled();
+                    });
+                });
             });
 
             it('should add an observeable state object to the settings', function() {
@@ -508,7 +534,7 @@
                     getSessionSuccess = jasmine.createSpy('getSession() success');
                     settings.getSession().then(getSessionSuccess);
 
-                    appWindow = {};
+                    appWindow = $iframe.prop('contentWindow');
 
                     result = cb(appWindow);
                 });
@@ -528,6 +554,10 @@
 
                 it('should return the session', function() {
                     expect(result).toBe(session);
+                });
+
+                it('should decorate the settings object with the app\'s c6 object', function() {
+                    expect(settings.appDefines).toBe(safeSession.window.c6);
                 });
 
                 describe('google analytics',function(){
