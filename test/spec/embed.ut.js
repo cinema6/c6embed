@@ -521,6 +521,8 @@
                                     var actualScript;
 
                                     beforeEach(function(done) {
+                                        var fakeScript = document.createElement('script');
+
                                         actualScript = document.createElement('script');
 
                                         window.c6 = {
@@ -534,9 +536,10 @@
                                         actualScript.onload = done;
 
                                         $div.append(actualScript);
+                                        $div.append(fakeScript);
                                     });
 
-                                    it('should try to use the last script on the page', function() {
+                                    it('should try to use the last c6embed script on the page', function() {
                                         expect(settingsByExp('e-def').config.script).toBe(actualScript);
                                     });
                                 });
