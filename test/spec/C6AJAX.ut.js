@@ -271,7 +271,7 @@
                 describe('if the status code is not 4xx or 5xx', function() {
                     beforeEach(function(done) {
                         xhr.status = 200;
-                        xhr.response = JSON.stringify({
+                        xhr.responseText = JSON.stringify({
                             name: 'Josh',
                             city: 'Pittstown',
                             state: 'NJ'
@@ -284,7 +284,7 @@
                     it('should resolve the promise with the response', function() {
                         expect(success).toHaveBeenCalledWith({
                             status: 200,
-                            data: JSON.parse(xhr.response),
+                            data: JSON.parse(xhr.responseText),
                             headers: jasmine.any(Function)
                         });
                         success.calls.mostRecent().args[0].headers();
@@ -296,7 +296,7 @@
                 describe('if the status code is 4xx or 5xx', function() {
                     beforeEach(function(done) {
                         xhr.status = 404;
-                        xhr.response = 'It wasn\'t there...';
+                        xhr.responseText = 'It wasn\'t there...';
 
                         xhr.onreadystatechange();
                         setTimeout(done, 0);
@@ -305,7 +305,7 @@
                     it('should reject the promise with the response', function() {
                         expect(failure).toHaveBeenCalledWith({
                             status: 404,
-                            data: xhr.response,
+                            data: xhr.responseText,
                             headers: jasmine.any(Function)
                         });
                         failure.calls.mostRecent().args[0].headers();

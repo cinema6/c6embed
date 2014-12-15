@@ -92,7 +92,12 @@
             }());
 
             return result;
-        }(document.getElementsByTagName('script'))),
+        }(
+            Array.prototype.slice.call(document.getElementsByTagName('script'))
+                .filter(function(script) {
+                    return 'data-exp' in script.attributes;
+                })
+        )),
         head = document.getElementsByTagName('head')[0],
         script = config.script,
         target = config.replaceImage ? (function() {
