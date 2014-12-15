@@ -216,10 +216,23 @@ module.exports = function(deps) {
                 .catch(function(err){
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
+
+                    function stringifyError(error) {
+                        try {
+                            return JSON.stringify(Object.getOwnPropertyNames(error)
+                                .reduce(function(result, prop) {
+                                    result[prop] = error[prop];
+                                    return result;
+                                }, {}), null, '    ');
+                        } catch(e) {
+                            return error;
+                        }
+                    }
+
                     window.__c6_ga__(embedTracker + '.send', 'event', {
                         'eventCategory' : 'Error',
                         'eventAction'   : 'Embed.App',
-                        'eventLabel'    : err.message,
+                        'eventLabel'    : stringifyError(err),
                         'page'  : '/embed/' + settings.config.exp + '/',
                         'title' : (experience.data && experience.data.title) || 'Error'
                     });
