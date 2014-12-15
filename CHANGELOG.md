@@ -3,6 +3,8 @@
 ## v2.9.1 (December 15, 2014)
 * Made change to potentially improve the stability of XHR requests
 * Added more robust GA error reporting
+* [FIX]: Fix for an issue that caused c6embed to fail silently if it was
+  appended to the page via JS
 
 ## v2.9.0 (December 11, 2014)
 * [FEATURE]: New GA account ids for embeds.
