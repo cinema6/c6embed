@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.9.2 (December 17, 2014)
+* [FIX]: Sending Visible events for standalone and jsonp players to fix issues in reports
+
 ## v2.9.1 (December 15, 2014)
 * Made change to potentially improve the stability of XHR requests
 * Added more robust GA error reporting
