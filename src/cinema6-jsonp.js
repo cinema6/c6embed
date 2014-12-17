@@ -260,6 +260,15 @@
                     'title' : experience.data.title,
                     'sessionControl' : 'start'
                 });
+               
+                //TODO - replace this when we can actually detect that we are visible
+                window.__c6_ga__(embedTracker + '.send', 'event', {
+                    'eventCategory' : 'Display',
+                    'eventAction'   : 'Visible',
+                    'eventLabel'    : experience.data.title,
+                    'page'  : '/embed/' + experience.id + '/',
+                    'title' : experience.data.title
+                });
                 /* jshint camelcase:true */
             });
 
