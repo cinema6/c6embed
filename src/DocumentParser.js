@@ -11,6 +11,10 @@ module.exports = function() {
     }
 
     function ParsedDocument(html) {
+        if (!(/<html(.|[\r\n])*?<\/html>/).test(html)) {
+            throw new TypeError('[' + html + '] is not a valid HTML document.');
+        }
+
         this.html = html;
     }
     ParsedDocument.prototype = {
