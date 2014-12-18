@@ -2,6 +2,7 @@
 
 ## v2.9.2 (December 17, 2014)
 * [FIX]: Sending Visible events for standalone and jsonp players to fix issues in reports
+* Send SponsoredCardRemoved events when sponsored cards are removed
 
 ## v2.9.1 (December 15, 2014)
 * Made change to potentially improve the stability of XHR requests

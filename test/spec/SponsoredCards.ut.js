@@ -20,7 +20,8 @@
                     require: jasmine.createSpy('c6.require()').and.callFake(function(modules, cb) {
                         cb(adtech);
                     })
-                }
+                },
+                __c6_ga__: jasmine.createSpy('c6_ga()')
             }
             
             adtech = {
@@ -29,7 +30,8 @@
             };
             
             experience = {
-                id: 'e1',
+                id: 'e-1234',
+                title: 'TestExp',
                 data: {
                     wildCardPlacement: '1234',
                     deck: [
@@ -42,6 +44,7 @@
 
             spCards = new SponsoredCards({ q: q, window: window });
             _private = spCards._private;
+            spyOn(_private, 'trimCard').and.callThrough();
         });
         
         beforeEach(function() {
@@ -58,7 +61,6 @@
                     spyOn(_private, 'getCardConfigs').and.callThrough();
                     spyOn(_private, 'loadAdtech').and.returnValue(q(adtech));
                     spyOn(_private, 'makeAdCall').and.returnValue(q());
-                    spyOn(_private, 'trimCard').and.callThrough();
                 });
                 
                 it('should load adtech and make ad calls for each sponsored card', function(done) {
@@ -90,8 +92,17 @@
                         expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.trimCard.calls.count()).toBe(2);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience, 'No wildCardPlacement');
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience, 'No wildCardPlacement');
+                        expect(window.__c6_ga__.calls.count()).toBe(2);
+                        expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                            {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                             eventLabel: '{"card":"rc1","message":"No wildCardPlacement"}',
+                             page: '/embed/e-1234/', title: 'TestExp'});
+                        expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                            {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                             eventLabel: '{"card":"rc1","message":"No wildCardPlacement"}',
+                             page: '/embed/e-1234/', title: 'TestExp'});
                         expect(experience.data.deck.length).toBe(1);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -104,8 +115,9 @@
                         expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.trimCard.calls.count()).toBe(2);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience, 'No wildCardPlacement');
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience, 'No wildCardPlacement');
+                        expect(window.__c6_ga__.calls.count()).toBe(2);
                         expect(experience.data.deck.length).toBe(1);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -118,27 +130,26 @@
                         expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.trimCard).not.toHaveBeenCalled();
+                        expect(window.__c6_ga__).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
-                it('should fail if loadAdtech fails', function(done) {
+                it('should still resolve if loadAdtech fails', function(done) {
                     _private.loadAdtech.and.returnValue(q.reject('I GOT A PROBLEM'));
                     
                     spCards.fetchSponsoredCards(experience).then(function() {
-                        expect('resolved').not.toBe('resolved');
-                    }).catch(function(error) {
-                        expect(error).toBe('I GOT A PROBLEM');
-                    }).done(function() {
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.trimCard.calls.count()).toBe(2);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience, 'loading adtech failed - I GOT A PROBLEM');
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience, 'loading adtech failed - I GOT A PROBLEM');
+                        expect(window.__c6_ga__.calls.count()).toBe(2);
                         expect(experience.data.deck.length).toBe(1);
-                        done();
-                    });
+                    }).catch(function(error) {
+                        expect(error).not.toBeDefined();
+                    }).done(done);
                 });
                 
                 describe('creates c6.addSponsoredCard that', function() {
@@ -235,7 +246,6 @@
                         opts.complete();
                     });
                     spyOn(_private, 'decorateCard').and.callThrough();
-                    spyOn(_private, 'trimCard').and.callThrough();
                 });
 
                 it('should call adtech.loadAd', function(done) {
@@ -246,6 +256,7 @@
                             params: { target: '_blank', adid: 'camp1', bnid: '1' }, complete: jasmine.any(Function) });
                         expect(_private.decorateCard).toHaveBeenCalledWith(experience.data.deck[0], experience, 1234);
                         expect(_private.trimCard).not.toHaveBeenCalled();
+                        expect(window.__c6_ga__).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -274,7 +285,11 @@
                             { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
                         ]);
                         expect(adtech.loadAd).toHaveBeenCalled();
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience, 'makeAdCall - Error: Timed out after 3000 ms');
+                        expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                            {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                             eventLabel: '{"card":"rc1","message":"makeAdCall - Error: Timed out after 3000 ms"}',
+                             page: '/embed/e-1234/', title: 'TestExp'});
                         expect(_private.decorateCard).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -296,31 +311,40 @@
                 });
                 
                 it('should call trimCard if there\'s no entry in the cardCache', function() {
-                    spyOn(_private, 'trimCard').and.callThrough();
                     _private.decorateCard(experience.data.deck[2], experience, 1234);
                     expect(experience.data.deck).toEqual([
                         { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                         { id: 'rc2', sponsored: false, campaign: { campaignId: null } }
                     ]);
+                    expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                        {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                         eventLabel: '{"card":"rc3","message":"ad call finished but no cardInfo"}',
+                         page: '/embed/e-1234/', title: 'TestExp'});
                 });
             });
             
             describe('trimCard', function() {
                 it('should delete a card from the deck', function() {
-                    _private.trimCard('rc1', experience);
+                    _private.trimCard('rc1', experience, 'PROBLEM');
                     expect(experience.data.deck).toEqual([
                         { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
                         { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
                     ]);
+                    expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                        {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                         eventLabel: '{"card":"rc1","message":"PROBLEM"}', page: '/embed/e-1234/', title: 'TestExp'});
                 });
                 
                 it('should not throw an error if the card is not in the deck', function() {
-                    expect(function() { return _private.trimCard('rc4', experience); }).not.toThrow();
+                    expect(function() { return _private.trimCard('rc4', experience, 'PROBLEM'); }).not.toThrow();
                     expect(experience.data.deck).toEqual([
                         { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                         { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
                         { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
                     ]);
+                    expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                        {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                         eventLabel: '{"card":"rc4","message":"PROBLEM"}', page: '/embed/e-1234/', title: 'TestExp'});
                 });
             });
         });
