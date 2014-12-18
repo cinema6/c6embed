@@ -27,6 +27,12 @@
                 document = documentParser(indexHTML);
             });
 
+            it('should throw an error if not given an HTML document', function() {
+                expect(function() {
+                    document = documentParser('I Suck!');
+                }).toThrow();
+            });
+
             describe('properties', function() {
                 describe('html', function() {
                     it('should be the provided html', function() {
