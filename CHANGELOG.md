@@ -1,6 +1,8 @@
 # C6Embed Changelog
 
 * [FEATURE]: Preloader animation added for full page MRs
+* Modified C6AJAX to be more like Angular $http in hopes of resolving
+  strange AJAX errors reported in GA
 
 ## v2.9.2 (December 17, 2014)
 * [FIX]: Sending Visible events for standalone and jsonp players to fix issues in reports
