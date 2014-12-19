@@ -176,6 +176,73 @@
         </script>
     </head>
     <body>
+        <div class="c6mr-preloader__group c6js-loader">
+            <div class="c6mr-preloader">
+                <div class="c6mr-preloader__ring">
+                    <div class="c6mr-preloader__orbit">
+                        <div class="c6mr-preloader__ball">&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style type="text/css">
+            .c6mr-preloader__group {
+                text-align: center;
+                position:absolute; left:0; top:0; bottom:0; right:0; z-index: 10;
+                background:#eee;
+                -webkit-transition:opacity 0.5s; transition:opacity 0.5s;
+                -webkit-transition-delay:0.25s; transition-delay:0.25s;
+                opacity:1; display:block;
+            }
+                .c6mr-preloader {
+                    position:absolute;
+                    margin:-42px 0 0 -42px;
+                    top:50%; left:50%;
+                }
+                .c6mr-preloader__ring {
+                    position:absolute;
+                    width:80px; height:80px;
+                    border:2px solid #ddd;
+                    border-radius:120px; 
+                }
+                .c6mr-preloader__orbit {
+                    position:absolute; left:6px; top:6px;
+                    width:68px; height:68px;
+                    -webkit-animation-name:c6DoSpinner;
+                    -webkit-animation-duration:1.5s;
+                    -webkit-animation-iteration-count:infinite;
+                    -webkit-animation-timing-function:linear;
+                    animation-name:c6DoSpinner;
+                    animation-duration:1.5s;
+                    animation-iteration-count:infinite;
+                    animation-timing-function:linear;
+                }
+                    .c6mr-preloader__ball {
+                        position:absolute; left:0; top:0;
+                        width:12px; height:12px;
+                        background:#28c6ff;
+                        border-radius:50px;
+                    }
+
+
+                @-webkit-keyframes c6DoSpinner {
+                    0%{
+                        -webkit-transform:rotate(0deg)
+                    }
+                    100%{
+                        -webkit-transform:rotate(360deg)
+                    }
+                }
+                @keyframes c6DoSpinner {
+                    0%{
+                        transform:rotate(0deg)
+                    }
+                    100% {
+                        transform:rotate(360deg)
+                    }
+                }
+        </style>
         <script>
             (function() {
                 'use strict';

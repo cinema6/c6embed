@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Preloader animation added for full page MRs
+
 ## v2.9.2 (December 17, 2014)
 * [FIX]: Sending Visible events for standalone and jsonp players to fix issues in reports
 * Added a more useful error if the MR Player's index.html file is not what
