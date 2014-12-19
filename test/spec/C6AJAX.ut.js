@@ -209,65 +209,7 @@
                 }).then(success, failure);
             });
 
-            describe('if the readyState is not 4', function() {
-                describe('0', function() {
-                    beforeEach(function(done) {
-                        xhr.readyState = 0;
-                        xhr.onreadystatechange();
-                        setTimeout(done, 0);
-                    });
-
-                    it('should do nothing', function() {
-                        expect(success).not.toHaveBeenCalled();
-                        expect(failure).not.toHaveBeenCalled();
-                    });
-                });
-
-                describe('1', function() {
-                    beforeEach(function(done) {
-                        xhr.readyState = 1;
-                        xhr.onreadystatechange();
-                        setTimeout(done, 0);
-                    });
-
-                    it('should do nothing', function() {
-                        expect(success).not.toHaveBeenCalled();
-                        expect(failure).not.toHaveBeenCalled();
-                    });
-                });
-
-                describe('2', function() {
-                    beforeEach(function(done) {
-                        xhr.readyState = 2;
-                        xhr.onreadystatechange();
-                        setTimeout(done, 0);
-                    });
-
-                    it('should do nothing', function() {
-                        expect(success).not.toHaveBeenCalled();
-                        expect(failure).not.toHaveBeenCalled();
-                    });
-                });
-
-                describe('3', function() {
-                    beforeEach(function(done) {
-                        xhr.readyState = 3;
-                        xhr.onreadystatechange();
-                        setTimeout(done, 0);
-                    });
-
-                    it('should do nothing', function() {
-                        expect(success).not.toHaveBeenCalled();
-                        expect(failure).not.toHaveBeenCalled();
-                    });
-                });
-            });
-
-            describe('when the readyState is 4', function() {
-                beforeEach(function() {
-                    xhr.readyState = 4;
-                });
-
+            describe('if the request loads', function() {
                 describe('if the status code is not 4xx or 5xx', function() {
                     beforeEach(function(done) {
                         xhr.status = 200;
@@ -277,7 +219,7 @@
                             state: 'NJ'
                         });
 
-                        xhr.onreadystatechange();
+                        xhr.onload();
                         setTimeout(done, 0);
                     });
 
@@ -298,7 +240,7 @@
                         xhr.status = 404;
                         xhr.responseText = 'It wasn\'t there...';
 
-                        xhr.onreadystatechange();
+                        xhr.onload();
                         setTimeout(done, 0);
                     });
 
@@ -311,6 +253,21 @@
                         failure.calls.mostRecent().args[0].headers();
                         expect(xhr.getAllResponseHeaders).toHaveBeenCalled();
                         expect(xhr.getAllResponseHeaders.calls.mostRecent().object).toBe(xhr);
+                    });
+                });
+            });
+
+            describe('if the request fails', function() {
+                beforeEach(function(done) {
+                    xhr.onerror();
+                    setTimeout(done, 0);
+                });
+
+                it('should reject the promise', function() {
+                    expect(failure).toHaveBeenCalledWith({
+                        status: null,
+                        data: jasmine.any(Error),
+                        headers: jasmine.any(Function)
                     });
                 });
             });

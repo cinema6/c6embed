@@ -376,6 +376,26 @@
                 expect(mockDocumentParser).toHaveBeenCalledWith(indexHTML);
             });
 
+            describe('if the ajax reqest has no data', function() {
+                var spy;
+
+                beforeEach(function(done) {
+                    spy = jasmine.createSpy('spy()');
+
+                    c6Ajax.get.and.returnValue(Q.when({
+                        status: 304,
+                        data: ''
+                    }));
+
+                    delete settings.promise;
+                    $window.c6.loadExperience(settings).catch(spy).finally(done);
+                });
+
+                it('should reject the chain with an error', function() {
+                    expect(spy).toHaveBeenCalledWith(new Error('Unexpected response for MR App request: ' + JSON.stringify({ status: 304, data: '' })));
+                });
+            });
+
             it('should resolve to the settings object', function() {
                 expect(session.ensureReadiness).toHaveBeenCalled();
                 expect(success).toHaveBeenCalledWith(settings);

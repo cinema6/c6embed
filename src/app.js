@@ -56,6 +56,12 @@ module.exports = function(deps) {
             function fetchApp() {
                 return c6Ajax.get(appFolder + appConfig.kMode + '.html')
                     .then(function parse(response) {
+                        if (!response.data) {
+                            throw new Error(
+                                'Unexpected response for MR App request: ' + JSON.stringify(response)
+                            );
+                        }
+
                         return documentParser(response.data);
                     });
             }
