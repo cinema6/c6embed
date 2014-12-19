@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.10.0 (December 19, 2014)
 * [FEATURE]: Preloader animation added for full page MRs
 * Modified C6AJAX to be more like Angular $http in hopes of resolving
   strange AJAX errors reported in GA
