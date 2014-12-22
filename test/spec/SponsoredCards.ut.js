@@ -97,12 +97,12 @@
                         expect(window.__c6_ga__.calls.count()).toBe(2);
                         expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                             {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                             eventLabel: '{"card":"rc1","message":"No wildCardPlacement"}',
-                             page: '/embed/e-1234/', title: 'TestExp'});
+                             eventLabel: '{"message":"No wildCardPlacement"}',
+                             page: '/embed/e-1234/rc1', title: 'TestExp'});
                         expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                             {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                             eventLabel: '{"card":"rc1","message":"No wildCardPlacement"}',
-                             page: '/embed/e-1234/', title: 'TestExp'});
+                             eventLabel: '{"message":"No wildCardPlacement"}',
+                             page: '/embed/e-1234/rc1', title: 'TestExp'});
                         expect(experience.data.deck.length).toBe(1);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -288,8 +288,8 @@
                         expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience, 'makeAdCall - Error: Timed out after 3000 ms');
                         expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                             {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                             eventLabel: '{"card":"rc1","message":"makeAdCall - Error: Timed out after 3000 ms"}',
-                             page: '/embed/e-1234/', title: 'TestExp'});
+                             eventLabel: '{"message":"makeAdCall - Error: Timed out after 3000 ms"}',
+                             page: '/embed/e-1234/rc1', title: 'TestExp'});
                         expect(_private.decorateCard).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -318,8 +318,8 @@
                     ]);
                     expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                         {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                         eventLabel: '{"card":"rc3","message":"ad call finished but no cardInfo"}',
-                         page: '/embed/e-1234/', title: 'TestExp'});
+                         eventLabel: '{"message":"ad call finished but no cardInfo"}',
+                         page: '/embed/e-1234/rc3', title: 'TestExp'});
                 });
             });
             
@@ -332,7 +332,7 @@
                     ]);
                     expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                         {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                         eventLabel: '{"card":"rc1","message":"PROBLEM"}', page: '/embed/e-1234/', title: 'TestExp'});
+                         eventLabel: '{"message":"PROBLEM"}', page: '/embed/e-1234/rc1', title: 'TestExp'});
                 });
                 
                 it('should not throw an error if the card is not in the deck', function() {
@@ -344,7 +344,7 @@
                     ]);
                     expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                         {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                         eventLabel: '{"card":"rc4","message":"PROBLEM"}', page: '/embed/e-1234/', title: 'TestExp'});
+                         eventLabel: '{"message":"PROBLEM"}', page: '/embed/e-1234/rc4', title: 'TestExp'});
                 });
             });
         });
