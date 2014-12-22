@@ -88,7 +88,7 @@
                 expect(c6.requireCache).toEqual({});
                 expect(c6.require).toEqual(jasmine.any(Function));
                 expect(c6.widgetContentCache).toEqual({});
-                expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2');
+                expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/);
                 expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/);
 
                 expect(c6.loadExperience).toEqual(jasmine.any(Function));
@@ -121,7 +121,7 @@
                     expect(c6.requireCache).toEqual({});
                     expect(c6.require).toEqual(jasmine.any(Function));
                     expect(c6.widgetContentCache).toEqual({});
-                    expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2');
+                    expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/);
                     expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/);
                     expect(c6.foo).toEqual({});
                     expect(c6.foo).toBe(orig.foo);

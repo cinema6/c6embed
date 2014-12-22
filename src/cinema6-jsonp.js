@@ -12,7 +12,9 @@
             embeds: [],
             requireCache: {},
             widgetContentCache: {},
-            gaAcctIdPlayer: 'UA-44457821-2',
+            gaAcctIdPlayer: (function(acc,mi,mx){
+                return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
+            }('UA-44457821',31,35)),
             gaAcctIdEmbed: (function(acc,mi,mx){
                 return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
             }('UA-44457821',6,30)),

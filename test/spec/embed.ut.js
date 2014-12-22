@@ -444,9 +444,9 @@
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
                                 require: jasmine.any(Function),
-                                branding: jasmine.any(Object),
-                                gaAcctIdPlayer: 'UA-44457821-2'
+                                branding: jasmine.any(Object)
                             }));
+                            expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
                             expect(window.c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
                         });
 
@@ -479,9 +479,9 @@
                                     app: null,
                                     loadExperience: jasmine.any(Function),
                                     requireCache: jasmine.any(Object),
-                                    branding: jasmine.any(Object),
-                                    gaAcctIdPlayer: 'UA-44457821-2'
+                                    branding: jasmine.any(Object)
                                 }));
+                                expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
                                 expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
                                 done();
                             };

@@ -106,7 +106,7 @@ describe('cinema6-jsonp.js', function() {
             expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
             expect(c6.require).toEqual(jasmine.any(Function), 'require');
             expect(c6.widgetContentCache).toEqual({}, 'widgetContentCache');
-            expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2', 'gaAcctIdPlayer');
+            expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/, 'gaAcctIdPlayer');
             expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/, 'gaAcctIdEmbed');
 
             expect(c6.loadExperience).toEqual(jasmine.any(Function), 'loadExperience');
@@ -135,7 +135,7 @@ describe('cinema6-jsonp.js', function() {
                 expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
                 expect(c6.require).toEqual(jasmine.any(Function), 'require');
                 expect(c6.widgetContentCache).toEqual({}, 'widgetContentCache');
-                expect(c6.gaAcctIdPlayer).toBe('UA-44457821-2', 'gaAcctIdPlayer');
+                expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/, 'gaAcctIdPlayer');
                 expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/, 'gaAcctIdEmbed');
 
                 expect(c6.loadExperience).toEqual(jasmine.any(Function), 'loadExperience');
