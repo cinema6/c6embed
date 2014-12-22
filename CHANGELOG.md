@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.11.0 (December 22, 2014)
+* [FEATURE]: Adding lots additional GA properties for the Player
+* [FIX]: Changed GA error report to make it cleaner for analysis when SponsoredCard trimmed
+
 ## v2.10.0 (December 19, 2014)
 * [FEATURE]: Preloader animation added for full page MRs
 * Modified C6AJAX to be more like Angular $http in hopes of resolving
