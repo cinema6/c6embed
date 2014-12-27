@@ -164,6 +164,12 @@
         c6.loadExperience(settings, true);
         splash.removeEventListener('mouseenter', handleMouseenter, false);
     }
+    
+    function handleClick() {
+        settings.config.showStartTime= (new Date()).getTime();
+        settings.config.context= 'embed';
+        splash.removeEventListener('click', handleClick, false);
+    }
 
     function splashVisible() {
         var viewportWidth = window.innerWidth,
@@ -331,6 +337,7 @@
         target.style.display = 'none';
     }
 
+    var requireStart = (new Date()).getTime();
     c6.require([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
         baseUrl + '/collateral/splash/splash.js',
@@ -346,7 +353,21 @@
             var branding = experience.data.branding,
                 c6SplashImage = baseUrl + experience.data.collateral.splash,
                 splashImage = target.tagName === 'IMG' ?
-                    target.getAttribute('src') : c6SplashImage;
+                    target.getAttribute('src') : c6SplashImage,
+                embedTracker = config.exp.replace(/e-/,'');
+
+            /* jshint camelcase:false */
+            if (experience && experience.data) {
+                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                    'timingCategory' : 'API',
+                    'timingVar'      : 'fetchExperience',
+                    'timingValue'    : ((new Date()).getTime() - requireStart),
+                    'timingLabel'    : 'c6',
+                    'page'  : '/exp/' + experience.id + '/?context=embed',
+                    'title' : experience.data.title
+                });
+            }
+            /* jshint camelcase:true */
 
             if (branding) {
                 /* jshint expr:true */
@@ -381,6 +402,9 @@
             } else {
                 splash.addEventListener('mouseenter', handleMouseenter, false);
             }
+
+            splash.addEventListener('click', handleClick, false);
+
         }
         catch (err) {
             /* jshint camelcase:false */

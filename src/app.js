@@ -73,7 +73,22 @@ module.exports = function(deps) {
             }
 
             function getSponsoredCards(document) {
-                return spCardService.fetchSponsoredCards(experience).thenResolve(document);
+                var startFetch = (new Date()).getTime();
+                return spCardService.fetchSponsoredCards(experience)
+                    .then(function(){
+                        /* jshint camelcase:false */
+                        var embedTracker = settings.config.exp.replace(/e-/,'');
+                        window.__c6_ga__(embedTracker + '.send', 'timing', {
+                            'timingCategory' : 'API',
+                            'timingVar'      : 'fetchSponsoredCards',
+                            'timingValue'    : ((new Date()).getTime() - startFetch),
+                            'timingLabel'    : 'adtech',
+                            'page'  : '/exp/' + settings.config.exp + '/?context=' +
+                                settings.config.context,
+                            'title' : settings.config.title
+                        });
+                        return document;
+                    });
             }
 
             function loadApp(document) {
@@ -192,6 +207,19 @@ module.exports = function(deps) {
                         });
 
                     this.observe('responsiveStyles', setResponsiveStyles);
+                    if (settings.config.showStartTime) {
+                        window.__c6_ga__(embedTracker + '.send', 'timing', {
+                            'timingCategory' : 'UX',
+                            'timingVar'      : (preload ? 'showPreloadedPlayer' : 'showPlayer'),
+                            'timingValue'    : ((new Date()).getTime() -
+                                settings.config.showStartTime),
+                            'timingLabel'    : settings.config.context,
+                            'page'  : '/exp/' + settings.config.exp + '/?context=' +
+                                settings.config.context,
+                            'title' : settings.config.title
+                        });
+                    }
+                    
                 } else {
                     $iframe.hide();
                     callDelegate('didShow');

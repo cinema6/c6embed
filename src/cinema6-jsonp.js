@@ -113,6 +113,8 @@
                     return config.experience.id === id ? config : result;
                 }, null);
 
+                config.config.showStartTime= (new Date()).getTime();
+                config.config.context= 'jsonp';
                 new DOMElement('img', {
                     src: config.trackingUrl
                 });
@@ -232,7 +234,8 @@
             branding: params.branding,
             placementId: params.adPlacementId,
             container: params.src
-        });
+        }),
+        requireStart = (new Date()).getTime();
 
         require(items.map(function(item) {
             return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' + query;
@@ -269,6 +272,15 @@
                     'eventAction'   : 'Visible',
                     'eventLabel'    : experience.data.title,
                     'page'  : '/embed/' + experience.id + '/',
+                    'title' : experience.data.title
+                });
+                
+                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                    'timingCategory' : 'API',
+                    'timingVar'      : 'fetchExperience',
+                    'timingValue'    : ((new Date()).getTime() - requireStart),
+                    'timingLabel'    : 'c6',
+                    'page'  : '/exp/' + experience.id + '/?context=jsonp',
                     'title' : experience.data.title
                 });
                 /* jshint camelcase:true */

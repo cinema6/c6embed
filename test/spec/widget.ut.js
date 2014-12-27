@@ -632,7 +632,8 @@
                                         expect(minireel.standalone).toBe(false);
                                         expect(minireel.config).toEqual({
                                             exp: experience.id,
-                                            title: experience.data.title
+                                            title: experience.data.title,
+                                            context: 'mr2'
                                         });
                                     });
                                 });
