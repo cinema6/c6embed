@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.12.0 (December 29, 2014)
+* [FEATURE]: Adding user timings to embed
+
 ## v2.11.0 (December 22, 2014)
 * [FEATURE]: Adding lots additional GA properties for the Player
 * [FIX]: Changed GA error report to make it cleaner for analysis when SponsoredCard trimmed
