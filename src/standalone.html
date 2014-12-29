@@ -6,6 +6,7 @@
             (function() {
                 'use strict';
 
+                window._c6InitTime = (new Date()).getTime();
                 var isProduction = (/^(www\.)?cinema6\.com$/).test(window.location.hostname),
                     base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
                     params = window.location.search.replace(/^\?/, '')
@@ -175,7 +176,8 @@
             } else {
                 window.__C6_DEBUG__ = true;
                 window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
-                writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
+                //writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
+                writeScript('c6embed.js');
             }
         </script>
     </head>
@@ -282,6 +284,15 @@
                         'page'  : '/embed/' + experience.id + '/',
                         'title' : experience.data.title
                     });
+                    
+                    window.__c6_ga__(embedTracker + '.send', 'timing', {
+                        'timingCategory' : 'API',
+                        'timingVar'      : 'fetchExperience',
+                        'timingValue'    : ((new Date()).getTime() - window._c6InitTime),
+                        'timingLabel'    : 'c6',
+                        'page'  : '/exp/' + experience.id + '/?context=standalone',
+                        'title' : experience.data.title
+                    });
                 }());
 
                 experience.data.mode = (function() {
@@ -304,7 +315,9 @@
                     splashDelegate: {},
                     config: {
                         exp: experience.id,
-                        title: experience.data.title
+                        title: experience.data.title,
+                        showStartTime: window._c6InitTime ,
+                        context: 'standalone'
                     }
                 }) - 1]);
             }());

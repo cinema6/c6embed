@@ -238,6 +238,7 @@
             }());
 
             function MiniReelConfig(experience, splash, trackingUrl) {
+                var self = this;
                 this.load = false;
                 this.preload = false;
 
@@ -251,6 +252,7 @@
                             src: trackingUrl
                         }));
 
+                        self.config.showStartTime = (new Date()).getTime();
                         return c6.loadExperience.apply(c6, arguments);
                     }
                 }, this, splash);
@@ -258,7 +260,8 @@
 
                 this.config = {
                     exp: experience.id,
-                    title: experience.data.title
+                    title: experience.data.title,
+                    context: 'mr2'
                 };
             }
 
@@ -271,7 +274,8 @@
                     context: 'mr2',
                     branding: config.branding,
                     placementId: config.adPlacementId
-                });
+                }),
+                requireStart = (new Date()).getTime();
 
                 c6.require(configs.map(function(item) {
                     return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
@@ -334,6 +338,15 @@
                             'page'  : '/embed/' + experience.id + '/',
                             'title' : experience.data.title,
                             'sessionControl' : 'start'
+                        });
+
+                        $window.__c6_ga__(embedTracker + '.send', 'timing', {
+                            'timingCategory' : 'API',
+                            'timingVar'      : 'fetchExperience',
+                            'timingValue'    : ((new Date()).getTime() - requireStart),
+                            'timingLabel'    : 'c6',
+                            'page'  : '/exp/' + experience.id + '/?context=mr2',
+                            'title' : experience.data.title
                         });
                         /* jshint camelcase:true */
                     });

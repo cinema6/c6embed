@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <title>My Awesome Blog</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+        <script src="//lib.cinema6.com/jquery/2.0.3-0-gf576d00/jquery.js"></script>
+        <script>
+            window.__C6_DEBUG__     = true;
+            window.__C6_APP_JS__    = 'c6embed.js';
+        </script>
+    </head>
+    <body>
+        <article>
+
+        <button id="request">Make JSONP Request</button>
+
+        <h1 id="title"></h1>
+
+        <img id="image" style="display: block;" />
+
+        <button id="launch" style="display: none;">Launch</button>
+        
+        <h5>Parameters</h5>
+        <p id="params"></p>
+
+        <h5>Full Payload</h5>
+        <p id="payload"></p>
+
+        </article>
+        <script>
+            $(function () {
+                // The JSONP Endpoint
+                    var endpoint = 'cinema6-jsonp.js?callback=onC6AdLoad&id=3378414';
+                function printJSON(object) {
+                    return JSON.stringify(object, null, '    ')
+                        .replace(/ /g, '&nbsp;')
+                        .replace(/\n/g, '<br />');
+                }
+
+                window.onC6AdLoad = function (payload) {
+                    var data = payload.items[0];
+                    $('#payload').html(printJSON(payload));
+                    $('#title').text(data.title);
+                    $('#params').html(printJSON(payload.params));
+                    $('#request').hide();
+                    $('#image').attr('src',data.image);
+                    $('#launch').show().click(function () { c6.loadExperienceById(data.id); }); 
+                };
+                $('body').append(['<script src="', endpoint, '"><', '/script>'].join(''));
+            }());
+        </script>
+    </body>
+</html>

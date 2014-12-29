@@ -239,18 +239,21 @@ describe('cinema6-jsonp.js', function() {
                         experience: {
                             id: 'e-c0fe92d7aeca1e'
                         },
+                        config : {},
                         trackingUrl: 'http://c6.co/8924htfn37848r43.jpg'
                     };
                     two = {
                         experience: {
                             id: 'e-4a2418dd5c0196'
                         },
+                        config : {},
                         trackingUrl: 'http://c6.co/9204uru89r44.jpg'
                     };
                     three = {
                         experience: {
                             id: 'e-99c243954c7966'
                         },
+                        config : {},
                         trackingUrl: 'http://c6.co/9384utf304r4f.jpg'
                     };
 

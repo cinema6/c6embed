@@ -28,12 +28,15 @@
         },
         standalone: {
             files: [
-                'src/standalone.html'
+                'src/standalone.html',
+                'src/**/*.js',
+                'lib/**/*.js',
+                'lite/**/*.js'
             ],
             options: {
                 livereload: true
             },
-            tasks: ['copy:standalone']
+            tasks: ['browserify:server', 'copy:standalone']
         },
         preview: {
             files: [
@@ -54,7 +57,7 @@
             options: {
                 livereload: true
             },
-            tasks: ['copy:jsonp']
+            tasks: ['browserify:server','copy:jsonp']
         },
         unit: {
             files: [
