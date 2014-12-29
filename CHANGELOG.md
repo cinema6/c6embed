@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.12.1 (December 29, 2014)
+* [FIX]: Fix for an issue that caused the standalone player not to work
+  in staging
+
 ## v2.12.0 (December 29, 2014)
 * [FEATURE]: Adding user timings to embed
 
