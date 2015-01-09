@@ -115,7 +115,7 @@
 
         return modules;
     }
-    
+
     c6.require = require;
 
     function complete(object, defaults) {
@@ -273,7 +273,8 @@
                 var queryParams = toQueryParams({
                     context: 'mr2',
                     branding: config.branding,
-                    placementId: config.adPlacementId
+                    placementId: config.adPlacementId,
+                    wildCardPlacement: config.wp
                 }),
                 requireStart = (new Date()).getTime();
 
