@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Make wildcard placement id overridable from mr2 configuration
+
 ## v2.12.1 (December 29, 2014)
 * [FIX]: Fix for an issue that caused the standalone player not to work
   in staging

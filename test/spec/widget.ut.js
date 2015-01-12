@@ -489,6 +489,39 @@
                                     });
                                 });
 
+                                describe('if a wildCardPlacement is specified', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710',
+                                            adPlacementId: '3330123',
+                                            wp: '3464003'
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&placementId=3330123&wildCardPlacement=3464003';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should load MiniReels with a placementId', function() {
+                                        minireels.forEach(function(experience) {
+                                            expect(experience.data).toEqual(jasmine.any(Object));
+                                        });
+                                    });
+                                });
+
                                 describe('if the widget is visible', function() {
                                     it('should preload all of its minireels', function() {
                                         expect(c6.loadExperience.calls.count()).toBe(3);
