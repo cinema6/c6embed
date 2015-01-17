@@ -503,12 +503,12 @@
                         });
 
                         it('should call GA',function(){
-                            expect($window.__c6_ga__.calls.argsFor(2)).toEqual(['68cde3e4177b8a.send','event',{ eventCategory: 'Display', eventAction: 'Show', eventLabel: undefined, page: '/embed/e-68cde3e4177b8a/', title: undefined }]);
+                            expect($window.__c6_ga__.calls.argsFor(2)).toEqual(['68cde3e4177b8a.send','event',{ eventCategory: 'Display', eventAction: 'Show', eventLabel: undefined}]);
                             
                             expect($window.__c6_ga__.calls.argsFor(3)[0]).toEqual('68cde3e4177b8a.send'); 
                             expect($window.__c6_ga__.calls.argsFor(3)[1]).toEqual('timing');
 
-                            expect($window.__c6_ga__.calls.argsFor(3)[2]).toEqual(jasmine.objectContaining({ timingCategory: 'UX', timingVar: 'showPlayer', timingLabel: 'embed', page: '/exp/e-68cde3e4177b8a/?context=embed'}));
+                            expect($window.__c6_ga__.calls.argsFor(3)[2]).toEqual(jasmine.objectContaining({ timingCategory: 'UX', timingVar: 'showPlayer', timingLabel: 'embed'}));
                         });
                     });
 
@@ -595,6 +595,9 @@
 
                     beforeEach(function(){
                         $window.c6.gaAcctIdPlayer = 'abc';
+                        settings.config.container = 'test';
+                        settings.config.context = 'test';
+                        settings.config.adId = 'xyz';
                         tracker = {
                             get : jasmine.createSpy('tracker.get')
                         };
@@ -608,7 +611,7 @@
                         $window.__c6_ga__.calls.argsFor(1)[0]();
                         expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
                         expect(tracker.get).toHaveBeenCalledWith('clientId');
-                        expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id' } );
+                        expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id', container: 'test', context: 'test', group: 'xyz' } );
                     });
 
                     it('sends no ping if it gets no clientId',function(){

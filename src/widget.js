@@ -30,11 +30,12 @@
                 }, $document.head));
             },
 
-            addReel: function(expId, placementId, clickUrl) {
+            addReel: function(expId, placementId, clickUrl, adId) {
                 return (this.widgetContentCache[placementId] ||
                     (this.widgetContentCache[placementId] = [])).push({
                         expId: expId,
-                        clickUrl: clickUrl
+                        clickUrl: clickUrl,
+                        adId: adId
                     });
             },
 
@@ -237,7 +238,7 @@
                 );
             }());
 
-            function MiniReelConfig(experience, splash, trackingUrl) {
+            function MiniReelConfig(experience, splash, trackingUrl, adId, container) {
                 var self = this;
                 this.load = false;
                 this.preload = false;
@@ -261,7 +262,9 @@
                 this.config = {
                     exp: experience.id,
                     title: experience.data.title,
-                    context: 'mr2'
+                    context: 'mr2',
+                    container: container,
+                    adId : adId
                 };
             }
 
@@ -274,7 +277,8 @@
                     context: 'mr2',
                     branding: config.branding,
                     placementId: config.adPlacementId,
-                    wildCardPlacement: config.wp
+                    wildCardPlacement: config.wp,
+                    container: config.container
                 }),
                 requireStart = (new Date()).getTime();
 
@@ -291,7 +295,9 @@
                                 return new MiniReelConfig(
                                     experience,
                                     splashPages[index],
-                                    configs[index].clickUrl
+                                    configs[index].clickUrl,
+                                    configs[index].adId,
+                                    config.container
                                 );
                             }),
                         extraSplashPages = (minireels.length === splashPages.length) ?
@@ -314,7 +320,17 @@
                     minireels.forEach(function(minireel) {
                         var experience = minireel.experience,
                             splash = minireel.embed,
-                            embedTracker = experience.id.replace(/^e-/, '');
+                            embedTracker = experience.id.replace(/^e-/, ''),
+                            pagePath = (function(e,q){
+                                var r='/embed/'+e+'/',p,qf=[];
+                                for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
+                                if (qf.length){ r += '?' + qf.join('&'); }
+                                return r;
+                            }(experience.id,{
+                                ct:minireel.config.container,
+                                cx:minireel.config.context,
+                                gp:minireel.config.adId
+                            }));
 
                         loadBrandingStyles(experience.data.branding);
                         splash.className += ' c6brand__' + experience.data.branding;
@@ -332,12 +348,12 @@
                         $window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
                         $window.__c6_ga__(embedTracker + '.set',{
+                            'page'  : pagePath,
+                            'title' : experience.data.title,
                             'dimension1' : $window.location.href
                         });
 
                         $window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                            'page'  : '/embed/' + experience.id + '/',
-                            'title' : experience.data.title,
                             'sessionControl' : 'start'
                         });
 
@@ -345,9 +361,7 @@
                             'timingCategory' : 'API',
                             'timingVar'      : 'fetchExperience',
                             'timingValue'    : ((new Date()).getTime() - requireStart),
-                            'timingLabel'    : 'c6',
-                            'page'  : '/exp/' + experience.id + '/?context=mr2',
-                            'title' : experience.data.title
+                            'timingLabel'    : 'c6'
                         });
                         /* jshint camelcase:true */
                     });

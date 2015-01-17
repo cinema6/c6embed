@@ -428,7 +428,8 @@
                                             for (var key in config) {
                                                 result[key.replace(/^data-/, '')] = config[key];
                                             }
-
+                                            result.context = 'embed';
+                                            result.container = (result.container || 'embed');
                                             result.script = $script[0];
                                             result.src = $script.attr('src');
                                             result.responsive = !result.height;

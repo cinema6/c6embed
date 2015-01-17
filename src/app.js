@@ -82,10 +82,7 @@ module.exports = function(deps) {
                             'timingCategory' : 'API',
                             'timingVar'      : 'fetchSponsoredCards',
                             'timingValue'    : ((new Date()).getTime() - startFetch),
-                            'timingLabel'    : 'adtech',
-                            'page'  : '/exp/' + settings.config.exp + '/?context=' +
-                                settings.config.context,
-                            'title' : settings.config.title
+                            'timingLabel'    : 'adtech'
                         });
                         return document;
                     });
@@ -145,11 +142,13 @@ module.exports = function(deps) {
                     }catch(e){
 
                     }
-
                     if (clientId){
                         session.ping('initAnalytics',{
                             accountId: window.c6.gaAcctIdPlayer,
-                            clientId:   clientId
+                            clientId:   clientId,
+                            container:  settings.config.container,
+                            context:    settings.config.context,
+                            group:      settings.config.adId
                         });
                     }
                 });
@@ -195,9 +194,7 @@ module.exports = function(deps) {
                     window.__c6_ga__(embedTracker + '.send', 'event', {
                         'eventCategory' : 'Display',
                         'eventAction'   : 'Show',
-                        'eventLabel'    : settings.config.title,
-                        'page'  : '/embed/' + settings.config.exp + '/',
-                        'title' : settings.config.title
+                        'eventLabel'    : settings.config.title
                     });
                     $iframe.show();
                     callDelegate('didHide');
@@ -213,10 +210,7 @@ module.exports = function(deps) {
                             'timingVar'      : (preload ? 'showPreloadedPlayer' : 'showPlayer'),
                             'timingValue'    : ((new Date()).getTime() -
                                 settings.config.showStartTime),
-                            'timingLabel'    : settings.config.context,
-                            'page'  : '/exp/' + settings.config.exp + '/?context=' +
-                                settings.config.context,
-                            'title' : settings.config.title
+                            'timingLabel'    : settings.config.context
                         });
                     }
                     
@@ -266,9 +260,7 @@ module.exports = function(deps) {
                     window.__c6_ga__(embedTracker + '.send', 'event', {
                         'eventCategory' : 'Error',
                         'eventAction'   : 'Embed.App',
-                        'eventLabel'    : stringifyError(err),
-                        'page'  : '/embed/' + settings.config.exp + '/',
-                        'title' : (experience.data && experience.data.title) || 'Error'
+                        'eventLabel'    : stringifyError(err)
                     });
                     return Q.reject(err);
                     /* jshint camelcase:true */
