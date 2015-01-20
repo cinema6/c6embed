@@ -666,7 +666,9 @@
                                         expect(minireel.config).toEqual({
                                             exp: experience.id,
                                             title: experience.data.title,
-                                            context: 'mr2'
+                                            context: 'mr2',
+                                            container: undefined,
+                                            adId: undefined
                                         });
                                     });
                                 });
@@ -723,12 +725,12 @@
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.require', 'displayfeatures');
 
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', {
+                                            page: '/embed/' + experience.id + '/?cx=mr2',
+                                            title: experience.data.title,
                                             dimension1: $window.location.href
                                         });
 
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.send', 'pageview', {
-                                            page: '/embed/' + experience.id + '/',
-                                            title: experience.data.title,
                                             sessionControl: 'start'
                                         });
                                     });
@@ -767,20 +769,23 @@
                         desired = [
                             {
                                 expId: 'e-317748a42e861b',
-                                clickUrl: 'track.me/tr-efe96eb03f3bee'
+                                clickUrl: 'track.me/tr-efe96eb03f3bee',
+                                adId: 'xyz'
                             },
                             {
                                 expId: 'e-a3f0967a8afc16',
-                                clickUrl: 'track.me/tr-c89b0839cecb08'
+                                clickUrl: 'track.me/tr-c89b0839cecb08',
+                                adId: 'xyz'
                             },
                             {
                                 expId: 'e-388f7b044c82e0',
-                                clickUrl: 'track.me/tr-c0d1bf9f330410'
+                                clickUrl: 'track.me/tr-c0d1bf9f330410',
+                                adId: 'xyz'
                             }
                         ];
 
                         desired.forEach(function(config) {
-                            c6.addReel(config.expId, '3330799', config.clickUrl);
+                            c6.addReel(config.expId, '3330799', config.clickUrl, 'xyz');
                         });
                     });
 

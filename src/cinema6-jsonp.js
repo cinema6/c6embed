@@ -100,12 +100,13 @@
                     src: appJs
                 }, document.head));
             },
-            addReel: function(id, placement, clickUrl) {
+            addReel: function(id, placement, clickUrl, adId) {
                 var cache = this.widgetContentCache;
 
                 (cache[placement] || (cache[placement] = [])).push({
                     expId: id,
-                    clickUrl: clickUrl
+                    clickUrl: clickUrl,
+                    adId : adId
                 });
             },
             loadExperienceById: function(id) {
@@ -205,7 +206,7 @@
     /**********************************************************************************************
      * Represents a MiniReel that has been loaded. These will go in the c6.embeds array.
      *********************************************************************************************/
-    function MiniReelConfig(experience, trackingUrl) {
+    function MiniReelConfig(experience, trackingUrl, adId, context, ctr) {
         this.load = false;
         this.preload = false;
 
@@ -218,7 +219,10 @@
         this.trackingUrl = trackingUrl;
         this.config = {
             exp: experience.id,
-            title: experience.data.title
+            title: experience.data.title,
+            container: ctr,
+            context: context,
+            adId: adId
         };
     }
 
@@ -243,11 +247,23 @@
             var experiences = Array.prototype.slice.call(arguments);
 
             c6.embeds.push.apply(c6.embeds, experiences.map(function(experience, index) {
-                return new MiniReelConfig(experience, items[index].clickUrl);
+                return new MiniReelConfig(experience,items[index].clickUrl,items[index].adId,
+                    'jsonp',params.src);
             }));
 
-            experiences.forEach(function(experience) {
-                var embedTracker = experience.id.replace(/^e-/, '');
+            c6.embeds.forEach(function(minireel) {
+                var experience = minireel.experience,
+                    embedTracker = experience.id.replace(/^e-/, ''),
+                    pagePath = (function(e,q){
+                        var r='/embed/'+e+'/',p,qf=[];
+                        for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
+                        if (qf.length){ r += '?' + qf.join('&'); }
+                        return r;
+                    }(experience.id,{
+                        cx:minireel.config.context,
+                        ct:minireel.config.container,
+                        gp:minireel.config.adId
+                    }));
 
                 /* jshint camelcase:false */
                 window.__c6_ga__('create', c6.gaAcctIdEmbed, {
@@ -257,12 +273,12 @@
                 window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
                 window.__c6_ga__(embedTracker + '.set',{
+                    'page'  : pagePath,
+                    'title' : experience.data.title,
                     'dimension1' : window.location.href
                 });
 
                 window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                    'page'  : '/embed/' + experience.id + '/',
-                    'title' : experience.data.title,
                     'sessionControl' : 'start'
                 });
                
@@ -270,18 +286,14 @@
                 window.__c6_ga__(embedTracker + '.send', 'event', {
                     'eventCategory' : 'Display',
                     'eventAction'   : 'Visible',
-                    'eventLabel'    : experience.data.title,
-                    'page'  : '/embed/' + experience.id + '/',
-                    'title' : experience.data.title
+                    'eventLabel'    : experience.data.title
                 });
                 
                 window.__c6_ga__(embedTracker + '.send', 'timing', {
                     'timingCategory' : 'API',
                     'timingVar'      : 'fetchExperience',
                     'timingValue'    : ((new Date()).getTime() - requireStart),
-                    'timingLabel'    : 'c6',
-                    'page'  : '/exp/' + experience.id + '/?context=jsonp',
-                    'title' : experience.data.title
+                    'timingLabel'    : 'c6'
                 });
                 /* jshint camelcase:true */
             });

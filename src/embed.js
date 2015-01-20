@@ -81,7 +81,8 @@
 
                 result[attribute] = attribute in result;
             }
-
+            result.context = 'embed';
+            result.container = (result.container || 'embed');
             result.script = script;
             result.responsive = !result.height;
             result.splash = (function() {
@@ -190,9 +191,7 @@
         window.__c6_ga__(embedTracker + '.send', 'event', {
             'eventCategory' : 'Display',
             'eventAction'   : 'Visible',
-            'eventLabel'    : settings.config.title,
-            'page'  : '/embed/' + settings.config.exp + '/',
-            'title' : settings.config.title
+            'eventLabel'    : settings.config.title
         });
         /* jshint camelcase:true */
     }
@@ -295,19 +294,18 @@
         })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
         /* jshint sub:false, asi:false, expr:false, indent:4 */
 
-        var embedTracker = config.exp.replace(/e-/,'');
+        var embedTracker = config.exp.replace(/e-/,''),
+            pagePath = (function(e,q){
+                var r='/embed/'+e+'/',p,qf=[];
+                for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
+                if (qf.length){ r += '?' + qf.join('&'); }
+                return r;
+            }(config.exp,{cx:config.context,ct:config.container}));
 
         window.__c6_ga__('create', c6.gaAcctIdPlayer, {
             'name'       : 'c6',
             'cookieName' : '_c6ga'
         });
-        /*
-        window.__c6_ga__('c6.require', 'displayfeatures');
-
-        window.__c6_ga__('c6.set',{
-            'dimension11' : window.location.href
-        });
-        */
 
         window.__c6_ga__('create', c6.gaAcctIdEmbed, {
             'name'       : embedTracker,
@@ -316,12 +314,12 @@
         window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
         window.__c6_ga__(embedTracker + '.set',{
-            'dimension1' : window.location.href
+            'dimension1' : window.location.href,
+            'page'  : pagePath,
+            'title' : config.title
         });
 
         window.__c6_ga__(embedTracker + '.send', 'pageview', {
-            'page'  : '/embed/' + config.exp + '/',
-            'title' : config.title,
             'sessionControl' : 'start'
         });
         /* jshint camelcase:true */
@@ -362,9 +360,7 @@
                     'timingCategory' : 'API',
                     'timingVar'      : 'fetchExperience',
                     'timingValue'    : ((new Date()).getTime() - requireStart),
-                    'timingLabel'    : 'c6',
-                    'page'  : '/exp/' + experience.id + '/?context=embed',
-                    'title' : experience.data.title
+                    'timingLabel'    : 'c6'
                 });
             }
             /* jshint camelcase:true */
@@ -412,9 +408,7 @@
             window.__c6_ga__(embedTracker + '.send', 'event', {
                 'eventCategory' : 'Error',
                 'eventAction'   : 'Embed',
-                'eventLabel'    : err.message,
-                'page'  : '/embed/' + settings.config.exp + '/',
-                'title' : settings.config.title || 'Error'
+                'eventLabel'    : err.message
             });
             /* jshint camelcase:true */
             throw err;

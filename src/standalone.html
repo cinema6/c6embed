@@ -25,6 +25,7 @@
                     c6 = window.c6 = {
                         isProduction: isProduction,
                         embeds: [],
+                        params : params,
                         gaAcctIdPlayer: (function(acc,mi,mx){
                             return acc+'-'+parseInt(
                                 ((Math.random()*999999999)%(mx-mi+1))+mi,10
@@ -259,7 +260,13 @@
                 }
 
                 (function() {
-                    var embedTracker = experience.id.replace(/^e-/, '');
+                    var embedTracker = experience.id.replace(/^e-/, ''),
+                        pagePath = (function(e,q){
+                            var r='/embed/'+e+'/',p,qf=[];
+                            for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
+                            if (qf.length){ r += '?' + qf.join('&'); }
+                            return r;
+                        }(experience.id,{cx:'standalone',ct:c6.params.src}));
 
                     window.__c6_ga__('create', c6.gaAcctIdEmbed, {
                         'name'       : embedTracker,
@@ -268,30 +275,26 @@
                     window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
                     window.__c6_ga__(embedTracker + '.set',{
-                        'dimension1' : window.location.href
+                        'dimension1' : window.location.href,
+                        'page'  : pagePath,
+                        'title' : experience.data.title
                     });
 
                     window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                        'page'  : '/embed/' + experience.id + '/',
-                        'title' : experience.data.title,
                         'sessionControl' : 'start'
                     });
                     
                     window.__c6_ga__(embedTracker + '.send', 'event', {
                         'eventCategory' : 'Display',
                         'eventAction'   : 'Visible',
-                        'eventLabel'    : experience.data.title,
-                        'page'  : '/embed/' + experience.id + '/',
-                        'title' : experience.data.title
+                        'eventLabel'    : experience.data.title
                     });
                     
                     window.__c6_ga__(embedTracker + '.send', 'timing', {
                         'timingCategory' : 'API',
                         'timingVar'      : 'fetchExperience',
                         'timingValue'    : ((new Date()).getTime() - window._c6InitTime),
-                        'timingLabel'    : 'c6',
-                        'page'  : '/exp/' + experience.id + '/?context=standalone',
-                        'title' : experience.data.title
+                        'timingLabel'    : 'c6'
                     });
                 }());
 
@@ -317,6 +320,7 @@
                         exp: experience.id,
                         title: experience.data.title,
                         showStartTime: window._c6InitTime ,
+                        container:c6.params.src,
                         context: 'standalone'
                     }
                 }) - 1]);
