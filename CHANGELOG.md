@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.13.0 (January 20, 2015)
 * [FEATURE]: Adding context,container and MR2 group ids to GA hits reports
 * [FEATURE]: Sening context,container and MR2 group id into the player on initAnalytics ping
 * [FEATURE]: Make wildcard placement id overridable from mr2 configuration
