@@ -17,7 +17,7 @@ module.exports = function(deps) {
     var c6 = window.c6,
         embeds = c6.embeds,
         noop = function() {};
-
+    
     function initialize(embeds) {
         return Q.all(embeds.map(function(settings) {
             return settings.load ?
@@ -31,7 +31,9 @@ module.exports = function(deps) {
     }
 
     c6.loadExperience = function(settings, preload) {
-        var promise;
+        var defaultAdNetwork = window.__C6_AD_NETWORK__ || '5473.1',
+            defaultAdServer  = window.__C6_AD_SERVER__  || 'adserver.adtechus.com',
+            promise;
 
         function bootstrap() {
             var experience = settings.experience,
@@ -48,6 +50,12 @@ module.exports = function(deps) {
                 appFolder = appUrl(experience.appUri + '/'),
                 state = null,
                 getSessionDeferred = Q.defer();
+
+            experience.data.adServer = experience.data.adServer || {};
+            experience.data.adServer.network =
+                experience.data.adServer.network || defaultAdNetwork;
+            experience.data.adServer.server =
+                experience.data.adServer.server || defaultAdServer;
 
             function insertIframe() {
                 $container.append($iframe);

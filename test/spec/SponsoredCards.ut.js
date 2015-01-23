@@ -33,6 +33,10 @@
                 id: 'e-1234',
                 title: 'TestExp',
                 data: {
+                    adServer : {
+                        network : '5473.1',
+                        server : 'adserver.adtechus.com'
+                    },
                     wildCardPlacement: '1234',
                     deck: [
                         { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
@@ -63,7 +67,7 @@
                     spyOn(_private, 'makeAdCall').and.returnValue(q());
                 });
                 
-                it('should load adtech and make ad calls for each sponsored card', function(done) {
+                it('should load adtech and make ad calls for each sponsored card with default adtech network', function(done) {
                     spCards.fetchSponsoredCards(experience).then(function() {
                         expect(_private.getCardConfigs).toHaveBeenCalledWith(experience);
                         expect(window.c6.cardCache).toEqual({ 1234: {} });
@@ -81,6 +85,32 @@
                             {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, 1234, adtech);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
                             {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, 1234, adtech);
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should load adtech and make ad calls with passed network', function(done) {
+                    experience.data.adServer.network = '4444.4' ;
+                    spCards.fetchSponsoredCards(experience).then(function() {
+                        expect(_private.loadAdtech).toHaveBeenCalled();
+                        expect(adtech.config.page).toEqual({
+                            network: '4444.4',
+                            server: 'adserver.adtechus.com'
+                        });
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should load adtech and make ad calls with passed server', function(done) {
+                    experience.data.adServer.server = 'somehost.com' ;
+                    spCards.fetchSponsoredCards(experience).then(function() {
+                        expect(_private.loadAdtech).toHaveBeenCalled();
+                        expect(adtech.config.page).toEqual({
+                            network: '5473.1',
+                            server: 'somehost.com'
+                        });
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);

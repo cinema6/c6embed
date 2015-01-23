@@ -344,6 +344,50 @@
                 }));
             });
 
+            it('should add a default adServer to experience', function(){
+                expect(experience.data.adServer).toEqual({
+                    network : '5473.1',
+                    server : 'adserver.adtechus.com'
+                });
+            });
+            
+            describe('if __C6_AD_... is set use it as default', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    delete experience.data.adServer;
+
+                    $window.__C6_AD_NETWORK__ = '1111.1';
+                    $window.__C6_AD_SERVER__  = 'somehost.com';
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+                
+                it('should add a default adServer to experience', function(){
+                    expect(experience.data.adServer).toEqual({
+                        network : '1111.1',
+                        server : 'somehost.com'
+                    });
+                });
+            });
+
+            describe('if experience has adServer use it', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    experience.data.adServer = {
+                        network : 'hbo',
+                        server  : 'big'
+                    };
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+                
+                it('should add a default adServer to experience', function(){
+                    expect(experience.data.adServer).toEqual({
+                        network : 'hbo',
+                        server : 'big'
+                    });
+                });
+            });
+
             it('should put the iframe in the embed container', function() {
                 expect(settings.embed.childNodes[1]).toBe($iframe[0]);
             });
