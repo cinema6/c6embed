@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.14.0 (January 23, 2015)
 * [FEATURE]: Making adtech network and server address somewhat more configurable
 
 ## v2.13.0 (January 20, 2015)
