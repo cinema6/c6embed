@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Making adtech network and server address somewhat more configurable
+
 ## v2.13.0 (January 20, 2015)
 * [FEATURE]: Adding context,container and MR2 group ids to GA hits reports
 * [FEATURE]: Sening context,container and MR2 group id into the player on initAnalytics ping
