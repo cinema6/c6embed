@@ -17,6 +17,9 @@ module.exports = function(deps) {
     var c6 = window.c6,
         embeds = c6.embeds,
         noop = function() {};
+    
+    var defaultDisplayNetwork = window.__C6_DSP_NETWORK__ || '5473.1',
+        defaultDisplayServer  = window.__C6_DSP_SERVER__  || 'adserver.adtechus.com';
 
     function initialize(embeds) {
         return Q.all(embeds.map(function(settings) {
@@ -48,6 +51,12 @@ module.exports = function(deps) {
                 appFolder = appUrl(experience.appUri + '/'),
                 state = null,
                 getSessionDeferred = Q.defer();
+
+            experience.data.displayServer = experience.data.displayServer || {};
+            experience.data.displayServer.network =
+                experience.data.displayServer.network || defaultDisplayNetwork;
+            experience.data.displayServer.server =
+                experience.data.displayServer.server || defaultDisplayServer;
 
             function insertIframe() {
                 $container.append($iframe);

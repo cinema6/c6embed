@@ -257,7 +257,7 @@
             });
         });
 
-        describe('c6.loadExperience(settings, preload)', function() {
+        ddescribe('c6.loadExperience(settings, preload)', function() {
             var settings,
                 $embed,
                 promise,
@@ -342,6 +342,29 @@
                     responsiveStyles: null,
                     active: jasmine.any(Boolean)
                 }));
+            });
+
+            it('should add a default displayServer to experience', function(){
+                expect(experience.data.displayServer).toEqual({
+                    network : '5473.1',
+                    server : 'adserver.adtechus.com'
+                });
+            });
+            
+            describe('if __C6_DSP_NETWORK__ is set', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+
+                    $window.__C6_DSP_NETWORK__ = '1111.1';
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+                
+                it('should add a default displayServer to experience', function(){
+                    expect(experience.data.displayServer).toEqual({
+                        network : '5473.1',
+                        server : 'adserver.adtechus.com'
+                    });
+                });
             });
 
             it('should put the iframe in the embed container', function() {
