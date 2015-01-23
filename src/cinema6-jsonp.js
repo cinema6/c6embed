@@ -7,6 +7,8 @@
      */
     var baseUrl = window.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs   = window.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        adNetwork = window.__C6_AD_NETWORK__ || '5473.1',
+        adServer  = window.__C6_AD_SERVER__  || 'adserver.adtechus.com',
         c6 = window.c6 = complete(window.c6 || {}, {
             app: null,
             embeds: [],
@@ -356,8 +358,8 @@
         adtech
     ) {
         adtech.config.page = {
-            network: '5473.1',
-            server: 'adserver.adtechus.com',
+            network: adNetwork,
+            server: adServer,
             enableMultiAd: true
         };
 

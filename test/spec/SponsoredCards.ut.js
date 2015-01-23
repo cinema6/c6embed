@@ -33,7 +33,7 @@
                 id: 'e-1234',
                 title: 'TestExp',
                 data: {
-                    displayServer : {
+                    adServer : {
                         network : '5473.1',
                         server : 'adserver.adtechus.com'
                     },
@@ -91,7 +91,7 @@
                 });
                 
                 it('should load adtech and make ad calls with passed network', function(done) {
-                    experience.data.displayServer.network = '4444.4' ;
+                    experience.data.adServer.network = '4444.4' ;
                     spCards.fetchSponsoredCards(experience).then(function() {
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(adtech.config.page).toEqual({
@@ -104,7 +104,7 @@
                 });
                 
                 it('should load adtech and make ad calls with passed server', function(done) {
-                    experience.data.displayServer.server = 'somehost.com' ;
+                    experience.data.adServer.server = 'somehost.com' ;
                     spCards.fetchSponsoredCards(experience).then(function() {
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(adtech.config.page).toEqual({
