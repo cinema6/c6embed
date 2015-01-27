@@ -170,6 +170,8 @@
                 window.writeScript = writeScript;
 
                 writeScript(base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
+                    branding: params.branding,
+                    placementId: params.adPlacementId,
                     container: c6.params.src,
                     wildCardPlacement: params.wp
                 }));

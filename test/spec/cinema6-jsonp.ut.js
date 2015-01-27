@@ -410,12 +410,12 @@ describe('cinema6-jsonp.js', function() {
                     load(function() {
                         adtech.config.placements['108542'].complete();
                         done();
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&count=3&src=veeseo&cb=' + Date.now());
+                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
                 });
 
                 it('should fetch minireels from the content service with additional params', function(done) {
                     waitForDeps(expIds.map(function(id) {
-                        return baseUrl + '/api/public/content/experience/' + id + '.js?branding=techcrunch&placementId=12345&container=veeseo';
+                        return baseUrl + '/api/public/content/experience/' + id + '.js?branding=techcrunch&placementId=12345&wildCardPlacement=333&container=veeseo';
                     }), function(experiences) {
                         expect(experiences.length).toBe(4);
                         experiences.forEach(function(exp){

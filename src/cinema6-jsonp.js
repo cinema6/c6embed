@@ -238,6 +238,7 @@
         var query = toQueryParams({
             branding: params.branding,
             placementId: params.adPlacementId,
+            wildCardPlacement: params.wp,
             container: params.src
         }),
         requireStart = (new Date()).getTime();

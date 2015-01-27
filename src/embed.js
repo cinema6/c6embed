@@ -348,7 +348,10 @@
             })
             .join('&');
     }({
-        container : config.container
+        container: config.container,
+        branding: config.branding,
+        placementId: config.adPlacementId,
+        wildCardPlacement: config.wp
     }));
     c6.require([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
