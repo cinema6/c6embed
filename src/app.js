@@ -47,7 +47,8 @@ module.exports = function(deps) {
                     kMode: browserInfo.profile.device !== 'phone' ?
                         experience.data.mode : 'mobile'
                 },
-                appFolder = appUrl(experience.appUri + '/'),
+                appFolder = (window.__C6_APP_FOLDER__ || appUrl(experience.appUri)) + '/',
+                appPath = appFolder + (window.__C6_APP_FILE__ || (appConfig.kMode + '.html')),
                 state = null,
                 getSessionDeferred = Q.defer();
 
@@ -62,7 +63,7 @@ module.exports = function(deps) {
             }
 
             function fetchApp() {
-                return c6Ajax.get(appFolder + appConfig.kMode + '.html')
+                return c6Ajax.get(appPath)
                     .then(function parse(response) {
                         if (!response.data) {
                             throw new Error(
