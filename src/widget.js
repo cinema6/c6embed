@@ -218,7 +218,7 @@
 
             return $document.getElementById(id);
         }());
-
+        config.container = config.container || 'mr2';
         loadBrandingStyles(config.branding);
 
         c6.require([
@@ -276,11 +276,10 @@
              */
             function populateWidget(configs) {
                 var queryParams = toQueryParams({
-                    context: 'mr2',
+                    container: config.container,
                     branding: config.branding,
                     placementId: config.adPlacementId,
-                    wildCardPlacement: config.wp,
-                    container: config.container
+                    wildCardPlacement: config.wp
                 }),
                 requireStart = (new Date()).getTime();
 
@@ -294,6 +293,10 @@
                                 return !!experience.data;
                             })
                             .map(function(experience, index) {
+                                if ((!!experience.data.mode) &&
+                                    (!experience.data.mode.match(/lightbox/))){
+                                    experience.data.mode = 'lightbox';
+                                }
                                 return new MiniReelConfig(
                                     experience,
                                     splashPages[index],

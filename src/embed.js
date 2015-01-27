@@ -335,12 +335,26 @@
         target.style.display = 'none';
     }
 
-    var requireStart = (new Date()).getTime();
+    var requireStart = (new Date()).getTime(), queryParams;
+    queryParams = (function (object) {
+        return Object.keys(object)
+            .filter(function(key) {
+                return !!object[key];
+            })
+            .map(function(key) {
+                return [key, object[key]]
+                    .map(encodeURIComponent)
+                    .join('=');
+            })
+            .join('&');
+    }({
+        container : config.container
+    }));
     c6.require([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
         baseUrl + '/collateral/splash/splash.js',
         splashOf(config.splash),
-        baseUrl + '/api/public/content/experience/' + config.exp + '.js'
+        baseUrl + '/api/public/content/experience/' + config.exp + '.js?' + queryParams
     ], function(
         tb,
         splashJS,

@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    describe('embed.js', function() {
+    ddescribe('embed.js', function() {
         var C6Query;
 
         var $;

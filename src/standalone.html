@@ -111,6 +111,10 @@
                         }
                     };
 
+                if (c6.params) {
+                    c6.params.src = c6.params.src || 'standalone'
+                }
+
                 function toQueryParams(object) {
                     return Object.keys(object)
                         .filter(function(key) {
@@ -166,7 +170,7 @@
                 window.writeScript = writeScript;
 
                 writeScript(base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
-                    context: 'standalone',
+                    container: c6.params.src,
                     wildCardPlacement: params.wp
                 }));
             }());
