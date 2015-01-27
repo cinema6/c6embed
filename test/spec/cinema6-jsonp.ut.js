@@ -394,7 +394,7 @@ describe('cinema6-jsonp.js', function() {
             var expIds;
 
             beforeEach(function() {
-                expIds = ['e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed', 'e-60196c3751eb52'];
+                expIds = ['e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed', 'e-60196c3751eb52','e-60196c3751eb52'];
 
                 expIds.forEach(function(id) {
                     c6.addReel(id, '108542', 'http://www.cinema6.com/track/' + id + '.jpg');
@@ -410,14 +410,33 @@ describe('cinema6-jsonp.js', function() {
                     load(function() {
                         adtech.config.placements['108542'].complete();
                         done();
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&count=3&src=veeseo&cb=' + Date.now());
+                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
                 });
 
                 it('should fetch minireels from the content service with additional params', function(done) {
                     waitForDeps(expIds.map(function(id) {
-                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=techcrunch&placementId=12345&container=veeseo';
+                        return baseUrl + '/api/public/content/experience/' + id + '.js?branding=techcrunch&placementId=12345&wildCardPlacement=333&container=veeseo';
                     }), function(experiences) {
-                        expect(experiences.length).toBe(3);
+                        expect(experiences.length).toBe(4);
+                        experiences.forEach(function(exp){
+                            switch(exp.id) {
+                                case 'e-fcb95ef54b22f5':
+                                case 'e-4b843ea93ed9d4':
+                                case 'e-60196c3751eb52':
+                                    {
+                                    expect(exp.data.mode).toEqual('lightbox');
+                                    break;
+                                    }
+                                case 'e-6b5ead50d4a1ed': 
+                                    {
+                                    expect(exp.data.mode).toEqual('lightbox-playlist');
+                                    break;
+                                    }
+                                default:
+                                    expect(exp.data.mode).not
+                                        .toBeDefined();
+                            }
+                        });
 
                         done();
                     });
@@ -429,7 +448,7 @@ describe('cinema6-jsonp.js', function() {
 
                 beforeEach(function(done) {
                     waitForDeps(expIds.map(function(id) {
-                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2';
+                        return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                     }), function(experiences) {
                         exps = experiences;
 
@@ -449,7 +468,7 @@ describe('cinema6-jsonp.js', function() {
                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.require', 'displayfeatures');
 
                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', {
-                            page: '/embed/' + experience.id + '/?cx=jsonp',
+                            page: '/embed/' + experience.id + '/?cx=jsonp&ct=jsonp',
                             title: experience.data.title,
                             dimension1: $window.location.href
                         });
@@ -466,7 +485,8 @@ describe('cinema6-jsonp.js', function() {
                             callback: 'onC6AdLoad',
                             id: 108542,
                             count: 3,
-                            cb: jasmine.any(Number)
+                            cb: jasmine.any(Number),
+                            src: 'jsonp'
                         },
                         items: exps.map(function(exp) {
                             return {
@@ -495,7 +515,7 @@ describe('cinema6-jsonp.js', function() {
                         expect(config.config).toEqual({
                             exp: exp.id,
                             title: exp.data.title,
-                            container: undefined,
+                            container: 'jsonp',
                             context: 'jsonp',
                             adId: undefined
                         });

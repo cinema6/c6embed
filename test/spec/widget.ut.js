@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    describe('widget.js', function() {
+   describe('widget.js', function() {
         var baseUrl, appJs,
             $window, $document,
             $, $env;
@@ -232,7 +232,7 @@
                         });
 
                         it('should put the splash template into the <div>', function() {
-                            expect($('.c6-mr2__mr-splash').length).toBe(3);
+                            expect($('.c6-mr2__mr-splash').length).toBe(4);
                         });
 
                         it('should configure adtech', function() {
@@ -264,7 +264,7 @@
 
                             it('should enqueue enough ads to fill the template', function() {
                                 expect(adtech.enqueueAd).toHaveBeenCalledWith(3330799);
-                                expect(adtech.enqueueAd.calls.count()).toBe(3);
+                                expect(adtech.enqueueAd.calls.count()).toBe(4);
                             });
 
                             it('should execute the queue', function() {
@@ -305,7 +305,7 @@
                                     adtech.config.placements['3330799'].complete();
 
                                     waitForDeps(minireelIds.slice(0, 3).map(function(id) {
-                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
+                                        return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&branding=digitaljournal';
                                     }), function(_minireels) {
                                         minireels = _minireels;
 
@@ -329,7 +329,7 @@
 
                                 beforeEach(function() {
                                     // Simulate another MR2 with our placement ID by adding more MiniReels than we asked for
-                                    minireelIds = ['e-fcb95ef54b22f5', 'e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed', 'e-123', 'e-456', 'e-abc'];
+                                    minireelIds = ['e-fcb95ef54b22f5', 'e-4b843ea93ed9d4', 'e-6b5ead50d4a1ed', 'e-60196c3751eb52', 'e-123', 'e-456', 'e-abc'];
 
                                     minireelIds.forEach(function(id) {
                                         c6.addReel(id, '3330799', 'http://www.cinema6.com/track/' + id + '.jpg');
@@ -341,7 +341,7 @@
                                         adtech.config.placements['3330799'].complete();
 
                                         waitForDeps(minireelIds.slice(0, 3).map(function(id) {
-                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&branding=digitaljournal';
                                         }), function(_minireels) {
                                             minireels = _minireels;
 
@@ -350,7 +350,7 @@
                                     });
 
                                     it('should create embeds for the first round', function() {
-                                        expect(c6.embeds.length).toBe(3);
+                                        expect(c6.embeds.length).toBe(4);
                                         minireels.forEach(function(experience, index) {
                                             expect(c6.embeds[index].experience).toBe(experience);
                                         });
@@ -361,7 +361,7 @@
                                             adtech.config.placements['3330799'].complete();
 
                                             waitForDeps(minireelIds.map(function(id) {
-                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
+                                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&branding=digitaljournal';
                                             }), function(_minireels) {
                                                 minireels = _minireels;
 
@@ -370,9 +370,33 @@
                                         });
 
                                         it('should create embeds for the next round', function() {
-                                            expect(c6.embeds.length).toBe(6);
+                                            expect(c6.embeds.length).toBe(7);
                                             minireels.forEach(function(experience, index) {
                                                 expect(c6.embeds[index].experience).toBe(experience);
+                                            });
+                                        });
+
+                                        it('should have the right modes',function(){
+                                            minireels.forEach(function(exp){
+                                                switch(exp.id) {
+                                                    case 'e-fcb95ef54b22f5':
+                                                    case 'e-4b843ea93ed9d4':
+                                                    case 'e-60196c3751eb52':
+                                                        {
+                                                        expect(exp.data.mode)
+                                                            .toEqual('lightbox');
+                                                        break;
+                                                        }
+                                                    case 'e-6b5ead50d4a1ed': 
+                                                        {
+                                                        expect(exp.data.mode)
+                                                            .toEqual('lightbox-playlist');
+                                                        break;
+                                                        }
+                                                    default:
+                                                        expect(exp.data.mode).not
+                                                            .toBeDefined();
+                                                }
                                             });
                                         });
                                     });
@@ -409,7 +433,7 @@
                                     adtech.config.placements['3330799'].complete();
 
                                     waitForDeps(minireelIds.map(function(id) {
-                                        return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=digitaljournal';
+                                        return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&branding=digitaljournal';
                                     }), function(_minireels) {
                                         var splashPages = Array.prototype.slice.call($('div.c6_widget')[0].querySelectorAll('.c6-mr2__mr-splash'));
 
@@ -442,7 +466,7 @@
                                         adtech.config.placements['3330710'].complete();
 
                                         waitForDeps(minireelIds.map(function(id) {
-                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2';
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2';
                                         }), function(_minireels) {
                                             minireels = _minireels;
 
@@ -474,7 +498,7 @@
                                         adtech.config.placements['3330710'].complete();
 
                                         waitForDeps(minireelIds.map(function(id) {
-                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&placementId=3330123';
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&placementId=3330123';
                                         }), function(_minireels) {
                                             minireels = _minireels;
 
@@ -507,7 +531,7 @@
                                         adtech.config.placements['3330710'].complete();
 
                                         waitForDeps(minireelIds.map(function(id) {
-                                            return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&placementId=3330123&wildCardPlacement=3464003';
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&placementId=3330123&wildCardPlacement=3464003';
                                         }), function(_minireels) {
                                             minireels = _minireels;
 
@@ -574,7 +598,7 @@
                                             adtech.config.placements['3330799'].complete();
 
                                             waitForDeps(minireelIds.map(function(id) {
-                                                return baseUrl + '/api/public/content/experience/' + id + '.js?context=mr2&branding=off-page';
+                                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&branding=off-page';
                                             }), function(_minireels) {
                                                 minireels = _minireels;
 
@@ -667,7 +691,7 @@
                                             exp: experience.id,
                                             title: experience.data.title,
                                             context: 'mr2',
-                                            container: undefined,
+                                            container: 'mr2',
                                             adId: undefined
                                         });
                                     });
@@ -725,7 +749,7 @@
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.require', 'displayfeatures');
 
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', {
-                                            page: '/embed/' + experience.id + '/?cx=mr2',
+                                            page: '/embed/' + experience.id + '/?ct=mr2&cx=mr2',
                                             title: experience.data.title,
                                             dimension1: $window.location.href
                                         });

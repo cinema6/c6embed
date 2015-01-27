@@ -133,7 +133,7 @@
                 });
 
             return getParams(jsonpScripts[jsonpScripts.length - 1].src);
-        }()), { count: 1 }),
+        }()), { count: 1, src: 'jsonp' }),
         container = (function() {
             var id = 'c6-lightbox-container';
 
@@ -236,9 +236,9 @@
      */
     function sendResponse(items) {
         var query = toQueryParams({
-            context: 'mr2',
             branding: params.branding,
             placementId: params.adPlacementId,
+            wildCardPlacement: params.wp,
             container: params.src
         }),
         requireStart = (new Date()).getTime();
@@ -249,6 +249,10 @@
             var experiences = Array.prototype.slice.call(arguments);
 
             c6.embeds.push.apply(c6.embeds, experiences.map(function(experience, index) {
+                if ((!!experience.data.mode) &&
+                    (!experience.data.mode.match(/lightbox/))){
+                    experience.data.mode = 'lightbox';
+                }
                 return new MiniReelConfig(experience,items[index].clickUrl,items[index].adId,
                     'jsonp',params.src);
             }));
