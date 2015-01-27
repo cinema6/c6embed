@@ -2,6 +2,7 @@
 
 * [FEATURE]: Pass container up to content service when getting experiences
 * [FEATURE]: Move lightbox override to jsonp/mr2 handlers, stop sending context to service
+* [FIX]: Remove page+title params for SponsoredCards GA report (will pick up defaults).
 
 ## v2.14.0 (January 23, 2015)
 * [FEATURE]: Making adtech network and server address somewhat more configurable
