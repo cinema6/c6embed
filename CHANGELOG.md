@@ -1,6 +1,7 @@
 # C6Embed Changelog
 
 ## v2.15.0 (January 27, 2015)
+* [FEATURE]: Add ability to override lookup of player index.html
 * [FEATURE]: Pass container up to content service when getting experiences
 * [FEATURE]: Move lightbox override to jsonp/mr2 handlers, stop sending context to service
 * [FIX]: Remove page+title params for SponsoredCards GA report (will pick up defaults).
