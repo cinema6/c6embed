@@ -205,6 +205,43 @@
         }
     }
 
+    function find(array, predicate) {
+        var index = 0;
+        var length = array.length;
+
+        for ( ; index < length; index++) {
+            if (predicate(array[index], index)) {
+                return array[index];
+            }
+        }
+
+        return null;
+    }
+
+    function sponsorDataOf(minireel) {
+        var sponsoredCard;
+
+        if (!!minireel.data.params.sponsor) {
+            return {
+                name: minireel.data.params.sponsor,
+                logo: minireel.data.collateral.logo
+            };
+        }
+
+        sponsoredCard = find(minireel.data.deck, function(card) {
+            return !!card.params.sponsor;
+        });
+
+        if (sponsoredCard) {
+            return {
+                name: sponsoredCard.params.sponsor,
+                logo: sponsoredCard.collateral.logo
+            };
+        }
+
+        return null;
+    }
+
     /**********************************************************************************************
      * Represents a MiniReel that has been loaded. These will go in the c6.embeds array.
      *********************************************************************************************/
@@ -314,7 +351,9 @@
                     return {
                         id: experience.id,
                         title: experience.data.title,
-                        image: baseUrl + experience.data.collateral.splash
+                        summary: experience.data.title,
+                        image: baseUrl + experience.data.collateral.splash,
+                        sponsor: sponsorDataOf(experience)
                     };
                 })
             });

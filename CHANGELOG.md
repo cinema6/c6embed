@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Provide summary and sponsor information in JSONP responses
+
 ## v2.15.0 (January 27, 2015)
 * [FEATURE]: Add ability to override lookup of player index.html
 * [FEATURE]: Pass container up to content service when getting experiences

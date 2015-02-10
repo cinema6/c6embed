@@ -4,8 +4,26 @@ module.exports = {
         title: 'MiniReel 2',
         mode: 'embed',
         collateral: {
-            splash: '/collateral/splash2.jpg'
+            splash: '/collateral/splash2.jpg',
+            logo: '//pbs.twimg.com/profile_images/477368316701315073/QeEBosLP_400x400.jpeg'
         },
-        branding: 'digitaljournal'
+        params: {
+            sponsor: 'Thebar.com'
+        },
+        branding: 'digitaljournal',
+        deck: [
+            {
+                params: {}
+            },
+            {
+                params: {}
+            },
+            {
+                params: {}
+            },
+            {
+                params: {}
+            }
+        ]
     }
 };
