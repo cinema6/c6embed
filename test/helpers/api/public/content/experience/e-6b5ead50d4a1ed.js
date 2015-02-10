@@ -6,6 +6,26 @@ module.exports = {
         collateral: {
             splash: '/collateral/splash1.jpg'
         },
-        branding: 'theinertia'
+        params: {},
+        branding: 'theinertia',
+        deck: [
+            {
+                params: {}
+            },
+            {
+                params: {}
+            },
+            {
+                params: {
+                    sponsor: 'Northface'
+                },
+                collateral: {
+                    logo: 'https://yt3.ggpht.com/-vP6o39RQ8j4/AAAAAAAAAAI/AAAAAAAAAAA/6IbVktshdRw/s100-c-k-no/photo.jpg'
+                }
+            },
+            {
+                params: {}
+            }
+        ]
     }
 };

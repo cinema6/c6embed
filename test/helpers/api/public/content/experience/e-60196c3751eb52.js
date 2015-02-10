@@ -6,6 +6,8 @@ module.exports = {
         title: 'Hello World!',
         collateral: {
             splash: '/collateral/e-123/8f394jfm8349r.splash.jpg'
-        }
+        },
+        params: {},
+        deck: []
     }
 };

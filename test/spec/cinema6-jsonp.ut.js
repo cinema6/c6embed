@@ -488,13 +488,42 @@ describe('cinema6-jsonp.js', function() {
                             cb: jasmine.any(Number),
                             src: 'jsonp'
                         },
-                        items: exps.map(function(exp) {
-                            return {
-                                id: exp.id,
-                                title: exp.data.title,
-                                image: baseUrl + exp.data.collateral.splash
-                            };
-                        })
+                        items: [
+                            {
+                                id: exps[0].id,
+                                title: exps[0].data.title,
+                                summary: exps[0].data.title,
+                                image: baseUrl + exps[0].data.collateral.splash,
+                                sponsor: {
+                                    name: exps[0].data.params.sponsor,
+                                    logo: exps[0].data.collateral.logo
+                                }
+                            },
+                            {
+                                id: exps[1].id,
+                                title: exps[1].data.title,
+                                summary: exps[1].data.title,
+                                image: baseUrl + exps[1].data.collateral.splash,
+                                sponsor: {
+                                    name: exps[1].data.deck[2].params.sponsor,
+                                    logo: exps[1].data.deck[2].collateral.logo
+                                }
+                            },
+                            {
+                                id: exps[2].id,
+                                title: exps[2].data.title,
+                                summary: exps[2].data.title,
+                                image: baseUrl + exps[2].data.collateral.splash,
+                                sponsor: null
+                            },
+                            {
+                                id: exps[3].id,
+                                title: exps[3].data.title,
+                                summary: exps[3].data.title,
+                                image: baseUrl + exps[3].data.collateral.splash,
+                                sponsor: null
+                            }
+                        ]
                     });
                 });
 
