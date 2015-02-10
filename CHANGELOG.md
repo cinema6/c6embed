@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.16.0 (February 10, 2015)
 * [FEATURE]: Provide summary and sponsor information in JSONP responses
 
 ## v2.15.0 (January 27, 2015)
