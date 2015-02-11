@@ -481,6 +481,25 @@ describe('cinema6-jsonp.js', function() {
                 });
             });
 
+            describe('if a launchPixel is specified', function() {
+                beforeEach(function(done) {
+                    c6.embeds.length = 0;
+                    load(function() {
+                        adtech.config.placements['108542'].complete();
+                        waitForDeps(expIds.map(function(id) {
+                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                        }), done);
+                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                });
+
+                it('should set the startPixel on the config', function() {
+                    expect(c6.embeds.length).toBe(expIds.length);
+                    c6.embeds.forEach(function(embed) {
+                        expect(embed.config.launchPixel).toBe('http://tracking.com/pixel');
+                    });
+                });
+            });
+
             describe('after the experiences have been fetched', function() {
                 var exps;
 
@@ -586,7 +605,8 @@ describe('cinema6-jsonp.js', function() {
                             context: 'jsonp',
                             adId: undefined,
                             startPixel: undefined,
-                            countPixel: undefined
+                            countPixel: undefined,
+                            launchPixel: undefined
                         });
                     });
                 });

@@ -614,6 +614,40 @@
                                     });
                                 });
 
+                                describe('if launchPixels are specified', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+                                        c6.embeds.length = 0;
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710',
+                                            launchPixels: ['custom.pixel', 'another.pixel']
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should place the pixels in the config', function() {
+                                        expect(c6.embeds.length).toBe(minireelIds.length);
+                                        c6.embeds.forEach(function(embed) {
+                                            expect(embed.config.launchPixel).toBe('custom.pixel another.pixel');
+                                        });
+                                    });
+                                });
+
                                 describe('if the widget is visible', function() {
                                     it('should preload all of its minireels', function() {
                                         expect(c6.loadExperience.calls.count()).toBe(3);
@@ -762,7 +796,8 @@
                                             container: 'mr2',
                                             adId: undefined,
                                             startPixel: undefined,
-                                            countPixel: undefined
+                                            countPixel: undefined,
+                                            launchPixel: undefined
                                         });
                                     });
                                 });

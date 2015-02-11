@@ -268,6 +268,7 @@
                     container: container,
                     startPixel: config.startPixels && config.startPixels.join(' '),
                     countPixel: config.countPixels && config.countPixels.join(' '),
+                    launchPixel: config.launchPixels && config.launchPixels.join(' '),
                     adId : adId
                 };
             }

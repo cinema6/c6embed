@@ -58,6 +58,14 @@ module.exports = function(deps) {
             experience.data.adServer.server =
                 experience.data.adServer.server || defaultAdServer;
 
+            if (settings.config.launchPixel) {
+                (function() {
+                    var campaign = (experience.data.campaign || (experience.data.campaign = {}));
+
+                    campaign.launchUrls = settings.config.launchPixel.split(' ');
+                }());
+            }
+
             function insertIframe() {
                 $container.append($iframe);
             }

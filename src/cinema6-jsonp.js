@@ -263,7 +263,8 @@
             context: context,
             adId: adId,
             startPixel: params.startPixel,
-            countPixel: params.countPixel
+            countPixel: params.countPixel,
+            launchPixel: params.launchPixel
         };
     }
 
