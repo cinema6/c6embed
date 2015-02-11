@@ -111,9 +111,7 @@
                         }
                     };
 
-                if (c6.params) {
-                    c6.params.src = c6.params.src || 'standalone'
-                }
+                c6.params.src = c6.params.src || 'standalone'
 
                 function toQueryParams(object) {
                     return Object.keys(object)
@@ -326,8 +324,10 @@
                         exp: experience.id,
                         title: experience.data.title,
                         showStartTime: window._c6InitTime ,
-                        container:c6.params.src,
-                        context: 'standalone'
+                        container: c6.params.src,
+                        context: 'standalone',
+                        startPixel: c6.params.startPixel,
+                        countPixel: c6.params.countPixel
                     }
                 }) - 1]);
             }());

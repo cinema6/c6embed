@@ -401,7 +401,27 @@
             });
             
             it('should fetch the sponsoredCards', function() {
-                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience);
+                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, {
+                    clickUrls: undefined,
+                    countUrls: undefined
+                });
+            });
+
+            describe('if the config has a startPixel and countPixel', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    settings.config.startPixel = 'http://my.com/pixel1 http://your.com/pixel2';
+                    settings.config.countPixel = 'http://my.com/pixel3 http://your.com/pixel4';
+                    spCardService.fetchSponsoredCards.calls.reset();
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should fetch the sponosred cards with the additional pixels', function() {
+                    expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, {
+                        clickUrls: settings.config.startPixel.split(' '),
+                        countUrls: settings.config.countPixel.split(' ')
+                    });
+                });
             });
 
             describe('if the device is a phone', function() {

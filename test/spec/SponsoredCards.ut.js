@@ -66,7 +66,63 @@
                     spyOn(_private, 'loadAdtech').and.returnValue(q(adtech));
                     spyOn(_private, 'makeAdCall').and.returnValue(q());
                 });
-                
+
+                describe('if called with a pixel object', function() {
+                    describe('if there are pixels defined', function() {
+                        beforeEach(function(done) {
+                            spCards.fetchSponsoredCards(experience, {
+                                clickUrls: ['click.me'],
+                                countUrls: ['count.me']
+                            }).finally(done);
+                        });
+
+                        it('should call _private.makeAdCall() with the additional pixels', function() {
+                            expect(_private.makeAdCall.calls.count()).toBe(2);
+                            expect(_private.makeAdCall).toHaveBeenCalledWith(
+                                jasmine.any(Object),
+                                experience,
+                                { clickUrls: ['click.me'], countUrls: ['count.me'] },
+                                1234,
+                                adtech
+                            );
+                        });
+                    });
+
+                    describe('if there are no pixels defined', function() {
+                        beforeEach(function(done) {
+                            spCards.fetchSponsoredCards(experience, {}).finally(done);
+                        });
+
+                        it('should call _private.makeAdCall() with some defaults', function() {
+                            expect(_private.makeAdCall.calls.count()).toBe(2);
+                            expect(_private.makeAdCall).toHaveBeenCalledWith(
+                                jasmine.any(Object),
+                                experience,
+                                { clickUrls: [], countUrls: [] },
+                                1234,
+                                adtech
+                            );
+                        });
+                    });
+                });
+
+                describe('if called without a pixel object', function() {
+                    beforeEach(function(done) {
+                        spCards.fetchSponsoredCards(experience).finally(done);
+                    });
+
+                    it('should call _private.makeAdCall() with some defaults', function() {
+                        expect(_private.makeAdCall.calls.count()).toBe(2);
+                        expect(_private.makeAdCall).toHaveBeenCalledWith(
+                            jasmine.any(Object),
+                            experience,
+                            { clickUrls: [], countUrls: [] },
+                            1234,
+                            adtech
+                        );
+                    });
+                });
+
                 it('should load adtech and make ad calls for each sponsored card with default adtech network', function(done) {
                     spCards.fetchSponsoredCards(experience).then(function() {
                         expect(_private.getCardConfigs).toHaveBeenCalledWith(experience);
@@ -82,9 +138,9 @@
                         
                         expect(_private.makeAdCall.calls.count()).toBe(2);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, 1234, adtech);
+                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, adtech);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, 1234, adtech);
+                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, adtech);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -268,7 +324,10 @@
             });
             
             describe('makeAdCall', function() {
+                var pixels;
+
                 beforeEach(function() {
+                    pixels = { countUrls: [], clickUrls: [] };
                     adtech.loadAd.and.callFake(function(opts) {
                         window.c6.cardCache = {1234: {camp1: {clickUrl: 'click.me', countUrl: 'count.me'}}};
                         opts.complete();
@@ -277,12 +336,12 @@
                 });
 
                 it('should call adtech.loadAd', function(done) {
-                    _private.makeAdCall(experience.data.deck[0], experience, 1234, adtech).then(function() {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
                         expect(experience.data.deck[0]).toEqual({ id: 'rc1', sponsored: true,
-                            campaign: { campaignId: 'camp1', clickUrl: 'click.me', countUrl: 'count.me' } });
+                            campaign: { campaignId: 'camp1', clickUrls: ['click.me'], countUrls: ['count.me'] } });
                         expect(adtech.loadAd).toHaveBeenCalledWith({ placement: 1234,
                             params: { target: '_blank', adid: 'camp1', bnid: '1' }, complete: jasmine.any(Function) });
-                        expect(_private.decorateCard).toHaveBeenCalledWith(experience.data.deck[0], experience, 1234);
+                        expect(_private.decorateCard).toHaveBeenCalledWith(experience.data.deck[0], experience, pixels, 1234);
                         expect(_private.trimCard).not.toHaveBeenCalled();
                         expect(window.__c6_ga__).not.toHaveBeenCalled();
                     }).catch(function(error) {
@@ -292,9 +351,9 @@
                 
                 it('should use the card\'s configured bannerId, if it exists', function(done) {
                     experience.data.deck[0].campaign.bannerId = '2';
-                    _private.makeAdCall(experience.data.deck[0], experience, 1234, adtech).then(function() {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
                         expect(experience.data.deck[0]).toEqual({ id: 'rc1', sponsored: true,
-                            campaign: { campaignId: 'camp1', clickUrl: 'click.me', countUrl: 'count.me', bannerId: '2' } });
+                            campaign: { campaignId: 'camp1', clickUrls: ['click.me'], countUrls: ['count.me'], bannerId: '2' } });
                         expect(adtech.loadAd).toHaveBeenCalledWith({ placement: 1234,
                             params: { target: '_blank', adid: 'camp1', bnid: '2' }, complete: jasmine.any(Function) });
                     }).catch(function(error) {
@@ -307,7 +366,7 @@
                         window.c6.cardCache = {1234: {camp1: {clickUrl: 'click.me', countUrl: 'count.me'}}};
                         setTimeout(opts.complete, 4000);
                     });
-                    _private.makeAdCall(experience.data.deck[0], experience, 1234, adtech).then(function() {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
                         expect(experience.data.deck).toEqual([
                             { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
                             { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
@@ -327,18 +386,20 @@
             });
             
             describe('decorateCard', function() {
+                var pixels;
                 beforeEach(function() {
+                    pixels = { countUrls: ['custom.count'], clickUrls: ['custom.click'] };
                     window.c6.cardCache = { 1234: { camp1: { clickUrl: 'click.me', countUrl: 'count.me' } } };
                 });
                 
                 it('should decorate a card with properties from the cardCache', function() {
-                    _private.decorateCard(experience.data.deck[0], experience, 1234);
+                    _private.decorateCard(experience.data.deck[0], experience, pixels, 1234);
                     expect(experience.data.deck[0]).toEqual({ id: 'rc1', sponsored: true,
-                        campaign: { campaignId: 'camp1', clickUrl: 'click.me', countUrl: 'count.me' } });
+                        campaign: { campaignId: 'camp1', clickUrls: ['custom.click', 'click.me'], countUrls: ['custom.count', 'count.me'] } });
                 });
                 
                 it('should call trimCard if there\'s no entry in the cardCache', function() {
-                    _private.decorateCard(experience.data.deck[2], experience, 1234);
+                    _private.decorateCard(experience.data.deck[2], experience, pixels, 1234);
                     expect(experience.data.deck).toEqual([
                         { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                         { id: 'rc2', sponsored: false, campaign: { campaignId: null } }

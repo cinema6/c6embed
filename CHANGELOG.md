@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Allow 3rd-party sponsored card tracking pixels to be fired
+
 ## v2.16.0 (February 10, 2015)
 * [FEATURE]: Provide summary and sponsor information in JSONP responses
 
