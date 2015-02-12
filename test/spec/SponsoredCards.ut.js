@@ -90,7 +90,10 @@
 
                     describe('if there are no pixels defined', function() {
                         beforeEach(function(done) {
-                            spCards.fetchSponsoredCards(experience, {}).finally(done);
+                            spCards.fetchSponsoredCards(experience, {
+                                clickUrls: undefined,
+                                countUrls: undefined
+                            }).finally(done);
                         });
 
                         it('should call _private.makeAdCall() with some defaults', function() {
