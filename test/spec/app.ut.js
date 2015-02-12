@@ -64,7 +64,10 @@
             experience = {
                 appUri: 'rumble',
                 data: {
-                    mode: 'lightbox-ads'
+                    mode: 'lightbox-ads',
+                    campaign: {
+                        data: 'foo'
+                    }
                 }
             };
 
@@ -401,7 +404,60 @@
             });
             
             it('should fetch the sponsoredCards', function() {
-                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience);
+                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, {
+                    clickUrls: undefined,
+                    countUrls: undefined
+                });
+            });
+
+            describe('if the config has a startPixel and countPixel', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    settings.config.startPixel = 'http://my.com/pixel1 http://your.com/pixel2';
+                    settings.config.countPixel = 'http://my.com/pixel3 http://your.com/pixel4';
+                    spCardService.fetchSponsoredCards.calls.reset();
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should fetch the sponosred cards with the additional pixels', function() {
+                    expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, {
+                        clickUrls: settings.config.startPixel.split(' '),
+                        countUrls: settings.config.countPixel.split(' ')
+                    });
+                });
+            });
+
+            describe('if the config has a launchPixel', function() {
+                beforeEach(function() {
+                    delete settings.promise;
+                    settings.config.launchPixel = 'http://my.com/pixel1 http://your.com/pixel2';
+                });
+
+                describe('if the minireel has a campaign', function() {
+                    var campaign;
+
+                    beforeEach(function(done) {
+                        campaign = experience.data.campaign = {};
+                        $window.c6.loadExperience(settings).finally(done);
+                    });
+
+                    it('should give the campaign launchUrls', function() {
+                        expect(campaign.launchUrls).toEqual(settings.config.launchPixel.split(' '));
+                    });
+                });
+
+                describe('if the minireel has no campaign', function() {
+                    beforeEach(function(done) {
+                        delete experience.data.campaign;
+                        $window.c6.loadExperience(settings).finally(done);
+                    });
+
+                    it('should create one for it', function() {
+                        expect(experience.data.campaign).toEqual({
+                            launchUrls: settings.config.launchPixel.split(' ')
+                        });
+                    });
+                });
             });
 
             describe('if the device is a phone', function() {

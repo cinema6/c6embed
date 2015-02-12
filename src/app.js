@@ -58,6 +58,14 @@ module.exports = function(deps) {
             experience.data.adServer.server =
                 experience.data.adServer.server || defaultAdServer;
 
+            if (settings.config.launchPixel) {
+                (function() {
+                    var campaign = (experience.data.campaign || (experience.data.campaign = {}));
+
+                    campaign.launchUrls = settings.config.launchPixel.split(' ');
+                }());
+            }
+
             function insertIframe() {
                 $container.append($iframe);
             }
@@ -83,18 +91,23 @@ module.exports = function(deps) {
 
             function getSponsoredCards(document) {
                 var startFetch = (new Date()).getTime();
-                return spCardService.fetchSponsoredCards(experience)
-                    .then(function(){
-                        /* jshint camelcase:false */
-                        var embedTracker = settings.config.exp.replace(/e-/,'');
-                        window.__c6_ga__(embedTracker + '.send', 'timing', {
-                            'timingCategory' : 'API',
-                            'timingVar'      : 'fetchSponsoredCards',
-                            'timingValue'    : ((new Date()).getTime() - startFetch),
-                            'timingLabel'    : 'adtech'
-                        });
-                        return document;
+                var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
+                var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
+
+                return spCardService.fetchSponsoredCards(experience, {
+                    clickUrls: clickUrls,
+                    countUrls: countUrls
+                }).then(function(){
+                    /* jshint camelcase:false */
+                    var embedTracker = settings.config.exp.replace(/e-/,'');
+                    window.__c6_ga__(embedTracker + '.send', 'timing', {
+                        'timingCategory' : 'API',
+                        'timingVar'      : 'fetchSponsoredCards',
+                        'timingValue'    : ((new Date()).getTime() - startFetch),
+                        'timingLabel'    : 'adtech'
                     });
+                    return document;
+                });
             }
 
             function loadApp(document) {

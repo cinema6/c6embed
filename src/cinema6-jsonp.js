@@ -261,7 +261,10 @@
             title: experience.data.title,
             container: ctr,
             context: context,
-            adId: adId
+            adId: adId,
+            startPixel: params.startPixel,
+            countPixel: params.countPixel,
+            launchPixel: params.launchPixel
         };
     }
 
