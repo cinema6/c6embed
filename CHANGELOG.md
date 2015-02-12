@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.17.0 (February 12, 2015)
 * [FEATURE]: Allow 3rd-party sponsored card tracking pixels to be fired
 * [FEATURE]: Allow 3rd-party pixels to be fired when a MiniReel is
   launched
