@@ -3,6 +3,7 @@
 * [FEATURE]: Allow 3rd-party sponsored card tracking pixels to be fired
 * [FEATURE]: Allow 3rd-party pixels to be fired when a MiniReel is
   launched
+* [FEATURE]: Added support for A/B testing branding
 
 ## v2.16.0 (February 10, 2015)
 * [FEATURE]: Provide summary and sponsor information in JSONP responses

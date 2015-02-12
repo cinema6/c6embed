@@ -1,6 +1,20 @@
 (function() {
     'use strict';
 
+    function waitForDeps(deps, done) {
+        var c6 = window.c6,
+            id = window.setInterval(function() {
+                if (deps.every(function(dep) {
+                    return !!c6.requireCache[dep];
+                })) {
+                    window.clearInterval(id);
+                    done(deps.map(function(dep) {
+                        return c6.requireCache[dep];
+                    }));
+                }
+            }, 50);
+    }
+
     describe('embed.js', function() {
         var C6Query;
 
@@ -168,6 +182,7 @@
                     });
 
                     afterEach(function() {
+                        delete window.c6;
                         $('link#c6-' + experience.data.branding).remove();
                     });
 
@@ -335,6 +350,35 @@
                         });
                     });
 
+                    describe('if there is already an embedded experience', function() {
+                        var experience;
+
+                        beforeEach(function(done) {
+                            var embed2 = document.createElement('script');
+
+                            $('link#c6-theinertia').remove();
+
+                            embed2.src = '/base/src/embed.js';
+                            embed2.setAttribute('data-exp', 'e-6b5ead50d4a1ed');
+                            embed2.setAttribute('data-splash', 'vertical-stack:3/2');
+
+                            $div.append(embed2);
+
+                            waitForDeps(['base/test/helpers/api/public/content/experience/e-6b5ead50d4a1ed.js?container=embed'], function(experiences) {
+                                experience = experiences[0];
+                                done();
+                            });
+                        });
+
+                        it('should use the branding of the existing experience', function() {
+                            expect(experience.data.branding).toBe(window.c6.embeds[0].experience.data.branding);
+                        });
+
+                        it('should not create a stylesheet for the unused branding', function() {
+                            expect($('link#c6-theinertia').length).toBe(0);
+                        });
+                    });
+
                     describe('the splash page', function() {
                         var $splash, splashJS;
 
@@ -447,7 +491,7 @@
                                 require: jasmine.any(Function),
                                 branding: jasmine.any(Object)
                             }));
-                            expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
+                            expect(window.c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
                             expect(window.c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
                         });
 

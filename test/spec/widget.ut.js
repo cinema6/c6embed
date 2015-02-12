@@ -29,7 +29,7 @@
                             return c6.requireCache[dep];
                         }));
                     }
-                }, 50);
+                }, 10);
         }
 
         beforeEach(function(done) {
@@ -394,8 +394,7 @@
                                                         break;
                                                         }
                                                     default:
-                                                        expect(exp.data.mode).not
-                                                            .toBeDefined();
+                                                        expect(exp.data.mode).toEqual('lightbox');
                                                 }
                                             });
                                         });
@@ -426,8 +425,6 @@
                                         spyOn($window, '__c6_ga__');
                                     }
 
-                                    c6.embeds.push({}, {}, {});
-
                                     spyOn(c6, 'loadExperience').and.callThrough();
 
                                     adtech.config.placements['3330799'].complete();
@@ -448,6 +445,52 @@
 
                                 it('should display the widget', function() {
                                     expect($('div.c6_widget').css('display')).toBe('inline-block');
+                                });
+
+                                it('should give all of the minireels the same branding', function() {
+                                    minireels.forEach(function(minireel) {
+                                        expect(minireel.data.branding).toBe(minireels[0].data.branding);
+                                    });
+                                });
+
+                                describe('if there is already a loaded minireel', function() {
+                                    beforeEach(function(done) {
+                                        c6.embeds.length = 0;
+                                        c6.embeds.push({
+                                            experience: {
+                                                data: {
+                                                    branding: 'the-boss'
+                                                }
+                                            }
+                                        });
+
+                                        $('div.c6_widget').remove();
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710'
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should give every minireel the branding of the first one', function() {
+                                        minireels.forEach(function(minireel) {
+                                            expect(minireel.data.branding).toBe('the-boss');
+                                        });
+                                    });
                                 });
 
                                 describe('if no branding is specified', function() {
@@ -854,7 +897,7 @@
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.require', 'displayfeatures');
 
                                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', {
-                                            page: '/embed/' + experience.id + '/?ct=mr2&cx=mr2',
+                                            page: '/embed/' + experience.id + '/?ct=mr2&cx=mr2&bd=urbantimes',
                                             title: experience.data.title,
                                             dimension1: $window.location.href
                                         });

@@ -245,7 +245,7 @@
     /**********************************************************************************************
      * Represents a MiniReel that has been loaded. These will go in the c6.embeds array.
      *********************************************************************************************/
-    function MiniReelConfig(experience, trackingUrl, adId, context, ctr) {
+    function MiniReelConfig(experience, trackingUrl, adId) {
         this.load = false;
         this.preload = false;
 
@@ -259,12 +259,12 @@
         this.config = {
             exp: experience.id,
             title: experience.data.title,
-            container: ctr,
-            context: context,
             adId: adId,
             startPixel: params.startPixel,
             countPixel: params.countPixel,
-            launchPixel: params.launchPixel
+            launchPixel: params.launchPixel,
+            container: params.src,
+            context: 'jsonp'
         };
     }
 
@@ -287,18 +287,15 @@
             return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' + query;
         }), function() {
             var experiences = Array.prototype.slice.call(arguments);
+            var embeds = experiences.map(function(experience, index) {
+                return new MiniReelConfig(experience, items[index].clickUrl, items[index].adId);
+            });
 
-            c6.embeds.push.apply(c6.embeds, experiences.map(function(experience, index) {
-                if ((!!experience.data.mode) &&
-                    (!experience.data.mode.match(/lightbox/))){
-                    experience.data.mode = 'lightbox';
-                }
-                return new MiniReelConfig(experience,items[index].clickUrl,items[index].adId,
-                    'jsonp',params.src);
-            }));
+            c6.embeds.push.apply(c6.embeds, embeds);
 
-            c6.embeds.forEach(function(minireel) {
+            embeds.forEach(function(minireel) {
                 var experience = minireel.experience,
+                    pageBranding = c6.embeds[0].experience.data.branding,
                     embedTracker = experience.id.replace(/^e-/, ''),
                     pagePath = (function(e,q){
                         var r='/embed/'+e+'/',p,qf=[];
@@ -308,8 +305,15 @@
                     }(experience.id,{
                         cx:minireel.config.context,
                         ct:minireel.config.container,
-                        gp:minireel.config.adId
+                        gp:minireel.config.adId,
+                        bd: pageBranding
                     }));
+
+                if (!(/lightbox/).test(experience.data.mode)) {
+                    experience.data.mode = 'lightbox';
+                }
+
+                experience.data.branding = pageBranding;
 
                 /* jshint camelcase:false */
                 window.__c6_ga__('create', c6.gaAcctIdEmbed, {
@@ -342,10 +346,8 @@
                     'timingLabel'    : 'c6'
                 });
                 /* jshint camelcase:true */
-            });
 
-            c6.embeds.forEach(function(embed) {
-                c6.loadExperience(embed, true);
+                c6.loadExperience(minireel, true);
             });
 
             callback({
