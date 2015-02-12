@@ -185,18 +185,6 @@
                 //writeScript('c6embed.js');
             }
         </script>
-    </head>
-    <body>
-        <div class="c6mr-preloader__group c6js-loader">
-            <div class="c6mr-preloader">
-                <div class="c6mr-preloader__ring">
-                    <div class="c6mr-preloader__orbit">
-                        <div class="c6mr-preloader__ball">&nbsp;
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <style type="text/css">
             .c6mr-preloader__group {
                 text-align: center;
@@ -254,6 +242,18 @@
                     }
                 }
         </style>
+    </head>
+    <body>
+        <div class="c6mr-preloader__group c6js-loader">
+            <div class="c6mr-preloader">
+                <div class="c6mr-preloader__ring">
+                    <div class="c6mr-preloader__orbit">
+                        <div class="c6mr-preloader__ball">&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script>
             (function() {
                 'use strict';
@@ -270,7 +270,7 @@
                             for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
                             if (qf.length){ r += '?' + qf.join('&'); }
                             return r;
-                        }(experience.id,{cx:'standalone',ct:c6.params.src}));
+                        }(experience.id,{cx:'standalone',ct:c6.params.src,bd:experience.data.branding}));
 
                     window.__c6_ga__('create', c6.gaAcctIdEmbed, {
                         'name'       : embedTracker,

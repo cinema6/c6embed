@@ -525,7 +525,7 @@ describe('cinema6-jsonp.js', function() {
                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.require', 'displayfeatures');
 
                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', {
-                            page: '/embed/' + experience.id + '/?cx=jsonp&ct=jsonp',
+                            page: '/embed/' + experience.id + '/?cx=jsonp&ct=jsonp&bd=digitaljournal',
                             title: experience.data.title,
                             dimension1: $window.location.href
                         });
@@ -607,6 +607,41 @@ describe('cinema6-jsonp.js', function() {
                             startPixel: undefined,
                             countPixel: undefined,
                             launchPixel: undefined
+                        });
+                    });
+                });
+
+                it('should give every experience the same branding', function() {
+                    exps.forEach(function(experience) {
+                        expect(experience.data.branding).toBe(exps[0].data.branding);
+                    });
+                });
+
+                describe('if there is already stuff in the c6.embeds array', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        c6.embeds.push({
+                            experience: {
+                                data: {
+                                    branding: 'master'
+                                }
+                            }
+                        });
+
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=veeseo';
+                            }), function(experiences) {
+                                exps = experiences;
+                                done();
+                            });
+                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now());
+                    });
+
+                    it('should take the branding from the experience that was already there', function() {
+                        exps.forEach(function(experience) {
+                            expect(experience.data.branding).toBe('master');
                         });
                     });
                 });

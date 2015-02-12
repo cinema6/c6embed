@@ -240,7 +240,7 @@
                 );
             }());
 
-            function MiniReelConfig(experience, splash, trackingUrl, adId, container) {
+            function MiniReelConfig(experience, splash, trackingUrl, adId) {
                 var self = this;
                 this.load = false;
                 this.preload = false;
@@ -265,10 +265,10 @@
                     exp: experience.id,
                     title: experience.data.title,
                     context: 'mr2',
-                    container: container,
                     startPixel: config.startPixels && config.startPixels.join(' '),
                     countPixel: config.countPixels && config.countPixels.join(' '),
                     launchPixel: config.launchPixels && config.launchPixels.join(' '),
+                    container: config.container,
                     adId : adId
                 };
             }
@@ -290,26 +290,20 @@
                     return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
                         queryParams;
                 }), function() {
-                    var experiences = Array.prototype.slice.call(arguments),
-                        minireels = experiences
-                            .filter(function(experience) {
-                                return !!experience.data;
-                            })
-                            .map(function(experience, index) {
-                                if ((!!experience.data.mode) &&
-                                    (!experience.data.mode.match(/lightbox/))){
-                                    experience.data.mode = 'lightbox';
-                                }
-                                return new MiniReelConfig(
-                                    experience,
-                                    splashPages[index],
-                                    configs[index].clickUrl,
-                                    configs[index].adId,
-                                    config.container
-                                );
-                            }),
-                        extraSplashPages = (minireels.length === splashPages.length) ?
-                            [] : splashPages.slice(minireels.length - splashPages.length);
+                    var experiences = Array.prototype.slice.call(arguments)
+                        .filter(function(experience) {
+                            return !!experience.data;
+                        });
+                    var minireels = experiences.map(function(experience, index) {
+                        return new MiniReelConfig(
+                            experience,
+                            splashPages[index],
+                            configs[index].clickUrl,
+                            configs[index].adId
+                        );
+                    });
+                    var extraSplashPages = (minireels.length === splashPages.length) ?
+                        [] : splashPages.slice(minireels.length - splashPages.length);
 
                     function handleViewportShift() {
                         if (elementIsOnScreen(container)) {
@@ -325,8 +319,11 @@
                         });
                     }
 
+                    c6.embeds.push.apply(c6.embeds, minireels);
+
                     minireels.forEach(function(minireel) {
                         var experience = minireel.experience,
+                            pageBranding = c6.embeds[0].experience.data.branding,
                             splash = minireel.embed,
                             embedTracker = experience.id.replace(/^e-/, ''),
                             pagePath = (function(e,q){
@@ -337,8 +334,15 @@
                             }(experience.id,{
                                 ct:minireel.config.container,
                                 cx:minireel.config.context,
-                                gp:minireel.config.adId
+                                gp:minireel.config.adId,
+                                bd:pageBranding
                             }));
+
+                        if (!(/lightbox/).test(experience.data.mode)) {
+                            experience.data.mode = 'lightbox';
+                        }
+
+                        experience.data.branding = pageBranding;
 
                         loadBrandingStyles(experience.data.branding);
                         splash.className += ' c6brand__' + experience.data.branding;
@@ -377,8 +381,6 @@
                     extraSplashPages.forEach(function(splash) {
                         splash.style.display = 'none';
                     });
-
-                    c6.embeds.push.apply(c6.embeds, minireels);
 
                     container.style.display = 'inline-block';
 
