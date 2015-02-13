@@ -97,7 +97,7 @@ module.exports = function(deps) {
                 return spCardService.fetchSponsoredCards(experience, {
                     clickUrls: clickUrls,
                     countUrls: countUrls
-                }).then(function(){
+                },preload).then(function(){
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
                     window.__c6_ga__(embedTracker + '.send', 'timing', {

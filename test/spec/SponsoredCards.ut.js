@@ -83,7 +83,8 @@
                                 experience,
                                 { clickUrls: ['click.me'], countUrls: ['count.me'] },
                                 1234,
-                                adtech
+                                adtech,
+                                3000
                             );
                         });
                     });
@@ -103,7 +104,8 @@
                                 experience,
                                 { clickUrls: [], countUrls: [] },
                                 1234,
-                                adtech
+                                adtech,
+                                3000
                             );
                         });
                     });
@@ -121,7 +123,8 @@
                             experience,
                             { clickUrls: [], countUrls: [] },
                             1234,
-                            adtech
+                            adtech,
+                            3000
                         );
                     });
                 });
@@ -141,9 +144,9 @@
                         
                         expect(_private.makeAdCall.calls.count()).toBe(2);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, adtech);
+                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, adtech,3000);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, adtech);
+                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, adtech,3000);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
