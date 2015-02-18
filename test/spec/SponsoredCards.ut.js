@@ -389,6 +389,32 @@
                     
                     jasmine.clock().tick(3001);
                 });
+
+                it('should trim card if adtech complete function throws an exception',function(done){
+                    var err = new Error('test error');
+                    _private.decorateCard.and.callFake(function(){
+                        throw (err);
+                    });
+                    adtech.loadAd.and.callFake(function(opts) {
+                        window.c6.cardCache = {1234: {camp1: {clickUrl: 'click.me', countUrl: 'count.me'}}};
+                        opts.complete();
+
+                    });
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                        expect(experience.data.deck).toEqual([
+                            { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
+                            { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
+                        ]);
+                        expect(adtech.loadAd).toHaveBeenCalled();
+                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience, 'makeAdCall - Error: test error');
+                        expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
+                            {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
+                             eventLabel: '{"message":"makeAdCall - Error: test error"}'});
+                        expect(_private.decorateCard).toHaveBeenCalled();
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
             });
             
             describe('decorateCard', function() {

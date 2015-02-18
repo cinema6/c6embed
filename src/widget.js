@@ -246,15 +246,25 @@
                 this.preload = false;
 
                 this.standalone = false;
-
+                this.trackingUrl = trackingUrl;
                 this.embed = splash;
                 this.splashDelegate = splashJS({
                     loadExperience: function() {
-                        // Fire tracking pixel when this MiniReel is opened.
-                        (new DOMElement('img', {
-                            src: trackingUrl
-                        }));
-
+                        if (self.trackingUrl) {
+                            // Fire tracking pixel when this MiniReel is opened.
+                            (new DOMElement('img', {
+                                src: self.trackingUrl
+                            }));
+                            delete self.trackingUrl;
+                            var embedTracker = self.config.exp.replace(/^e-/, '');
+                            /* jshint camelcase:false */
+                            window.__c6_ga__(embedTracker + '.send', 'event', {
+                                'eventCategory' : 'Display',
+                                'eventAction'   : 'AttemptShow',
+                                'eventLabel'    : self.config.title
+                            });
+                            /* jshint camelcase:true */
+                        }
                         self.config.showStartTime = (new Date()).getTime();
                         return c6.loadExperience.apply(c6, arguments);
                     }

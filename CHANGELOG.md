@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v2.18.0 (February 18, 2015)
+* [FEATURE]: Add exception handler around makeAdCall completion function in lib/SponsoredCard.js
+* [FEATURE]: Adtech trackingUrl will only fire once per MR
+* [FEATURE]: Add GA AttemptShow event to Embed,Jsonp,MR2 embeds - fired first time user clicks splash
+
 ## v2.17.1 (February 13, 2015)
 * [FEATURE]: Stretch out adtech timeouts if MR is preloaded
 

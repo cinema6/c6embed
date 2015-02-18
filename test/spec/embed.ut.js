@@ -356,6 +356,14 @@
                         beforeEach(function(done) {
                             var embed2 = document.createElement('script');
 
+                            window.c6.embeds.unshift({
+                                experience: {
+                                    data: {
+                                        branding: 'custom-branding'
+                                    }
+                                }
+                            });
+
                             $('link#c6-theinertia').remove();
 
                             embed2.src = '/base/src/embed.js';
@@ -371,7 +379,7 @@
                         });
 
                         it('should use the branding of the existing experience', function() {
-                            expect(experience.data.branding).toBe(window.c6.embeds[0].experience.data.branding);
+                            expect(experience.data.branding).toBe('custom-branding');
                         });
 
                         it('should not create a stylesheet for the unused branding', function() {

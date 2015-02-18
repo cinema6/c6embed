@@ -118,9 +118,21 @@
 
                 config.config.showStartTime= (new Date()).getTime();
                 config.config.context= 'jsonp';
-                new DOMElement('img', {
-                    src: config.trackingUrl
-                });
+                if (config.trackingUrl) {
+                    new DOMElement('img', {
+                        src: config.trackingUrl
+                    });
+                    delete config.trackingUrl;
+                    
+                    var embedTracker = config.experience.id.replace(/^e-/, '');
+                    /* jshint camelcase:false */
+                    window.__c6_ga__(embedTracker + '.send', 'event', {
+                        'eventCategory' : 'Display',
+                        'eventAction'   : 'AttemptShow',
+                        'eventLabel'    : config.experience.data.title
+                    });
+                    /* jshint camelcase:true */
+                }
 
                 return this.loadExperience(config);
             }

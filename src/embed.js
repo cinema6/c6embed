@@ -169,6 +169,14 @@
     function handleClick() {
         settings.config.showStartTime= (new Date()).getTime();
         settings.config.context= 'embed';
+        /* jshint camelcase:false */
+        var embedTracker = config.exp.replace(/e-/,'');
+        window.__c6_ga__(embedTracker + '.send', 'event', {
+            'eventCategory' : 'Display',
+            'eventAction'   : 'AttemptShow',
+            'eventLabel'    : settings.config.title
+        });
+        /* jshint camelcase:true */
         splash.removeEventListener('click', handleClick, false);
     }
 

@@ -240,21 +240,30 @@ describe('cinema6-jsonp.js', function() {
 
                     one = {
                         experience: {
-                            id: 'e-c0fe92d7aeca1e'
+                            id: 'e-c0fe92d7aeca1e',
+                            data : {
+                                title : 'Experience One'
+                            }
                         },
                         config : {},
                         trackingUrl: 'http://c6.co/8924htfn37848r43.jpg'
                     };
                     two = {
                         experience: {
-                            id: 'e-4a2418dd5c0196'
+                            id: 'e-4a2418dd5c0196',
+                            data : {
+                                title : 'Experience Two'
+                            }
                         },
                         config : {},
                         trackingUrl: 'http://c6.co/9204uru89r44.jpg'
                     };
                     three = {
                         experience: {
-                            id: 'e-99c243954c7966'
+                            id: 'e-99c243954c7966',
+                            data : {
+                                title : 'Experience Three'
+                            }
                         },
                         config : {},
                         trackingUrl: 'http://c6.co/9384utf304r4f.jpg'
@@ -277,7 +286,16 @@ describe('cinema6-jsonp.js', function() {
 
                 it('should fire a tracking pixel for that experience', function() {
                     expect(element.tagName).toBe('IMG');
-                    expect(element.src).toBe(two.trackingUrl);
+                    expect(element.src).toBe('http://c6.co/9204uru89r44.jpg');
+                    expect(two.trackingUrl).not.toBeDefined();
+                    expect($window.__c6_ga__.calls.mostRecent().args).toEqual([
+                        '4a2418dd5c0196.send',
+                        'event',{
+                            eventCategory : 'Display',
+                            eventAction   : 'AttemptShow',
+                            eventLabel    : 'Experience Two'
+                        }
+                    ]);
                 });
             });
         });
