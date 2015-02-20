@@ -213,11 +213,22 @@ module.exports = function(deps) {
 
                 /* jshint camelcase:false */
                 if (active) {
-                    window.__c6_ga__(embedTracker + '.send', 'event', {
-                        'eventCategory' : 'Display',
-                        'eventAction'   : 'Show',
-                        'eventLabel'    : settings.config.title
-                    });
+                    if (settings.config.showStartTime) {
+                        window.__c6_ga__(embedTracker + '.send', 'event', {
+                            'eventCategory' : 'Display',
+                            'eventAction'   : 'Show',
+                            'eventLabel'    : settings.config.title
+                        });
+                        window.__c6_ga__(embedTracker + '.send', 'timing', {
+                            'timingCategory' : 'UX',
+                            'timingVar'      : (preload ? 'showPreloadedPlayer' : 'showPlayer'),
+                            'timingValue'    : ((new Date()).getTime() -
+                                settings.config.showStartTime),
+                            'timingLabel'    : settings.config.context
+                        });
+                        delete settings.config.showStartTime;
+                    }
+                    
                     $iframe.show();
                     callDelegate('didHide');
                     getSession()
@@ -226,16 +237,6 @@ module.exports = function(deps) {
                         });
 
                     this.observe('responsiveStyles', setResponsiveStyles);
-                    if (settings.config.showStartTime) {
-                        window.__c6_ga__(embedTracker + '.send', 'timing', {
-                            'timingCategory' : 'UX',
-                            'timingVar'      : (preload ? 'showPreloadedPlayer' : 'showPlayer'),
-                            'timingValue'    : ((new Date()).getTime() -
-                                settings.config.showStartTime),
-                            'timingLabel'    : settings.config.context
-                        });
-                    }
-                    
                 } else {
                     $iframe.hide();
                     callDelegate('didShow');

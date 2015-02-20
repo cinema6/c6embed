@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FIX]: Stop duplicated Show event and timing when re-opening a MR.
+
 ## v2.18.0 (February 18, 2015)
 * [FEATURE]: Add exception handler around makeAdCall completion function in lib/SponsoredCard.js
 * [FEATURE]: Adtech trackingUrl will only fire once per MR
