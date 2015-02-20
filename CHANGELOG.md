@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.19.0 (February 20, 2015)
 * [FIX]: Stop duplicated Show event and timing when re-opening a MR.
 * [DEPRECATION]: Remove ability to automatically replace an image with a
   MiniReel embed using the OpenGraph API
