@@ -20,8 +20,7 @@
 
         var $;
 
-        var $div,
-            $ogImage;
+        var $div;
 
         function settingsByExp(exp) {
             return window.c6.embeds.reduce(function(result, settings) {
@@ -71,14 +70,11 @@
             $ = new C6Query({ window: window, document: document });
 
             $div = $('<div id="test"></div>');
-            $ogImage = $('<meta property="og:image" content="http://www.cinema6.com/collateral/custom.jpg">');
-            $('head').append($ogImage);
             $('body').append($div);
         });
 
         afterEach(function() {
             $div.remove();
-            $ogImage.remove();
             delete window.c6;
             delete window.__C6_URL_ROOT__;
         });
@@ -196,7 +192,7 @@
                         });
                     });
 
-                    describe('if replaceImage is true', function() {
+                    describe('if replaceImage is set', function() {
                         var $embed;
 
                         function create(done) {
@@ -204,7 +200,7 @@
 
                             window.c6.requireCache = {};
                             script.src = '/base/src/embed.js';
-                            script.setAttribute('data-replace-image', '');
+                            script.setAttribute('data-replace-image', '.header_image');
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'flavor1:1/1');
 
@@ -228,11 +224,11 @@
                             }
                         });
 
-                        describe('with one image on the page', function() {
+                        describe('with an image on the page', function() {
                             var $img;
 
                             beforeEach(function(done) {
-                                $img = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
+                                $img = $('<img class="header_image" src="http://www.cinema6.com/collateral/custom.jpg">');
                                 $('body').append($img);
                                 create(function() {
                                     $embed = $('div.c6embed-e-abc');
@@ -257,32 +253,6 @@
                             });
                         });
 
-                        describe('with more than one image on the page', function() {
-                            var $img1, $img2, script;
-
-                            beforeEach(function(done) {
-                                $img1 = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
-                                $img2 = $('<img src="http://www.cinema6.com/collateral/custom.jpg">');
-
-                                $('body').append($img1);
-                                $('body').append($img2);
-                                script = create(function() {
-                                    $embed = $('div.c6embed-e-abc');
-                                    done();
-                                });
-                            });
-
-                            afterEach(function() {
-                                $img1.remove();
-                                $img2.remove();
-                            });
-
-                            it('should insert the embed after the script', function() {
-                                expect($embed[0].nextSibling).toBe(script);
-                                expect($embed[0].nextSibling.tagName).toBe('SCRIPT');
-                            });
-                        });
-
                         describe('with no images on the page', function() {
                             var script;
 
@@ -291,27 +261,6 @@
                                     $embed = $('div.c6embed-e-abc');
                                     done();
                                 });
-                            });
-
-                            it('should insert the embed after the script', function() {
-                                expect($embed[0].nextSibling).toBe(script);
-                                expect($embed[0].nextSibling.tagName).toBe('SCRIPT');
-                            });
-                        });
-
-                        describe('if there is no open graph meta tag', function() {
-                            var script;
-
-                            beforeEach(function(done) {
-                                $ogImage.remove();
-                                script = create(function() {
-                                    $embed = $('div.c6embed-e-abc');
-                                    done();
-                                });
-                            });
-
-                            afterEach(function() {
-                                $('head').append($ogImage);
                             });
 
                             it('should insert the embed after the script', function() {
@@ -487,7 +436,6 @@
                                             result.responsive = !result.height;
                                             result.splash = jasmine.any(Object);
                                             result.preload = 'data-preload' in config;
-                                            result.replaceImage = false;
 
                                             return result;
                                         }())

@@ -1,6 +1,10 @@
 # C6Embed Changelog
 
 * [FIX]: Stop duplicated Show event and timing when re-opening a MR.
+* [DEPRECATION]: Remove ability to automatically replace an image with a
+  MiniReel embed using the OpenGraph API
+* [FEAUTRE]: Add ability to replace a DOM element with a MiniReel embed
+  by passing in its CSS selector
 
 ## v2.18.0 (February 18, 2015)
 * [FEATURE]: Add exception handler around makeAdCall completion function in lib/SponsoredCard.js
