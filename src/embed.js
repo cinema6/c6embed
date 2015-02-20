@@ -27,7 +27,7 @@
                 }
             }
         }),
-        bools = ['preload', 'replaceImage'],
+        bools = ['preload'],
         config = (function(scripts) {
             var script = (readyState !== 'loading') ? (function() {
                 var pending = c6.pending || [],
@@ -103,13 +103,7 @@
         )),
         head = document.getElementsByTagName('head')[0],
         script = config.script,
-        target = config.replaceImage ? (function() {
-            var ogImage = $('meta[property="og:image"]')[0],
-                mainImageSrc = ogImage && ogImage.getAttribute('content'),
-                mainImages = (mainImageSrc || []) && $('img[src="' + mainImageSrc + '"]');
-
-            return mainImages.length === 1 ? mainImages[0] : script;
-        }()) : script,
+        target = (config.replaceImage && $(config.replaceImage)[0]) || script,
         responsiveStyles = {},
         staticStyles = {
             width: config.width,
