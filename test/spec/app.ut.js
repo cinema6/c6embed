@@ -610,6 +610,19 @@
 
                             expect($window.__c6_ga__.calls.argsFor(3)[2]).toEqual(jasmine.objectContaining({ timingCategory: 'UX', timingVar: 'showPlayer', timingLabel: 'embed'}));
                         });
+
+                        describe('repeat show',function(){
+                            beforeEach(function(done) {
+                                $window.__c6_ga__.calls.reset();
+                                state.set('active', false);
+                                state.set('active', true);
+                                setTimeout(done, 20);
+                            });
+
+                            it('should not call GA',function(){
+                                expect($window.__c6_ga__).not.toHaveBeenCalled();
+                            });
+                        });
                     });
 
                     describe('when true', function() {
