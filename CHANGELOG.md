@@ -1,10 +1,13 @@
 # C6Embed Changelog
 
+## v2.19.1 (February 26, 2015)
+* [FIX]: Trim empty wildcard placeholders
+
 ## v2.19.0 (February 20, 2015)
 * [FIX]: Stop duplicated Show event and timing when re-opening a MR.
 * [DEPRECATION]: Remove ability to automatically replace an image with a
   MiniReel embed using the OpenGraph API
-* [FEAUTRE]: Add ability to replace a DOM element with a MiniReel embed
+* [FEATURE]: Add ability to replace a DOM element with a MiniReel embed
   by passing in its CSS selector
 
 ## v2.18.0 (February 18, 2015)
@@ -72,7 +75,7 @@
 ## v2.9.0 (December 11, 2014)
 * [FEATURE]: New GA account ids for embeds.
 * [FEATURE]: Sending some errors to GA.
-* [FEAUTRE]: Support autoplaying videos on the first slide in mobile
+* [FEATURE]: Support autoplaying videos on the first slide in mobile
 
 ## v2.8.2 (December 9, 2014)
 * [FIX]: Fix for an issue that caused MiniReels with sponsored cards not
