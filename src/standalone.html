@@ -6,6 +6,7 @@
             (function() {
                 'use strict';
 
+                window.__C6_AD_NETWORK__ = '5491.1'; //TODO
                 window._c6InitTime = (new Date()).getTime();
                 var isProduction = (/^(www\.)?cinema6\.com$/).test(window.location.hostname),
                     base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
@@ -170,6 +171,7 @@
                 writeScript(base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
                     branding: params.branding,
                     placementId: params.adPlacementId,
+                    campaign: c6.params.campaign,
                     container: c6.params.src,
                     wildCardPlacement: params.wp
                 }));
@@ -181,8 +183,8 @@
             } else {
                 window.__C6_DEBUG__ = true;
                 window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
-                writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
-                //writeScript('c6embed.js');
+                // writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
+                writeScript('c6embed.js'); //TODO: recomment
             }
         </script>
         <style type="text/css">

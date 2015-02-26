@@ -311,6 +311,7 @@
             .join('&');
     }({
         container: config.container,
+        campaign: config.campaign,
         branding: config.branding,
         placementId: config.adPlacementId,
         wildCardPlacement: config.wp
