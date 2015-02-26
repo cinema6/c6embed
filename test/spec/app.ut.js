@@ -67,7 +67,13 @@
                     mode: 'lightbox-ads',
                     campaign: {
                         data: 'foo'
-                    }
+                    },
+                    deck: [
+                        { id: 'rc-1', type: 'youtube' },
+                        { id: 'rc-2', type: 'wildcard' },
+                        { id: 'rc-3', type: 'vimeo' },
+                        { id: 'rc-4', type: 'wildcard' }
+                    ]
                 }
             };
 
@@ -401,6 +407,13 @@
 
             it('should fetch index.html', function() {
                 expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
+            });
+            
+            it('should trim out empty wildcard placeholders', function() {
+                expect(settings.experience.data.deck).toEqual([
+                    { id: 'rc-1', type: 'youtube' },
+                    { id: 'rc-3', type: 'vimeo' }
+                ]);
             });
             
             it('should fetch the sponsoredCards', function() {

@@ -109,6 +109,13 @@ module.exports = function(deps) {
                     return document;
                 });
             }
+            
+            function trimPlaceholders(document) {
+                experience.data.deck = experience.data.deck.filter(function(card) {
+                    return card.type !== 'wildcard';
+                });
+                return document;
+            }
 
             function loadApp(document) {
                 return $iframe.load(document.toString(), communicateWithApp)
@@ -260,6 +267,7 @@ module.exports = function(deps) {
                 .then(fetchApp)
                 .then(modifyApp)
                 .then(getSponsoredCards)
+                .then(trimPlaceholders)
                 .then(loadApp)
                 .then(setAppDefines)
                 .then(initAnalytics)
