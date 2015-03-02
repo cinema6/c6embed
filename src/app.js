@@ -110,6 +110,7 @@ module.exports = function(deps) {
                 });
             }
             
+            //TODO: for MR+Campaign, should we also fetch more sponsored cards to fill slots?
             function trimPlaceholders(document) {
                 experience.data.deck = experience.data.deck.filter(function(card) {
                     return card.type !== 'wildcard';

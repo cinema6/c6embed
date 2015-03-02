@@ -14,6 +14,7 @@
             embeds: [],
             branding: {},
             requireCache: {},
+            sponsoredCards: {},
             widgetContentCache: {},
             gaAcctIdPlayer: (function(acc,mi,mx){
                 return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
@@ -32,7 +33,20 @@
                 }, $document.head));
             },
 
+            // TODO: should this match addSponsoredCard in lib/SponsoredCards more?
+            addSponsoredCard: function(placementId, campaignId, extId, clickUrl, countUrl) {
+                console.log('ASDF: called c6.addSponsoredCard with ' + Array.prototype.slice.call(arguments).join(', '));
+                return (this.sponsoredCards[placementId] ||
+                    (this.sponsoredCards[placementId] = [])).push({
+                        campaignId  : campaignId,
+                        extId       : extId,
+                        clickUrl    : clickUrl,
+                        countUrl    : countUrl
+                    });
+            },
+
             addReel: function(expId, placementId, clickUrl, adId) {
+                console.log('ASDF: called c6.addReel with ' + Array.prototype.slice.call(arguments).join(', '));
                 return (this.widgetContentCache[placementId] ||
                     (this.widgetContentCache[placementId] = [])).push({
                         expId: expId,
@@ -287,7 +301,7 @@
              * This function will populate the MR2 widget with MiniReels. It is called by adtech
              * after all of the MiniReels have been pulled down from the ad server.
              */
-            function populateWidget(configs) {
+            function populateWidget(configs, sponsoredCard) {
                 var queryParams = toQueryParams({
                     container: config.container,
                     branding: config.branding,
@@ -300,18 +314,28 @@
                     return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' +
                         queryParams;
                 }), function() {
-                    var experiences = Array.prototype.slice.call(arguments)
+                    var minireels = Array.prototype.slice.call(arguments)
                         .filter(function(experience) {
-                            return !!experience.data;
+                            return !!(experience.data && experience.data.deck);
+                        })
+                        .map(function(experience, index) {
+                            if (sponsoredCard) { // swap sp. card for first placeholder
+                                for (var i = 0; i < experience.data.deck.length; i++) {
+                                    if (experience.data.deck[i].type === 'wildcard') {
+                                        experience.data.deck[i] = sponsoredCard;
+                                        break;
+                                    }
+                                }
+                            }
+                        
+                            return new MiniReelConfig(
+                                experience,
+                                splashPages[index],
+                                configs[index].clickUrl,
+                                configs[index].adId
+                            );
                         });
-                    var minireels = experiences.map(function(experience, index) {
-                        return new MiniReelConfig(
-                            experience,
-                            splashPages[index],
-                            configs[index].clickUrl,
-                            configs[index].adId
-                        );
-                    });
+
                     var extraSplashPages = (minireels.length === splashPages.length) ?
                         [] : splashPages.slice(minireels.length - splashPages.length);
 
@@ -411,24 +435,73 @@
 
             adtech.config.placements[config.id] = {
                 adContainerId: 'ad',
-                complete: function() {
-                    return populateWidget(
-                        c6.widgetContentCache[config.id]
-                            .splice(0, splashPages.length)
-                    );
-                }
             };
+            
+            function loadSponsoredCard(banner) {
+                c6.require(
+                    [baseUrl + '/api/public/content/card/' + banner.extId + '.js'],
+                    function(card) {
+                        if (card && card.campaign) {
+                            card.campaign.clickUrls = (config.startPixels || [])
+                                                      .concat(banner.clickUrl);
+                            card.campaign.countUrls = (config.countPixels || [])
+                                                      .concat(banner.countUrl);
+                            console.log('ASDF: decorated card ' + card.id + ' : ' + JSON.stringify(card.campaign));
+                            requestExperiences(card);
+                        } else {
+                            requestExperiences();
+                        }
+                    }
+                );
+            }
 
             // Request a MiniReel for every MiniReel placeholder in the widget
-            splashPages.forEach(function() {
-                adtech.enqueueAd(parseInt(config.id));
-            });
+            function requestExperiences(sponsoredCard) {
+                console.log('ASDF: calling requestExperiences');
+                var numCalls = splashPages.length - (c6.widgetContentCache[config.id] || []).length;
+                    
+                for (var i = 0; i < numCalls; i++) {
+                    adtech.enqueueAd({
+                        placement: parseInt(config.id),
+                        params: {
+                            Allowedsizes: '1x1',
+                            kwlp1: sponsoredCard && sponsoredCard.id,
+                            kwlp3: (config.categories || []).join('+')
+                        },
+                        complete: function() {
+                            console.log('ASDF: actually completed multiAd call');
+                            return populateWidget(
+                                c6.widgetContentCache[config.id].splice(0, splashPages.length),
+                                sponsoredCard
+                            );
+                        }
+                    });
+                }
 
-            adtech.executeQueue({
-                multiAd: {
-                    disableAdInjection: true,
-                    readyCallback: function() {
-                        adtech.showAd(config.id);
+                adtech.executeQueue({
+                    multiAd: {
+                        disableAdInjection: true,
+                        readyCallback: function() {
+                            adtech.showAd(config.id);
+                        }
+                    }
+                });
+            }
+
+            console.log('ASDF: about to start Adtech calls: ', config.id); //TODO
+            adtech.loadAd({
+                placement: parseInt(config.id),
+                params: {
+                    Allowedsizes: '2x2,2x1,1x1',
+                    kwlp3: (config.categories || []).join() //TODO: won't get kwlp camps if no cats
+                },
+                complete: function() {
+                    console.log('ASDF: finished first Adtech call');
+                    var cardBanner = (c6.sponsoredCards[config.id] || [])[0];
+                    if (cardBanner && cardBanner.extId) {
+                        loadSponsoredCard(cardBanner);
+                    } else {
+                        requestExperiences();
                     }
                 }
             });
