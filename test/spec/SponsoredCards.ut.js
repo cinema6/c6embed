@@ -152,6 +152,36 @@
                     }).done(done);
                 });
                 
+                it('should not overwrite existing entries in the cardCache', function(done) {
+                    window.c6.cardCache = {
+                        1234: {
+                            987: { foo: 'bar' },
+                            876: { foo: 'baz' }
+                        },
+                        4321: {
+                            567: { foo: 'buz' }
+                        }
+                    };
+
+                    spCards.fetchSponsoredCards(experience).then(function() {
+                        expect(_private.getCardConfigs).toHaveBeenCalledWith(experience);
+                        expect(window.c6.cardCache).toEqual({
+                            1234: {
+                                987: { foo: 'bar' },
+                                876: { foo: 'baz' }
+                            },
+                            4321: {
+                                567: { foo: 'buz' }
+                            }
+                        });
+                        expect(window.c6.addSponsoredCard).toEqual(jasmine.any(Function));
+                        expect(_private.loadAdtech).toHaveBeenCalled();
+                        expect(_private.makeAdCall.calls.count()).toBe(2);
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
                 it('should load adtech and make ad calls with passed network', function(done) {
                     experience.data.adServer.network = '4444.4' ;
                     spCards.fetchSponsoredCards(experience).then(function() {
@@ -247,7 +277,7 @@
                         spCards.fetchSponsoredCards(experience).then(function() {
                             window.c6.addSponsoredCard(1234, 'c1', 'ext1', 'click.me', 'count.me');
                             expect(window.c6.cardCache).toEqual({
-                                1234: { c1: { campExtId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me' } }
+                                1234: { c1: { extId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me' } }
                             });
                         }).catch(function(error) {
                             expect(error.toString()).not.toBeDefined();
@@ -312,6 +342,30 @@
                     ]);
                 });
                 
+                it('should handle WildCard-style cards', function() {
+                    experience.data.deck.push({ id: 'rc-sp1', sponsored: true, campaign: {}, adtechId: 123 });
+                    expect(_private.getCardConfigs(experience)).toEqual([
+                        { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
+                        { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } },
+                        { id: 'rc-sp1', sponsored: true, campaign: {}, adtechId: 123 }
+                    ]);
+                });
+                
+                it('should not choose cards that already have both click + count urls', function() {
+                    experience.data.deck = [
+                        { id: 'rc-sp1', sponsored: true, campaign: {}, adtechId: 123 },
+                        { id: 'rc-sp2', sponsored: true, campaign: { clickUrl: 'click.me' }, adtechId: 456 },
+                        { id: 'rc-sp3', sponsored: true, campaign: { countUrl: 'count.me' }, adtechId: 789 },
+                        { id: 'rc-sp4', sponsored: true, campaign: { clickUrl: 'click.me', countUrl: 'count.me' }, adtechId: 987 }
+                    ];
+                    
+                    expect(_private.getCardConfigs(experience)).toEqual([
+                        { id: 'rc-sp1', sponsored: true, campaign: {}, adtechId: 123 },
+                        { id: 'rc-sp2', sponsored: true, campaign: { clickUrl: 'click.me' }, adtechId: 456 },
+                        { id: 'rc-sp3', sponsored: true, campaign: { countUrl: 'count.me' }, adtechId: 789 }
+                    ]);
+                });
+                
                 it('should handle nonexistent or empty decks', function() {
                     experience.data.deck = [];
                     expect(_private.getCardConfigs(experience)).toEqual([]);
@@ -323,7 +377,8 @@
                     experience.data.deck = [
                         { id: 'rc1', sponsored: true, campaign: { foo: 'bar' } },
                         { id: 'rc2', sponsored: true },
-                        { id: 'rc3', campaign: { campaignId: 'camp3' } }
+                        { id: 'rc3', campaign: { campaignId: 'camp3' } },
+                        { id: 'rc4', sponsored: false, adtechId: 123 }
                     ];
                     expect(_private.getCardConfigs(experience)).toEqual([]);
                 });
@@ -334,8 +389,9 @@
 
                 beforeEach(function() {
                     pixels = { countUrls: [], clickUrls: [] };
+                    window.c6.cardCache = { 1234: {} };
                     adtech.loadAd.and.callFake(function(opts) {
-                        window.c6.cardCache = {1234: {camp1: {clickUrl: 'click.me', countUrl: 'count.me'}}};
+                        window.c6.cardCache[1234].camp1 = { clickUrl: 'click.me', countUrl: 'count.me' };
                         opts.complete();
                     });
                     spyOn(_private, 'decorateCard').and.callThrough();
@@ -362,6 +418,40 @@
                             campaign: { campaignId: 'camp1', clickUrls: ['click.me'], countUrls: ['count.me'], bannerId: '2' } });
                         expect(adtech.loadAd).toHaveBeenCalledWith({ placement: 1234,
                             params: { target: '_blank', adid: 'camp1', bnid: '2' }, complete: jasmine.any(Function) });
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should handle WildCard-style cards', function(done) {
+                    window.c6.cardCache[1234]['987'] = { clickUrl: 'click.me.now', countUrl: 'count.me.now' };
+                    experience.data.deck[0] = {
+                        id: 'rc1',
+                        sponsored: true,
+                        adtechId: 987,
+                        bannerId: '3',
+                        campaign: {}
+                    };
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                        expect(experience.data.deck[0]).toEqual({
+                            id: 'rc1',
+                            sponsored: true,
+                            adtechId: 987,
+                            bannerId: '3',
+                            campaign: {
+                                clickUrls: ['click.me.now'],
+                                countUrls: ['count.me.now']
+                            }
+                        });
+                        expect(adtech.loadAd).toHaveBeenCalledWith({
+                            placement: 1234,
+                            params: {
+                                target: '_blank',
+                                adid: '987',
+                                bnid: '3'
+                            },
+                            complete: jasmine.any(Function)
+                        });
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -428,6 +518,28 @@
                     _private.decorateCard(experience.data.deck[0], experience, pixels, 1234);
                     expect(experience.data.deck[0]).toEqual({ id: 'rc1', sponsored: true,
                         campaign: { campaignId: 'camp1', clickUrls: ['custom.click', 'click.me'], countUrls: ['custom.count', 'count.me'] } });
+                });
+
+                it('should handle WildCard-style cards', function() {
+                    window.c6.cardCache[1234]['987'] = { clickUrl: 'click.me.now', countUrl: 'count.me.now' };
+                    experience.data.deck[0] = {
+                        id: 'rc1',
+                        sponsored: true,
+                        adtechId: 987,
+                        bannerId: '3',
+                        campaign: {}
+                    };
+                    _private.decorateCard(experience.data.deck[0], experience, pixels, 1234);
+                    expect(experience.data.deck[0]).toEqual({
+                        id: 'rc1',
+                        sponsored: true,
+                        adtechId: 987,
+                        bannerId: '3',
+                        campaign: {
+                            clickUrls: ['custom.click', 'click.me.now'],
+                            countUrls: ['custom.count', 'count.me.now']
+                        }
+                    });
                 });
                 
                 it('should call trimCard if there\'s no entry in the cardCache', function() {

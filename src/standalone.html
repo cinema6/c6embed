@@ -110,6 +110,10 @@
                             return modules;
                         }
                     };
+                    
+                if (!isProduction) {
+                    window.__C6_AD_NETWORK__ = '5491.1';
+                }
 
                 c6.params.src = c6.params.src || 'standalone'
 
@@ -170,6 +174,7 @@
                 writeScript(base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
                     branding: params.branding,
                     placementId: params.adPlacementId,
+                    campaign: c6.params.campaign,
                     container: c6.params.src,
                     wildCardPlacement: params.wp
                 }));

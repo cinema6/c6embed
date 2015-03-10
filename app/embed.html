@@ -12,6 +12,7 @@
             window.__C6_DEBUG__     = true;
             window.__C6_URL_ROOT__  = window.location.protocol + '//staging.cinema6.com';
             window.__C6_APP_JS__    = 'c6embed.js';
+            window.__C6_AD_NETWORK__= '5491.1';
         </script>
     </head>
     <body>
@@ -22,6 +23,11 @@
                 </span>
             </div>
             <script src="embed.js" data-container="testcontainer" data-exp="e-b581faf0436e05" data-splash="img-text-overlay:16/9" data-preload></script>
+            
+            <!-- This embed code loads a MR that contains an old, hardcoded sponsored card + a WildCard statically mapped in this campaign -->
+            <!--
+            <script src="embed.js" data-campaign="cam-db1e05c5d5f257" data-exp="e-1dba568083f443" data-splash="img-text-overlay:16/9" data-preload></script>
+            -->
             <script>
                 (function(attrs) {
                     var c6 = (window.c6 || (window.c6 = {})),
