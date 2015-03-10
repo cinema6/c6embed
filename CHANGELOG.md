@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.20.0 (March 10, 2015)
+* [FIX]: Fetch banners for WildCards inserted into a minireel in the content service
+
 ## v2.19.1 (February 26, 2015)
 * [FIX]: Trim empty wildcard placeholders
 
