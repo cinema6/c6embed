@@ -312,6 +312,7 @@
     }({
         container: config.container,
         campaign: config.campaign,
+        preview: config.preview,
         branding: config.branding,
         placementId: config.adPlacementId,
         wildCardPlacement: config.wp
