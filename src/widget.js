@@ -91,7 +91,7 @@
                     }.toString() + '(window))',
                     '</script>',
                     '<script>(' + onCreateFrame.toString() + '(window))</script>',
-                    '<script src="' + src + '"></script>'
+                    '<script src="' + src + '" charset="utf-8"></script>'
                 ].join('\n');
 
             iframe.addEventListener('load', function() {
