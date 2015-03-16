@@ -257,7 +257,7 @@
                     }.toString() + '(window))',
                     '</script>',
                     '<script>(' + onCreateFrame.toString() + '(window))</script>',
-                    '<script src="' + src + '"></script>'
+                    '<script src="' + src + '" charset="utf-8"></script>'
                 ].join('\n');
 
             iframe.addEventListener('load', function() {
@@ -312,6 +312,7 @@
     }({
         container: config.container,
         campaign: config.campaign,
+        preview: config.preview,
         branding: config.branding,
         placementId: config.adPlacementId,
         wildCardPlacement: config.wp

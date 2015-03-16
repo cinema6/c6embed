@@ -15,7 +15,7 @@
 
                 var isProduction = (/^(www\.)?(cinema6\.com|ci6\.co)$/).test(window.location.hostname),
                     base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
-                    params = window.location.search.replace(/^\?/, '')
+                    params = window._c6Params = window.location.search.replace(/^\?/, '')
                         .split('&')
                         .reduce(function(params, segment) {
                             var pair = segment.split('=')
@@ -43,8 +43,21 @@
                         }('UA-44457821',6,30))
                     };
 
+                function toQueryParams(object) {
+                    return Object.keys(object)
+                        .filter(function(key) {
+                            return object[key] !== undefined;
+                        })
+                        .map(function(key) {
+                            return [key, object[key]]
+                                .map(encodeURIComponent)
+                                .join('=');
+                        })
+                        .join('&');
+                }
+
                 function writeScript(src) {
-                    document.write('<script src="' + src +'"><\/script>');
+                    document.write('<script src="' + src +'" charset="utf-8"><\/script>');
                 }
 
                 window.module = {
@@ -52,7 +65,12 @@
                 };
 
                 window.writeScript = writeScript;
-                window.src = base + '/api/public/content/experience/' + params.id + '.js';
+                
+                window.src = base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
+                    container: params.container || 'embed',
+                    campaign: params.campaign,
+                    preview: 'true'
+                });
                 writeScript(src);
             }());
         </script>
@@ -63,7 +81,9 @@
             } else {
                 window.__C6_DEBUG__ = true;
                 window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
+                window.__C6_APP_JS__ = 'https://s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js';
                 embedSrc = '//s3.amazonaws.com/c6.dev/ext/c6embed/v1/c6embed.js';
+                // embedSrc = './embed.js';
             }
         </script>
         <script>
@@ -88,9 +108,28 @@
             <div class="ui__previewHolder clearfix">
                 <script>
                     var experience = window.module.exports,
+                        params = window._c6Params,
                         splashData = experience.data.splash,
                         splashString = splashData.theme + ':' + splashData.ratio.replace('-', '/');
-                    document.write('<script src="' + embedSrc + '" data-exp="'+experience.id+'" data-splash="'+splashString+'" data-preload></scrip'+'t>');
+                    
+                    var attrString = (function toDataAttributes(obj) {
+                        return Object.keys(obj)
+                        .filter(function(key) {
+                            return obj[key] !== undefined;
+                        })
+                        .map(function(key) {
+                            return 'data-' + key + '=' + obj[key];
+                        })
+                        .join(' ');
+                    })({
+                        exp         : experience.id,
+                        splash      : splashString,
+                        container   : params.container,
+                        campaign    : params.campaign,
+                        preview     : 'true'
+                    });
+                        
+                    document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload></scrip'+'t>');
                 </script>
             </div>
 
