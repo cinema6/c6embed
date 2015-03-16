@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.20.1 (March 16, 2015)
+* [FIX]: Fix for an issue that could cause a MiniReel with UTF-8
+  characters in the text to appear broken on some sites
+
 ## v2.20.0 (March 10, 2015)
 * [FIX]: Fetch banners for WildCards inserted into a minireel in the content service
 * [FIX]: Preview page passes `campaign` and `preview` params to embed.js for passing to content service
