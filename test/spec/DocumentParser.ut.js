@@ -7,9 +7,11 @@
         var documentParser;
 
         var indexHTML;
+        var indexHTML2;
 
         beforeEach(function() {
             indexHTML = require('../helpers/mock_index.js');
+            indexHTML2 = require('../helpers/mock_index--2.0.js');
 
             DocumentParser = require('../../src/DocumentParser');
 
@@ -31,6 +33,22 @@
                 expect(function() {
                     document = documentParser('I Suck!');
                 }).toThrow();
+            });
+
+            describe('if called with macro values', function() {
+                beforeEach(function() {
+                    document = documentParser(indexHTML2, {
+                        mode: 'mobile',
+                        script: 'main.js',
+                        foo: 'bar'
+                    });
+                });
+
+                it('should replace the dynamic variables with the provided values', function() {
+                    expect(document.toString()).toContain('<link rel="stylesheet" href="css/mobile.css" />');
+                    expect(document.toString()).toContain('<script src="main.js"></script>');
+                    expect(document.toString()).toContain('The mode is mobile!');
+                });
             });
 
             describe('properties', function() {
