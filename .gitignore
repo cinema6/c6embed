@@ -18,3 +18,4 @@ dist/
 reports/
 app/*.js
 app/index.html
+.tern-project

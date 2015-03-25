@@ -120,6 +120,7 @@
             embed: div,
             splashDelegate: {},
             standalone: false,
+            playerVersion: parseInt(config.playerVersion, 10) || 1,
             load: false,
             preload: false,
             config: config

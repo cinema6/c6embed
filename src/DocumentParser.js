@@ -10,10 +10,17 @@ module.exports = function() {
             html.slice(insertionPoint);
     }
 
-    function ParsedDocument(html) {
+    function ParsedDocument(html, params) {
         if (!(/<html(.|[\r\n])*?<\/html>/).test(html)) {
             throw new TypeError('[' + html + '] is not a valid HTML document.');
         }
+
+        Object.keys(params).forEach(function(prop) {
+            var value = params[prop];
+            var matcher = new RegExp('\\$\\{' + prop + '\\}', 'g');
+
+            html = html.replace(matcher, value);
+        });
 
         this.html = html;
     }
@@ -53,7 +60,7 @@ module.exports = function() {
         }
     };
 
-    return function(html) {
-        return new ParsedDocument(html);
+    return function(html, params) {
+        return new ParsedDocument(html, params || {});
     };
 };

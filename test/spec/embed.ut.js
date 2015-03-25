@@ -421,6 +421,7 @@
                                         load: 'data-preload' in config,
                                         preload: 'data-preload' in config,
                                         standalone: false,
+                                        playerVersion: 1,
                                         experience: experience,
                                         splashDelegate: {},
                                         config: (function() {
@@ -449,6 +450,25 @@
                             }));
                             expect(window.c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
                             expect(window.c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
+                        });
+
+                        describe('if the playerVersion is specified', function() {
+                            beforeEach(function(done) {
+                                delete window.c6;
+
+                                var script = document.createElement('script');
+                                script.src = '/base/src/embed.js';
+                                script.setAttribute('data-exp', 'e-123');
+                                script.setAttribute('data-splash', 'foo:1/1');
+                                script.setAttribute('data-player-version', '3');
+                                script.onload = done;
+
+                                $($div).append(script);
+                            });
+
+                            it('should set the playerVersion', function() {
+                                expect(window.c6.embeds[0].playerVersion).toBe(3);
+                            });
                         });
 
                         it('should be reused if there are multiple embed instances', function(done) {

@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add support for MiniReel Player 2.0
+
 ## v2.20.1 (March 16, 2015)
 * [FIX]: Fix for an issue that could cause a MiniReel with UTF-8
   characters in the text to appear broken on some sites

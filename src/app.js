@@ -47,8 +47,14 @@ module.exports = function(deps) {
                     kMode: browserInfo.profile.device !== 'phone' ?
                         experience.data.mode : 'mobile'
                 },
-                appFolder = (window.__C6_APP_FOLDER__ || appUrl(experience.appUri)) + '/',
-                appPath = appFolder + (window.__C6_APP_FILE__ || (appConfig.kMode + '.html')),
+                player2Modes = ['mobile'],
+                playerVersion = player2Modes.indexOf(appConfig.kMode) > -1 ?
+                    settings.playerVersion : 1,
+                appUri = playerVersion === 2 ? 'mini-reel-player' : experience.appUri,
+                appFolder = (window.__C6_APP_FOLDER__ || appUrl(appUri)) + '/',
+                appFile = window.__C6_APP_FILE__ ||
+                    (playerVersion === 2 ? 'index' : appConfig.kMode) + '.html',
+                appPath = appFolder + appFile,
                 state = null,
                 getSessionDeferred = Q.defer();
 
@@ -79,7 +85,9 @@ module.exports = function(deps) {
                             );
                         }
 
-                        return documentParser(response.data);
+                        return documentParser(response.data, {
+                            mode: appConfig.kMode
+                        });
                     });
             }
 
