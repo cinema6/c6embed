@@ -25,6 +25,7 @@
         var $iframe,
             experience,
             indexHTML,
+            indexHTML2,
             parsedDoc,
             session,
             safeSession;
@@ -60,6 +61,7 @@
                 documentParser = new DocumentParser();
 
             indexHTML = require('../helpers/mock_index.js');
+            indexHTML2 = require('../helpers/mock_index--2.0.js');
 
             experience = {
                 appUri: 'rumble',
@@ -285,6 +287,10 @@
                         return Q.when({
                             data: indexHTML
                         });
+                    case config.appBase + '/mini-reel-player/index.html':
+                        return Q.when({
+                            data: indexHTML2
+                        });
                     default:
                         return Q.reject('404 NOT FOUND!');
                     }
@@ -408,7 +414,60 @@
             it('should fetch index.html', function() {
                 expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
             });
-            
+
+            describe('if playerVersion is 2', function() {
+                beforeEach(function(done) {
+                    settings.playerVersion = 2;
+
+                    delete settings.promise;
+                    settings.experience.data.mode = 'lightbox-playlist';
+                    browserInfo.profile.device = 'phone';
+                    c6Ajax.get.calls.reset();
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should fetch player 2.0', function() {
+                    expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
+                });
+
+                ['full', 'solo', 'solo-ads', 'lightbox', 'lightbox-playlist'].forEach(function(mode) {
+                    describe('if the mode is ' + mode, function() {
+                        beforeEach(function(done) {
+                            settings.experience.data.mode = mode;
+
+                            delete settings.promise;
+                            browserInfo.profile.device = 'desktop';
+                            c6Ajax.get.calls.reset();
+
+                            $window.c6.loadExperience(settings).finally(done);
+                        });
+
+                        it('should load player 1.0', function() {
+                            expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/' + mode + '.html');
+                        });
+                    });
+                });
+
+                ['mobile'].forEach(function(mode) {
+                    describe('if the mode is ' + mode, function() {
+                        beforeEach(function(done) {
+                            settings.experience.data.mode = mode;
+
+                            delete settings.promise;
+                            browserInfo.profile.device = 'desktop';
+                            c6Ajax.get.calls.reset();
+
+                            $window.c6.loadExperience(settings).finally(done);
+                        });
+                    });
+
+                    it('should load player 2.0', function() {
+                        expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
+                    });
+                });
+            });
+
             it('should trim out empty wildcard placeholders', function() {
                 expect(settings.experience.data.deck).toEqual([
                     { id: 'rc-1', type: 'youtube' },
@@ -476,6 +535,11 @@
             describe('if the device is a phone', function() {
                 beforeEach(function(done) {
                     delete settings.promise;
+                    mockDocumentParser.calls.reset();
+                    c6Ajax.get.calls.reset();
+                    c6Ajax.get.and.returnValue(Q.when({
+                        data: indexHTML
+                    }));
 
                     browserInfo.profile.device = 'phone';
 
@@ -485,10 +549,14 @@
                 it('should load the mobile version', function() {
                     expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/mobile.html');
                 });
+
+                it('should provide the mobile mode to the document', function() {
+                    expect(mockDocumentParser).toHaveBeenCalledWith(jasmine.any(String), { mode: 'mobile' });
+                });
             });
 
             it('should parse the document', function() {
-                expect(mockDocumentParser).toHaveBeenCalledWith(indexHTML);
+                expect(mockDocumentParser).toHaveBeenCalledWith(indexHTML, { mode: 'lightbox-ads' });
             });
 
             describe('if the ajax reqest has no data', function() {
