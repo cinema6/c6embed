@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.21.0 (March 25, 2015)
 * [FEATURE]: Add support for MiniReel Player 2.0
 
 ## v2.20.1 (March 16, 2015)
