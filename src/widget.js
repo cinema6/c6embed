@@ -246,6 +246,7 @@
                 this.preload = false;
 
                 this.standalone = false;
+                this.playerVersion = config.playerVersion || 1;
                 this.trackingUrl = trackingUrl;
                 this.embed = splash;
                 this.splashDelegate = splashJS({
