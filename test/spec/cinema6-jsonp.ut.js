@@ -610,6 +610,7 @@ describe('cinema6-jsonp.js', function() {
                         expect(config.preload).toBe(false);
 
                         expect(config.standalone).toBe(false);
+                        expect(config.playerVersion).toBe(1);
 
                         expect(config.embed).toBe($('div#c6-lightbox-container')[0]);
                         expect(config.splashDelegate).toEqual({});
@@ -625,6 +626,24 @@ describe('cinema6-jsonp.js', function() {
                             startPixel: undefined,
                             countPixel: undefined,
                             launchPixel: undefined
+                        });
+                    });
+                });
+
+                describe('if the playerVersion is set in the URL', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now());
+                    });
+
+                    it('should set the playerVersion to the supplied version', function() {
+                        c6.embeds.forEach(function(minireel) {
+                            expect(minireel.playerVersion).toBe(4);
                         });
                     });
                 });

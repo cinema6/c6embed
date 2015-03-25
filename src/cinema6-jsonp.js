@@ -262,6 +262,7 @@
         this.preload = false;
 
         this.standalone = false;
+        this.playerVersion = params.playerVersion || 1;
 
         this.embed = container;
         this.splashDelegate = {};
