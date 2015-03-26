@@ -69,6 +69,7 @@
     var SponsoredCards = require('../lib/SponsoredCards'),
         spCards = new SponsoredCards({
             window: window,
+            config: config,
             q: q
         });
 

@@ -98,14 +98,20 @@ module.exports = function(deps) {
             }
 
             function getSponsoredCards(document) {
+                if (settings.hasSponsoredCards) { //don't load more cards for mr2 or jsonp minireels
+                    return document;
+                }
+                console.log('ASDF: calling getSponsoredCards for ' + settings.experience.id); //TODO
+                
                 var startFetch = (new Date()).getTime();
                 var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
                 var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
 
-                return spCardService.fetchSponsoredCards(experience, {
+                return spCardService.fetchSponsoredCards(experience, settings.config, {
                     clickUrls: clickUrls,
                     countUrls: countUrls
-                },preload).then(function(){
+                }, preload).then(function(){
+                    console.log('ASDF: finished fetchSpCards in app.js for ' + settings.experience.id); //TODO
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
                     window.__c6_ga__(embedTracker + '.send', 'timing', {
@@ -119,6 +125,7 @@ module.exports = function(deps) {
             }
             
             function trimPlaceholders(document) {
+                console.log('ASDF: trimming extra placeholders for ' + experience.id); //TODO
                 experience.data.deck = experience.data.deck.filter(function(card) {
                     return card.type !== 'wildcard';
                 });
@@ -281,6 +288,8 @@ module.exports = function(deps) {
                 .then(initAnalytics)
                 .then(finish)
                 .catch(function(err){
+                    console.log('ASDF: caught error in app.js');
+                    console.log(err && err.stack || err);
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
 

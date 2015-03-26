@@ -186,8 +186,8 @@
             } else {
                 window.__C6_DEBUG__ = true;
                 window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
-                writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
-                //writeScript('c6embed.js');
+                //writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js'); //TODO
+                writeScript('c6embed.js');
             }
         </script>
         <style type="text/css">
@@ -329,7 +329,9 @@
                     config: {
                         exp: experience.id,
                         title: experience.data.title,
-                        showStartTime: window._c6InitTime ,
+                        showStartTime: window._c6InitTime,
+                        campaign: c6.params.campaign,
+                        categories: c6.params.categories,
                         container: c6.params.src,
                         context: 'standalone',
                         startPixel: c6.params.startPixel,

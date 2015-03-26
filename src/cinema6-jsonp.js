@@ -267,6 +267,7 @@
         this.embed = container;
         this.splashDelegate = {};
         this.experience = experience;
+        this.hasSponsoredCards = true;
 
         this.trackingUrl = trackingUrl;
         this.config = {

@@ -271,6 +271,7 @@
                     }
                 }, this, splash);
                 this.experience = experience;
+                this.hasSponsoredCards = true;
 
                 this.config = {
                     exp: experience.id,
