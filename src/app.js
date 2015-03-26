@@ -101,7 +101,6 @@ module.exports = function(deps) {
                 if (settings.hasSponsoredCards) { //don't load more cards for mr2 or jsonp minireels
                     return document;
                 }
-                console.log('ASDF: calling getSponsoredCards for ' + settings.experience.id); //TODO
                 
                 var startFetch = (new Date()).getTime();
                 var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
@@ -111,7 +110,6 @@ module.exports = function(deps) {
                     clickUrls: clickUrls,
                     countUrls: countUrls
                 }, preload).then(function(){
-                    console.log('ASDF: finished fetchSpCards in app.js for ' + settings.experience.id); //TODO
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
                     window.__c6_ga__(embedTracker + '.send', 'timing', {
@@ -125,7 +123,6 @@ module.exports = function(deps) {
             }
             
             function trimPlaceholders(document) {
-                console.log('ASDF: trimming extra placeholders for ' + experience.id); //TODO
                 experience.data.deck = experience.data.deck.filter(function(card) {
                     return card.type !== 'wildcard';
                 });
