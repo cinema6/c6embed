@@ -602,7 +602,7 @@ describe('cinema6-jsonp.js', function() {
                     });
                 });
 
-                it('should push configuration into the emebds array', function() {
+                it('should push configuration into the embeds array', function() {
                     exps.forEach(function(exp, index) {
                         var config = c6.embeds[index];
 
@@ -621,6 +621,7 @@ describe('cinema6-jsonp.js', function() {
                             exp: exp.id,
                             title: exp.data.title,
                             container: 'jsonp',
+                            hasSponsoredCards: true,
                             context: 'jsonp',
                             adId: undefined,
                             startPixel: undefined,

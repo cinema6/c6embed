@@ -271,7 +271,6 @@
                     }
                 }, this, splash);
                 this.experience = experience;
-                this.hasSponsoredCards = true;
 
                 this.config = {
                     exp: experience.id,
@@ -281,6 +280,7 @@
                     countPixel: config.countPixels && config.countPixels.join(' '),
                     launchPixel: config.launchPixels && config.launchPixels.join(' '),
                     container: config.container,
+                    hasSponsoredCards: true,
                     adId : adId
                 };
             }

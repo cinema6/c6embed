@@ -98,10 +98,6 @@ module.exports = function(deps) {
             }
 
             function getSponsoredCards(document) {
-                if (settings.hasSponsoredCards) { //don't load more cards for mr2 or jsonp minireels
-                    return document;
-                }
-                
                 var startFetch = (new Date()).getTime();
                 var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
                 var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
@@ -285,8 +281,6 @@ module.exports = function(deps) {
                 .then(initAnalytics)
                 .then(finish)
                 .catch(function(err){
-                    console.log('ASDF: caught error in app.js');
-                    console.log(err && err.stack || err);
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
 
