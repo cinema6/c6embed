@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.22.0 (March 27, 2015)
+* [FEATURE]: Dynamically fetch WildCards to fill empty placeholders in minireels
+
 ## v2.21.0 (March 25, 2015)
 * [FEATURE]: Add support for MiniReel Player 2.0
 
