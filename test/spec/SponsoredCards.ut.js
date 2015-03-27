@@ -1009,6 +1009,31 @@
                     }).done(done);
                 });
                 
+                it('should only use the first four categories', function(done) {
+                    config.categories = 'one,two,three,four,five,six';
+                    _private.fetchDynamicCards(withWildcards, config, pixels, adtech, 3000).then(function() {
+                        expect(adtech.enqueueAd.calls.count()).toBe(2);
+                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
+                            expect(args).toEqual([{
+                                placement: 7654,
+                                params: {
+                                    target: '_blank',
+                                    Allowedsizes: '2x2',
+                                    kwlp1: 'cam-1',
+                                    kwlp3: 'one+two+three+four',
+                                    sub1: 'e-4567'
+                                },
+                                complete: jasmine.any(Function)
+                            }]);
+                        });
+                        expect(adtech.executeQueue.calls.count()).toBe(1);
+                        expect(_private.loadCardObjects).toHaveBeenCalled();
+                        expect(_private.sendError).not.toHaveBeenCalled();
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
                 it('should handle the campaign and categories params being undefined', function(done) {
                     _private.fetchDynamicCards(withWildcards, {}, pixels, adtech, 3000).then(function() {
                         expect(adtech.enqueueAd.calls.count()).toBe(2);
