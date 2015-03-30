@@ -2,6 +2,7 @@
 
 ## v2.22.0 (March 27, 2015)
 * [FEATURE]: Dynamically fetch WildCards to fill empty placeholders in minireels
+* [FEATURE]: Add support for close button with Jump Ramp
 
 ## v2.21.0 (March 25, 2015)
 * [FEATURE]: Add support for MiniReel Player 2.0

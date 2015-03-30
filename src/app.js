@@ -47,6 +47,7 @@ module.exports = function(deps) {
                     kMode: browserInfo.profile.device !== 'phone' ?
                         experience.data.mode : 'mobile'
                 },
+                standalone = settings.config.container === 'jumpramp' ? false : settings.standalone,
                 player2Modes = ['mobile'],
                 playerVersion = player2Modes.indexOf(appConfig.kMode) > -1 ?
                     settings.playerVersion : 1,
@@ -134,7 +135,7 @@ module.exports = function(deps) {
 
             function communicateWithApp(appWindow) {
                 var session = experienceService.registerExperience(experience, appWindow, {
-                    standalone: settings.standalone
+                    standalone: standalone
                 }).on('open', function openApp() {
                     state.set('active', true);
                 })

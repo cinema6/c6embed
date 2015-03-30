@@ -784,6 +784,25 @@
                     expect(settings.appDefines).toBe(safeSession.window.c6);
                 });
 
+                describe('if running inside of jumpramp', function() {
+                    beforeEach(function(done) {
+                        delete settings.promise;
+                        settings.config.container = 'jumpramp';
+                        settings.standalone = true;
+                        experienceService.registerExperience.calls.reset();
+
+                        $window.c6.loadExperience(settings).then(function() {
+                            $iframe.load.calls.mostRecent().args[1](appWindow);
+                        }).finally(done);
+                    });
+
+                    it('should set standalone to false', function() {
+                        expect(experienceService.registerExperience).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), {
+                            standalone: false
+                        });
+                    });
+                });
+
                 describe('google analytics',function(){
                     var tracker;
 
