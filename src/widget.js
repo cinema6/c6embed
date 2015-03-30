@@ -280,6 +280,7 @@
                     countPixel: config.countPixels && config.countPixels.join(' '),
                     launchPixel: config.launchPixels && config.launchPixels.join(' '),
                     container: config.container,
+                    hasSponsoredCards: true,
                     adId : adId
                 };
             }

@@ -838,6 +838,7 @@
                                             title: experience.data.title,
                                             context: 'mr2',
                                             container: 'mr2',
+                                            hasSponsoredCards: true,
                                             adId: undefined,
                                             startPixel: undefined,
                                             countPixel: undefined,

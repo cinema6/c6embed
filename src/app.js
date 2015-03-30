@@ -102,10 +102,10 @@ module.exports = function(deps) {
                 var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
                 var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
 
-                return spCardService.fetchSponsoredCards(experience, {
+                return spCardService.fetchSponsoredCards(experience, settings.config, {
                     clickUrls: clickUrls,
                     countUrls: countUrls
-                },preload).then(function(){
+                }, preload).then(function(){
                     /* jshint camelcase:false */
                     var embedTracker = settings.config.exp.replace(/e-/,'');
                     window.__c6_ga__(embedTracker + '.send', 'timing', {

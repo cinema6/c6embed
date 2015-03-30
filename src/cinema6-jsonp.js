@@ -277,6 +277,7 @@
             countPixel: params.countPixel,
             launchPixel: params.launchPixel,
             container: params.src,
+            hasSponsoredCards: true,
             context: 'jsonp'
         };
     }

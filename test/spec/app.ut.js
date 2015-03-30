@@ -476,12 +476,12 @@
             });
             
             it('should fetch the sponsoredCards', function() {
-                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, {
+                expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
                     clickUrls: undefined,
                     countUrls: undefined
                 },undefined);
             });
-
+            
             describe('if the config has a startPixel and countPixel', function() {
                 beforeEach(function(done) {
                     delete settings.promise;
@@ -492,7 +492,7 @@
                 });
 
                 it('should fetch the sponosred cards with the additional pixels', function() {
-                    expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, {
+                    expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
                         clickUrls: settings.config.startPixel.split(' '),
                         countUrls: settings.config.countPixel.split(' ')
                     },undefined);
