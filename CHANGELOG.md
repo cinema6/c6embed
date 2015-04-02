@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.24.0 (April 2, 2015)
 * [FEATURE]: Add support for loading the "full" player via MiniReel Player 2.0
 
 ## v2.23.0 (March 31, 2015)
