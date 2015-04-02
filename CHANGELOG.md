@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add support for loading the "full" player via MiniReel Player 2.0
+
 ## v2.23.0 (March 31, 2015)
 * [FEATURE]: Add support for close button with Jump Ramp
 

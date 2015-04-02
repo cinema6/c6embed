@@ -431,7 +431,7 @@
                     expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
                 });
 
-                ['full', 'solo', 'solo-ads', 'lightbox', 'lightbox-playlist'].forEach(function(mode) {
+                ['solo', 'solo-ads', 'lightbox', 'lightbox-playlist'].forEach(function(mode) {
                     describe('if the mode is ' + mode, function() {
                         beforeEach(function(done) {
                             settings.experience.data.mode = mode;
@@ -449,7 +449,7 @@
                     });
                 });
 
-                ['mobile'].forEach(function(mode) {
+                ['full', 'mobile'].forEach(function(mode) {
                     describe('if the mode is ' + mode, function() {
                         beforeEach(function(done) {
                             settings.experience.data.mode = mode;
@@ -460,10 +460,10 @@
 
                             $window.c6.loadExperience(settings).finally(done);
                         });
-                    });
 
-                    it('should load player 2.0', function() {
-                        expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
+                        it('should load player 2.0', function() {
+                            expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
+                        });
                     });
                 });
             });
