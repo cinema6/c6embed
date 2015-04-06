@@ -2,6 +2,8 @@
 
 ## v2.24.1 (April 6, 2015)
 * [FIX]: Default to categories on minireel for sponsored card calls
+* [FIX]: Remove "full" from player 2.0 whitelist until IE issue is
+  resolved
 
 ## v2.24.0 (April 2, 2015)
 * [FEATURE]: Add support for loading the "full" player via MiniReel Player 2.0
