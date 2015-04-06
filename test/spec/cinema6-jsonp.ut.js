@@ -626,7 +626,26 @@ describe('cinema6-jsonp.js', function() {
                             adId: undefined,
                             startPixel: undefined,
                             countPixel: undefined,
-                            launchPixel: undefined
+                            launchPixel: undefined,
+                            preview: undefined
+                        });
+                    });
+                });
+                
+                describe('if preview mode is set in the URL', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now());
+                    });
+
+                    it('should set the preview attribute in the experiences\' config', function() {
+                        exps.forEach(function(exp, index) {
+                            expect(c6.embeds[index].config.preview).toBe('true');
                         });
                     });
                 });

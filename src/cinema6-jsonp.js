@@ -278,7 +278,8 @@
             launchPixel: params.launchPixel,
             container: params.src,
             hasSponsoredCards: true,
-            context: 'jsonp'
+            context: 'jsonp',
+            preview: params.preview
         };
     }
 

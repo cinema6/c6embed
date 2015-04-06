@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.24.3 (April 6, 2015)
+* [FIX]: Support `preview` param in all delivery modes
+
 ## v2.24.2 (April 6, 2015)
 * [FIX]: Re-enable support for using Player 2.0 with the full mode
 

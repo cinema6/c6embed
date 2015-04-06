@@ -310,6 +310,19 @@
                     }).done(done);
                 });
                 
+                it('should return early if config.preview is true', function(done) {
+                    config.preview = true;
+                    spCards.fetchSponsoredCards(experience, config).then(function() {
+                        expect(_private.loadAdtech).not.toHaveBeenCalled();
+                        expect(_private.makeAdCall).not.toHaveBeenCalled();
+                        expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
+                        expect(_private.trimCard).not.toHaveBeenCalled();
+                        expect(_private.sendError).not.toHaveBeenCalled();
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
                 it('should not fetchDynamicCards if config.hasSponsoredCards is true', function(done) {
                     config.hasSponsoredCards = true;
                     spCards.fetchSponsoredCards(withWildcards, config).then(function() {
