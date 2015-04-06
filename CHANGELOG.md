@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.24.1 (April 6, 2015)
+* [FIX]: Default to categories on minireel for sponsored card calls
+
 ## v2.24.0 (April 2, 2015)
 * [FEATURE]: Add support for loading the "full" player via MiniReel Player 2.0
 
