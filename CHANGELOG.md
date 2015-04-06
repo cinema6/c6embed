@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.24.2 (April 6, 2015)
+* [FIX]: Re-enable support for using Player 2.0 with the full mode
+
 ## v2.24.1 (April 6, 2015)
 * [FIX]: Default to categories on minireel for sponsored card calls
 * [FIX]: Remove "full" from player 2.0 whitelist until IE issue is
