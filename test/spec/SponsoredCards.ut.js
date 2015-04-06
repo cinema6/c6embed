@@ -1034,6 +1034,32 @@
                     }).done(done);
                 });
                 
+                it('should default to categories on the experience', function(done) {
+                    config.categories = '';
+                    withWildcards.categories = ['blah', 'bloop'];
+                    _private.fetchDynamicCards(withWildcards, config, pixels, adtech, 3000).then(function() {
+                        expect(adtech.enqueueAd.calls.count()).toBe(2);
+                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
+                            expect(args).toEqual([{
+                                placement: 7654,
+                                params: {
+                                    target: '_blank',
+                                    Allowedsizes: '2x2',
+                                    kwlp1: 'cam-1',
+                                    kwlp3: 'blah+bloop',
+                                    sub1: 'e-4567'
+                                },
+                                complete: jasmine.any(Function)
+                            }]);
+                        });
+                        expect(adtech.executeQueue.calls.count()).toBe(1);
+                        expect(_private.loadCardObjects).toHaveBeenCalled();
+                        expect(_private.sendError).not.toHaveBeenCalled();
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
                 it('should handle the campaign and categories params being undefined', function(done) {
                     _private.fetchDynamicCards(withWildcards, {}, pixels, adtech, 3000).then(function() {
                         expect(adtech.enqueueAd.calls.count()).toBe(2);
