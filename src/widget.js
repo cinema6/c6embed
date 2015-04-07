@@ -281,7 +281,8 @@
                     launchPixel: config.launchPixels && config.launchPixels.join(' '),
                     container: config.container,
                     hasSponsoredCards: true,
-                    adId : adId
+                    adId : adId,
+                    preview: config.preview,
                 };
             }
 

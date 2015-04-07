@@ -842,7 +842,41 @@
                                             adId: undefined,
                                             startPixel: undefined,
                                             countPixel: undefined,
-                                            launchPixel: undefined
+                                            launchPixel: undefined,
+                                            preview: undefined
+                                        });
+                                    });
+                                });
+                                
+                                describe('if preview mode is active', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+                                        c6.embeds.length = 0;
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710',
+                                            preview: true
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should set the preview attribute in the experience\'s config', function() {
+                                        c6.embeds.forEach(function(minireel) {
+                                            expect(minireel.config.preview).toBe(true);
                                         });
                                     });
                                 });
