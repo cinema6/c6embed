@@ -65,7 +65,7 @@
                 };
 
                 window.writeScript = writeScript;
-                
+
                 window.src = base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
                     container: params.container || 'embed',
                     campaign: params.campaign,
@@ -101,7 +101,7 @@
                     <div class="c6Brand c6Brand--logo c6Sprite--alpha">
                         <span class="ir">Cinema6</span>
                     </div>
-                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+experience.data.title+'</strong>')</script></em>&rdquo;</h1>
+                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+experience.data.title+'<\/strong>')</script></em>&rdquo;</h1>
                 </header>
             </div>
 
@@ -111,7 +111,7 @@
                         params = window._c6Params,
                         splashData = experience.data.splash,
                         splashString = splashData.theme + ':' + splashData.ratio.replace('-', '/');
-                    
+
                     var attrString = (function toDataAttributes(obj) {
                         return Object.keys(obj)
                         .filter(function(key) {
@@ -122,14 +122,15 @@
                         })
                         .join(' ');
                     })({
-                        exp         : experience.id,
-                        splash      : splashString,
-                        container   : params.container,
-                        campaign    : params.campaign,
-                        preview     : 'true'
+                        exp             : experience.id,
+                        splash          : splashString,
+                        container       : params.container,
+                        campaign        : params.campaign,
+                        preview         : 'true',
+                        'player-version': params.playerVersion
                     });
-                        
-                    document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload></scrip'+'t>');
+
+                    document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload><\/script>');
                 </script>
             </div>
 
