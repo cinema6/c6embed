@@ -122,11 +122,12 @@
                         })
                         .join(' ');
                     })({
-                        exp         : experience.id,
-                        splash      : splashString,
-                        container   : params.container,
-                        campaign    : params.campaign,
-                        preview     : 'true'
+                        exp             : experience.id,
+                        splash          : splashString,
+                        container       : params.container,
+                        campaign        : params.campaign,
+                        preview         : 'true',
+                        'player-version': params.playerVersion
                     });
 
                     document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload><\/script>');
