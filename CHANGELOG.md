@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add support for using Player 2.0 with the light, lightbox
+  and lightbox-playlist modes
+
 ## v2.24.3 (April 6, 2015)
 * [FIX]: Support `preview` param in all delivery modes
 
