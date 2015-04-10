@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.25.0 (April 10, 2015)
 * [FEATURE]: Add support for using Player 2.0 with the light, lightbox
   and lightbox-playlist modes
 * [FEATURE]: Add support for using Player 2.0 on Cinema6 studio preview
