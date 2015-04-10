@@ -6,6 +6,10 @@
 * [FEATURE]: Add support for using Player 2.0 on Cinema6 studio preview
   page
 
+## v2.24.4 (April 10, 2015)
+* [FIX]: Fix for an issue that caused the MR Player to be shown before
+  it was launched on the Digital Journal mobile site
+
 ## v2.24.3 (April 6, 2015)
 * [FIX]: Support `preview` param in all delivery modes
 

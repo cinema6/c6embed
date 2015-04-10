@@ -53,11 +53,11 @@
             });
 
             it('should have a width of 100%', function() {
-                expect($iframe.attr('width')).toBe('100%');
+                expect($iframe.attr('style')).toContain('width: 100%;');
             });
 
-            it('should have a height of 0', function() {
-                expect($iframe.attr('height')).toBe('0');
+            it('should have a height of 0px', function() {
+                expect($iframe.attr('style')).toContain('height: 0px;');
             });
 
             it('should be positioned absolutely', function() {
@@ -215,7 +215,7 @@
                 });
 
                 it('should set the height to 100%', function() {
-                    expect($result.attr('height')).toBe('100%');
+                    expect($result[0].style.height).toBe('100%');
                 });
             });
 
@@ -226,7 +226,7 @@
                 });
 
                 it('should set the height to 0', function() {
-                    expect($result.attr('height')).toBe('0');
+                    expect($result[0].style.height).toBe('0px');
                 });
             });
         });

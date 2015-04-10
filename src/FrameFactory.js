@@ -8,10 +8,8 @@ module.exports = function(deps) {
     return function() {
         var $result = $([
             '<iframe src="about:blank"',
-            '    width="100%"',
-            '    height="0"',
             '    scrolling="no"',
-            '    style="border: none; position: absolute; top: 0px; left: 0px; z-index: 100;"',
+            '    style="border: none; position: absolute; top: 0px; left: 0px; width: 100%; height: 0px; z-index: 100;"',
             '    class="c6__cant-touch-this">',
             '</iframe>'
         ].join(''));
@@ -60,11 +58,11 @@ module.exports = function(deps) {
         };
 
         $result.show = function() {
-            this.attr('height', '100%');
+            this.css('height', '100%');
         };
 
         $result.hide = function() {
-            this.attr('height', '0');
+            this.css('height', '0px');
         };
 
         return $result;
