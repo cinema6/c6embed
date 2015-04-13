@@ -86,6 +86,8 @@ module.exports = function(deps) {
             }
 
             function fetchApp() {
+                var startFetch = new Date().getTime();
+
                 return c6Ajax.get(appPath)
                     .then(function parse(response) {
                         if (!response.data) {
@@ -93,6 +95,13 @@ module.exports = function(deps) {
                                 'Unexpected response for MR App request: ' + JSON.stringify(response)
                             );
                         }
+
+                        /* jshint camelcase:false */
+                        window.__c6_ga__(embedTracker + '.send', 'timing', {
+                            'timingCategory' : 'API',
+                            'timingVar'      : 'fetchPlayer',
+                            'timingValue'    : (new Date().getTime() - startFetch)
+                        });
 
                         return documentParser(response.data, {
                             mode: appConfig.kMode

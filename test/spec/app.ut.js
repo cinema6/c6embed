@@ -422,6 +422,31 @@
                 expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
             });
 
+            it('should measure the amount of time it takes to fetch the player\'s HTML', function(done) {
+                var response = { data: indexHTML2 };
+                var responseDeferred = Q.defer();
+                c6Ajax.get.and.returnValue(responseDeferred.promise);
+                delete settings.promise;
+                $window.c6.loadExperience(settings);
+
+                Q.delay(50)
+                    .then(function() {
+                        responseDeferred.resolve(response);
+                        return responseDeferred.promise;
+                    })
+                    .then(function() {
+                        return Q.delay(5);
+                    })
+                    .then(function() {
+                        expect($window.__c6_ga__).toHaveBeenCalledWith('68cde3e4177b8a.send', 'timing', {
+                            timingCategory: 'API',
+                            timingVar: 'fetchPlayer',
+                            timingValue: jasmine.any(Number)
+                        });
+                    })
+                    .finally(done);
+            });
+
             describe('if playerVersion is 2', function() {
                 beforeEach(function(done) {
                     settings.playerVersion = 2;
@@ -832,7 +857,7 @@
                     });
 
                     it('sends a ping if it gets a clientId',function(){
-                        $window.__c6_ga__.calls.argsFor(2)[0]();
+                        $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
                         expect(tracker.get).toHaveBeenCalledWith('clientId');
                         expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id', container: 'test', context: 'test', group: 'xyz' } );
@@ -843,7 +868,7 @@
 
                         session.trigger('ready', true);
                         session.ping.calls.reset();
-                        $window.__c6_ga__.calls.argsFor(2)[0]();
+                        $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect(session.ping).not.toHaveBeenCalled();
                     });
 
@@ -852,7 +877,7 @@
 
                         session.trigger('ready', true);
                         session.ping.calls.reset();
-                        $window.__c6_ga__.calls.argsFor(2)[0]();
+                        $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect(session.ping).not.toHaveBeenCalled();
                     });
                 });
