@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Added additional GA reporting to try to shed light on
+  strange dropoffs
+
 ## v2.25.0 (April 10, 2015)
 * [FEATURE]: Add support for using Player 2.0 with the light, lightbox
   and lightbox-playlist modes
