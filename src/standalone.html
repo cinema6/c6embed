@@ -3,6 +3,16 @@
     <head>
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <script>
+            window.onerror = function(message) {
+                var img = new Image();
+                img.src = 'http://portal.cinema6.com/collateral/etc/tracking/1x1-pixel.gif?' + toQueryParams({
+                    cb: new Date().getTime(),
+                    ct: 'Error',
+                    lb: message
+                });
+                return false;
+            }
+
             function toQueryParams(object) {
                 return Object.keys(object)
                     .filter(function(key) {
