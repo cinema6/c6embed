@@ -3,6 +3,62 @@
     <head>
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <script>
+            window.onerror = function(message) {
+                var img = new Image();
+                img.src = 'http://portal.cinema6.com/collateral/etc/tracking/1x1-pixel.gif?' + toQueryParams({
+                    cb: new Date().getTime(),
+                    ct: 'Error',
+                    lb: message
+                });
+                return false;
+            }
+
+            function toQueryParams(object) {
+                return Object.keys(object)
+                    .filter(function(key) {
+                        return object[key] !== undefined;
+                    })
+                    .map(function(key) {
+                        return [key, object[key]]
+                            .map(encodeURIComponent)
+                            .join('=');
+                    })
+                    .join('&');
+            }
+
+            function writeScript(src) {
+                document.write('<script src="' + src +'" charset="utf-8"><\/script>');
+            }
+
+            function loadScript(src, callback) {
+                callback = callback || function() {};
+
+                var script = document.createElement('script');
+                script.async = true;
+                script.onload = function() { callback(null); };
+                script.onerror = function() { callback(new Error('Error loading script: "' + src + '".')); };
+                script.src = src;
+
+                document.head.appendChild(script);
+
+                return script;
+            }
+
+            function DOMElement(tag, attrs, appendTo) {
+                var element = document.createElement(tag),
+                    attr;
+
+                for (attr in attrs) {
+                    element.setAttribute(attr, attrs[attr]);
+                }
+
+                if (appendTo) {
+                    appendTo.appendChild(element);
+                }
+
+                return element;
+            }
+
             (function() {
                 'use strict';
 
@@ -115,39 +171,7 @@
                     window.__C6_AD_NETWORK__ = '5491.1';
                 }
 
-                c6.params.src = c6.params.src || 'standalone'
-
-                function toQueryParams(object) {
-                    return Object.keys(object)
-                        .filter(function(key) {
-                            return object[key] !== undefined;
-                        })
-                        .map(function(key) {
-                            return [key, object[key]]
-                                .map(encodeURIComponent)
-                                .join('=');
-                        })
-                        .join('&');
-                }
-
-                function writeScript(src) {
-                    document.write('<script src="' + src +'" charset="utf-8"><\/script>');
-                }
-
-                function DOMElement(tag, attrs, appendTo) {
-                    var element = document.createElement(tag),
-                        attr;
-
-                    for (attr in attrs) {
-                        element.setAttribute(attr, attrs[attr]);
-                    }
-
-                    if (appendTo) {
-                        appendTo.appendChild(element);
-                    }
-
-                    return element;
-                }
+                c6.params.src = c6.params.src || 'standalone';
 
                 /* Create GA Tracker */
                 (function() {
@@ -169,8 +193,6 @@
                     exports: {}
                 };
 
-                window.writeScript = writeScript;
-
                 writeScript(base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
                     branding: params.branding,
                     placementId: params.adPlacementId,
@@ -181,14 +203,62 @@
             }());
         </script>
         <script>
-            if (window.c6.isProduction) {
-                writeScript('//lib.cinema6.com/c6embed/v1/app.min.js');
-            } else {
-                window.__C6_DEBUG__ = true;
-                window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
-                writeScript('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
-                // writeScript('c6embed.js');
-            }
+            (function() {
+                var experience = window.module.exports;
+
+                if (!experience.id) { //e.g. 404
+                    return window.location.href = '/404.html';
+                }
+
+                var embedTracker = window.embedTracker = experience.id.replace(/^e-/, ''),
+                    pagePath = (function(e,q){
+                        var r='/embed/'+e+'/',p,qf=[];
+                        for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
+                        if (qf.length){ r += '?' + qf.join('&'); }
+                        return r;
+                    }(experience.id,{cx:'standalone',ct:c6.params.src,bd:experience.data.branding}));
+
+                window.__c6_ga__('create', c6.gaAcctIdEmbed, {
+                    'name'       : embedTracker,
+                    'cookieName' : '_c6ga'
+                });
+                window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
+
+                window.__c6_ga__(embedTracker + '.set',{
+                    'dimension1' : window.location.href,
+                    'page'  : pagePath,
+                    'title' : experience.data.title
+                });
+
+                window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                    'sessionControl' : 'start'
+                });
+                
+                window.__c6_ga__(embedTracker + '.send', 'event', {
+                    'eventCategory' : 'Display',
+                    'eventAction'   : 'Visible',
+                    'eventLabel'    : experience.data.title
+                });
+                
+                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                    'timingCategory' : 'API',
+                    'timingVar'      : 'fetchExperience',
+                    'timingValue'    : ((new Date()).getTime() - window._c6InitTime),
+                    'timingLabel'    : 'c6'
+                });
+
+                experience.data.mode = (function() {
+                    switch (experience.data.deck.length) {
+                    case 1:
+                        return experience.data.deck[0].modules.indexOf('displayAd') > -1 ?
+                            'solo-ads' : 'solo';
+                    default:
+                        return 'full';
+                    }
+                }());
+
+                document.write('<title>' + experience.data.title + '<' + '/title>');
+            }());
         </script>
         <style type="text/css">
             .c6mr-preloader__group {
@@ -264,63 +334,26 @@
                 'use strict';
                 var experience = window.module.exports;
 
-                if (!experience.id) { //e.g. 404
-                    return window.location.href = '/404.html';
+                function loadApp(src) {
+                    return loadScript(src, function(error) {
+                        if (error) {
+                            return window.__c6_ga__(embedTracker + '.send', 'event', {
+                                'eventCategory' : 'Bootstrap',
+                                'eventAction'   : 'Error',
+                                'eventLabel'    : error.message
+                            });
+                        }
+
+                        return window.__c6_ga__(embedTracker + '.send', 'event', {
+                            'eventCategory' : 'Bootstrap',
+                            'eventAction'   : 'LoadApp'
+                        });
+                    });
                 }
 
-                (function() {
-                    var embedTracker = experience.id.replace(/^e-/, ''),
-                        pagePath = (function(e,q){
-                            var r='/embed/'+e+'/',p,qf=[];
-                            for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
-                            if (qf.length){ r += '?' + qf.join('&'); }
-                            return r;
-                        }(experience.id,{cx:'standalone',ct:c6.params.src,bd:experience.data.branding}));
-
-                    window.__c6_ga__('create', c6.gaAcctIdEmbed, {
-                        'name'       : embedTracker,
-                        'cookieName' : '_c6ga'
-                    });
-                    window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
-
-                    window.__c6_ga__(embedTracker + '.set',{
-                        'dimension1' : window.location.href,
-                        'page'  : pagePath,
-                        'title' : experience.data.title
-                    });
-
-                    window.__c6_ga__(embedTracker + '.send', 'pageview', {
-                        'sessionControl' : 'start'
-                    });
-                    
-                    window.__c6_ga__(embedTracker + '.send', 'event', {
-                        'eventCategory' : 'Display',
-                        'eventAction'   : 'Visible',
-                        'eventLabel'    : experience.data.title
-                    });
-                    
-                    window.__c6_ga__(embedTracker + '.send', 'timing', {
-                        'timingCategory' : 'API',
-                        'timingVar'      : 'fetchExperience',
-                        'timingValue'    : ((new Date()).getTime() - window._c6InitTime),
-                        'timingLabel'    : 'c6'
-                    });
-                }());
-
-                experience.data.mode = (function() {
-                    switch (experience.data.deck.length) {
-                    case 1:
-                        return experience.data.deck[0].modules.indexOf('displayAd') > -1 ?
-                            'solo-ads' : 'solo';
-                    default:
-                        return 'full';
-                    }
-                }());
-
-                document.write('<title>' + experience.data.title + '<' + '/title>');
-
-                c6.loadExperience(c6.embeds[c6.embeds.push({
+                c6.embeds.push({
                     load: true,
+                    preload: false,
                     standalone: true,
                     playerVersion: parseInt(c6.params.playerVersion, 10) || 1,
                     experience: window.module.exports,
@@ -339,8 +372,17 @@
                         launchPixel: c6.params.launchPixel,
                         preview: c6.params.preview
                     }
-                }) - 1]);
-            }());
+                });
+
+                if (window.c6.isProduction) {
+                    loadApp('//lib.cinema6.com/c6embed/v1/app.min.js');
+                } else {
+                    window.__C6_DEBUG__ = true;
+                    window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
+                    loadApp('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
+                    // loadApp('c6embed.js');
+                }
+                }());
         </script>
     </body>
 </html>

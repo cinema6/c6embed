@@ -102,7 +102,7 @@ describe('cinema6-jsonp.js', function() {
 
         it('should have the required properties', function() {
             expect(c6.app).toBe(null, 'app');
-            expect(c6.embeds).toEqual([], 'embeds');
+            expect(c6.embeds).toEqual(jasmine.any($window.Array), 'embeds');
             expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
             expect(c6.require).toEqual(jasmine.any(Function), 'require');
             expect(c6.widgetContentCache).toEqual({}, 'widgetContentCache');
@@ -130,7 +130,7 @@ describe('cinema6-jsonp.js', function() {
 
             it('should extend it', function() {
                 expect(c6.app).toBe(null, 'app');
-                expect(c6.embeds).toEqual([], 'embeds');
+                expect(c6.embeds).toEqual(jasmine.any($window.Array), 'embeds');
                 expect(c6.branding).toEqual({}, 'branding');
                 expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
                 expect(c6.require).toEqual(jasmine.any(Function), 'require');
@@ -174,7 +174,13 @@ describe('cinema6-jsonp.js', function() {
                 });
 
                 it('should add the MiniReel to an array, associated with the placementId', function() {
-                    expect(c6.widgetContentCache['108542']).toEqual(desired);
+                    desired.forEach(function(expectedConfig, index) {
+                        var actualConfig = c6.widgetContentCache['108542'][index];
+
+                        expect(actualConfig.expId).toBe(expectedConfig.expId);
+                        expect(actualConfig.clickUrl).toBe(expectedConfig.clickUrl);
+                        expect(actualConfig.adId).toBe(expectedConfig.adId);
+                    });
                 });
             });
 
@@ -563,43 +569,30 @@ describe('cinema6-jsonp.js', function() {
                             cb: jasmine.any(Number),
                             src: 'jsonp'
                         },
-                        items: [
-                            {
-                                id: exps[0].id,
-                                title: exps[0].data.title,
-                                summary: exps[0].data.title,
-                                image: baseUrl + exps[0].data.collateral.splash,
-                                sponsor: {
-                                    name: exps[0].data.params.sponsor,
-                                    logo: exps[0].data.collateral.logo
-                                }
-                            },
-                            {
-                                id: exps[1].id,
-                                title: exps[1].data.title,
-                                summary: exps[1].data.title,
-                                image: baseUrl + exps[1].data.collateral.splash,
-                                sponsor: {
-                                    name: exps[1].data.deck[2].params.sponsor,
-                                    logo: exps[1].data.deck[2].collateral.logo
-                                }
-                            },
-                            {
-                                id: exps[2].id,
-                                title: exps[2].data.title,
-                                summary: exps[2].data.title,
-                                image: baseUrl + exps[2].data.collateral.splash,
-                                sponsor: null
-                            },
-                            {
-                                id: exps[3].id,
-                                title: exps[3].data.title,
-                                summary: exps[3].data.title,
-                                image: baseUrl + exps[3].data.collateral.splash,
-                                sponsor: null
-                            }
-                        ]
+                        items: jasmine.any($window.Array)
                     });
+
+                    var result = $window.onC6AdLoad.calls.mostRecent().args[0];
+
+                    exps.forEach(function(experience, index) {
+                        var data = result.items[index];
+
+                        expect(data.id).toBe(experience.id);
+                        expect(data.title).toBe(experience.data.title);
+                        expect(data.summary).toBe(experience.data.title);
+                        expect(data.image).toBe(baseUrl + experience.data.collateral.splash);
+                    });
+
+                    expect(result.items[0].sponsor).toEqual({
+                        name: exps[0].data.params.sponsor,
+                        logo: exps[0].data.collateral.logo
+                    });
+                    expect(result.items[1].sponsor).toEqual({
+                        name: exps[1].data.deck[2].params.sponsor,
+                        logo: exps[1].data.deck[2].collateral.logo
+                    });
+                    expect(result.items[2].sponsor).toBeNull();
+                    expect(result.items[2].sponsor).toBeNull();
                 });
 
                 it('should push configuration into the embeds array', function() {

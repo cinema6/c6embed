@@ -58,6 +58,14 @@ module.exports = function(deps) {
                 appPath = appFolder + appFile,
                 state = null,
                 getSessionDeferred = Q.defer();
+            var embedTracker = settings.config.exp.replace(/e-/,'');
+
+            /* jshint camelcase:false */
+            window.__c6_ga__(embedTracker + '.send', 'event', {
+                'eventCategory' : 'Bootstrap',
+                'eventAction'   : 'LoadExperience'
+            });
+            /* jshint camelcase:true */
 
             experience.data.adServer = experience.data.adServer || {};
             experience.data.adServer.network =
@@ -78,6 +86,8 @@ module.exports = function(deps) {
             }
 
             function fetchApp() {
+                var startFetch = new Date().getTime();
+
                 return c6Ajax.get(appPath)
                     .then(function parse(response) {
                         if (!response.data) {
@@ -85,6 +95,13 @@ module.exports = function(deps) {
                                 'Unexpected response for MR App request: ' + JSON.stringify(response)
                             );
                         }
+
+                        /* jshint camelcase:false */
+                        window.__c6_ga__(embedTracker + '.send', 'timing', {
+                            'timingCategory' : 'API',
+                            'timingVar'      : 'fetchPlayer',
+                            'timingValue'    : (new Date().getTime() - startFetch)
+                        });
 
                         return documentParser(response.data, {
                             mode: appConfig.kMode
@@ -108,7 +125,6 @@ module.exports = function(deps) {
                     countUrls: countUrls
                 }, preload).then(function(){
                     /* jshint camelcase:false */
-                    var embedTracker = settings.config.exp.replace(/e-/,'');
                     window.__c6_ga__(embedTracker + '.send', 'timing', {
                         'timingCategory' : 'API',
                         'timingVar'      : 'fetchSponsoredCards',

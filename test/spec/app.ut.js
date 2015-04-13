@@ -351,6 +351,13 @@
                 });
             });
 
+            it('should send an event to GA', function() {
+                expect($window.__c6_ga__).toHaveBeenCalledWith('68cde3e4177b8a.send', 'event', {
+                    'eventCategory' : 'Bootstrap',
+                    'eventAction'   : 'LoadExperience'
+                });
+            });
+
             it('should add an observeable state object to the settings', function() {
                 expect(settings.state).toEqual(jasmine.any(Observable));
                 expect(settings.state).toEqual(jasmine.objectContaining({
@@ -413,6 +420,31 @@
 
             it('should fetch index.html', function() {
                 expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/' + experience.appUri + '/lightbox-ads.html');
+            });
+
+            it('should measure the amount of time it takes to fetch the player\'s HTML', function(done) {
+                var response = { data: indexHTML2 };
+                var responseDeferred = Q.defer();
+                c6Ajax.get.and.returnValue(responseDeferred.promise);
+                delete settings.promise;
+                $window.c6.loadExperience(settings);
+
+                Q.delay(50)
+                    .then(function() {
+                        responseDeferred.resolve(response);
+                        return responseDeferred.promise;
+                    })
+                    .then(function() {
+                        return Q.delay(5);
+                    })
+                    .then(function() {
+                        expect($window.__c6_ga__).toHaveBeenCalledWith('68cde3e4177b8a.send', 'timing', {
+                            timingCategory: 'API',
+                            timingVar: 'fetchPlayer',
+                            timingValue: jasmine.any(Number)
+                        });
+                    })
+                    .finally(done);
             });
 
             describe('if playerVersion is 2', function() {
@@ -653,6 +685,7 @@
                                 padding: '20px',
                                 marginTop: '50px'
                             });
+                            $window.__c6_ga__.calls.reset();
 
                             state.set('active', false);
                             setTimeout(done, 20);
@@ -682,33 +715,14 @@
                                 expect(settings.embed.style[prop]).toBe('10px');
                             });
                         });
-
-                        it('should call GA',function(){
-                            expect($window.__c6_ga__.calls.argsFor(2)).toEqual(['68cde3e4177b8a.send','event',{ eventCategory: 'Display', eventAction: 'Show', eventLabel: undefined}]);
-                            
-                            expect($window.__c6_ga__.calls.argsFor(3)[0]).toEqual('68cde3e4177b8a.send'); 
-                            expect($window.__c6_ga__.calls.argsFor(3)[1]).toEqual('timing');
-
-                            expect($window.__c6_ga__.calls.argsFor(3)[2]).toEqual(jasmine.objectContaining({ timingCategory: 'UX', timingVar: 'showPlayer', timingLabel: 'embed'}));
-                        });
-
-                        describe('repeat show',function(){
-                            beforeEach(function(done) {
-                                $window.__c6_ga__.calls.reset();
-                                state.set('active', false);
-                                state.set('active', true);
-                                setTimeout(done, 20);
-                            });
-
-                            it('should not call GA',function(){
-                                expect($window.__c6_ga__).not.toHaveBeenCalled();
-                            });
-                        });
                     });
 
                     describe('when true', function() {
                         beforeEach(function(done) {
                             state.set('active', false);
+                            $window.__c6_ga__.calls.reset();
+                            settings.config.showStartTime = 12345;
+
                             state.set('active', true);
                             setTimeout(done, 20);
                         });
@@ -724,6 +738,28 @@
                         it('should ping a nice message to the application', function() {
                             expect(session.ensureReadiness).toHaveBeenCalled();
                             expect(safeSession.ping).toHaveBeenCalledWith('show');
+                        });
+
+                        it('should call GA',function(){
+                            expect($window.__c6_ga__.calls.argsFor(0)).toEqual(['68cde3e4177b8a.send','event',{ eventCategory: 'Display', eventAction: 'Show', eventLabel: undefined}]);
+
+                            expect($window.__c6_ga__.calls.argsFor(1)[0]).toEqual('68cde3e4177b8a.send'); 
+                            expect($window.__c6_ga__.calls.argsFor(1)[1]).toEqual('timing');
+
+                            expect($window.__c6_ga__.calls.argsFor(1)[2]).toEqual(jasmine.objectContaining({ timingCategory: 'UX', timingVar: 'showPlayer', timingLabel: 'embed'}));
+                        });
+
+                        describe('repeat show',function(){
+                            beforeEach(function(done) {
+                                $window.__c6_ga__.calls.reset();
+                                state.set('active', false);
+                                state.set('active', true);
+                                setTimeout(done, 20);
+                            });
+
+                            it('should not call GA',function(){
+                                expect($window.__c6_ga__).not.toHaveBeenCalled();
+                            });
                         });
 
                         describe('if there are responsiveStyles', function() {
@@ -821,7 +857,7 @@
                     });
 
                     it('sends a ping if it gets a clientId',function(){
-                        $window.__c6_ga__.calls.argsFor(1)[0]();
+                        $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
                         expect(tracker.get).toHaveBeenCalledWith('clientId');
                         expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id', container: 'test', context: 'test', group: 'xyz' } );
@@ -832,7 +868,7 @@
 
                         session.trigger('ready', true);
                         session.ping.calls.reset();
-                        $window.__c6_ga__.calls.argsFor(1)[0]();
+                        $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect(session.ping).not.toHaveBeenCalled();
                     });
 
@@ -841,7 +877,7 @@
 
                         session.trigger('ready', true);
                         session.ping.calls.reset();
-                        $window.__c6_ga__.calls.argsFor(1)[0]();
+                        $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect(session.ping).not.toHaveBeenCalled();
                     });
                 });
