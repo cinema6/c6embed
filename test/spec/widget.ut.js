@@ -83,7 +83,7 @@
 
             it('should have all the required properties', function() {
                 expect(c6.app).toBe(null);
-                expect(c6.embeds).toEqual([]);
+                expect(c6.embeds).toEqual(jasmine.any($window.Array));
                 expect(c6.branding).toEqual({});
                 expect(c6.requireCache).toEqual({});
                 expect(c6.require).toEqual(jasmine.any(Function));
@@ -116,7 +116,7 @@
 
                 it('should be extended', function() {
                     expect(c6.app).toBe(null);
-                    expect(c6.embeds).toEqual([]);
+                    expect(c6.embeds).toEqual(jasmine.any($window.Array));
                     expect(c6.branding).toEqual({});
                     expect(c6.requireCache).toEqual({});
                     expect(c6.require).toEqual(jasmine.any(Function));
@@ -1031,7 +1031,13 @@
                     });
 
                     it('should add the MiniReel to an array, associated with the placementId', function() {
-                        expect(c6.widgetContentCache['3330799']).toEqual(desired);
+                        desired.forEach(function(desired, index) {
+                            var actual = c6.widgetContentCache['3330799'][index];
+
+                            ['expId', 'clickUrl', 'adId'].forEach(function(prop) {
+                                expect(actual[prop]).toEqual(actual[prop], prop);
+                            });
+                        });
                     });
                 });
 
