@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.26.0 (April 13, 2015)
 * [FEATURE]: Added additional GA reporting to try to shed light on
   strange dropoffs
 
