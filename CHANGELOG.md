@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add reporting when the page is loaded
+* [FEATURE]: Add reporting when the page is closed
+
 ## v2.26.0 (April 13, 2015)
 * [FEATURE]: Added additional GA reporting to try to shed light on
   strange dropoffs
