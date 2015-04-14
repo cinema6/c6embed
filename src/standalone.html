@@ -3,6 +3,7 @@
     <head>
         <meta name="viewport" content="width=device-width,initial-scale=1">
         <script>
+            window._c6InitTime = (new Date()).getTime();
             window.onerror = function(message) {
                 var img = new Image();
                 img.src = 'http://portal.cinema6.com/collateral/etc/tracking/1x1-pixel.gif?' + toQueryParams({
@@ -11,7 +12,39 @@
                     lb: message
                 });
                 return false;
-            }
+            };
+            window.onload = function() {
+                var img = new Image();
+                var timestamp = new Date().getTime();
+                var timeOnPage = timestamp - window._c6InitTime;
+                img.src = 'http://portal.cinema6.com/collateral/etc/tracking/1x1-pixel.gif?' + toQueryParams({
+                    cb: timestamp,
+                    ct: 'PageLoad',
+                    lb: timeOnPage
+                });
+                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                    'timingCategory' : 'API',
+                    'timingVar'      : 'loadPage',
+                    'timingValue'    : timeOnPage,
+                    'timingLabel'    : 'c6'
+                });
+            };
+            window.onbeforeunload = function() {
+                var img = new Image();
+                var timestamp = new Date().getTime();
+                var timeOnPage = timestamp - window._c6InitTime;
+                img.src = 'http://portal.cinema6.com/collateral/etc/tracking/1x1-pixel.gif?' + toQueryParams({
+                    cb: timestamp,
+                    ct: 'Close',
+                    lb: timeOnPage
+                });
+                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                    'timingCategory' : 'API',
+                    'timingVar'      : 'closePage',
+                    'timingValue'    : timeOnPage,
+                    'timingLabel'    : 'c6'
+                });
+            };
 
             function toQueryParams(object) {
                 return Object.keys(object)
@@ -62,7 +95,6 @@
             (function() {
                 'use strict';
 
-                window._c6InitTime = (new Date()).getTime();
                 var isProduction = (/^(www\.)?cinema6\.com$/).test(window.location.hostname),
                     base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
                     params = window.location.search.replace(/^\?/, '')
@@ -233,13 +265,13 @@
                 window.__c6_ga__(embedTracker + '.send', 'pageview', {
                     'sessionControl' : 'start'
                 });
-                
+
                 window.__c6_ga__(embedTracker + '.send', 'event', {
                     'eventCategory' : 'Display',
                     'eventAction'   : 'Visible',
                     'eventLabel'    : experience.data.title
                 });
-                
+
                 window.__c6_ga__(embedTracker + '.send', 'timing', {
                     'timingCategory' : 'API',
                     'timingVar'      : 'fetchExperience',
