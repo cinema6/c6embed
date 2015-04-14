@@ -10,7 +10,8 @@
                 port: '<%= settings.sandboxPort %>',
                 base: 'app',
                 livereload: true,
-                protocol: 'http'
+                protocol: 'http',
+                debug: true
             }
         }
     };
