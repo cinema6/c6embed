@@ -396,6 +396,33 @@
                         });
                     });
 
+                    describe('in the android browser', function() {
+                        beforeEach(function() {
+                            userAgent.app.name = 'android';
+                            userAgent.app.version = '4.0';
+                            userAgent.os.name = 'android';
+
+                            mockWindow.screen.width = 720;
+                            mockWindow.screen.height = 1280;
+                            mockWindow.innerWidth = 360;
+                            mockWindow.innerHeight = 567;
+
+                            profile = browserInfo.generateProfile();
+                        });
+
+                        describe('resolution', function() {
+                            it('should be based on the window\'s innerWidth and innerHeight', function() {
+                                expect(profile.resolution).toBe('360x567');
+                            });
+                        });
+
+                        describe('device', function() {
+                            it('should be calculated based on the window\'s innerWidth and innerHeight', function() {
+                                expect(profile.device).toBe('phone');
+                            });
+                        });
+                    });
+
                     describe('on everything', function() {
                         beforeEach(function() {
                             profile = browserInfo.generateProfile();
