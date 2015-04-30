@@ -243,13 +243,61 @@
                 }
             },
             android : {
+                'ANDROID_BROWSER': {
+                    agentString: 'Mozilla/5.0 (Linux; U; Android 4.3; en-us; SGH-T999 Build/JSS15J) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30',
+                    tests: {
+                        app: {
+                            name: function(o) { expect(o.app.name).toBe('android'); },
+                            version: function(o) { expect(o.app.version).toBe('4.0'); }
+                        },
+                        device: {
+                            name: function(o) { expect(o.device.name).toBe('android'); },
+                            version: function(o) { expect(o.device.version).toBeNull(); },
+                            isKindle: function(o) { expect(o.device.isKindle()).toBe(false); },
+                            isAndroid: function(o) { expect(o.device.isAndroid()).toBe(true); },
+                            isIPhone: function(o) { expect(o.device.isIPhone()).toBe(false); },
+                            isIPod: function(o) { expect(o.device.isIPod()).toBe(false); },
+                            isIPad: function(o) { expect(o.device.isIPad()).toBe(false); },
+                            isIOS: function(o) { expect(o.device.isIOS()).toBe(false); },
+                            isMobile: function(o) { expect(o.device.isMobile()).toBe(true); }
+                        },
+                        os: {
+                            name: function(o) { expect(o.os.name).toBe('android'); },
+                            version: function(o) { expect(o.os.version).toBe('4.3'); }
+                        }
+                    }
+                },
+                'CHROME': {
+                    agentString: 'Mozilla/5.0 (Linux; Android 4.3; SGH-T999 Build/JSS15J) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.111 Mobile Safari/537.36',
+                    tests: {
+                        app: {
+                            name: function(o) { expect(o.app.name).toBe('chrome'); },
+                            version: function(o) { expect(o.app.version).toBe('42.0.2311.111'); }
+                        },
+                        device: {
+                            name: function(o) { expect(o.device.name).toBe('android'); },
+                            version: function(o) { expect(o.device.version).toBeNull(); },
+                            isKindle: function(o) { expect(o.device.isKindle()).toBe(false); },
+                            isAndroid: function(o) { expect(o.device.isAndroid()).toBe(true); },
+                            isIPhone: function(o) { expect(o.device.isIPhone()).toBe(false); },
+                            isIPod: function(o) { expect(o.device.isIPod()).toBe(false); },
+                            isIPad: function(o) { expect(o.device.isIPad()).toBe(false); },
+                            isIOS: function(o) { expect(o.device.isIOS()).toBe(false); },
+                            isMobile: function(o) { expect(o.device.isMobile()).toBe(true); }
+                        },
+                        os: {
+                            name: function(o) { expect(o.os.name).toBe('android'); },
+                            version: function(o) { expect(o.os.version).toBe('4.3'); }
+                        }
+                    }
+                },
                 'DROID_BROWSER'  : {
                     agentString : 'Mozilla/5.0 (Linux; U; Android 4.1.2; en-us; ' +
                                   'DROID4 Build/9.8.2O-72_VZW-18) AppleWebKit/534.30 ' +
                                   '(KHTML, like Gecko) Version/4.0 Mobile Safari/534.30',
                     tests : {
                         app     : {
-                            name  : function(o) { expect(o.app.name).toEqual('safari'); },
+                            name  : function(o) { expect(o.app.name).toEqual('android'); },
                             version : function(o) { expect(o.app.version).toEqual('4.0'); }
                         },
                         device  : {
