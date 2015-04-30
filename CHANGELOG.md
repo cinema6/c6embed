@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.27.1 (April 30, 2015)
+* [FIX]: Fix for an issue that could cause the mobile player not to be
+  used in the Android Browser
+
 ## v2.27.0 (April 14, 2015)
 * [FEATURE]: Add reporting when the page is loaded
 * [FEATURE]: Add reporting when the page is closed
