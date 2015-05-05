@@ -463,7 +463,7 @@
                     expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
                 });
 
-                ['solo', 'solo-ads'].forEach(function(mode) {
+                [].forEach(function(mode) {
                     describe('if the mode is ' + mode, function() {
                         beforeEach(function(done) {
                             settings.experience.data.mode = mode;
@@ -481,7 +481,7 @@
                     });
                 });
 
-                ['full', 'mobile', 'lightbox', 'lightbox-playlist', 'light'].forEach(function(mode) {
+                ['full', 'mobile', 'lightbox', 'lightbox-playlist', 'light', 'solo', 'solo-ads'].forEach(function(mode) {
                     describe('if the mode is ' + mode, function() {
                         beforeEach(function(done) {
                             settings.experience.data.mode = mode;
