@@ -48,7 +48,7 @@ module.exports = function(deps) {
                         experience.data.mode : 'mobile'
                 },
                 standalone = settings.config.container === 'jumpramp' ? false : settings.standalone,
-                player2Modes = ['mobile', 'full', 'light', 'lightbox', 'lightbox-playlist'],
+                player2Modes = ['mobile', 'full', 'light', 'lightbox', 'lightbox-playlist', 'solo', 'solo-ads'],
                 playerVersion = player2Modes.indexOf(appConfig.kMode) > -1 ?
                     settings.playerVersion : 1,
                 appUri = playerVersion === 2 ? 'mini-reel-player' : experience.appUri,
