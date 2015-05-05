@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.27.2 (May 5, 2015)
+* [FEATURE]: Add support for using Player 2.0 with the solo and
+  solo-ads modes
+
 ## v2.27.1 (April 30, 2015)
 * [FIX]: Fix for an issue that could cause the mobile player not to be
   used in the Android Browser
