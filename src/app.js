@@ -54,7 +54,7 @@ module.exports = function(deps) {
                 appUri = playerVersion === 2 ? 'mini-reel-player' : experience.appUri,
                 appFolder = (window.__C6_APP_FOLDER__ || appUrl(appUri)) + '/',
                 appFile = window.__C6_APP_FILE__ ||
-                    (playerVersion === 2 ? 'index' : appConfig.kMode) + '.html',
+                    ((appUri === 'mini-reel-player') ? 'index' : appConfig.kMode) + '.html',
                 appPath = appFolder + appFile,
                 state = null,
                 getSessionDeferred = Q.defer();
