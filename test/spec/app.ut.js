@@ -500,20 +500,36 @@
                 });
             });
 
+            describe('if the appUri is "mini-reel-player"', function() {
+                beforeEach(function(done) {
+                    settings.playerVersion = 1;
+
+                    delete settings.promise;
+                    settings.experience.appUri = 'mini-reel-player';
+                    c6Ajax.get.calls.reset();
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should load player 2.0', function() {
+                    expect(c6Ajax.get).toHaveBeenCalledWith(config.appBase + '/mini-reel-player/index.html');
+                });
+            });
+
             it('should trim out empty wildcard placeholders', function() {
                 expect(settings.experience.data.deck).toEqual([
                     { id: 'rc-1', type: 'youtube' },
                     { id: 'rc-3', type: 'vimeo' }
                 ]);
             });
-            
+
             it('should fetch the sponsoredCards', function() {
                 expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
                     clickUrls: undefined,
                     countUrls: undefined
                 },undefined);
             });
-            
+
             describe('if the config has a startPixel and countPixel', function() {
                 beforeEach(function(done) {
                     delete settings.promise;
