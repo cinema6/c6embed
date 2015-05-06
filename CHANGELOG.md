@@ -3,6 +3,8 @@
 ## v2.27.2 (May 5, 2015)
 * [FEATURE]: Add support for using Player 2.0 with the solo and
   solo-ads modes
+* [FIX]: Fix for an issue that caused experiences created for MiniReel
+  Player 2.0 not to load
 
 ## v2.27.1 (April 30, 2015)
 * [FIX]: Fix for an issue that could cause the mobile player not to be
