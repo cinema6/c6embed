@@ -24,6 +24,10 @@ module.exports = function(deps) {
 
             if (parent.tagName === 'HTML') { return; }
 
+            if ($parent.hasClass('c6__cant-touch-this')) {
+                return fixup($parent[0]);
+            }
+
             $parent.createSnapshot();
 
             style.setProperty('z-index', 'auto', 'important');

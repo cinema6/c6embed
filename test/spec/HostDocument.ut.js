@@ -53,6 +53,9 @@
                         '    .sibling {',
                         '        position: fixed; z-index: 200; opacity: 0.25;',
                         '    }',
+                        '    .c6__cant-touch-this {',
+                        '        opacity: 0.5; z-index: 100;',
+                        '    }',
                         '</style>'
                     ].join(''));
 
@@ -62,7 +65,9 @@
                         '    <div class="transparent">',
                         '        Hello',
                         '        <div class="above">',
-                        '            <div class="zindex-test-target"></div>',
+                        '            <div class="c6__cant-touch-this">',
+                        '                <div class="zindex-test-target"></div>',
+                        '            </div>',
                         '        </div>',
                         '    </div>',
                         '</div>'
@@ -111,6 +116,11 @@
                     expect($test.css('position')).toBe('fixed');
                     expect($transparent.css('opacity')).toBe('0.5');
                     expect($above.css('z-index')).toBe('200');
+                });
+
+                it('should not touch elements with the "c6__cant-touch-this" class', function() {
+                    expect($('.c6__cant-touch-this').css('opacity')).not.toBe('1');
+                    expect($('.c6__cant-touch-this').css('z-index')).not.toBe('auto');
                 });
             });
 
