@@ -115,6 +115,43 @@
                     });
                 });
 
+                describe('if called with appData that includes a profile', function() {
+                    var appData;
+                    var profile;
+
+                    beforeEach(function() {
+                        profile = {
+                            device: 'desktop',
+                            flash: false
+                        };
+
+                        appData = {
+                            standalone: false,
+                            profile: profile
+                        };
+
+                        experience.registerExperience(exp, expWindow, appData);
+                    });
+
+                    describe('when the handshake is requested', function() {
+                        var respondSpy, sentAppData;
+
+                        beforeEach(function() {
+                            respondSpy = jasmine.createSpy('respond()');
+
+                            session.trigger('handshake', {}, respondSpy);
+
+                            sentAppData = respondSpy.calls.mostRecent().args[0].appData;
+                        });
+
+                        it('should send app data that uses the custom profile', function() {
+                            expect(sentAppData).toEqual(jasmine.objectContaining({
+                                profile: profile
+                            }));
+                        });
+                    });
+                });
+
                 it('should create a postmessage session with the window', function() {
                     expect(postmessage.createSession).toHaveBeenCalledWith(expWindow);
                 });
