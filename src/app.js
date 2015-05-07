@@ -37,14 +37,15 @@ module.exports = function(deps) {
 
         function bootstrap() {
             var experience = settings.experience,
+                profile = settings.profile || browserInfo.profile,
                 $iframe = frameFactory(),
                 $container = $(settings.embed),
                 splashDelegate = settings.splashDelegate,
                 appConfig = {
                     kDebug: config.debug,
-                    kDevice: browserInfo.profile.device,
+                    kDevice: profile.device,
                     kEnvUrlRoot: config.urlRoot,
-                    kMode: browserInfo.profile.device !== 'phone' ?
+                    kMode: profile.device !== 'phone' ?
                         experience.data.mode : 'mobile'
                 },
                 standalone = settings.config.container === 'jumpramp' ? false : settings.standalone,
@@ -134,7 +135,7 @@ module.exports = function(deps) {
                     return document;
                 });
             }
-            
+
             function trimPlaceholders(document) {
                 experience.data.deck = experience.data.deck.filter(function(card) {
                     return card.type !== 'wildcard';
@@ -151,7 +152,8 @@ module.exports = function(deps) {
 
             function communicateWithApp(appWindow) {
                 var session = experienceService.registerExperience(experience, appWindow, {
-                    standalone: standalone
+                    standalone: standalone,
+                    profile: profile
                 }).on('open', function openApp() {
                     state.set('active', true);
                 })
@@ -159,10 +161,12 @@ module.exports = function(deps) {
                     state.set('active', false);
                 })
                 .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
+                    if (settings.allowFullscreen === false) { return; }
+
                     $iframe.fullscreen(shouldEnterFullscreen);
 
                     if (shouldEnterFullscreen) {
-                        if (browserInfo.profile.device === 'phone') {
+                        if (profile.device === 'phone') {
                             hostDocument.shrink(true);
                         }
 

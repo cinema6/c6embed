@@ -144,7 +144,7 @@
                 registerExperience: jasmine.createSpy('experienceService.registerExperience()')
                     .and.returnValue(session)
             };
-            
+
             spCardService = {
                 fetchSponsoredCards: jasmine.createSpy('spCardService.fetchSponsoredCards()')
                     .and.returnValue(Q())
@@ -445,6 +445,46 @@
                         });
                     })
                     .finally(done);
+            });
+
+            describe('if a profile is provided in the settings', function() {
+                beforeEach(function(done) {
+                    settings.profile = {
+                        device: 'phone',
+                        flash: false
+                    };
+                    browserInfo.profile.device = 'desktop';
+                    settings.experience.data.mode = 'lightbox-playlist';
+                    settings.experience.appUri = 'mini-reel-player';
+
+                    delete settings.promise;
+                    c6Ajax.get.calls.reset();
+                    mockDocumentParser.calls.reset();
+                    experienceService.registerExperience.calls.reset();
+                    hostDocument.shrink.calls.reset();
+
+                    $window.c6.loadExperience(settings).then(function() {
+                        var cb = $iframe.load.calls.mostRecent().args[1];
+                        var appWindow = $iframe.prop('contentWindow');
+
+                        cb(appWindow);
+                    }).finally(done);
+                });
+
+                it('should set the mode based on the provided profile', function() {
+                    expect(mockDocumentParser).toHaveBeenCalledWith(jasmine.any(String), { mode: 'mobile' });
+                });
+
+                it('should include the profile as app data', function() {
+                    expect(experienceService.registerExperience).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), jasmine.objectContaining({
+                        profile: settings.profile
+                    }));
+                });
+
+                it('should use the provided profile when entering fullscreen mode', function() {
+                    session.emit('fullscreenMode', true);
+                    expect(hostDocument.shrink).toHaveBeenCalled();
+                });
             });
 
             describe('if playerVersion is 2', function() {
@@ -817,7 +857,8 @@
 
                 it('should start a session with the app', function() {
                     expect(experienceService.registerExperience).toHaveBeenCalledWith(experience, appWindow, {
-                        standalone: settings.standalone
+                        standalone: settings.standalone,
+                        profile: browserInfo.profile
                     });
                 });
 
@@ -849,9 +890,9 @@
                     });
 
                     it('should set standalone to false', function() {
-                        expect(experienceService.registerExperience).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), {
+                        expect(experienceService.registerExperience).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), jasmine.objectContaining({
                             standalone: false
-                        });
+                        }));
                     });
                 });
 
@@ -927,6 +968,26 @@
                         describe('on a ' + device, function() {
                             beforeEach(function() {
                                 browserInfo.profile.device = device;
+                            });
+
+                            describe('if allowFullscreen is false', function() {
+                                beforeEach(function() {
+                                    settings.allowFullscreen = false;
+                                });
+
+                                describe('when true is provided', function() {
+                                    beforeEach(function() {
+                                        session.emit('fullscreenMode', true);
+                                    });
+
+                                    it('should not fullscreen the iframe', function() {
+                                        expect($iframe.fullscreen).not.toHaveBeenCalled();
+                                    });
+
+                                    it('should not put the iframe in the root stacking context', function() {
+                                        expect(hostDocument.putInRootStackingContext).not.toHaveBeenCalled();
+                                    });
+                                });
                             });
 
                             [true, false].forEach(function(bool) {
