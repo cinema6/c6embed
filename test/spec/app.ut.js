@@ -929,6 +929,26 @@
                                 browserInfo.profile.device = device;
                             });
 
+                            describe('if allowFullscreen is false', function() {
+                                beforeEach(function() {
+                                    settings.allowFullscreen = false;
+                                });
+
+                                describe('when true is provided', function() {
+                                    beforeEach(function() {
+                                        session.emit('fullscreenMode', true);
+                                    });
+
+                                    it('should not fullscreen the iframe', function() {
+                                        expect($iframe.fullscreen).not.toHaveBeenCalled();
+                                    });
+
+                                    it('should not put the iframe in the root stacking context', function() {
+                                        expect(hostDocument.putInRootStackingContext).not.toHaveBeenCalled();
+                                    });
+                                });
+                            });
+
                             [true, false].forEach(function(bool) {
                                 describe('when ' + bool + ' is provided', function() {
                                     beforeEach(function() {

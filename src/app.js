@@ -159,6 +159,8 @@ module.exports = function(deps) {
                     state.set('active', false);
                 })
                 .on('fullscreenMode', function requestFullscreen(shouldEnterFullscreen) {
+                    if (settings.allowFullscreen === false) { return; }
+
                     $iframe.fullscreen(shouldEnterFullscreen);
 
                     if (shouldEnterFullscreen) {
