@@ -1,5 +1,12 @@
 # C6Embed Changelog
 
+* [FEATURE]: Make device profile customizable via the object passed to
+  c6.loadExperience()
+* [FEATURE]: Allow entering fullscreen mode to be prevented via a flag
+  on the object passed to c6.loadExperience()
+* [FIX]: Fix for an issue that could cause elements with the
+  "c6__cant-touch-this" class to still be modified
+
 ## v2.27.2 (May 5, 2015)
 * [FEATURE]: Add support for using Player 2.0 with the solo and
   solo-ads modes
