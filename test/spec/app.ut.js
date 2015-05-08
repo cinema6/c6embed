@@ -604,6 +604,19 @@
                     it('should give the campaign launchUrls', function() {
                         expect(campaign.launchUrls).toEqual(settings.config.launchPixel.split(' '));
                     });
+
+                    describe('if the campaign already has launchPixels', function() {
+                        beforeEach(function(done) {
+                            delete settings.promise;
+                            campaign.launchUrls = ['http://my.com/mother-pixel'];
+
+                            $window.c6.loadExperience(settings).finally(done);
+                        });
+
+                        it('should use all the pixels', function() {
+                            expect(campaign.launchUrls).toEqual(['http://my.com/mother-pixel'].concat(settings.config.launchPixel.split(' ')));
+                        });
+                    });
                 });
 
                 describe('if the minireel has no campaign', function() {

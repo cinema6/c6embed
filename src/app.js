@@ -78,7 +78,8 @@ module.exports = function(deps) {
                 (function() {
                     var campaign = (experience.data.campaign || (experience.data.campaign = {}));
 
-                    campaign.launchUrls = settings.config.launchPixel.split(' ');
+                    campaign.launchUrls = (campaign.launchUrls || [])
+                        .concat(settings.config.launchPixel.split(' '));
                 }());
             }
 
