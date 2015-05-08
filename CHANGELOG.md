@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.28.0 (May 8, 2015)
 * [FEATURE]: Make device profile customizable via the object passed to
   c6.loadExperience()
 * [FEATURE]: Allow entering fullscreen mode to be prevented via a flag
