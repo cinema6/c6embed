@@ -811,7 +811,35 @@
                         cb({id: id, campaign: {} });
                     });
                 });
-                
+
+                describe('if the card already has some pixels', function() {
+                    beforeEach(function(done) {
+                        window.c6.require.and.callFake(function(urls, cb) {
+                            var id = urls[0].match(/[^\/]+(?=\.js)/)[0];
+                            cb({id: id, campaign: { clickUrls: ['click.custom'], countUrls: ['count.custom'] } });
+                        });
+
+                        _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).finally(done);
+                    });
+
+                    it('should combine the existing pixels with the campaign ones', function() {
+                        expect(withWildcards.data.deck).toEqual([
+                            jasmine.any(Object),
+                            jasmine.objectContaining({
+                                campaign: {
+                                    clickUrls: ['click.custom', 'click.me', 'click.2'], countUrls: ['count.custom', 'count.me', 'count.2']
+                                }
+                            }),
+                            jasmine.objectContaining({
+                                campaign: {
+                                    clickUrls: ['click.custom', 'click.me', 'click.3'], countUrls: ['count.custom', 'count.me', 'count.3']
+                                }
+                            }),
+                            jasmine.any(Object)
+                        ]);
+                    });
+                });
+
                 it('should filter banners in the cache and load card objects from c6.require', function(done) {
                     _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).then(function() {
                         expect(withWildcards.data.deck).toEqual([

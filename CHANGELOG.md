@@ -6,6 +6,8 @@
   on the object passed to c6.loadExperience()
 * [FIX]: Fix for an issue that could cause elements with the
   "c6__cant-touch-this" class to still be modified
+* [FEATURE]: Add support for tracking pixels specified in the sponsored
+  card or MiniReel
 
 ## v2.27.2 (May 5, 2015)
 * [FEATURE]: Add support for using Player 2.0 with the solo and
