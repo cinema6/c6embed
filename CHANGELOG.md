@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.28.1 (May 11, 2015)
+* [FIX]: Fix for an issue that caused custom pixels not to be fired when
+  a static card map was used for a campaign
+
 ## v2.28.0 (May 8, 2015)
 * [FEATURE]: Make device profile customizable via the object passed to
   c6.loadExperience()
