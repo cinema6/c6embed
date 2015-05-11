@@ -704,6 +704,24 @@
                         usableFor: { 'e-1234': true }
                     } } };
                 });
+
+                describe('if the card already has some pixels', function() {
+                    var card;
+
+                    beforeEach(function() {
+                        card = experience.data.deck[0];
+
+                        card.campaign.clickUrls = ['my.click'];
+                        card.campaign.countUrls = ['my.count'];
+
+                        _private.decorateCard(card, experience, pixels, 1234);
+                    });
+
+                    it('should not overwrite the pixels', function() {
+                        expect(card.campaign.clickUrls).toEqual(['my.click', 'custom.click', 'click.me']);
+                        expect(card.campaign.countUrls).toEqual(['my.count', 'custom.count', 'count.me']);
+                    });
+                });
                 
                 it('should decorate a card with properties from the cardCache', function() {
                     _private.decorateCard(experience.data.deck[0], experience, pixels, 1234);
