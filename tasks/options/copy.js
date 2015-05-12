@@ -63,33 +63,29 @@ module.exports = {
             }
         ]
     },
-    dist: {
+    tmp: {
         files: [
             {
                 src: 'src/embed.js',
-                dest: '<%= settings.distDir %>/c6embed.js'
+                dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
             },
             {
                 src: 'src/widget.js',
-                dest: '<%= settings.distDir %>/mr2.js'
+                dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
             },
             {
                 src: 'src/cinema6-jsonp.js',
-                dest: '<%= settings.distDir %>/cinema6-jsonp.js'
-            },
-            {
-                src: 'src/preview.html',
-                dest: 'app/preview.html'
+                dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
             },
             {
                 src: 'styles/**',
-                dest: 'app/',
+                dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
                 cwd: 'src'
             },
             {
                 src: 'img/**',
-                dest: 'app/',
+                dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
                 cwd: 'src'
             }

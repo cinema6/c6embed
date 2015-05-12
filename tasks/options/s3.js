@@ -5,7 +5,8 @@
         options: {
             key:    '<%= settings.aws.accessKeyId %>',
             secret: '<%= settings.aws.secretAccessKey %>',
-            access: 'public-read'
+            access: 'public-read',
+            ContentEncoding: 'gzip'
         },
         test: {
             options: {

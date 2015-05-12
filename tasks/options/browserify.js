@@ -8,7 +8,7 @@ module.exports = {
         files: [
             {
                 src: ['src/main.js'],
-                dest: '<%= settings.distDir %>/app.js'
+                dest: '.tmp/build/<%= settings.distDir %>/app.js'
             }
         ]
     },
