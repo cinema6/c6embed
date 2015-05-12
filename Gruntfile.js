@@ -104,14 +104,16 @@ module.exports = function(grunt) {
      *********************************************************************************************/
 
     grunt.registerTask('build', 'build app into distDir', [
+        'clean:build',
         'git_describe_tags',
         'test:unit',
-        'copy:dist',
+        'copy:tmp',
         'browserify:dist',
         'uglify:dist',
         'usebanner:dist',
+        'htmlmin:dist',
         'inline:dist',
-        'htmlmin:dist'
+        'compress:dist'
     ]);
 
     /*********************************************************************************************

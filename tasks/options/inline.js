@@ -3,7 +3,7 @@
 
     module.exports = {
           dist: {
-              src: [ 'app/preview.html' ]
+              src: [ '.tmp/build/<%= settings.distDir %>/preview.html' ]
           }
     };
 })();

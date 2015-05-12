@@ -15,11 +15,11 @@ module.exports = {
         files: [
             {
                 src: 'src/standalone.html',
-                dest: '<%= settings.distDir %>/standalone.html'
+                dest: '.tmp/build/<%= settings.distDir %>/standalone.html'
             },
             {
-                src: 'app/preview.html',
-                dest: '<%= settings.distDir %>/preview.html'
+                src: 'src/preview.html',
+                dest: '.tmp/build/<%= settings.distDir %>/preview.html'
             }
         ]
     }

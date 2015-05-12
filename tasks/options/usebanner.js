@@ -12,7 +12,7 @@ module.exports = {
             ].join('\n')
         },
         files: {
-            src: ['<%= settings.distDir %>/**/*.js']
+            src: ['.tmp/build/<%= settings.distDir %>/**/*.js']
         }
     }
 };
