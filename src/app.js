@@ -8,7 +8,7 @@ module.exports = function(deps) {
         config = deps.config,
         documentParser = deps.documentParser,
         browserInfo = deps.browserInfo,
-        experienceService = deps.experienceService,
+        Player = deps.Player,
         spCardService = deps.spCardService,
         hostDocument = deps.hostDocument,
         Observable = deps.Observable,
@@ -58,7 +58,7 @@ module.exports = function(deps) {
                     ((appUri === 'mini-reel-player') ? 'index' : appConfig.kMode) + '.html',
                 appPath = appFolder + appFile,
                 state = null,
-                getSessionDeferred = Q.defer();
+                getPlayerDeferred = Q.defer();
             var embedTracker = settings.config.exp.replace(/e-/,'');
 
             /* jshint camelcase:false */
@@ -81,10 +81,6 @@ module.exports = function(deps) {
                     campaign.launchUrls = (campaign.launchUrls || [])
                         .concat(settings.config.launchPixel.split(' '));
                 }());
-            }
-
-            function insertIframe() {
-                $container.append($iframe);
             }
 
             function fetchApp() {
@@ -117,45 +113,14 @@ module.exports = function(deps) {
                     .setBase(appFolder);
             }
 
-            function getSponsoredCards(document) {
-                var startFetch = (new Date()).getTime();
-                var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
-                var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
-
-                return spCardService.fetchSponsoredCards(experience, settings.config, {
-                    clickUrls: clickUrls,
-                    countUrls: countUrls
-                }, preload).then(function(){
-                    /* jshint camelcase:false */
-                    window.__c6_ga__(embedTracker + '.send', 'timing', {
-                        'timingCategory' : 'API',
-                        'timingVar'      : 'fetchSponsoredCards',
-                        'timingValue'    : ((new Date()).getTime() - startFetch),
-                        'timingLabel'    : 'adtech'
-                    });
-                    return document;
-                });
-            }
-
-            function trimPlaceholders(document) {
-                experience.data.deck = experience.data.deck.filter(function(card) {
-                    return card.type !== 'wildcard';
-                });
-                return document;
-            }
-
             function loadApp(document) {
-                return $iframe.load(document.toString(), communicateWithApp)
-                    .then(function(session) {
-                        return session.ensureReadiness();
-                    });
+                return $iframe.load(document.toString(), communicateWithApp);
             }
 
             function communicateWithApp(appWindow) {
-                var session = experienceService.registerExperience(experience, appWindow, {
-                    standalone: standalone,
-                    profile: profile
-                }).on('open', function openApp() {
+                var player = new Player(appWindow);
+
+                player.session.on('open', function openApp() {
                     state.set('active', true);
                 })
                 .on('close', function closeApp() {
@@ -182,9 +147,59 @@ module.exports = function(deps) {
                     }
                 });
 
-                getSessionDeferred.resolve(session);
+                getPlayerDeferred.resolve(player);
 
-                return session;
+                return player;
+            }
+
+            function getSponsoredCards() {
+                var startFetch = (new Date()).getTime();
+                var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
+                var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
+
+                return spCardService.fetchSponsoredCards(experience, settings.config, {
+                    clickUrls: clickUrls,
+                    countUrls: countUrls
+                }, preload).then(function(){
+                    /* jshint camelcase:false */
+                    window.__c6_ga__(embedTracker + '.send', 'timing', {
+                        'timingCategory' : 'API',
+                        'timingVar'      : 'fetchSponsoredCards',
+                        'timingValue'    : ((new Date()).getTime() - startFetch),
+                        'timingLabel'    : 'adtech'
+                    });
+                });
+            }
+
+            function trimPlaceholders() {
+                experience.data.deck = experience.data.deck.filter(function(card) {
+                    return card.type !== 'wildcard';
+                });
+                return experience;
+            }
+
+            function loadPlayer() {
+                $container.append($iframe);
+
+                return fetchApp()
+                    .then(modifyApp)
+                    .then(loadApp);
+            }
+
+            function loadAds() {
+                return getSponsoredCards().then(trimPlaceholders);
+            }
+
+            function bootstrapPlayer(values) {
+                var player = values[0], experience = values[1];
+
+                player.bootstrap({
+                    experience: experience,
+                    profile: settings.profile || browserInfo.profile,
+                    standalone: standalone
+                });
+
+                return player.getReadySession();
             }
 
             function setAppDefines(session) {
@@ -213,12 +228,19 @@ module.exports = function(deps) {
                 });
             }
 
+            function loadAll() {
+                return Q.all([
+                    loadPlayer(),
+                    loadAds()
+                ]).then(bootstrapPlayer).then(setAppDefines).then(initAnalytics);
+            }
+
             function finish() {
                 return settings;
             }
 
-            settings.getSession = function() {
-                return getSessionDeferred.promise;
+            settings.getPlayer = function() {
+                return getPlayerDeferred.promise;
             };
 
             $container.addClass('c6__cant-touch-this')
@@ -240,9 +262,9 @@ module.exports = function(deps) {
                 }
 
                 function getSession() {
-                    return settings.getSession()
-                        .then(function(session) {
-                            return session.ensureReadiness();
+                    return settings.getPlayer()
+                        .then(function(player) {
+                            return player.getReadySession();
                         });
                 }
 
@@ -265,7 +287,7 @@ module.exports = function(deps) {
                         });
                         delete settings.config.showStartTime;
                     }
-                    
+
                     $iframe.show();
                     callDelegate('didHide');
                     getSession()
@@ -293,14 +315,7 @@ module.exports = function(deps) {
             // this method modifies the DOM (by adding the iframe.) So, we make sure to do all of
             // our work asynchronously in the next event loop.
             return Q.delay(0)
-                .then(insertIframe)
-                .then(fetchApp)
-                .then(modifyApp)
-                .then(getSponsoredCards)
-                .then(trimPlaceholders)
-                .then(loadApp)
-                .then(setAppDefines)
-                .then(initAnalytics)
+                .then(loadAll)
                 .then(finish)
                 .catch(function(err){
                     /* jshint camelcase:false */

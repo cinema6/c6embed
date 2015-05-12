@@ -19,7 +19,6 @@
             mockDocumentParser,
             browserInfo,
             spCardService,
-            experienceService,
             hostDocument;
 
         var $iframe,
@@ -28,16 +27,29 @@
             indexHTML2,
             parsedDoc,
             session,
-            safeSession;
+            safeSession,
+            player;
 
         function Session() {
             AsEvented.call(this);
             this.window = {};
         }
         Session.prototype = {
-            ping: jasmine.createSpy('session.ping()'),
-            ensureReadiness: jasmine.createSpy('session.ensureReadiness()')
+            ping: jasmine.createSpy('session.ping()')
         };
+
+        var Player = jasmine.createSpy('Player()').and.callFake(function() {
+            this.session = session = new Session();
+            safeSession = new Session();
+            safeSession.window.c6 = {
+                html5Videos: []
+            };
+
+            this.getReadySession = jasmine.createSpy('player.getReadySession()').and.returnValue(Q.when(safeSession));
+            this.bootstrap = jasmine.createSpy('player.bootstrap()').and.returnValue(this);
+
+            player = this;
+        });
 
         function run() {
             return app({
@@ -50,7 +62,7 @@
                 documentParser: mockDocumentParser,
                 browserInfo: browserInfo,
                 spCardService: spCardService,
-                experienceService: experienceService,
+                Player: Player,
                 hostDocument: hostDocument,
                 Observable: Observable
             });
@@ -106,7 +118,9 @@
             frameFactory = function() {
                 $iframe = $('<iframe src="about:blank"></iframe>');
 
-                $iframe.load = jasmine.createSpy('$iframe.load()').and.returnValue(Q.when(session));
+                $iframe.load = jasmine.createSpy('$iframe.load()').and.callFake(function(html, onReady) {
+                    return Q.when(onReady($iframe.prop('contentWindow')));
+                });
                 $iframe.fullscreen = jasmine.createSpy('$iframe.fullscreen()');
                 $iframe.show = jasmine.createSpy('$iframe.show()');
                 $iframe.hide = jasmine.createSpy('$iframe.hide()');
@@ -132,22 +146,12 @@
                 }
             };
 
-            session = new Session();
-            safeSession = new Session();
-            safeSession.window.c6 = {
-                html5Videos: []
-            };
-            session.ensureReadiness.and.returnValue(Q.when(safeSession));
-            safeSession.ensureReadiness.and.returnValue(Q.when(safeSession));
-
-            experienceService = {
-                registerExperience: jasmine.createSpy('experienceService.registerExperience()')
-                    .and.returnValue(session)
-            };
-
             spCardService = {
                 fetchSponsoredCards: jasmine.createSpy('spCardService.fetchSponsoredCards()')
-                    .and.returnValue(Q())
+                    .and.callFake(function(experience) {
+                        experience.loadedCards = true;
+                        return Q();
+                    })
             };
 
             hostDocument = {
@@ -460,15 +464,9 @@
                     delete settings.promise;
                     c6Ajax.get.calls.reset();
                     mockDocumentParser.calls.reset();
-                    experienceService.registerExperience.calls.reset();
                     hostDocument.shrink.calls.reset();
 
-                    $window.c6.loadExperience(settings).then(function() {
-                        var cb = $iframe.load.calls.mostRecent().args[1];
-                        var appWindow = $iframe.prop('contentWindow');
-
-                        cb(appWindow);
-                    }).finally(done);
+                    $window.c6.loadExperience(settings).finally(done);
                 });
 
                 it('should set the mode based on the provided profile', function() {
@@ -476,7 +474,7 @@
                 });
 
                 it('should include the profile as app data', function() {
-                    expect(experienceService.registerExperience).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), jasmine.objectContaining({
+                    expect(player.bootstrap).toHaveBeenCalledWith(jasmine.objectContaining({
                         profile: settings.profile
                     }));
                 });
@@ -681,7 +679,7 @@
             });
 
             it('should resolve to the settings object', function() {
-                expect(session.ensureReadiness).toHaveBeenCalled();
+                expect(player.getReadySession).toHaveBeenCalled();
                 expect(success).toHaveBeenCalledWith(settings);
             });
 
@@ -739,7 +737,7 @@
 
                 beforeEach(function() {
                     state = settings.state;
-                    spyOn(settings, 'getSession').and.returnValue(Q.when(session));
+                    spyOn(settings, 'getPlayer').and.returnValue(Q.when(player));
                     spyOn(state, 'observe').and.callThrough();
                 });
 
@@ -749,7 +747,7 @@
                             state.set('active', true);
                             $iframe.hide.calls.reset();
                             settings.splashDelegate.didShow.calls.reset();
-                            session.ensureReadiness.calls.reset();
+                            player.getReadySession.calls.reset();
                             state.set('responsiveStyles', {
                                 padding: '20px',
                                 marginTop: '50px'
@@ -775,7 +773,7 @@
                         });
 
                         it('should ping a nice message to the application', function() {
-                            expect(session.ensureReadiness).toHaveBeenCalled();
+                            expect(player.getReadySession).toHaveBeenCalled();
                             expect(safeSession.ping).toHaveBeenCalledWith('hide');
                         });
 
@@ -805,7 +803,7 @@
                         });
 
                         it('should ping a nice message to the application', function() {
-                            expect(session.ensureReadiness).toHaveBeenCalled();
+                            expect(player.getReadySession).toHaveBeenCalled();
                             expect(safeSession.ping).toHaveBeenCalledWith('show');
                         });
 
@@ -855,35 +853,32 @@
 
             describe('when the app loads', function() {
                 var appWindow,
-                    result, getSessionSuccess;
+                    getPlayerSuccess;
 
                 beforeEach(function() {
-                    var cb = $iframe.load.calls.mostRecent().args[1];
-
-                    getSessionSuccess = jasmine.createSpy('getSession() success');
-                    settings.getSession().then(getSessionSuccess);
+                    getPlayerSuccess = jasmine.createSpy('getPlayer() success');
+                    settings.getPlayer().then(getPlayerSuccess);
 
                     appWindow = $iframe.prop('contentWindow');
-
-                    result = cb(appWindow);
                 });
 
                 it('should start a session with the app', function() {
-                    expect(experienceService.registerExperience).toHaveBeenCalledWith(experience, appWindow, {
-                        standalone: settings.standalone,
-                        profile: browserInfo.profile
+                    expect(Player).toHaveBeenCalledWith(appWindow);
+                });
+
+                it('should bootstrap the player', function() {
+                    expect(player.bootstrap).toHaveBeenCalledWith({
+                        experience: experience,
+                        profile: browserInfo.profile,
+                        standalone: settings.standalone
                     });
                 });
 
-                it('should resolve the settings.getSession() method\'s promise', function(done) {
+                it('should resolve the settings.getPlayer() method\'s promise', function(done) {
                     setTimeout(function() {
-                        expect(getSessionSuccess).toHaveBeenCalledWith(session);
+                        expect(getPlayerSuccess).toHaveBeenCalledWith(player);
                         done();
                     }, 10);
-                });
-
-                it('should return the session', function() {
-                    expect(result).toBe(session);
                 });
 
                 it('should decorate the settings object with the app\'s c6 object', function() {
@@ -895,15 +890,13 @@
                         delete settings.promise;
                         settings.config.container = 'jumpramp';
                         settings.standalone = true;
-                        experienceService.registerExperience.calls.reset();
+                        player.bootstrap.calls.reset();
 
-                        $window.c6.loadExperience(settings).then(function() {
-                            $iframe.load.calls.mostRecent().args[1](appWindow);
-                        }).finally(done);
+                        $window.c6.loadExperience(settings).finally(done);
                     });
 
                     it('should set standalone to false', function() {
-                        expect(experienceService.registerExperience).toHaveBeenCalledWith(jasmine.any(Object), jasmine.any(Object), jasmine.objectContaining({
+                        expect(player.bootstrap).toHaveBeenCalledWith(jasmine.objectContaining({
                             standalone: false
                         }));
                     });
