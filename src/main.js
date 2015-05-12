@@ -56,15 +56,13 @@
             $: c6Query
         });
 
-    /* Create Experience */
-    var Experience = require('../lib/Experience'),
-        experience = new Experience({
-            window: window,
-            postmessage: postmessage,
-            q: q,
-            browserInfo: browserInfo
-        });
-        
+    /* Create Player */
+    var PlayerProvider = require('../src/PlayerProvider.js');
+    var Player = new PlayerProvider({
+        postmessage: postmessage,
+        q: q
+    });
+
     /* Create SponsoredCards */
     var SponsoredCards = require('../lib/SponsoredCards'),
         spCards = new SponsoredCards({
@@ -115,7 +113,7 @@
         c6Ajax: c6Ajax,
         documentParser: documentParser,
         browserInfo: browserInfo,
-        experienceService: experience,
+        Player: Player,
         spCardService: spCards,
         hostDocument: hostDocument,
         Observable: Observable
