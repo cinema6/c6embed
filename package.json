@@ -30,6 +30,7 @@
     "grunt-inline": "0.3.2",
     "grunt-karma": "^0.8.2",
     "grunt-open": "~0.2.2",
+    "grunt-text-replace": "^0.4.0",
     "jasmine-core": "^2.2.0",
     "karma": "^0.12.4",
     "karma-chrome-launcher": "^0.1.3",

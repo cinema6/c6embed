@@ -5,8 +5,8 @@
         dist: {
             files: [
                 {
-                    src: ['.tmp/build/<%= settings.distDir %>/app.js'],
-                    dest: '.tmp/build/<%= settings.distDir %>/app.min.js'
+                    src: ['.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.js'],
+                    dest: '.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.min.js'
                 },
                 {
                     src: ['.tmp/build/<%= settings.distDir %>/c6embed.js'],

@@ -1,6 +1,17 @@
 (function() {
     'use strict';
 
+    var publicJsSrcs = [
+        '<%= settings.distDir %>/**/*.js',
+        '!<%= settings.distDir %>/app--<%= git_tag %>.js',
+        '!<%= settings.distDir %>/app--<%= git_tag %>.min.js'
+    ];
+
+    var appJsSrcs = [
+        '<%= settings.distDir %>/app--<%= git_tag %>.js',
+        '<%= settings.distDir %>/app--<%= git_tag %>.min.js'
+    ];
+
     module.exports = {
         options: {
             key:    '<%= settings.aws.accessKeyId %>',
@@ -14,11 +25,19 @@
             },
             upload: [
                 {
-                    src: '<%= settings.distDir %>/**/*.js',
+                    src: publicJsSrcs,
                     dest: '<%= settings.s3.test.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=0'
+                        CacheControl: 'max-age=60'
+                    }
+                },
+                {
+                    src: appJsSrcs,
+                    dest: '<%= settings.s3.test.app %>',
+                    rel : '<%= settings.distDir %>/',
+                    options: {
+                        CacheControl: 'max-age=31556926'
                     }
                 }
             ]
@@ -61,11 +80,19 @@
             },
             upload: [
                 {
-                    src: '<%= settings.distDir %>/**/*.js',
+                    src: publicJsSrcs,
                     dest: '<%= settings.s3.production.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=0'
+                        CacheControl: 'max-age=60'
+                    }
+                },
+                {
+                    src: appJsSrcs,
+                    dest: '<%= settings.s3.production.app %>',
+                    rel : '<%= settings.distDir %>/',
+                    options: {
+                        CacheControl: 'max-age=31556926'
                     }
                 }
             ]

@@ -3,6 +3,10 @@
 * [PERFORMANCE]: c6embed now fetches sponsored cards and loads the
   MiniReel Player at the same time (instead of waiting for the sponsored
   cards to fetch first)
+* [PERFORMANCE]: Upload code with gzip compression (resulting in files
+  about half of their original size)
+* [PERFORMANCE]: Add version string to filename of built app.js and
+  upload it with a max-age of one year
 
 ## v2.28.1 (May 11, 2015)
 * [FIX]: Fix for an issue that caused custom pixels not to be fired when

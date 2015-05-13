@@ -113,6 +113,7 @@ module.exports = function(grunt) {
         'usebanner:dist',
         'htmlmin:dist',
         'inline:dist',
+        'replace:dist',
         'compress:dist'
     ]);
 
