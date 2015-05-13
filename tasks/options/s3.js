@@ -16,8 +16,7 @@
         options: {
             key:    '<%= settings.aws.accessKeyId %>',
             secret: '<%= settings.aws.secretAccessKey %>',
-            access: 'public-read',
-            ContentEncoding: 'gzip'
+            access: 'public-read'
         },
         test: {
             options: {
@@ -29,7 +28,8 @@
                     dest: '<%= settings.s3.test.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60'
+                        CacheControl: 'max-age=60',
+                        ContentEncoding: 'gzip'
                     }
                 },
                 {
@@ -37,7 +37,8 @@
                     dest: '<%= settings.s3.test.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=31556926'
+                        CacheControl: 'max-age=31556926',
+                        ContentEncoding: 'gzip'
                     }
                 }
             ]
@@ -53,7 +54,8 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=60',
-                        ContentType: 'text/html'
+                        ContentType: 'text/html',
+                        ContentEncoding: 'gzip'
                     }
                 }
             ]
@@ -69,7 +71,8 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=60',
-                        ContentType: 'text/html'
+                        ContentType: 'text/html',
+                        ContentEncoding: 'gzip'
                     }
                 }
             ]
@@ -84,7 +87,8 @@
                     dest: '<%= settings.s3.production.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60'
+                        CacheControl: 'max-age=60',
+                        ContentEncoding: 'gzip'
                     }
                 },
                 {
@@ -92,7 +96,8 @@
                     dest: '<%= settings.s3.production.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=31556926'
+                        CacheControl: 'max-age=31556926',
+                        ContentEncoding: 'gzip'
                     }
                 }
             ]
@@ -108,7 +113,8 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=60',
-                        ContentType: 'text/html'
+                        ContentType: 'text/html',
+                        ContentEncoding: 'gzip'
                     }
                 }
             ]
@@ -124,7 +130,8 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=60',
-                        ContentType: 'text/html'
+                        ContentType: 'text/html',
+                        ContentEncoding: 'gzip'
                     }
                 }
             ]
