@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.29.0 (May 13, 2015)
 * [PERFORMANCE]: c6embed now fetches sponsored cards and loads the
   MiniReel Player at the same time (instead of waiting for the sponsored
   cards to fetch first)
