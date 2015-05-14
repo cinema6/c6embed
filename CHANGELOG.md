@@ -8,6 +8,8 @@
   about half of their original size)
 * [PERFORMANCE]: Add version string to filename of built app.js and
   upload it with a max-age of one year
+* [FEATURE]: Add ability to immediately launch a MiniReel with the
+  data-auto-launch attribute on the embed
 
 ## v2.28.1 (May 11, 2015)
 * [FIX]: Fix for an issue that caused custom pixels not to be fired when
