@@ -270,6 +270,94 @@
                     }
                 });
             });
+
+            describe('autoLaunch', function() {
+                var settings;
+
+                beforeEach(function() {
+                    settings = {
+                        load: false,
+                        preload: false,
+                        config: {
+                            exp: 'e-456'
+                        },
+                        experience: experience,
+                        splashDelegate: {},
+                        embed: embed1
+                    };
+
+                    c6.embeds = [settings];
+                });
+
+                describe('if true', function() {
+                    beforeEach(function() {
+                        settings.autoLaunch = true;
+                        settings.load = true;
+                    });
+
+                    ['phone', 'tablet'].forEach(function(device) {
+                        describe('if the device is a ' + device, function() {
+                            beforeEach(function(done) {
+                                browserInfo.profile.device = device;
+
+                                run().finally(done);
+                            });
+
+                            it('should preload the player', function() {
+                                expect(settings.state.get('active')).toBe(false);
+                            });
+
+                            describe('when c6.loadExperience() is called', function() {
+                                beforeEach(function(done) {
+                                    c6.loadExperience(settings, false).finally(done);
+                                });
+
+                                it('should launch the player', function() {
+                                    expect(settings.state.get('active')).toBe(true);
+                                });
+                            });
+                        });
+                    });
+
+                    ['desktop', 'netbook'].forEach(function(device) {
+                        describe('if the device is a ' + device, function() {
+                            beforeEach(function(done) {
+                                browserInfo.profile.device = device;
+
+                                run().finally(done);
+                            });
+
+                            it('should launch the player', function() {
+                                expect(settings.state.get('active')).toBe(true);
+                            });
+
+                            describe('if preload is true', function() {
+                                beforeEach(function(done) {
+                                    settings = {
+                                        load: true,
+                                        preload: true,
+                                        autoLaunch: true,
+                                        config: {
+                                            exp: 'e-456'
+                                        },
+                                        experience: experience,
+                                        splashDelegate: {},
+                                        embed: embed1
+                                    };
+
+                                    c6.embeds = [settings];
+
+                                    run().finally(done);
+                                });
+
+                                it('should still launch the player', function() {
+                                    expect(settings.state.get('active')).toBe(true);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
         });
 
         describe('c6.loadExperience(settings, preload)', function() {

@@ -27,7 +27,7 @@
                 }
             }
         }),
-        bools = ['preload'],
+        bools = ['preload', 'autoLaunch'],
         config = (function(scripts) {
             var script = (readyState !== 'loading') ? (function() {
                 var pending = c6.pending || [],
@@ -123,6 +123,7 @@
             playerVersion: parseInt(config.playerVersion, 10) || 1,
             load: false,
             preload: false,
+            autoLaunch: config.autoLaunch,
             config: config
         }) - 1];
 
@@ -348,7 +349,12 @@
                     for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
                     if (qf.length){ r += '?' + qf.join('&'); }
                     return r;
-                }(config.exp,{cx:config.context,ct:config.container,bd:experience.data.branding}));
+                }(config.exp, {
+                    cx: config.context,
+                    ct: config.container,
+                    bd: experience.data.branding,
+                    al: config.autoLaunch
+                }));
 
             window.__c6_ga__('create', c6.gaAcctIdPlayer, {
                 'name'       : 'c6',
@@ -419,7 +425,7 @@
                 window.addEventListener('resize', viewChangeHandler);
             }
 
-            if (config.preload) {
+            if (config.preload || config.autoLaunch) {
                 c6.loadExperience(settings, true);
             } else {
                 splash.addEventListener('mouseenter', handleMouseenter, false);

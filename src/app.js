@@ -31,13 +31,18 @@ module.exports = function(deps) {
     }
 
     c6.loadExperience = function(settings, preload) {
+        var profile = settings.profile || browserInfo.profile;
         var defaultAdNetwork = window.__C6_AD_NETWORK__ || '5473.1',
             defaultAdServer  = window.__C6_AD_SERVER__  || 'adserver.adtechus.com',
             promise;
+        var autoLaunch = (settings.autoLaunch && (/^(desktop|netbook)$/).test(profile.device));
+
+        if (settings.autoLaunch) {
+            preload = true;
+        }
 
         function bootstrap() {
             var experience = settings.experience,
-                profile = settings.profile || browserInfo.profile,
                 $iframe = frameFactory(),
                 $container = $(settings.embed),
                 splashDelegate = settings.splashDelegate,
@@ -310,6 +315,8 @@ module.exports = function(deps) {
                 /* jshint camelcase:true */
             });
 
+            settings.autoLaunch = false;
+
             // The iframe must be inserted asynchronously here because, on iOS, if the method is
             // called from a mouse hover event, click event handlers will not execute becasue
             // this method modifies the DOM (by adding the iframe.) So, we make sure to do all of
@@ -351,7 +358,7 @@ module.exports = function(deps) {
 
         promise = settings.promise || (settings.promise = bootstrap());
 
-        if (!preload) {
+        if (!preload || autoLaunch) {
             promise.then(function(settings) {
                 settings.state.set('active', true);
             });

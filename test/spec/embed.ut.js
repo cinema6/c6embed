@@ -420,6 +420,7 @@
                                         embed: $('.c6embed-e-123')[0],
                                         load: 'data-preload' in config,
                                         preload: 'data-preload' in config,
+                                        autoLaunch: 'data-auto-launch' in config,
                                         standalone: false,
                                         playerVersion: 1,
                                         experience: experience,
@@ -437,6 +438,9 @@
                                             result.responsive = !result.height;
                                             result.splash = jasmine.any(Object);
                                             result.preload = 'data-preload' in config;
+                                            result.autoLaunch = 'data-auto-launch' in config;
+
+                                            delete result['auto-launch'];
 
                                             return result;
                                         }())
@@ -625,29 +629,29 @@
             });
         });
 
+        function createEmbed(attrs, done) {
+            var script,
+                intervalId = setInterval(function() {
+                    if (!window.c6) { return; }
+
+                    if (Object.keys(window.c6.requireCache).length === 4) {
+                        clearInterval(intervalId);
+                        done();
+                    }
+                }, 100);
+
+            script = document.createElement('script');
+            script.src = '/base/src/embed.js';
+            script.setAttribute('data-splash', 'foo:1/1');
+            attrs.forEach(function(pair) {
+                script.setAttribute(pair[0], pair[1] || '');
+            });
+            script.setAttribute('data-exp', 'e-60196c3751eb52');
+
+            $div.append(script);
+        }
+
         describe('data-preload attr', function() {
-            function createEmbed(preload, done) {
-                var script,
-                    intervalId = setInterval(function() {
-                        if (!window.c6) { return; }
-
-                        if (Object.keys(window.c6.requireCache).length === 4) {
-                            clearInterval(intervalId);
-                            done();
-                        }
-                    }, 100);
-
-                script = document.createElement('script');
-                script.src = '/base/src/embed.js';
-                script.setAttribute('data-splash', 'foo:1/1');
-                if (preload) {
-                    script.setAttribute('data-preload');
-                }
-                script.setAttribute('data-exp', 'e-60196c3751eb52');
-
-                $div.append(script);
-            }
-
             beforeEach(function() {
                 window.c6 = {
                     embeds: [],
@@ -658,7 +662,7 @@
 
             describe('if true', function() {
                 beforeEach(function(done) {
-                    createEmbed(true, done);
+                    createEmbed([['data-preload']], done);
                 });
 
                 it('should preload the experience', function() {
@@ -668,11 +672,49 @@
 
             describe('if preload is false', function() {
                 beforeEach(function(done) {
-                    createEmbed(false, done);
+                    createEmbed([], done);
                 });
 
                 it('should not preload the experience', function() {
                     expect(window.c6.loadExperience).not.toHaveBeenCalled();
+                });
+            });
+        });
+
+        describe('data-auto-launch attr', function() {
+            beforeEach(function() {
+                window.c6 = {
+                    embeds: [],
+                    requireCache: {},
+                    loadExperience: jasmine.createSpy('c6.loadExperience()')
+                };
+            });
+
+            describe('if true', function() {
+                beforeEach(function(done) {
+                    createEmbed([['data-auto-launch']], done);
+                });
+
+                it('should auto launch the experience', function() {
+                    expect(window.c6.loadExperience).toHaveBeenCalledWith(settingsByExp('e-60196c3751eb52'), true);
+                });
+
+                it('should make the autoLaunch boolean true', function() {
+                    expect(window.c6.loadExperience).toHaveBeenCalledWith(jasmine.objectContaining({ autoLaunch: true }), true);
+                });
+            });
+
+            describe('if false', function() {
+                beforeEach(function(done) {
+                    createEmbed([], done);
+                });
+
+                it('should not auto launch the experience', function() {
+                    expect(window.c6.loadExperience).not.toHaveBeenCalled();
+                });
+
+                it('should make the autoLaunch boolean true', function() {
+                    expect(settingsByExp('e-60196c3751eb52').autoLaunch).toBe(false);
                 });
             });
         });
