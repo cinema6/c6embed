@@ -46,6 +46,17 @@
                 });
             };
 
+            window.onmessage = (window !== window.parent ? function(event) {
+                var data = (function() {
+                    try { return JSON.parse(event.data); } catch(e) { return {}; }
+                }());
+                var events = ['launch', 'adStart', 'adCount'];
+
+                if (events.indexOf(data.event) > -1) {
+                    window.parent.postMessage(JSON.stringify(data), '*');
+                }
+            } : null);
+
             function toQueryParams(object) {
                 return Object.keys(object)
                     .filter(function(key) {
