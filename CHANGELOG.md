@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.30.0 (May 15, 2015)
 * [FEATURE]: Add ability for the standalone player to forward events
   from the MiniReel Player
 * [FIX]: Fix for an issue that caused sponsored cards not to load on
