@@ -17,7 +17,10 @@
             
             window = {
                 c6: { require: jasmine.createSpy('c6.require()') },
-                __c6_ga__: jasmine.createSpy('c6_ga()')
+                __c6_ga__: jasmine.createSpy('c6_ga()'),
+                location: {
+                    protocol: 'http:'
+                }
             }
             
             adtech = {
@@ -558,6 +561,7 @@
                                 bnid: '1',
                                 sub1: 'e-1234'
                             },
+                            secure: false,
                             complete: jasmine.any(Function)
                         });
                         expect(window.c6.cardCache[1234].camp1.usableFor['e-1234']).toBe(false);
@@ -568,6 +572,21 @@
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
+                });
+
+                describe('if the page is https:', function() {
+                    beforeEach(function(done) {
+                        window.location.protocol = 'https:';
+                        adtech.loadAd.calls.reset();
+
+                        _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(done);
+                    });
+
+                    it('should set secure to true', function() {
+                        expect(adtech.loadAd).toHaveBeenCalledWith(jasmine.objectContaining({
+                            secure: true
+                        }));
+                    });
                 });
                 
                 it('should use the card\'s configured bannerId, if it exists', function(done) {
@@ -591,6 +610,7 @@
                                 bnid: '2',
                                 sub1: 'e-1234'
                             },
+                            secure: jasmine.any(Boolean),
                             complete: jasmine.any(Function)
                         });
                     }).catch(function(error) {
@@ -629,6 +649,7 @@
                                 bnid: '3',
                                 sub1: 'e-1234'
                             },
+                            secure: jasmine.any(Boolean),
                             complete: jasmine.any(Function)
                         });
                         expect(window.c6.cardCache[1234]['987'].usableFor['e-1234']).toBe(false);
