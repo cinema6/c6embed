@@ -237,6 +237,7 @@
 
                         it('should configure adtech', function() {
                             expect(adtech.config.page).toEqual({
+                                protocol: 'http',
                                 network: '5473.1',
                                 server: 'adserver.adtechus.com',
                                 enableMultiAd: true

@@ -296,7 +296,8 @@ describe('cinema6-jsonp.js', function() {
                     expect(two.trackingUrl).not.toBeDefined();
                     expect($window.__c6_ga__.calls.mostRecent().args).toEqual([
                         '4a2418dd5c0196.send',
-                        'event',{
+                        'event',
+                        {
                             eventCategory : 'Display',
                             eventAction   : 'AttemptShow',
                             eventLabel    : 'Experience Two'
@@ -374,6 +375,7 @@ describe('cinema6-jsonp.js', function() {
 
         it('should configure adtech', function() {
             expect(adtech.config.page).toEqual({
+                protocol: 'http',
                 network: '5473.1',
                 server: 'adserver.adtechus.com',
                 enableMultiAd: true
@@ -624,7 +626,7 @@ describe('cinema6-jsonp.js', function() {
                         });
                     });
                 });
-                
+
                 describe('if preview mode is set in the URL', function() {
                     beforeEach(function(done) {
                         c6.embeds.length = 0;

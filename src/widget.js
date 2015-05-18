@@ -407,6 +407,7 @@
             }
 
             adtech.config.page = {
+                protocol: ($window.location.protocol === 'https:' ) ? 'https' : 'http',
                 network: adNetwork,
                 server: adServer,
                 enableMultiAd: true
