@@ -64,7 +64,7 @@
     });
 
     /* Create SponsoredCards */
-    var SponsoredCards = require('../lib/SponsoredCards'),
+    var SponsoredCards = require('./SponsoredCards'),
         spCards = new SponsoredCards({
             window: window,
             config: config,
