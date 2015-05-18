@@ -14,7 +14,7 @@ module.exports = {
     widget: {
         files: [
             {
-                src: 'src/widget.js',
+                src: 'src/widget/widget.js',
                 dest: 'app/widget.js'
             },
             {
@@ -70,7 +70,7 @@ module.exports = {
                 dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
             },
             {
-                src: 'src/widget.js',
+                src: 'src/widget/widget.js',
                 dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
             },
             {

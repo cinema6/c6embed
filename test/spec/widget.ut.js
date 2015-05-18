@@ -9,7 +9,7 @@
         function load(done) {
             var script = $document.createElement('script');
 
-            script.src = '/base/src/widget.js';
+            script.src = '/base/src/widget/widget.js';
             script.onload = function() {
                 done();
             };
