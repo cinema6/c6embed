@@ -398,7 +398,7 @@
             }
         }
     };
-
+    
     /* Create GA Tracker */
     (function() {
         /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
@@ -421,11 +421,12 @@
         adtech
     ) {
         adtech.config.page = {
+            protocol: (window.location.protocol === 'https:' ) ? 'https' : 'http',
             network: adNetwork,
             server: adServer,
             enableMultiAd: true
         };
-
+        
         adtech.config.placements[params.id] = {
             adContainerId: 'ad',
             complete: function() {

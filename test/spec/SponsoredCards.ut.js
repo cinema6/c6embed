@@ -177,6 +177,7 @@
 
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(adtech.config.page).toEqual({
+                            protocol: 'http',
                             network: '5473.1',
                             server: 'adserver.adtechus.com',
                             enableMultiAd: true
@@ -230,6 +231,7 @@
                     spCards.fetchSponsoredCards(experience, config).then(function() {
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(adtech.config.page).toEqual({
+                            protocol: 'http',
                             network: '4444.4',
                             server: 'adserver.adtechus.com',
                             enableMultiAd: true
@@ -244,6 +246,7 @@
                     spCards.fetchSponsoredCards(experience, config).then(function() {
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(adtech.config.page).toEqual({
+                            protocol: 'http',
                             network: '5473.1',
                             server: 'somehost.com',
                             enableMultiAd: true
@@ -561,7 +564,6 @@
                                 bnid: '1',
                                 sub1: 'e-1234'
                             },
-                            secure: false,
                             complete: jasmine.any(Function)
                         });
                         expect(window.c6.cardCache[1234].camp1.usableFor['e-1234']).toBe(false);
@@ -574,21 +576,6 @@
                     }).done(done);
                 });
 
-                describe('if the page is https:', function() {
-                    beforeEach(function(done) {
-                        window.location.protocol = 'https:';
-                        adtech.loadAd.calls.reset();
-
-                        _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(done);
-                    });
-
-                    it('should set secure to true', function() {
-                        expect(adtech.loadAd).toHaveBeenCalledWith(jasmine.objectContaining({
-                            secure: true
-                        }));
-                    });
-                });
-                
                 it('should use the card\'s configured bannerId, if it exists', function(done) {
                     experience.data.deck[0].campaign.bannerId = '2';
                     _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
@@ -610,7 +597,6 @@
                                 bnid: '2',
                                 sub1: 'e-1234'
                             },
-                            secure: jasmine.any(Boolean),
                             complete: jasmine.any(Function)
                         });
                     }).catch(function(error) {
@@ -649,7 +635,6 @@
                                 bnid: '3',
                                 sub1: 'e-1234'
                             },
-                            secure: jasmine.any(Boolean),
                             complete: jasmine.any(Function)
                         });
                         expect(window.c6.cardCache[1234]['987'].usableFor['e-1234']).toBe(false);
