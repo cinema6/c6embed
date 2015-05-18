@@ -85,7 +85,7 @@
             it('should base64 decode any attributes that start with a :', function(done) {
                 var script = document.createElement('script');
 
-                script.src = '/base/src/embed.js';
+                script.src = '/base/src/embed/embed.js';
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
@@ -110,7 +110,7 @@
             it('should base64 decode any attributes that start with a -', function(done) {
                 var script = document.createElement('script');
 
-                script.src = '/base/src/embed.js';
+                script.src = '/base/src/embed/embed.js';
 
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
@@ -159,7 +159,7 @@
                             var script = document.createElement('script');
 
                             experience = exp;
-                            script.src = '/base/src/embed.js';
+                            script.src = '/base/src/embed/embed.js';
                             for (var key in config) {
                                 script.setAttribute(key, config[key]);
                             }
@@ -199,7 +199,7 @@
                             var script = document.createElement('script');
 
                             window.c6.requireCache = {};
-                            script.src = '/base/src/embed.js';
+                            script.src = '/base/src/embed/embed.js';
                             script.setAttribute('data-replace-image', '.header_image');
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'flavor1:1/1');
@@ -283,7 +283,7 @@
                             beforeEach(function(done) {
                                 var embed2 = document.createElement('script');
 
-                                embed2.src = '/base/src/embed.js';
+                                embed2.src = '/base/src/embed/embed.js';
                                 for (var key in config) {
                                     embed2.setAttribute(key, config[key]);
                                 }
@@ -315,7 +315,7 @@
 
                             $('link#c6-theinertia').remove();
 
-                            embed2.src = '/base/src/embed.js';
+                            embed2.src = '/base/src/embed/embed.js';
                             embed2.setAttribute('data-exp', 'e-6b5ead50d4a1ed');
                             embed2.setAttribute('data-splash', 'vertical-stack:3/2');
 
@@ -461,7 +461,7 @@
                                 delete window.c6;
 
                                 var script = document.createElement('script');
-                                script.src = '/base/src/embed.js';
+                                script.src = '/base/src/embed/embed.js';
                                 script.setAttribute('data-exp', 'e-123');
                                 script.setAttribute('data-splash', 'foo:1/1');
                                 script.setAttribute('data-player-version', '3');
@@ -479,7 +479,7 @@
                             var c6 = window.c6,
                                 script = document.createElement('script');
 
-                            script.src = '/base/src/embed.js';
+                            script.src = '/base/src/embed/embed.js';
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'foo:1/1');
                             $($div).append(script);
@@ -493,7 +493,7 @@
                             var c6 = window.c6 = { blah: 'foo' },
                                 script = document.createElement('script');
 
-                            script.src = '/base/src/embed.js';
+                            script.src = '/base/src/embed/embed.js';
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'foo:1/1');
                             $($div).append(script);
@@ -523,7 +523,7 @@
                                         pending: ['c6embed-q9h6dda4']
                                     };
 
-                                    actualScript.src = '/base/src/embed.js';
+                                    actualScript.src = '/base/src/embed/embed.js';
                                     configScript.setAttribute('id', 'c6embed-q9h6dda4');
                                     configScript.setAttribute('data-exp', 'e-456');
                                     configScript.setAttribute('data-splash', 'flavorflav:6/5');
@@ -554,7 +554,7 @@
                                             pending: []
                                         };
 
-                                        actualScript.src = '/base/src/embed.js';
+                                        actualScript.src = '/base/src/embed/embed.js';
                                         actualScript.setAttribute('data-exp', 'e-def');
                                         actualScript.setAttribute('data-splash', 'flavorflav:6/5');
 
@@ -641,7 +641,7 @@
                 }, 100);
 
             script = document.createElement('script');
-            script.src = '/base/src/embed.js';
+            script.src = '/base/src/embed/embed.js';
             script.setAttribute('data-splash', 'foo:1/1');
             attrs.forEach(function(pair) {
                 script.setAttribute(pair[0], pair[1] || '');
@@ -726,7 +726,7 @@
                 script.setAttribute('data-exp', 'e-abc');
                 script.setAttribute('data-splash', 'flavorflav:6/5');
 
-                script.src = '/base/src/embed.js';
+                script.src = '/base/src/embed/embed.js';
                 script.onload = done;
                 $div.append(script);
             });
@@ -743,7 +743,7 @@
                 script.setAttribute('data-exp', 'e-abc');
                 script.setAttribute('data-splash', 'flavorflav:6/5');
 
-                script.src = '/base/src/embed.js';
+                script.src = '/base/src/embed/embed.js';
                 script.onload = done;
                 $div.append(script);
             });
@@ -773,7 +773,7 @@
                 script.setAttribute('data-height', '300px');
                 script.setAttribute('data-splash', 'foo:1/1');
 
-                script.src = '/base/src/embed.js';
+                script.src = '/base/src/embed/embed.js';
                 script.onload = done;
                 $div.append(script);
             });

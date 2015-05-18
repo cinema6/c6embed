@@ -2,7 +2,7 @@ module.exports = {
     embed: {
         files: [
             {
-                src: 'src/embed.js',
+                src: 'src/embed/embed.js',
                 dest: 'app/embed.js'
             },
             {
@@ -66,7 +66,7 @@ module.exports = {
     tmp: {
         files: [
             {
-                src: 'src/embed.js',
+                src: 'src/embed/embed.js',
                 dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
             },
             {

@@ -20,8 +20,8 @@ module.exports = function(config) {
         files: [
             'node_modules/q/q.js',
             'node_modules/asEvented/asevented.js',
-            { pattern: 'src/embed.js', included: false },
-            { pattern: 'src/widget.js', included: false },
+            { pattern: 'src/embed/embed.js', included: false },
+            { pattern: 'src/widget/widget.js', included: false },
             { pattern: 'src/cinema6-jsonp/cinema6-jsonp.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
