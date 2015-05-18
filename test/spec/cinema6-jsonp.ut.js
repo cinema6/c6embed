@@ -1,4 +1,4 @@
-fdescribe('cinema6-jsonp.js', function() {
+describe('cinema6-jsonp.js', function() {
     'use strict';
 
     var C6Query;
