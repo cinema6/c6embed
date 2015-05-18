@@ -34,17 +34,17 @@ module.exports = {
     preview: {
         files: [
             {
-                src: 'src/preview.html',
+                src: 'src/preview/preview.html',
                 dest: 'app/index.html'
             },
             {
-                src: 'styles/**',
+                src: 'src/styles/**',
                 dest: 'app/',
                 expand: true,
                 cwd: 'src'
             },
             {
-                src: 'img/**',
+                src: 'src/img/**',
                 dest: 'app/',
                 expand: true,
                 cwd: 'src'
@@ -81,13 +81,13 @@ module.exports = {
                 src: 'styles/**',
                 dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
-                cwd: 'src'
+                cwd: 'src/preview'
             },
             {
                 src: 'img/**',
                 dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
-                cwd: 'src'
+                cwd: 'src/preview'
             }
         ]
     }

@@ -18,7 +18,7 @@ module.exports = {
                 dest: '.tmp/build/<%= settings.distDir %>/standalone.html'
             },
             {
-                src: 'src/preview.html',
+                src: 'src/preview/preview.html',
                 dest: '.tmp/build/<%= settings.distDir %>/preview.html'
             }
         ]
