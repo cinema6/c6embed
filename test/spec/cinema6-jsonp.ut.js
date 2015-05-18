@@ -15,7 +15,7 @@ describe('cinema6-jsonp.js', function() {
     function load(cb, src) {
         var script = $document.createElement('script');
 
-        script.src = src || ('/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
+        script.src = src || ('/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
         script.onload = cb;
 
         $workspace.append(script);
@@ -53,7 +53,7 @@ describe('cinema6-jsonp.js', function() {
 
             $workspace = $([
                 '<div>',
-                '    <script src="/base/src/cinema6-jsonp.js?callback=foo&id=12345"></script>',
+                '    <script src="/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=foo&id=12345"></script>',
                 '</div>'
             ].join(''));
 
@@ -345,7 +345,7 @@ describe('cinema6-jsonp.js', function() {
             beforeEach(function(done) {
                 adtech.enqueueAd.calls.reset();
 
-                load(done, '/base/src/cinema6-jsonp.js');
+                load(done, '/base/src/cinema6-jsonp/cinema6-jsonp.js');
             });
 
             it('should call enqueueAd once', function() {
@@ -362,7 +362,7 @@ describe('cinema6-jsonp.js', function() {
 
                 script.onload = done;
 
-                script.src = '/base/src/cinema6-jsonp.js';
+                script.src = '/base/src/cinema6-jsonp/cinema6-jsonp.js';
             });
 
             it('should still work', function() {
@@ -436,7 +436,7 @@ describe('cinema6-jsonp.js', function() {
                     load(function() {
                         adtech.config.placements['108542'].complete();
                         done();
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
+                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
                 });
 
                 it('should fetch minireels from the content service with additional params', function(done) {
@@ -477,7 +477,7 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -496,7 +496,7 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -515,7 +515,7 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -635,7 +635,7 @@ describe('cinema6-jsonp.js', function() {
                             waitForDeps(expIds.map(function(id) {
                                 return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                             }), done);
-                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now());
+                        }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now());
                     });
 
                     it('should set the preview attribute in the experiences\' config', function() {
@@ -653,7 +653,7 @@ describe('cinema6-jsonp.js', function() {
                             waitForDeps(expIds.map(function(id) {
                                 return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                             }), done);
-                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now());
+                        }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now());
                     });
 
                     it('should set the playerVersion to the supplied version', function() {
@@ -688,7 +688,7 @@ describe('cinema6-jsonp.js', function() {
                                 exps = experiences;
                                 done();
                             });
-                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now());
+                        }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now());
                     });
 
                     it('should take the branding from the experience that was already there', function() {

@@ -22,7 +22,7 @@ module.exports = function(config) {
             'node_modules/asEvented/asevented.js',
             { pattern: 'src/embed.js', included: false },
             { pattern: 'src/widget.js', included: false },
-            { pattern: 'src/cinema6-jsonp.js', included: false },
+            { pattern: 'src/cinema6-jsonp/cinema6-jsonp.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
             { pattern: 'test/helpers/**/*.html', included: false },

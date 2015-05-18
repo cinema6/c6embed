@@ -54,7 +54,7 @@ module.exports = {
     jsonp: {
         files: [
             {
-                src: 'src/cinema6-jsonp.js',
+                src: 'src/cinema6-jsonp/cinema6-jsonp.js',
                 dest: 'app/cinema6-jsonp.js'
             },
             {
@@ -74,7 +74,7 @@ module.exports = {
                 dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
             },
             {
-                src: 'src/cinema6-jsonp.js',
+                src: 'src/cinema6-jsonp/cinema6-jsonp.js',
                 dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
             },
             {
