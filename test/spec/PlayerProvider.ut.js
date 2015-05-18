@@ -1,4 +1,4 @@
-var PlayerProvider = require('../../src/PlayerProvider.js');
+var PlayerProvider = require('../../src/app/PlayerProvider.js');
 var PostMessage = require('../../lib/PostMessage.js');
 var q = require('../../node_modules/q/q.js');
 var asEvented = require('../../node_modules/asEvented/asevented.js');

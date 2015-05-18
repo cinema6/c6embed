@@ -12,7 +12,7 @@
         var experience, withWildcards;
         
         beforeEach(function() {
-            SponsoredCards = require('../../src/SponsoredCards');
+            SponsoredCards = require('../../src/app/SponsoredCards');
             q = require('../../node_modules/q/q.js');
             
             window = {

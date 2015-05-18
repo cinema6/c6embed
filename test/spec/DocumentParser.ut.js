@@ -13,7 +13,7 @@
             indexHTML = require('../helpers/mock_index.js');
             indexHTML2 = require('../helpers/mock_index--2.0.js');
 
-            DocumentParser = require('../../src/DocumentParser');
+            DocumentParser = require('../../src/app/DocumentParser');
 
             documentParser = new DocumentParser({});
         });

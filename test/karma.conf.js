@@ -33,7 +33,7 @@ module.exports = function(config) {
         ],
 
         exclude: [
-            'src/main.js'
+            'src/app/main.js'
         ],
 
         preprocessors: {

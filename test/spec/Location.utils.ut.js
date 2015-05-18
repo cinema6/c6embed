@@ -14,7 +14,7 @@
                 }
             };
 
-            Location = require('../../src/utils/Location');
+            Location = require('../../src/app/utils/Location');
             $location = new Location({ window: $window });
         });
 

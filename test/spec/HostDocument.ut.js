@@ -17,7 +17,7 @@
             test.src = 'about:blank';
             document.getElementsByTagName('body')[0].appendChild(test);
 
-            HostDocument = require('../../src/HostDocument');
+            HostDocument = require('../../src/app/HostDocument');
             C6Query = require('../../lib/C6Query');
 
             $window = test.contentWindow;
