@@ -14,7 +14,7 @@ module.exports = {
         },
         files: [
             {
-                src: 'src/standalone.html',
+                src: 'src/standalone/standalone.html',
                 dest: '.tmp/build/<%= settings.distDir %>/standalone.html'
             },
             {

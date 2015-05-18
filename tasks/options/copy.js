@@ -26,7 +26,7 @@ module.exports = {
     standalone: {
         files: [
             {
-                src: 'src/standalone.html',
+                src: 'src/standalone/standalone.html',
                 dest: 'app/index.html'
             }
         ]
