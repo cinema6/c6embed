@@ -10,10 +10,6 @@ module.exports = {
     widget: {
         files: [
             {
-                src: 'src/widget/widget.js',
-                dest: 'app/widget.js'
-            },
-            {
                 src: 'app/widget.html',
                 dest: 'app/index.html'
             }
@@ -61,10 +57,6 @@ module.exports = {
     },
     tmp: {
         files: [
-            {
-                src: 'src/widget/widget.js',
-                dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
-            },
             {
                 src: 'src/cinema6-jsonp/cinema6-jsonp.js',
                 dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'

@@ -1,6 +1,8 @@
 (function() {
     'use strict';
 
+    var widgetJS = require('../../src/widget/widget.js');
+
    describe('widget.js', function() {
         var baseUrl, appJs,
             $window, $document,
@@ -9,11 +11,10 @@
         function load(done) {
             var script = $document.createElement('script');
 
-            script.src = '/base/src/widget/widget.js';
-            script.onload = function() {
-                done();
-            };
+            script.src = '/base/test/helpers/scripts/mock_widget.js';
             $('body').append(script);
+            widgetJS($window, $document);
+            setTimeout(done, 0);
 
             return script;
         }
@@ -59,15 +60,15 @@
             $('body').append($env);
         });
 
-        afterEach(function() {
-            $env.remove();
-        });
-
         it('should configure google analytics', function() {
             expect($window.__c6_ga__).toHaveBeenCalledWith('create', $window.c6.gaAcctIdPlayer, {
                 name: 'c6',
                 cookieName: '_c6ga'
             });
+        });
+
+        afterEach(function() {
+            $env.remove();
         });
 
         describe('the c6 object', function() {
@@ -83,7 +84,7 @@
 
             it('should have all the required properties', function() {
                 expect(c6.app).toBe(null);
-                expect(c6.embeds).toEqual(jasmine.any($window.Array));
+                expect(c6.embeds).toEqual(jasmine.any(Array));
                 expect(c6.branding).toEqual({});
                 expect(c6.requireCache).toEqual({});
                 expect(c6.require).toEqual(jasmine.any(Function));
@@ -116,7 +117,7 @@
 
                 it('should be extended', function() {
                     expect(c6.app).toBe(null);
-                    expect(c6.embeds).toEqual(jasmine.any($window.Array));
+                    expect(c6.embeds).toEqual(jasmine.any(Array));
                     expect(c6.branding).toEqual({});
                     expect(c6.requireCache).toEqual({});
                     expect(c6.require).toEqual(jasmine.any(Function));
@@ -140,6 +141,15 @@
                             template: 'collateral/mr2/templates/test',
                             id: '3330799'
                         });
+                    });
+
+                    afterEach(function(done) {
+                        waitForDeps([
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js',
+                            '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
+                            baseUrl + '/collateral/splash/splash.js',
+                            baseUrl + '/collateral/mr2/templates/test.js'
+                        ], done);
                     });
 
                     it('should write a <div> into the DOM', function() {

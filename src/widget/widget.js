@@ -1,4 +1,4 @@
-(function($window, $document/*, readyState*/) {
+module.exports = function($window, $document) {
     'use strict';
 
     /**
@@ -74,7 +74,7 @@
                     src: 'about:blank',
                     'data-module': _src
                 }),
-                head = document.getElementsByTagName('head')[0],
+                head = $document.getElementsByTagName('head')[0],
                 html = [
                     '<script>',
                     '(' + function(window) {
@@ -133,7 +133,7 @@
     }
 
     function DOMElement(tag, attrs, appendTo) {
-        var element = document.createElement(tag),
+        var element = $document.createElement(tag),
             attr;
 
         for (attr in attrs) {
@@ -448,7 +448,7 @@
         })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
         /* jshint sub:false, asi:false, expr:false, indent:4 */
 
-        window.__c6_ga__('create', c6.gaAcctIdPlayer, {
+        $window.__c6_ga__('create', c6.gaAcctIdPlayer, {
             'name'       : 'c6',
             'cookieName' : '_c6ga'
         });
@@ -473,4 +473,4 @@
             }
         }
     };
-}(window, document, window.mockReadyState || document.readyState));
+};
