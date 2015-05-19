@@ -16,7 +16,7 @@
         debug: {
             options: {
                 singleRun: false,
-                background: true
+                autoWatch: true
             }
         }
     };
