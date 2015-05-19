@@ -1,15 +1,15 @@
-(function() {
+module.exports = function($window, $document) {
     'use strict';
 
     /**
      * Initialize some default configuration. Set up the c6 object (if it still needs to be set
      * up.)
      */
-    var baseUrl = window.__C6_URL_ROOT__ || '//portal.cinema6.com',
-        appJs   = window.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
-        adNetwork = window.__C6_AD_NETWORK__ || '5473.1',
-        adServer  = window.__C6_AD_SERVER__  || 'adserver.adtechus.com',
-        c6 = window.c6 = complete(window.c6 || {}, {
+    var baseUrl = $window.__C6_URL_ROOT__ || '//portal.cinema6.com',
+        appJs   = $window.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        adNetwork = $window.__C6_AD_NETWORK__ || '5473.1',
+        adServer  = $window.__C6_AD_SERVER__  || 'adserver.adtechus.com',
+        c6 = $window.c6 = complete($window.c6 || {}, {
             app: null,
             embeds: [],
             requireCache: {},
@@ -32,7 +32,7 @@
                     modules[index] = module;
 
                     if (++loaded === srcs.length) {
-                        cb.apply(window, modules);
+                        cb.apply($window, modules);
                     }
                 }
 
@@ -48,7 +48,7 @@
                             src: 'about:blank',
                             'data-module': _src
                         }),
-                        head = document.getElementsByTagName('head')[0],
+                        head = $document.getElementsByTagName('head')[0],
                         html = [
                             '<script>',
                             '(' + function(window) {
@@ -100,7 +100,7 @@
                 /* jshint expr:true */
                 this.app || (this.app = new DOMElement('script', {
                     src: appJs
-                }, document.head));
+                }, $document.head));
             },
             addReel: function(id, placement, clickUrl, adId) {
                 var cache = this.widgetContentCache;
@@ -126,7 +126,7 @@
                     
                     var embedTracker = config.experience.id.replace(/^e-/, '');
                     /* jshint camelcase:false */
-                    window.__c6_ga__(embedTracker + '.send', 'event', {
+                    $window.__c6_ga__(embedTracker + '.send', 'event', {
                         'eventCategory' : 'Display',
                         'eventAction'   : 'AttemptShow',
                         'eventLabel'    : config.experience.data.title
@@ -139,7 +139,7 @@
         }),
         require = c6.require,
         params = complete((function() {
-            var jsonpScripts = Array.prototype.slice.call(document.getElementsByTagName('script'))
+            var jsonpScripts = Array.prototype.slice.call($document.getElementsByTagName('script'))
                 .filter(function(script) {
                     return (/\/cinema6-jsonp(.min)?\.js/).test(script.src);
                 });
@@ -149,11 +149,11 @@
         container = (function() {
             var id = 'c6-lightbox-container';
 
-            return document.getElementById(id) || new DOMElement('div', {
+            return $document.getElementById(id) || new DOMElement('div', {
                 id: id
-            }, document.body);
+            }, $document.body);
         }()),
-        callback = window[params.callback];
+        callback = $window[params.callback];
 
     /**********************************************************************************************
      * Helper/Utility Functions
@@ -195,7 +195,7 @@
     }
 
     function DOMElement(tag, attrs, appendTo) {
-        var element = document.createElement(tag),
+        var element = $document.createElement(tag),
             attr;
 
         for (attr in attrs) {
@@ -331,30 +331,30 @@
                 experience.data.branding = pageBranding;
 
                 /* jshint camelcase:false */
-                window.__c6_ga__('create', c6.gaAcctIdEmbed, {
+                $window.__c6_ga__('create', c6.gaAcctIdEmbed, {
                     'name'       : embedTracker,
                     'cookieName' : '_c6ga'
                 });
-                window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
+                $window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
-                window.__c6_ga__(embedTracker + '.set',{
+                $window.__c6_ga__(embedTracker + '.set',{
                     'page'  : pagePath,
                     'title' : experience.data.title,
-                    'dimension1' : window.location.href
+                    'dimension1' : $window.location.href
                 });
 
-                window.__c6_ga__(embedTracker + '.send', 'pageview', {
+                $window.__c6_ga__(embedTracker + '.send', 'pageview', {
                     'sessionControl' : 'start'
                 });
                
                 //TODO - replace this when we can actually detect that we are visible
-                window.__c6_ga__(embedTracker + '.send', 'event', {
+                $window.__c6_ga__(embedTracker + '.send', 'event', {
                     'eventCategory' : 'Display',
                     'eventAction'   : 'Visible',
                     'eventLabel'    : experience.data.title
                 });
                 
-                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                $window.__c6_ga__(embedTracker + '.send', 'timing', {
                     'timingCategory' : 'API',
                     'timingVar'      : 'fetchExperience',
                     'timingValue'    : ((new Date()).getTime() - requireStart),
@@ -405,10 +405,10 @@
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
+        })($window,$document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
         /* jshint sub:false, asi:false, expr:false, indent:4 */
 
-        window.__c6_ga__('create', c6.gaAcctIdPlayer, {
+        $window.__c6_ga__('create', c6.gaAcctIdPlayer, {
             'name'       : 'c6',
             'cookieName' : '_c6ga'
         });
@@ -421,7 +421,7 @@
         adtech
     ) {
         adtech.config.page = {
-            protocol: (window.location.protocol === 'https:' ) ? 'https' : 'http',
+            protocol: ($window.location.protocol === 'https:' ) ? 'https' : 'http',
             network: adNetwork,
             server: adServer,
             enableMultiAd: true
@@ -447,4 +447,4 @@
             }
         });
     });
-}());
+};

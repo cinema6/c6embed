@@ -19,6 +19,10 @@ module.exports = {
                 dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
             },
             {
+                src: 'src/cinema6-jsonp/main.js',
+                dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
+            },
+            {
                 src: ['src/app/main.js'],
                 dest: '.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.js'
             }
@@ -36,6 +40,10 @@ module.exports = {
             {
                 src: ['src/widget/main.js'],
                 dest: '<%= settings.appDir %>/widget.js'
+            },
+            {
+                src: 'src/cinema6-jsonp/main.js',
+                dest: 'app/cinema6-jsonp.js'
             },
             {
                 src: ['src/app/main.js'],

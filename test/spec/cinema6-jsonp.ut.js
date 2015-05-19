@@ -1,6 +1,8 @@
 describe('cinema6-jsonp.js', function() {
     'use strict';
 
+    var jsonpJS = require('../../src/cinema6-jsonp/cinema6-jsonp.js');
+
     var C6Query;
 
     var $;
@@ -15,10 +17,12 @@ describe('cinema6-jsonp.js', function() {
     function load(cb, src) {
         var script = $document.createElement('script');
 
-        script.src = src || ('/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
-        script.onload = cb;
-
+        script.src = src || ('/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
         $workspace.append(script);
+        jsonpJS($window, $document);
+        cb();
+
+        return script;
     }
 
     function waitForDeps(deps, done) {
@@ -53,7 +57,7 @@ describe('cinema6-jsonp.js', function() {
 
             $workspace = $([
                 '<div>',
-                '    <script src="/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=foo&id=12345"></script>',
+                '    <script src="/base/test/helpers/scripts/cinema6-jsonp.js?callback=foo&id=12345"></script>',
                 '</div>'
             ].join(''));
 
@@ -102,7 +106,7 @@ describe('cinema6-jsonp.js', function() {
 
         it('should have the required properties', function() {
             expect(c6.app).toBe(null, 'app');
-            expect(c6.embeds).toEqual(jasmine.any($window.Array), 'embeds');
+            expect(c6.embeds).toEqual(jasmine.any(Array), 'embeds');
             expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
             expect(c6.require).toEqual(jasmine.any(Function), 'require');
             expect(c6.widgetContentCache).toEqual({}, 'widgetContentCache');
@@ -130,7 +134,7 @@ describe('cinema6-jsonp.js', function() {
 
             it('should extend it', function() {
                 expect(c6.app).toBe(null, 'app');
-                expect(c6.embeds).toEqual(jasmine.any($window.Array), 'embeds');
+                expect(c6.embeds).toEqual(jasmine.any(Array), 'embeds');
                 expect(c6.branding).toEqual({}, 'branding');
                 expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
                 expect(c6.require).toEqual(jasmine.any(Function), 'require');
@@ -345,7 +349,7 @@ describe('cinema6-jsonp.js', function() {
             beforeEach(function(done) {
                 adtech.enqueueAd.calls.reset();
 
-                load(done, '/base/src/cinema6-jsonp/cinema6-jsonp.js');
+                load(done, '/base/test/helpers/scripts/cinema6-jsonp.js');
             });
 
             it('should call enqueueAd once', function() {
@@ -355,14 +359,7 @@ describe('cinema6-jsonp.js', function() {
 
         describe('if the script is minified', function() {
             beforeEach(function(done) {
-                var script = document.createElement('script');
-
-                $workspace.append(script);
-                $('<script src="/base/src/cinema6-jsonp.min.js?id=12345678"></script>').insertAfter(script);
-
-                script.onload = done;
-
-                script.src = '/base/src/cinema6-jsonp/cinema6-jsonp.js';
+                load(done, '/base/test/helpers/scripts/cinema6-jsonp.min.js?id=12345678');
             });
 
             it('should still work', function() {
@@ -436,7 +433,7 @@ describe('cinema6-jsonp.js', function() {
                     load(function() {
                         adtech.config.placements['108542'].complete();
                         done();
-                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
                 });
 
                 it('should fetch minireels from the content service with additional params', function(done) {
@@ -477,7 +474,7 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -496,7 +493,7 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -515,7 +512,7 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -571,7 +568,7 @@ describe('cinema6-jsonp.js', function() {
                             cb: jasmine.any(Number),
                             src: 'jsonp'
                         },
-                        items: jasmine.any($window.Array)
+                        items: jasmine.any(Array)
                     });
 
                     var result = $window.onC6AdLoad.calls.mostRecent().args[0];
@@ -635,7 +632,7 @@ describe('cinema6-jsonp.js', function() {
                             waitForDeps(expIds.map(function(id) {
                                 return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                             }), done);
-                        }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now());
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now());
                     });
 
                     it('should set the preview attribute in the experiences\' config', function() {
@@ -653,7 +650,7 @@ describe('cinema6-jsonp.js', function() {
                             waitForDeps(expIds.map(function(id) {
                                 return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                             }), done);
-                        }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now());
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now());
                     });
 
                     it('should set the playerVersion to the supplied version', function() {
@@ -688,7 +685,7 @@ describe('cinema6-jsonp.js', function() {
                                 exps = experiences;
                                 done();
                             });
-                        }, '/base/src/cinema6-jsonp/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now());
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now());
                     });
 
                     it('should take the branding from the experience that was already there', function() {

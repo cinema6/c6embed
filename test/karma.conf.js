@@ -19,7 +19,6 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: 'src/cinema6-jsonp/cinema6-jsonp.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
             { pattern: 'test/helpers/scripts/**/*.js', included: false },
@@ -32,6 +31,7 @@ module.exports = function(config) {
             'src/app/**/*.js': ['jshint', 'browserify'],
             'src/embed/**/*.js': ['jshint', 'browserify'],
             'src/widget/**/*.js': ['jshint', 'browserify'],
+            'src/cinema6-jsonp/**/*.js': ['jshint', 'browserify'],
             'src/**/*.js': ['jshint'],
             'test/spec/**/*.js': ['browserify'],
             'test/helpers/*.js': ['browserify']
