@@ -9,6 +9,12 @@
     "asEvented": "~0.4.3",
     "q": "~1.0.0"
   },
+  "browser": {
+    "Modernizr": "./ext/modernizr.custom.71747.js"
+  },
+  "browserify-shim": {
+    "Modernizr": "Modernizr"
+  },
   "devDependencies": {
     "aws-sdk": "~2.0.0-rc3",
     "browserify": "~3.30.1",
@@ -17,7 +23,7 @@
     "escape-regexp": "0.0.1",
     "grunt": "^0.4.4",
     "grunt-banner": "^0.2.2",
-    "grunt-browserify": "~1.3.1",
+    "grunt-browserify": "^3.8.0",
     "grunt-c6-util": "git+ssh://git@github.com:cinema6/c6-grunt-util",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-compress": "^0.13.0",

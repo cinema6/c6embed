@@ -1,12 +1,6 @@
 module.exports = {
     options: {
-        shim: {
-            Modernizr: { path: 'ext/modernizr.custom.71747.js', exports: 'Modernizr' }
-        },
-        postBundleCB: function(error, src, next) {
-            'use strict';
-            next(error, '(function() {var ' + src + '}())');
-        }
+        transform: ['browserify-shim']
     },
     dist: {
         files: [
