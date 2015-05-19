@@ -1,4 +1,4 @@
-(function(win, readyState) {
+module.exports = function(win, readyState) {
     'use strict';
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
@@ -462,4 +462,4 @@
             throw err;
         }
     });
-}(window, window.mockReadyState || document.readyState));
+};

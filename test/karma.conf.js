@@ -19,18 +19,19 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: 'src/embed/embed.js', included: false },
             { pattern: 'src/widget/widget.js', included: false },
             { pattern: 'src/cinema6-jsonp/cinema6-jsonp.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
+            { pattern: 'test/helpers/scripts/**/*.js', included: false },
             { pattern: 'test/helpers/**/*.html', included: false },
             'test/spec/**/*.js'
         ],
 
         preprocessors: {
-            'src/app/**/*.js': ['jshint', 'browserify'],
             'lib/**/*.js': ['jshint', 'browserify'],
+            'src/app/**/*.js': ['jshint', 'browserify'],
+            'src/embed/**/*.js': ['jshint', 'browserify'],
             'src/**/*.js': ['jshint'],
             'test/spec/**/*.js': ['browserify'],
             'test/helpers/*.js': ['browserify']

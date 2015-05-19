@@ -2,10 +2,6 @@ module.exports = {
     embed: {
         files: [
             {
-                src: 'src/embed/embed.js',
-                dest: 'app/embed.js'
-            },
-            {
                 src: 'app/embed.html',
                 dest: 'app/index.html'
             }
@@ -65,10 +61,6 @@ module.exports = {
     },
     tmp: {
         files: [
-            {
-                src: 'src/embed/embed.js',
-                dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
-            },
             {
                 src: 'src/widget/widget.js',
                 dest: '.tmp/build/<%= settings.distDir %>/mr2.js'

@@ -1,6 +1,8 @@
 (function() {
     'use strict';
 
+    var embedJS = require('../../src/embed/embed.js');
+
     function waitForDeps(deps, done) {
         var c6 = window.c6,
             id = window.setInterval(function() {
@@ -82,54 +84,40 @@
         describe('common functionality', function() {
             var $script;
 
-            it('should base64 decode any attributes that start with a :', function(done) {
+            it('should base64 decode any attributes that start with a :', function() {
                 var script = document.createElement('script');
-
-                script.src = '/base/src/embed/embed.js';
-
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
                 script.setAttribute('data-splash', 'foo:1/1');
                 script.setAttribute('data-:title', btoa('Hello World!'));
                 script.setAttribute('data-:test', btoa('This is a Test!'));
-
-                script.onload = function() {
-                    var config = window.c6.embeds[0].config;
-
-                    expect(config.title).toBe('Hello World!');
-                    expect(config.test).toBe('This is a Test!');
-                    expect(config[':title']).not.toBeDefined();
-                    expect(config[':test']).not.toBeDefined();
-
-                    done();
-                };
-
                 $div.append(script);
+                embedJS(window, document.readyState);
+
+                var config = window.c6.embeds[0].config;
+
+                expect(config.title).toBe('Hello World!');
+                expect(config.test).toBe('This is a Test!');
+                expect(config[':title']).not.toBeDefined();
+                expect(config[':test']).not.toBeDefined();
             });
 
-            it('should base64 decode any attributes that start with a -', function(done) {
+            it('should base64 decode any attributes that start with a -', function() {
                 var script = document.createElement('script');
-
-                script.src = '/base/src/embed/embed.js';
-
                 script.setAttribute('data-exp', 'e-abc123');
                 script.setAttribute('data-width', '60%');
                 script.setAttribute('data-splash', 'foo:1/1');
                 script.setAttribute('data--title', btoa('Hello World!'));
                 script.setAttribute('data--test', btoa('This is a Test!'));
-
-                script.onload = function() {
-                    var config = window.c6.embeds[0].config;
-
-                    expect(config.title).toBe('Hello World!');
-                    expect(config.test).toBe('This is a Test!');
-                    expect(config['-title']).not.toBeDefined();
-                    expect(config['-test']).not.toBeDefined();
-
-                    done();
-                };
-
                 $div.append(script);
+                embedJS(window, document.readyState);
+
+                var config = window.c6.embeds[0].config;
+
+                expect(config.title).toBe('Hello World!');
+                expect(config.test).toBe('This is a Test!');
+                expect(config['-title']).not.toBeDefined();
+                expect(config['-test']).not.toBeDefined();
             });
 
             [
@@ -159,21 +147,20 @@
                             var script = document.createElement('script');
 
                             experience = exp;
-                            script.src = '/base/src/embed/embed.js';
                             for (var key in config) {
                                 script.setAttribute(key, config[key]);
                             }
-
+                            script.src = '/base/test/helpers/scripts/mock_embed.js';
                             $script = $(script);
-                            $script[0].onload = function() {
-                                var intervalId = setInterval(function() {
-                                    if (Object.keys(window.c6.requireCache).length === 4) {
-                                        clearInterval(intervalId);
-                                        done();
-                                    }
-                                }, 50);
-                            };
                             $div.append($script);
+                            embedJS(window, document.readyState);
+
+                            var intervalId = setInterval(function() {
+                                if (Object.keys(window.c6.requireCache).length === 4) {
+                                    clearInterval(intervalId);
+                                    done();
+                                }
+                            }, 50);
                         });
                     });
 
@@ -199,21 +186,18 @@
                             var script = document.createElement('script');
 
                             window.c6.requireCache = {};
-                            script.src = '/base/src/embed/embed.js';
                             script.setAttribute('data-replace-image', '.header_image');
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'flavor1:1/1');
-
-                            script.onload = function() {
-                                var intervalId = setInterval(function() {
-                                    if (Object.keys(window.c6.requireCache).length === 4) {
-                                        clearInterval(intervalId);
-                                        done();
-                                    }
-                                }, 50);
-                            };
-
                             $div.append(script);
+                            embedJS(window, document.readyState);
+
+                            var intervalId = setInterval(function() {
+                                if (Object.keys(window.c6.requireCache).length === 4) {
+                                    clearInterval(intervalId);
+                                    done();
+                                }
+                            }, 50);
 
                             return script;
                         }
@@ -280,17 +264,15 @@
                         });
 
                         describe('with multiple embeds on the same page', function() {
-                            beforeEach(function(done) {
+                            beforeEach(function() {
                                 var embed2 = document.createElement('script');
 
-                                embed2.src = '/base/src/embed/embed.js';
                                 for (var key in config) {
                                     embed2.setAttribute(key, config[key]);
                                 }
 
-                                embed2.onload = done;
-
                                 $div.append(embed2);
+                                embedJS(window, document.readyState);
                             });
 
                             it('should not add the branding again', function() {
@@ -315,11 +297,11 @@
 
                             $('link#c6-theinertia').remove();
 
-                            embed2.src = '/base/src/embed/embed.js';
                             embed2.setAttribute('data-exp', 'e-6b5ead50d4a1ed');
                             embed2.setAttribute('data-splash', 'vertical-stack:3/2');
 
                             $div.append(embed2);
+                            embedJS(window, document.readyState);
 
                             waitForDeps(['base/test/helpers/api/public/content/experience/e-6b5ead50d4a1ed.js?container=embed'], function(experiences) {
                                 experience = experiences[0];
@@ -415,59 +397,57 @@
                     describe('the c6 object', function() {
                         it('should exist', function() {
                             expect(window.c6).toEqual(jasmine.objectContaining({
-                                embeds : [
-                                    {
-                                        embed: $('.c6embed-e-123')[0],
-                                        load: 'data-preload' in config,
-                                        preload: 'data-preload' in config,
-                                        autoLaunch: 'data-auto-launch' in config,
-                                        standalone: false,
-                                        playerVersion: 1,
-                                        experience: experience,
-                                        splashDelegate: {},
-                                        config: (function() {
-                                            var result = {};
-
-                                            for (var key in config) {
-                                                result[key.replace(/^data-/, '')] = config[key];
-                                            }
-                                            result.context = 'embed';
-                                            result.container = (result.container || 'embed');
-                                            result.script = $script[0];
-                                            result.src = $script.attr('src');
-                                            result.responsive = !result.height;
-                                            result.splash = jasmine.any(Object);
-                                            result.preload = 'data-preload' in config;
-                                            result.autoLaunch = 'data-auto-launch' in config;
-
-                                            delete result['auto-launch'];
-
-                                            return result;
-                                        }())
-                                    }
-                                ],
-                                app: 'data-preload' in config ? jasmine.any(Object) : null,
+                                embeds: jasmine.any(Array),
+                                app: 'data-preload' in config ? jasmine.any(document.createElement('script').constructor) : null,
                                 loadExperience: jasmine.any(Function),
                                 requireCache: jasmine.any(Object),
                                 require: jasmine.any(Function),
                                 branding: jasmine.any(Object)
                             }));
-                            expect(window.c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
-                            expect(window.c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
+                            expect(window.c6.embeds.length).toBe(1);
+                            expect(window.c6.embeds[0]).toEqual(jasmine.objectContaining({
+                                embed: $('.c6embed-e-123')[0],
+                                load: 'data-preload' in config,
+                                preload: 'data-preload' in config,
+                                autoLaunch: 'data-auto-launch' in config,
+                                standalone: false,
+                                playerVersion: 1,
+                                experience: experience,
+                                splashDelegate: {},
+                                config: jasmine.any(Object)
+                            }));
+                            expect(window.c6.embeds[0].config).toEqual((function() {
+                                var result = {};
+
+                                for (var key in config) {
+                                    result[key.replace(/^data-/, '')] = config[key];
+                                }
+                                result.context = 'embed';
+                                result.container = (result.container || 'embed');
+                                result.script = $script[0];
+                                result.src = $script.attr('src');
+                                result.responsive = !result.height;
+                                result.splash = jasmine.any(Object);
+                                result.preload = 'data-preload' in config;
+                                result.autoLaunch = 'data-auto-launch' in config;
+
+                                delete result['auto-launch'];
+
+                                return result;
+                            }()));
                         });
 
                         describe('if the playerVersion is specified', function() {
-                            beforeEach(function(done) {
+                            beforeEach(function() {
                                 delete window.c6;
 
                                 var script = document.createElement('script');
-                                script.src = '/base/src/embed/embed.js';
                                 script.setAttribute('data-exp', 'e-123');
                                 script.setAttribute('data-splash', 'foo:1/1');
                                 script.setAttribute('data-player-version', '3');
-                                script.onload = done;
 
                                 $($div).append(script);
+                                embedJS(window, document.readyState);
                             });
 
                             it('should set the playerVersion', function() {
@@ -475,63 +455,57 @@
                             });
                         });
 
-                        it('should be reused if there are multiple embed instances', function(done) {
+                        it('should be reused if there are multiple embed instances', function() {
                             var c6 = window.c6,
                                 script = document.createElement('script');
 
-                            script.src = '/base/src/embed/embed.js';
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'foo:1/1');
                             $($div).append(script);
-                            script.onload = function() {
-                                expect(window.c6).toBe(c6);
-                                done();
-                            };
+                            embedJS(window, document.readyState);
+
+                            expect(window.c6).toBe(c6);
                         });
 
-                        it('should fill in any missing props on the c6 object if they are missing', function(done) {
+                        it('should fill in any missing props on the c6 object if they are missing', function() {
                             var c6 = window.c6 = { blah: 'foo' },
                                 script = document.createElement('script');
 
-                            script.src = '/base/src/embed/embed.js';
                             script.setAttribute('data-exp', 'e-abc');
                             script.setAttribute('data-splash', 'foo:1/1');
                             $($div).append(script);
-                            script.onload = function() {
-                                expect(c6).toEqual(jasmine.objectContaining({
-                                    blah: 'foo',
-                                    embeds: jasmine.any(Array),
-                                    app: null,
-                                    loadExperience: jasmine.any(Function),
-                                    requireCache: jasmine.any(Object),
-                                    branding: jasmine.any(Object)
-                                }));
-                                expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
-                                expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
-                                done();
-                            };
+                            embedJS(window, document.readyState);
+
+                            expect(c6).toEqual(jasmine.objectContaining({
+                                blah: 'foo',
+                                embeds: jasmine.any(Array),
+                                app: null,
+                                loadExperience: jasmine.any(Function),
+                                requireCache: jasmine.any(Object),
+                                branding: jasmine.any(Object)
+                            }));
+                            expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-\d+/);
+                            expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-\d+/);
                         });
 
                         ['interactive', 'complete'].forEach(function(readyState) {
                             describe('if the document is ' + readyState, function() {
-                                beforeEach(function(done) {
+                                beforeEach(function() {
                                     var actualScript = document.createElement('script'),
                                         configScript = document.createElement('script');
 
-                                    window.mockReadyState = readyState;
                                     window.c6 = {
                                         pending: ['c6embed-q9h6dda4']
                                     };
 
-                                    actualScript.src = '/base/src/embed/embed.js';
                                     configScript.setAttribute('id', 'c6embed-q9h6dda4');
                                     configScript.setAttribute('data-exp', 'e-456');
                                     configScript.setAttribute('data-splash', 'flavorflav:6/5');
 
-                                    actualScript.onload = done;
-
                                     $div.append(configScript);
                                     $div.append(actualScript);
+
+                                    embedJS(window, readyState);
                                 });
 
                                 it('should find the script by the global exp id', function() {
@@ -545,7 +519,7 @@
                                 describe('if there is nothing in the pending array', function() {
                                     var actualScript;
 
-                                    beforeEach(function(done) {
+                                    beforeEach(function() {
                                         var fakeScript = document.createElement('script');
 
                                         actualScript = document.createElement('script');
@@ -554,14 +528,13 @@
                                             pending: []
                                         };
 
-                                        actualScript.src = '/base/src/embed/embed.js';
                                         actualScript.setAttribute('data-exp', 'e-def');
                                         actualScript.setAttribute('data-splash', 'flavorflav:6/5');
 
-                                        actualScript.onload = done;
-
                                         $div.append(actualScript);
                                         $div.append(fakeScript);
+
+                                        embedJS(window, readyState);
                                     });
 
                                     it('should try to use the last c6embed script on the page', function() {
@@ -641,7 +614,6 @@
                 }, 100);
 
             script = document.createElement('script');
-            script.src = '/base/src/embed/embed.js';
             script.setAttribute('data-splash', 'foo:1/1');
             attrs.forEach(function(pair) {
                 script.setAttribute(pair[0], pair[1] || '');
@@ -649,6 +621,7 @@
             script.setAttribute('data-exp', 'e-60196c3751eb52');
 
             $div.append(script);
+            embedJS(window, document.readyState);
         }
 
         describe('data-preload attr', function() {
@@ -720,15 +693,14 @@
         });
 
         describe('with no branding', function() {
-            beforeEach(function(done) {
+            beforeEach(function() {
                 var script = document.createElement('script');
 
                 script.setAttribute('data-exp', 'e-abc');
                 script.setAttribute('data-splash', 'flavorflav:6/5');
 
-                script.src = '/base/src/embed/embed.js';
-                script.onload = done;
                 $div.append(script);
+                embedJS(window, document.readyState);
             });
 
             it('should not add a branding stylesheet', function() {
@@ -737,15 +709,14 @@
         });
 
         describe('when responsive', function() {
-            beforeEach(function(done) {
+            beforeEach(function() {
                 var script = document.createElement('script');
 
                 script.setAttribute('data-exp', 'e-abc');
                 script.setAttribute('data-splash', 'flavorflav:6/5');
 
-                script.src = '/base/src/embed/embed.js';
-                script.onload = done;
                 $div.append(script);
+                embedJS(window, document.readyState);
             });
 
             describe('the container', function() {
@@ -765,7 +736,7 @@
         });
 
         describe('when not responsive', function() {
-            beforeEach(function(done) {
+            beforeEach(function() {
                 var script = document.createElement('script');
 
                 script.setAttribute('data-exp', 'e-def');
@@ -773,9 +744,8 @@
                 script.setAttribute('data-height', '300px');
                 script.setAttribute('data-splash', 'foo:1/1');
 
-                script.src = '/base/src/embed/embed.js';
-                script.onload = done;
                 $div.append(script);
+                embedJS(window, document.readyState);
             });
 
             describe('the container', function() {
