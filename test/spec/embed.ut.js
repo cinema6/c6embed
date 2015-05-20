@@ -84,6 +84,7 @@
             window.mockReadyState = 'loading';
             window.__C6_URL_ROOT__ = 'base/test/helpers';
             window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
+            window.__c6_ga__ = jasmine.createSpy('window.__c6_ga__()');
 
             importScripts.cache = {};
 

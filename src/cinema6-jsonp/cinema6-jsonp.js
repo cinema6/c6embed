@@ -1,6 +1,8 @@
 module.exports = function($window, $document) {
     'use strict';
 
+    /* jshint camelcase:false */
+
     var importScripts = require('../../lib/importScripts').withConfig({
         paths: {
             adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
@@ -328,18 +330,10 @@ module.exports = function($window, $document) {
 
     /* Create GA Tracker */
     (function() {
-        /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })($window,$document,'script','//www.google-analytics.com/analytics.js','__c6_ga__');
-        /* jshint sub:false, asi:false, expr:false, indent:4 */
-
         $window.__c6_ga__('create', c6.gaAcctIdPlayer, {
             'name'       : 'c6',
             'cookieName' : '_c6ga'
         });
-        /* jshint camelcase:true */
     }());
 
     importScripts([

@@ -20,7 +20,6 @@ describe('cinema6-jsonp.js', function() {
 
     function load(cb, src, cache) {
         var script = $document.createElement('script');
-        var gaSpy = $window.__c6_ga__;
 
         script.src = src || ('/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
         $workspace.append(script);
@@ -29,13 +28,7 @@ describe('cinema6-jsonp.js', function() {
             return (importScripts = withConfig.call(importScriptsMain, config));
         });
         jsonpJS($window, $document);
-        var id = setInterval(function() {
-            if ($window.__c6_ga__ !== gaSpy) {
-                $window.__c6_ga__ = gaSpy;
-                cb();
-                clearInterval(id);
-            }
-        }, 10);
+        cb();
 
         return script;
     }
