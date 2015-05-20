@@ -1,13 +1,14 @@
 module.exports = function(win, readyState) {
     'use strict';
 
+    var importScripts = require('../../lib/importScripts');
+
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
         loadStart = new Date().getTime(),
         c6 = win.c6 = complete(win.c6 || {}, {
             embeds: [],
             app: null,
-            requireCache: {},
             branding: {},
             gaAcctIdPlayer: (function(acc,mi,mx){
                 return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
@@ -216,80 +217,6 @@ module.exports = function(win, readyState) {
             splashConfig.ratio.join('-') + '.js';
     }
 
-    function require(srcs, cb) {
-        var modules = [],
-            loaded = 0,
-            config = require.config || {},
-            paths = config.paths || {},
-            shims = config.shim || {};
-
-        function load(module, index) {
-            modules[index] = module;
-
-            if (++loaded === srcs.length) {
-                cb.apply(window, modules);
-            }
-        }
-
-        srcs.forEach(function(_src, index) {
-            var src = paths[_src] || _src,
-                shim = shims[_src] || {},
-                exports = shim.exports,
-                onCreateFrame = shim.onCreateFrame || function() {};
-
-            if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
-
-            var iframe = new DOMElement('iframe', {
-                    src: 'about:blank',
-                    'data-module': _src
-                }),
-                head = document.getElementsByTagName('head')[0],
-                html = [
-                    '<script>',
-                    '(' + function(window) {
-                        try {
-                            // This hack is needed in order for the browser to send the
-                            // "referer" header in Safari.
-                            window.history.replaceState(null, null, window.parent.location.href);
-                        } catch(e) {}
-                        window.Text = window.parent.Text;
-                        window.module = {
-                            exports: {}
-                        };
-                        window.exports = window.module.exports;
-                    }.toString() + '(window))',
-                    '</script>',
-                    '<script>(' + onCreateFrame.toString() + '(window))</script>',
-                    '<script src="' + src + '" charset="utf-8"></script>'
-                ].join('\n');
-
-            iframe.addEventListener('load', function() {
-                var frameWindow = iframe.contentWindow,
-                    head = frameWindow.document.getElementsByTagName('head')[0];
-
-                if (head.childNodes.length < 1) { return; }
-
-                load(
-                    (c6.requireCache[src] =
-                        (exports ? frameWindow[exports] : frameWindow.module.exports)
-                    ),
-                    index
-                );
-            }, false);
-
-            head.appendChild(iframe);
-
-            // The iframe must have its contents written using document.write(), otherwise the
-            // browser will not send the "referer" header when requesting the script.
-            iframe.contentWindow.document.write(html);
-            iframe.contentWindow.document.close();
-        });
-
-        return modules;
-    }
-    
-    c6.require = require;
-
     for (attr in containerStyles) {
         div.style[attr] = containerStyles[attr];
     }
@@ -320,7 +247,7 @@ module.exports = function(win, readyState) {
         placementId: config.adPlacementId,
         wildCardPlacement: config.wp
     }));
-    c6.require([
+    importScripts([
         '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
         baseUrl + '/collateral/splash/splash.js',
         splashOf(config.splash),
