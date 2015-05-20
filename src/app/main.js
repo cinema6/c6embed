@@ -27,6 +27,9 @@
     /* Fetch asEvented */
     var asEvented = require('asEvented');
 
+    /* Fetch importScripts */
+    var importScripts = require('../../lib/importScripts');
+
     /* Create UserAgent */
     var UserAgent = require('../../lib/UserAgent.js'),
         userAgent = new UserAgent({
@@ -68,7 +71,8 @@
         spCards = new SponsoredCards({
             window: window,
             config: config,
-            q: q
+            q: q,
+            importScripts: importScripts
         });
 
     /* Create C6AJAX */

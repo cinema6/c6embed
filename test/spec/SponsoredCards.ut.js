@@ -9,6 +9,10 @@
             adtech,
             _private;
 
+        var importScriptsMain = require('../../lib/importScripts.js');
+        var withConfig = importScriptsMain.withConfig;
+        var importScripts;
+
         var experience, withWildcards;
         
         beforeEach(function() {
@@ -21,7 +25,7 @@
                 location: {
                     protocol: 'http:'
                 }
-            }
+            };
             
             adtech = {
                 config: { placements: {} },
@@ -66,7 +70,15 @@
                 }
             };
 
-            spCards = new SponsoredCards({ q: q, config: { urlRoot: 'http://test.com' }, window: window });
+            spyOn(importScriptsMain, 'withConfig').and.callFake(function() {
+                var importFn = withConfig.apply(importScriptsMain, arguments);
+
+                return (importScripts = jasmine.createSpy('importScripts()').and.callFake(function() {
+                    return importFn.apply(null, arguments);
+                }));
+            });
+
+            spCards = new SponsoredCards({ q: q, config: { urlRoot: 'http://test.com' }, window: window, importScripts: importScriptsMain });
             _private = spCards._private;
             spyOn(_private, 'trimCard').and.callThrough();
             spyOn(_private, 'sendError').and.callThrough();
@@ -417,7 +429,7 @@
         
             describe('loadAdtech', function() {
                 beforeEach(function() {
-                    window.c6.require.and.callFake(function(modules, cb) {
+                    importScripts.and.callFake(function(modules, cb) {
                         cb(adtech);
                     });
                 });
@@ -425,8 +437,8 @@
                 it('should setup necessary config and require in adtech', function(done) {
                     _private.loadAdtech().then(function(resp) {
                         expect(resp).toBe(adtech);
-                        expect(window.c6.require).toHaveBeenCalledWith(['adtech'], jasmine.any(Function));
-                        expect(window.c6.require.config).toEqual({
+                        expect(importScripts).toHaveBeenCalledWith(['adtech'], jasmine.any(Function));
+                        expect(importScriptsMain.withConfig).toHaveBeenCalledWith({
                             paths: { adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js' },
                             shim: { adtech: {
                                 exports: 'ADTECH',
@@ -439,7 +451,7 @@
                 });
                 
                 it('should timeout if require never calls back with anything', function(done) {
-                    window.c6.require.and.callFake(function(modules, cb) { return adtech; });
+                    importScripts.and.callFake(function(modules, cb) { return adtech; });
                     
                     _private.loadAdtech().then(function(resp) {
                         expect(resp).not.toBeDefined();
@@ -457,7 +469,7 @@
                                 parent: window,
                                 document: { write: jasmine.createSpy('document.write') }
                             };
-                            window.c6.require.config.shim.adtech.onCreateFrame(newWindow);
+                            importScriptsMain.withConfig.calls.mostRecent().args[0].shim.adtech.onCreateFrame(newWindow);
                             expect(newWindow.c6).toBe(window.c6);
                             expect(newWindow.document.write).toHaveBeenCalledWith('<div id="ad"></div>');
                         }).catch(function(error) {
@@ -830,7 +842,7 @@
                     };
                     spyOn(_private, 'swapCard').and.callThrough();
 
-                    window.c6.require.and.callFake(function(urls, cb) {
+                    importScripts.and.callFake(function(urls, cb) {
                         var id = urls[0].match(/[^\/]+(?=\.js)/)[0];
                         cb({id: id, campaign: {} });
                     });
@@ -838,7 +850,7 @@
 
                 describe('if the card already has some pixels', function() {
                     beforeEach(function(done) {
-                        window.c6.require.and.callFake(function(urls, cb) {
+                        importScripts.and.callFake(function(urls, cb) {
                             var id = urls[0].match(/[^\/]+(?=\.js)/)[0];
                             cb({id: id, campaign: { clickUrls: ['click.custom'], countUrls: ['count.custom'] } });
                         });
@@ -876,9 +888,9 @@
                             } },
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
-                        expect(window.c6.require.calls.count()).toBe(2);
-                        expect(window.c6.require).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js'], jasmine.any(Function));
-                        expect(window.c6.require).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js'], jasmine.any(Function));
+                        expect(importScripts.calls.count()).toBe(2);
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js'], jasmine.any(Function));
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js'], jasmine.any(Function));
                         expect(_private.swapCard.calls.count()).toBe(2);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc3', type: 'wildcard'}, withWildcards.data.deck[2], withWildcards);
@@ -891,7 +903,7 @@
                 });
                 
                 it('should send errors if the cards cannot be found', function(done) {
-                    window.c6.require.and.callFake(function(urls, cb) { cb(); });
+                    importScripts.and.callFake(function(urls, cb) { cb(); });
 
                     _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).then(function() {
                         expect(withWildcards.data.deck).toEqual([
@@ -900,7 +912,7 @@
                             { id: 'rc3', type: 'wildcard' },
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
-                        expect(window.c6.require.calls.count()).toBe(2);
+                        expect(importScripts.calls.count()).toBe(2);
                         expect(_private.swapCard).not.toHaveBeenCalled();
                         expect(_private.sendError.calls.count()).toBe(2);
                         expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'card rc-sp2 not found');
@@ -923,8 +935,8 @@
                             { id: 'rc3', type: 'wildcard' },
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
-                        expect(window.c6.require.calls.count()).toBe(1);
-                        expect(window.c6.require).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js'], jasmine.any(Function));
+                        expect(importScripts.calls.count()).toBe(1);
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js'], jasmine.any(Function));
                         expect(_private.swapCard.calls.count()).toBe(1);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
                         expect(_private.sendError).not.toHaveBeenCalled();
@@ -944,7 +956,7 @@
                             { id: 'rc3', type: 'wildcard' },
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
-                        expect(window.c6.require).not.toHaveBeenCalled();
+                        expect(importScripts).not.toHaveBeenCalled();
                         expect(_private.swapCard).not.toHaveBeenCalled();
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
@@ -954,6 +966,8 @@
             });
             
             describe('swapCard', function() {
+                var newCard;
+
                 beforeEach(function() {
                     newCard = { id: 'rc-sp1', sponsored: true, adtechId: 1337 };
                 });
