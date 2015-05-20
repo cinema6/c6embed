@@ -1,6 +1,25 @@
 module.exports = function($window, $document) {
     'use strict';
 
+    var importScripts = require('../../lib/importScripts').withConfig({
+        paths: {
+            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
+        },
+        shim: {
+            adtech: {
+                exports: 'ADTECH',
+                onCreateFrame: function(window) {
+                    var document = window.document;
+
+                    window.c6 = window.parent.c6;
+
+                    /* jshint evil:true */
+                    document.write('<div id="ad"></div>');
+                }
+            }
+        }
+    });
+
     /**
      * Initialize some default configuration. Set up the c6 object (if it still needs to be set
      * up.)
@@ -20,78 +39,6 @@ module.exports = function($window, $document) {
             gaAcctIdEmbed: (function(acc,mi,mx){
                 return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
             }('UA-44457821',6,30)),
-
-            require: function(srcs, cb) {
-                var modules = [],
-                    loaded = 0,
-                    config = require.config || {},
-                    paths = config.paths || {},
-                    shims = config.shim || {};
-
-                function load(module, index) {
-                    modules[index] = module;
-
-                    if (++loaded === srcs.length) {
-                        cb.apply($window, modules);
-                    }
-                }
-
-                srcs.forEach(function(_src, index) {
-                    var src = paths[_src] || _src,
-                        shim = shims[_src] || {},
-                        exports = shim.exports,
-                        onCreateFrame = shim.onCreateFrame || function() {};
-
-                    if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
-
-                    var iframe = new DOMElement('iframe', {
-                            src: 'about:blank',
-                            'data-module': _src
-                        }),
-                        head = $document.getElementsByTagName('head')[0],
-                        html = [
-                            '<script>',
-                            '(' + function(window) {
-                                try {
-                                    // This hack is needed in order for the browser to send the
-                                    // "referer" header in Safari.
-                                    window.history.replaceState(null, null, window.parent.location.href);
-                                } catch(e) {}
-                                window.Text = window.parent.Text;
-                                window.module = {
-                                    exports: {}
-                                };
-                                window.exports = window.module.exports;
-                            }.toString() + '(window))',
-                            '</script>',
-                            '<script>(' + onCreateFrame.toString() + '(window))</script>',
-                            '<script src="' + src + '" charset="utf-8"></script>'
-                        ].join('\n');
-
-                    iframe.addEventListener('load', function() {
-                        var frameWindow = iframe.contentWindow,
-                            head = frameWindow.document.getElementsByTagName('head')[0];
-
-                        if (head.childNodes.length < 1) { return; }
-
-                        load(
-                            (c6.requireCache[src] =
-                                (exports ? frameWindow[exports] : frameWindow.module.exports)
-                            ),
-                            index
-                        );
-                    }, false);
-
-                    head.appendChild(iframe);
-
-                    // The iframe must have its contents written using document.write(), otherwise the
-                    // browser will not send the "referer" header when requesting the script.
-                    iframe.contentWindow.document.write(html);
-                    iframe.contentWindow.document.close();
-                });
-
-                return modules;
-            },
 
             loadExperience: function(minireel, preload) {
                 minireel.load = true;
@@ -137,7 +84,6 @@ module.exports = function($window, $document) {
                 return this.loadExperience(config);
             }
         }),
-        require = c6.require,
         params = complete((function() {
             var jsonpScripts = Array.prototype.slice.call($document.getElementsByTagName('script'))
                 .filter(function(script) {
@@ -298,7 +244,7 @@ module.exports = function($window, $document) {
         }),
         requireStart = (new Date()).getTime();
 
-        require(items.map(function(item) {
+        importScripts(items.map(function(item) {
             return baseUrl + '/api/public/content/experience/' + item.expId + '.js?' + query;
         }), function() {
             var experiences = Array.prototype.slice.call(arguments);
@@ -380,25 +326,6 @@ module.exports = function($window, $document) {
         });
     }
 
-    require.config = {
-        paths: {
-            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
-        },
-        shim: {
-            adtech: {
-                exports: 'ADTECH',
-                onCreateFrame: function(window) {
-                    var document = window.document;
-
-                    window.c6 = window.parent.c6;
-
-                    /* jshint evil:true */
-                    document.write('<div id="ad"></div>');
-                }
-            }
-        }
-    };
-    
     /* Create GA Tracker */
     (function() {
         /* jshint sub:true, asi:true, expr:true, camelcase:false, indent:false */
@@ -415,7 +342,7 @@ module.exports = function($window, $document) {
         /* jshint camelcase:true */
     }());
 
-    require([
+    importScripts([
         'adtech'
     ], function(
         adtech
@@ -426,7 +353,7 @@ module.exports = function($window, $document) {
             server: adServer,
             enableMultiAd: true
         };
-        
+
         adtech.config.placements[params.id] = {
             adContainerId: 'ad',
             complete: function() {
