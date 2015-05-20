@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [DEV]: Reorganize to remove code duplication
+
 ## v2.30.1 (May 21, 2015)
 * [FIX]: Fix for an issue that casued show player timings not to be sent
   to GA for auto-launching MiniReels
