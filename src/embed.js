@@ -3,6 +3,7 @@
 
     var baseUrl = win.__C6_URL_ROOT__ || '//portal.cinema6.com',
         appJs = win.__C6_APP_JS__ || '//lib.cinema6.com/c6embed/v1/app.min.js',
+        loadStart = new Date().getTime(),
         c6 = win.c6 = complete(win.c6 || {}, {
             embeds: [],
             app: null,
@@ -425,6 +426,10 @@
                 window.addEventListener('resize', viewChangeHandler);
             }
 
+            if (config.autoLaunch) {
+                settings.config.showStartTime = (new Date()).getTime();
+            }
+
             if (config.preload || config.autoLaunch) {
                 c6.loadExperience(settings, true);
             } else {
@@ -433,6 +438,17 @@
 
             splash.addEventListener('click', handleClick, false);
 
+            win.addEventListener('beforeunload', function() {
+                var loaded = !!(settings.state && settings.state.get('active'));
+
+                /* jshint camelcase: false */
+                window.__c6_ga__(embedTracker + '.send', 'timing', {
+                    'timingCategory' : 'API',
+                    'timingVar'      : loaded ? 'closePageAfterLoad' : 'closePageBeforeLoad',
+                    'timingValue'    : (new Date().getTime() - loadStart),
+                    'timingLabel'    : 'c6'
+                });
+            }, false);
         }
         catch (err) {
             /* jshint camelcase:false */
