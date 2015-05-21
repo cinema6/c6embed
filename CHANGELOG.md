@@ -3,6 +3,7 @@
 ## v2.30.1 (May 15, 2015)
 * [FIX]: Fix for an issue that casued show player timings not to be sent
   to GA for auto-launching MiniReels
+* Send a timing to GA when the page an embed is on is closed
 
 ## v2.30.0 (May 15, 2015)
 * [FEATURE]: Add ability for the standalone player to forward events
