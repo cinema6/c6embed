@@ -425,6 +425,10 @@
                 window.addEventListener('resize', viewChangeHandler);
             }
 
+            if (config.autoLaunch) {
+                settings.config.showStartTime = (new Date()).getTime();
+            }
+
             if (config.preload || config.autoLaunch) {
                 c6.loadExperience(settings, true);
             } else {
