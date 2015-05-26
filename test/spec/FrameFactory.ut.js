@@ -20,8 +20,8 @@
 
             q = require('../../node_modules/q/q');
             C6Query = require('../../lib/C6Query');
-            FrameFactory = require('../../src/FrameFactory');
-            DocumentParser = require('../../src/DocumentParser');
+            FrameFactory = require('../../src/app/FrameFactory');
+            DocumentParser = require('../../src/app/DocumentParser');
 
             documentParser = new DocumentParser({});
             fakeDocumentParser = jasmine.createSpy('documentParser()')

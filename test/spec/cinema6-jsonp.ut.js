@@ -1,82 +1,94 @@
 describe('cinema6-jsonp.js', function() {
     'use strict';
 
+    var jsonpJS = require('../../src/cinema6-jsonp/cinema6-jsonp.js');
+    var importScriptsMain = require('../../lib/importScripts.js');
+    var withConfig = importScriptsMain.withConfig;
+    var importScripts;
+
     var C6Query;
 
     var $;
 
     var $window, $document,
-        $env,
         $workspace;
+
+    var globals;
 
     var c6,
         baseUrl, appJs;
 
-    function load(cb, src) {
+    function load(cb, src, cache) {
         var script = $document.createElement('script');
 
-        script.src = src || ('/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
-        script.onload = cb;
-
+        script.src = src || ('/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&count=3&cb=' + Date.now());
         $workspace.append(script);
+        importScriptsMain.withConfig.and.callFake(function(config) {
+            config.cache = cache || {};
+            return (importScripts = withConfig.call(importScriptsMain, config));
+        });
+        jsonpJS($window, $document);
+        cb();
+
+        return script;
     }
 
     function waitForDeps(deps, done) {
-        var c6 = $window.c6,
-            id = $window.setInterval(function() {
-                if (deps.every(function(dep) {
-                    return !!c6.requireCache[dep];
-                })) {
-                    $window.clearInterval(id);
-                    done(deps.map(function(dep) {
-                        return c6.requireCache[dep];
-                    }));
-                }
-            }, 50);
+        var id = $window.setInterval(function() {
+            if (deps.every(function(dep) {
+                return !!importScripts.cache[dep];
+            })) {
+                $window.clearInterval(id);
+                done(deps.map(function(dep) {
+                    return importScripts.cache[dep];
+                }));
+            }
+        }, 50);
     }
 
     beforeEach(function(done) {
+        globals = Object.keys(window);
+
         C6Query = require('../../lib/C6Query');
+        $window = window; $document = document;
 
-        $ = new C6Query({ document: document, window: window });
+        $ = new C6Query({ document: $document, window: $window });
 
-        $env = $('<iframe src="/base/test/helpers/dummy.html" style="width: 800px; height: 600px; overflow: auto;" scrolling="yes"></iframe>');
-        $env[0].onload = function() {
-            $window = $env.prop('contentWindow');
-            $document = $window.document;
-            $ = new C6Query({ window: $window, document: $document });
+        spyOn(importScriptsMain, 'withConfig').and.callFake(function() {
+            return (importScripts = withConfig.apply(importScriptsMain, arguments));
+        });
 
-            $('body').css({
-                margin: 0,
-                padding: 0
-            });
+        $workspace = $([
+            '<div>',
+            '    <script src="/base/test/helpers/scripts/cinema6-jsonp.js?callback=foo&id=12345"></script>',
+            '</div>'
+        ].join(''));
+        $('body').append($workspace);
 
-            $workspace = $([
-                '<div>',
-                '    <script src="/base/src/cinema6-jsonp.js?callback=foo&id=12345"></script>',
-                '</div>'
-            ].join(''));
+        baseUrl = $window.__C6_URL_ROOT__ = '/base/test/helpers';
+        appJs = $window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
+        $window.__c6_ga__ = jasmine.createSpy('__c6_ga__');
 
-            $('body').append($workspace);
+        $window.onC6AdLoad = jasmine.createSpy('onC6AdLoad()');
 
-            baseUrl = $window.__C6_URL_ROOT__ = '/base/test/helpers';
-            appJs = $window.__C6_APP_JS__ = 'http://staging.cinema6.com/foo.js';
-            $window.__c6_ga__ = jasmine.createSpy('__c6_ga__');
+        load(function() {
+            c6 = $window.c6;
 
-            $window.console = $window.parent.console;
-            $window.onC6AdLoad = jasmine.createSpy('onC6AdLoad()');
-
-            load(function() {
-                c6 = $window.c6;
-
-                done();
-            });
-        };
-        $('body').append($env);
+            done();
+        });
     });
 
     afterEach(function() {
         $workspace.remove();
+        Object.keys(window).filter(function(global) {
+            return globals.indexOf(global) < 0;
+        }).forEach(function(global) {
+            delete window[global];
+        });
+    });
+
+    afterAll(function() {
+        $('iframe[data-module]').remove();
     });
 
     it('should configure google analytics', function() {
@@ -102,9 +114,7 @@ describe('cinema6-jsonp.js', function() {
 
         it('should have the required properties', function() {
             expect(c6.app).toBe(null, 'app');
-            expect(c6.embeds).toEqual(jasmine.any($window.Array), 'embeds');
-            expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
-            expect(c6.require).toEqual(jasmine.any(Function), 'require');
+            expect(c6.embeds).toEqual(jasmine.any(Array), 'embeds');
             expect(c6.widgetContentCache).toEqual({}, 'widgetContentCache');
             expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/, 'gaAcctIdPlayer');
             expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/, 'gaAcctIdEmbed');
@@ -130,10 +140,8 @@ describe('cinema6-jsonp.js', function() {
 
             it('should extend it', function() {
                 expect(c6.app).toBe(null, 'app');
-                expect(c6.embeds).toEqual(jasmine.any($window.Array), 'embeds');
+                expect(c6.embeds).toEqual(jasmine.any(Array), 'embeds');
                 expect(c6.branding).toEqual({}, 'branding');
-                expect(c6.requireCache).toEqual(jasmine.any(Object), 'requireCache');
-                expect(c6.require).toEqual(jasmine.any(Function), 'require');
                 expect(c6.widgetContentCache).toEqual({}, 'widgetContentCache');
                 expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/, 'gaAcctIdPlayer');
                 expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/, 'gaAcctIdEmbed');
@@ -319,9 +327,11 @@ describe('cinema6-jsonp.js', function() {
 
                 spyOn(adtech, 'enqueueAd');
                 spyOn(adtech, 'executeQueue');
-                spyOn($window, '__c6_ga__');
+                $window.__c6_ga__.calls.reset();
 
-                load(done);
+                load(done, null, {
+                    '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                });
             });
         });
 
@@ -329,7 +339,8 @@ describe('cinema6-jsonp.js', function() {
             var adtechEnv;
 
             beforeEach(function() {
-                adtechEnv = $('iframe[data-module=adtech]').prop('contentWindow');
+                var $adtechEnvs = $('iframe[data-module=adtech]');
+                adtechEnv = $adtechEnvs[$adtechEnvs.length - 1].contentWindow;
             });
 
             it('should set up a reference to the c6 object', function() {
@@ -345,7 +356,9 @@ describe('cinema6-jsonp.js', function() {
             beforeEach(function(done) {
                 adtech.enqueueAd.calls.reset();
 
-                load(done, '/base/src/cinema6-jsonp.js');
+                load(done, '/base/test/helpers/scripts/cinema6-jsonp.js', {
+                    '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                });
             });
 
             it('should call enqueueAd once', function() {
@@ -355,14 +368,9 @@ describe('cinema6-jsonp.js', function() {
 
         describe('if the script is minified', function() {
             beforeEach(function(done) {
-                var script = document.createElement('script');
-
-                $workspace.append(script);
-                $('<script src="/base/src/cinema6-jsonp.min.js?id=12345678"></script>').insertAfter(script);
-
-                script.onload = done;
-
-                script.src = '/base/src/cinema6-jsonp.js';
+                load(done, '/base/test/helpers/scripts/cinema6-jsonp.min.js?id=12345678', {
+                    '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                });
             });
 
             it('should still work', function() {
@@ -436,7 +444,9 @@ describe('cinema6-jsonp.js', function() {
                     load(function() {
                         adtech.config.placements['108542'].complete();
                         done();
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&cb=' + Date.now(), {
+                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                    });
                 });
 
                 it('should fetch minireels from the content service with additional params', function(done) {
@@ -477,7 +487,9 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
+                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                    });
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -496,7 +508,9 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
+                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                    });
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -515,7 +529,9 @@ describe('cinema6-jsonp.js', function() {
                         waitForDeps(expIds.map(function(id) {
                             return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                         }), done);
-                    }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now());
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
+                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                    });
                 });
 
                 it('should set the startPixel on the config', function() {
@@ -571,7 +587,7 @@ describe('cinema6-jsonp.js', function() {
                             cb: jasmine.any(Number),
                             src: 'jsonp'
                         },
-                        items: jasmine.any($window.Array)
+                        items: jasmine.any(Array)
                     });
 
                     var result = $window.onC6AdLoad.calls.mostRecent().args[0];
@@ -635,7 +651,9 @@ describe('cinema6-jsonp.js', function() {
                             waitForDeps(expIds.map(function(id) {
                                 return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                             }), done);
-                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now());
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&preview=true&playerVersion=4&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
                     });
 
                     it('should set the preview attribute in the experiences\' config', function() {
@@ -653,7 +671,9 @@ describe('cinema6-jsonp.js', function() {
                             waitForDeps(expIds.map(function(id) {
                                 return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
                             }), done);
-                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now());
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&playerVersion=4&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
                     });
 
                     it('should set the playerVersion to the supplied version', function() {
@@ -688,7 +708,9 @@ describe('cinema6-jsonp.js', function() {
                                 exps = experiences;
                                 done();
                             });
-                        }, '/base/src/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now());
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&src=veeseo&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
                     });
 
                     it('should take the branding from the experience that was already there', function() {

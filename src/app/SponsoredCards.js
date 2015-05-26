@@ -4,6 +4,25 @@ module.exports = function(deps) {
     var $window = deps.window;
     var config = deps.config;
     var q = deps.q;
+    var importScripts = deps.importScripts.withConfig({
+        paths: {
+            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
+        },
+        shim: {
+            adtech: {
+                exports: 'ADTECH',
+                onCreateFrame: function(window) {
+                    var document = window.document;
+
+                    window.c6 = window.parent.c6;
+
+                    /* jshint evil:true */
+                    document.write('<div id="ad"></div>');
+                    /* jshint evil:false */
+                }
+            }
+        }
+    });
 
     var c6 = $window.c6;
     var urlRoot = config.urlRoot;
@@ -36,29 +55,12 @@ module.exports = function(deps) {
         /* jshint camelcase:true */
     };
 
-    // Load the Adtech library using c6.require
+    // Load the Adtech library
     _private.loadAdtech = function(timeout) {
         var deferred = q.defer();
         timeout = timeout || 5000;
-        c6.require.config = c6.require.config || {};
-        c6.require.config.paths = c6.require.config.paths || {};
-        c6.require.config.shim = c6.require.config.shim || {};
-        c6.require.config.paths.adtech = '//aka-cdn.adtechus.com/dt/common/DAC.js';
-        
-        c6.require.config.shim.adtech = {
-            exports: 'ADTECH',
-            onCreateFrame: function(window) {
-                var document = window.document;
 
-                window.c6 = window.parent.c6;
-
-                /* jshint evil:true */
-                document.write('<div id="ad"></div>');
-                /* jshint evil:false */
-            }
-        };
-
-        c6.require(['adtech'], deferred.resolve);
+        importScripts(['adtech'], deferred.resolve);
 
         return deferred.promise.timeout(timeout, 'Timed out after ' + timeout + 'ms loading adtech library');
     };
@@ -146,7 +148,7 @@ module.exports = function(deps) {
         return q.all(banners.map(function(banner) {
             var deferred = q.defer();
 
-            c6.require([urlRoot + '/api/public/content/card/' + banner.extId + '.js'], function(card) {
+            importScripts([urlRoot + '/api/public/content/card/' + banner.extId + '.js'], function(card) {
                 var campaign;
 
                 if (!card || !card.campaign) {

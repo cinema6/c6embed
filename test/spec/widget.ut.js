@@ -1,41 +1,53 @@
 (function() {
     'use strict';
 
+    var widgetJS = require('../../src/widget/widget.js');
+    var importScriptsMain = require('../../lib/importScripts.js');
+    var withConfig = importScriptsMain.withConfig;
+    var importScripts;
+
    describe('widget.js', function() {
         var baseUrl, appJs,
             $window, $document,
-            $, $env;
+            $env, $;
 
-        function load(done) {
+        function load(done, cache) {
             var script = $document.createElement('script');
 
-            script.src = '/base/src/widget.js';
-            script.onload = function() {
-                done();
-            };
+            script.src = '/base/test/helpers/scripts/mock_widget.js';
             $('body').append(script);
+            importScriptsMain.withConfig.and.callFake(function(config) {
+                config.cache = cache || {};
+                config.container = $document.head;
+                return (importScripts = withConfig.call(importScriptsMain, config));
+            });
+            widgetJS($window, $document);
+            setTimeout(done, 0);
 
             return script;
         }
 
         function waitForDeps(deps, done) {
-            var c6 = $window.c6,
-                id = $window.setInterval(function() {
-                    if (deps.every(function(dep) {
-                        return !!c6.requireCache[dep];
-                    })) {
-                        $window.clearInterval(id);
-                        done(deps.map(function(dep) {
-                            return c6.requireCache[dep];
-                        }));
-                    }
-                }, 10);
+            var id = $window.setInterval(function() {
+                if (deps.every(function(dep) {
+                    return !!importScripts.cache[dep];
+                })) {
+                    $window.clearInterval(id);
+                    done(deps.map(function(dep) {
+                        return importScripts.cache[dep];
+                    }));
+                }
+            }, 10);
         }
 
         beforeEach(function(done) {
             var C6Query = require('../../lib/C6Query');
 
             $ = new C6Query({ window: window, document: document });
+
+            spyOn(importScriptsMain, 'withConfig').and.callFake(function() {
+                return (importScripts = withConfig.apply(importScriptsMain, arguments));
+            });
 
             $env = $('<iframe src="/base/test/helpers/dummy.html" style="width: 800px; height: 600px; overflow: auto;" scrolling="yes"></iframe>');
             $env[0].onload = function() {
@@ -46,6 +58,10 @@
                 $('body').css({
                     margin: 0,
                     padding: 0
+                });
+
+                spyOn($document, 'write').and.callFake(function(html) {
+                    $('body').append($(html));
                 });
 
                 baseUrl = $window.__C6_URL_ROOT__ = '/base/test/helpers';
@@ -59,15 +75,15 @@
             $('body').append($env);
         });
 
-        afterEach(function() {
-            $env.remove();
-        });
-
         it('should configure google analytics', function() {
             expect($window.__c6_ga__).toHaveBeenCalledWith('create', $window.c6.gaAcctIdPlayer, {
                 name: 'c6',
                 cookieName: '_c6ga'
             });
+        });
+
+        afterEach(function() {
+            $env.remove();
         });
 
         describe('the c6 object', function() {
@@ -83,10 +99,8 @@
 
             it('should have all the required properties', function() {
                 expect(c6.app).toBe(null);
-                expect(c6.embeds).toEqual(jasmine.any($window.Array));
+                expect(c6.embeds).toEqual(jasmine.any(Array));
                 expect(c6.branding).toEqual({});
-                expect(c6.requireCache).toEqual({});
-                expect(c6.require).toEqual(jasmine.any(Function));
                 expect(c6.widgetContentCache).toEqual({});
                 expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/);
                 expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/);
@@ -116,10 +130,8 @@
 
                 it('should be extended', function() {
                     expect(c6.app).toBe(null);
-                    expect(c6.embeds).toEqual(jasmine.any($window.Array));
+                    expect(c6.embeds).toEqual(jasmine.any(Array));
                     expect(c6.branding).toEqual({});
-                    expect(c6.requireCache).toEqual({});
-                    expect(c6.require).toEqual(jasmine.any(Function));
                     expect(c6.widgetContentCache).toEqual({});
                     expect(c6.gaAcctIdPlayer).toMatch(/UA-44457821-/);
                     expect(c6.gaAcctIdEmbed).toMatch(/UA-44457821-/);
@@ -140,6 +152,15 @@
                             template: 'collateral/mr2/templates/test',
                             id: '3330799'
                         });
+                    });
+
+                    afterEach(function(done) {
+                        waitForDeps([
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js',
+                            '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
+                            baseUrl + '/collateral/splash/splash.js',
+                            baseUrl + '/collateral/mr2/templates/test.js'
+                        ], done);
                     });
 
                     it('should write a <div> into the DOM', function() {

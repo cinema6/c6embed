@@ -1,13 +1,23 @@
 module.exports = {
     options: {
-        shim: {
-            Modernizr: { path: 'ext/modernizr.custom.71747.js', exports: 'Modernizr' }
-        }
+        transform: ['browserify-shim']
     },
     dist: {
         files: [
             {
-                src: ['src/main.js'],
+                src: 'src/embed/main.js',
+                dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
+            },
+            {
+                src: 'src/widget/main.js',
+                dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
+            },
+            {
+                src: 'src/cinema6-jsonp/main.js',
+                dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
+            },
+            {
+                src: ['src/app/main.js'],
                 dest: '.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.js'
             }
         ]
@@ -18,7 +28,19 @@ module.exports = {
         },
         files: [
             {
-                src: ['src/main.js'],
+                src: ['src/embed/main.js'],
+                dest: '<%= settings.appDir %>/embed.js'
+            },
+            {
+                src: ['src/widget/main.js'],
+                dest: '<%= settings.appDir %>/widget.js'
+            },
+            {
+                src: 'src/cinema6-jsonp/main.js',
+                dest: 'app/cinema6-jsonp.js'
+            },
+            {
+                src: ['src/app/main.js'],
                 dest: '<%= settings.appDir %>/c6embed.js'
             }
         ]

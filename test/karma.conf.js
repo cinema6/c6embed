@@ -6,10 +6,11 @@ module.exports = function(config) {
         // base path, that will be used to resolve files and exclude
         basePath: '..',
 
-        frameworks: ['jasmine', 'commonjs'],
+        frameworks: ['browserify', 'jasmine'],
 
         plugins: [
-            'karma-commonjs',
+            'karma-jshint',
+            'karma-browserify',
             'karma-jasmine',
             'karma-junit-reporter',
             'karma-phantomjs-launcher',
@@ -18,31 +19,22 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'node_modules/q/q.js',
-            'node_modules/asEvented/asevented.js',
-            { pattern: 'src/embed.js', included: false },
-            { pattern: 'src/widget.js', included: false },
-            { pattern: 'src/cinema6-jsonp.js', included: false },
             { pattern: 'test/helpers/collateral/**/*.js', included: false },
             { pattern: 'test/helpers/api/**/*.js', included: false },
+            { pattern: 'test/helpers/scripts/**/*.js', included: false },
             { pattern: 'test/helpers/**/*.html', included: false },
-            'lib/**/*.js',
-            'src/**/*.js',
-            'test/spec/**/*.js',
-            'test/helpers/**/*.js'
-        ],
-
-        exclude: [
-            'src/main.js'
+            'test/spec/**/*.js'
         ],
 
         preprocessors: {
-            'node_modules/q/q.js': ['commonjs'],
-            'node_modules/asEvented/asevented.js': ['commonjs'],
-            'lib/**/*.js': ['commonjs'],
-            'src/**/!(embed|widget|cinema6-jsonp).js': ['commonjs'],
-            'test/spec/**/*.js': ['commonjs'],
-            'test/helpers/*.js': ['commonjs']
+            'lib/**/*.js': ['jshint', 'browserify'],
+            'src/app/**/*.js': ['jshint', 'browserify'],
+            'src/embed/**/*.js': ['jshint', 'browserify'],
+            'src/widget/**/*.js': ['jshint', 'browserify'],
+            'src/cinema6-jsonp/**/*.js': ['jshint', 'browserify'],
+            'src/**/*.js': ['jshint'],
+            'test/spec/**/*.js': ['browserify'],
+            'test/helpers/*.js': ['browserify']
         },
 
         // test results reporter to use
@@ -80,6 +72,10 @@ module.exports = function(config) {
 
         // Continuous Integration mode
         // if true, it capture browsers, run tests and exit
-        singleRun: true
+        singleRun: true,
+
+        browserify: {
+            debug: true
+        }
     });
 };

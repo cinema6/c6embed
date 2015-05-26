@@ -8,7 +8,7 @@
         var $window;
 
         beforeEach(function() {
-            Config = require('../../src/Config');
+            Config = require('../../src/app/Config');
 
             $window = { location : { } };
 

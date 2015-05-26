@@ -69,7 +69,7 @@
         }
 
         beforeEach(function() {
-            var DocumentParser = require('../../src/DocumentParser'),
+            var DocumentParser = require('../../src/app/DocumentParser'),
                 documentParser = new DocumentParser();
 
             indexHTML = require('../helpers/mock_index.js');
@@ -160,7 +160,7 @@
                 reset: jasmine.createSpy('hostDocument.reset()')
             };
 
-            app = require('../../src/app');
+            app = require('../../src/app/app');
         });
 
         it('should exist', function() {

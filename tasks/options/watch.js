@@ -59,15 +59,6 @@
             },
             tasks: ['browserify:server','copy:jsonp']
         },
-        unit: {
-            files: [
-                'src/**/*.js',
-                'lib/**/*.js',
-                'lite/**/*.js',
-                'test/spec/**/*.js',
-            ],
-            tasks: ['karma:debug:run', 'jshint:all']
-        },
         e2e: {
             files: [
                 '<%= settings.appDir %>/*.html',

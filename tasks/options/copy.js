@@ -2,10 +2,6 @@ module.exports = {
     embed: {
         files: [
             {
-                src: 'src/embed.js',
-                dest: 'app/embed.js'
-            },
-            {
                 src: 'app/embed.html',
                 dest: 'app/index.html'
             }
@@ -13,10 +9,6 @@ module.exports = {
     },
     widget: {
         files: [
-            {
-                src: 'src/widget.js',
-                dest: 'app/widget.js'
-            },
             {
                 src: 'app/widget.html',
                 dest: 'app/index.html'
@@ -26,7 +18,7 @@ module.exports = {
     standalone: {
         files: [
             {
-                src: 'src/standalone.html',
+                src: 'src/standalone/standalone.html',
                 dest: 'app/index.html'
             }
         ]
@@ -34,17 +26,17 @@ module.exports = {
     preview: {
         files: [
             {
-                src: 'src/preview.html',
+                src: 'src/preview/preview.html',
                 dest: 'app/index.html'
             },
             {
-                src: 'styles/**',
+                src: 'src/styles/**',
                 dest: 'app/',
                 expand: true,
                 cwd: 'src'
             },
             {
-                src: 'img/**',
+                src: 'src/img/**',
                 dest: 'app/',
                 expand: true,
                 cwd: 'src'
@@ -54,10 +46,6 @@ module.exports = {
     jsonp: {
         files: [
             {
-                src: 'src/cinema6-jsonp.js',
-                dest: 'app/cinema6-jsonp.js'
-            },
-            {
                 src: 'app/jsonp.html',
                 dest: 'app/index.html'
             }
@@ -66,28 +54,16 @@ module.exports = {
     tmp: {
         files: [
             {
-                src: 'src/embed.js',
-                dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
-            },
-            {
-                src: 'src/widget.js',
-                dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
-            },
-            {
-                src: 'src/cinema6-jsonp.js',
-                dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
-            },
-            {
                 src: 'styles/**',
                 dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
-                cwd: 'src'
+                cwd: 'src/preview'
             },
             {
                 src: 'img/**',
                 dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
-                cwd: 'src'
+                cwd: 'src/preview'
             }
         ]
     }

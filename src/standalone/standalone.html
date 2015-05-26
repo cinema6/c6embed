@@ -134,82 +134,9 @@
                             return acc+'-'+parseInt(
                                 ((Math.random()*999999999)%(mx-mi+1))+mi,10
                             );
-                        }('UA-44457821',6,30)),
-
-                        requireCache: {},
-                        require: function(srcs, cb) {
-                            var modules = [],
-                                loaded = 0,
-                                config = this.require.config || {},
-                                paths = config.paths || {},
-                                shims = config.shim || {};
-
-                            function load(module, index) {
-                                modules[index] = module;
-
-                                if (++loaded === srcs.length) {
-                                    cb.apply(window, modules);
-                                }
-                            }
-
-                            srcs.forEach(function(_src, index) {
-                                var src = paths[_src] || _src,
-                                    shim = shims[_src] || {},
-                                    exports = shim.exports,
-                                    onCreateFrame = shim.onCreateFrame || function() {};
-
-                                if (c6.requireCache[src]) { return load(c6.requireCache[src], index); }
-
-                                var iframe = new DOMElement('iframe', {
-                                        src: 'about:blank',
-                                        'data-module': _src
-                                    }),
-                                    head = document.getElementsByTagName('head')[0],
-                                    html = [
-                                        '<script>',
-                                        '(' + function(window) {
-                                            try {
-                                                // This hack is needed in order for the browser to send the
-                                                // "referer" header in Safari.
-                                                window.history.replaceState(null, null, window.parent.location.href);
-                                            } catch(e) {}
-                                            window.Text = window.parent.Text;
-                                            window.module = {
-                                                exports: {}
-                                            };
-                                            window.exports = window.module.exports;
-                                        }.toString() + '(window))',
-                                        '<\/script>',
-                                        '<script>(' + onCreateFrame.toString() + '(window))<\/script>',
-                                        '<script src="' + src + '" charset="utf-8"><\/script>'
-                                    ].join('\n');
-
-                                iframe.addEventListener('load', function() {
-                                    var frameWindow = iframe.contentWindow,
-                                        head = frameWindow.document.getElementsByTagName('head')[0];
-
-                                    if (head.childNodes.length < 1) { return; }
-
-                                    load(
-                                        (c6.requireCache[src] =
-                                            (exports ? frameWindow[exports] : frameWindow.module.exports)
-                                        ),
-                                        index
-                                    );
-                                }, false);
-
-                                head.appendChild(iframe);
-
-                                // The iframe must have its contents written using document.write(), otherwise the
-                                // browser will not send the "referer" header when requesting the script.
-                                iframe.contentWindow.document.write(html);
-                                iframe.contentWindow.document.close();
-                            });
-
-                            return modules;
-                        }
+                        }('UA-44457821',6,30))
                     };
-                    
+
                 if (!isProduction) {
                     window.__C6_AD_NETWORK__ = '5491.1';
                 }
@@ -423,7 +350,7 @@
                     window.__C6_DEBUG__ = true;
                     window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
                     loadApp('//s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js');
-                    // loadApp('c6embed.js');
+                    //loadApp('c6embed.js');
                 }
                 }());
         </script>
