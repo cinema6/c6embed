@@ -316,7 +316,7 @@ module.exports = function($window, $document) {
                         /* jshint camelcase:false */
                         $window.__c6_ga__('create', c6.gaAcctIdEmbed, {
                             'name'       : embedTracker,
-                            'cookieName' : '_c6ga',
+                            'storage'      : 'none',
                             'cookieDomain' : 'none'
                         });
                         $window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
@@ -392,7 +392,7 @@ module.exports = function($window, $document) {
     (function() {
         $window.__c6_ga__('create', c6.gaAcctIdPlayer, {
             'name'       : 'c6',
-            'cookieName' : '_c6ga',
+            'storage'      : 'none',
             'cookieDomain' : 'none'
         });
     }());

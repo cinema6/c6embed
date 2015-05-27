@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.31.1 (May 27, 2015)
+* [FIX]: Actually turned off cookie storage altogether to avoid IE/safari error when running in iframe
+
 ## v2.31.0 (May 27, 2015)
 * [DEV]: Reorganize to remove code duplication
 * [FIX]: Try setting GA cookieDomain to none to avoid IE/safari error when running in iframe
