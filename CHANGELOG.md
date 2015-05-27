@@ -1,6 +1,8 @@
 # C6Embed Changelog
 
+## v2.31.0 (May 27, 2015)
 * [DEV]: Reorganize to remove code duplication
+* [FIX]: Try setting GA cookieDomain to none to avoid IE/safari error when running in iframe
 
 ## v2.30.1 (May 21, 2015)
 * [FIX]: Fix for an issue that casued show player timings not to be sent

@@ -280,12 +280,14 @@ module.exports = function(win, readyState) {
 
             window.__c6_ga__('create', c6.gaAcctIdPlayer, {
                 'name'       : 'c6',
-                'cookieName' : '_c6ga'
+                'cookieName' : '_c6ga',
+                'cookieDomain' : 'none'
             });
 
             window.__c6_ga__('create', c6.gaAcctIdEmbed, {
                 'name'       : embedTracker,
-                'cookieName' : '_c6ga'
+                'cookieName' : '_c6ga',
+                'cookieDomain' : 'none'
             });
             window.__c6_ga__(embedTracker + '.require', 'displayfeatures');
 
