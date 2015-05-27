@@ -94,7 +94,8 @@ describe('cinema6-jsonp.js', function() {
     it('should configure google analytics', function() {
         expect($window.__c6_ga__).toHaveBeenCalledWith('create', $window.c6.gaAcctIdPlayer, {
             name: 'c6',
-            cookieName: '_c6ga'
+            cookieName: '_c6ga',
+            cookieDomain : 'none'
         });
     });
 
@@ -561,7 +562,8 @@ describe('cinema6-jsonp.js', function() {
 
                         expect($window.__c6_ga__).toHaveBeenCalledWith('create', c6.gaAcctIdEmbed, {
                             name: embedTracker,
-                            cookieName: '_c6ga'
+                            cookieName: '_c6ga',
+                            cookieDomain : 'none'
                         });
 
                         expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.require', 'displayfeatures');
