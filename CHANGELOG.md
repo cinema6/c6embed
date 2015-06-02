@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.32.0 (June 2, 2015)
+* [FIX]: Put error handling in for null adtech object in SponsoredCard fetch (adblock)
+* [FEATURE]:  Added timing event, some error detail to help figure out adtech fails
+
 ## v2.31.1 (May 27, 2015)
 * [FIX]: Actually turned off cookie storage altogether to avoid IE/safari error when running in iframe
 

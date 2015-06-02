@@ -55,6 +55,16 @@ module.exports = function(deps) {
         /* jshint camelcase:true */
     };
 
+    _private.sendTiming = function(expId,tvar,tval) {
+        var embedTracker = expId.replace(/e-/,'');
+        /* jshint camelcase:false */
+        deps.window.__c6_ga__(embedTracker + '.send', 'timing', {
+            'timingCategory' : 'API',
+            'timingVar'      : tvar,
+            'timingValue'    : tval
+        });
+    };
+
     // Load the Adtech library
     _private.loadAdtech = function(timeout) {
         var deferred = q.defer();
@@ -189,7 +199,9 @@ module.exports = function(deps) {
         var deferred = q.defer(),
             placement = parseInt(experience.data.wildCardPlacement),
             placeholders = _private.getPlaceholders(experience),
-            categories = (config && config.categories || []);
+            categories = (config && config.categories || []),
+            startFetch = new Date().getTime(),
+            completes = 0;
         categories = (typeof categories === 'string') ? categories.split(',') : categories;
         
         if (categories.length === 0) {
@@ -211,6 +223,11 @@ module.exports = function(deps) {
                     sub1: experience.id
                 },
                 complete: function onComplete() { // adtech should only call once
+                    if (completes === 0){
+                        _private.sendTiming(experience.id,'adtechExecQueue',
+                            (new Date().getTime() - startFetch));
+                    }
+                    completes++;
                     _private.loadCardObjects(experience, placeholders, pixels, placement)
                     .then(deferred.resolve)
                     .catch(deferred.reject);
@@ -218,17 +235,17 @@ module.exports = function(deps) {
             });
         });
 
-        adtech.executeQueue({
+        var queueId = adtech.executeQueue({
             multiAd: {
-                disableAdInjection: true,
-                readyCallback: function() {
-                    adtech.showAd(placement);
-                }
+                disableAdInjection: true
             }
         });
+
+        adtech.showAd(placement,queueId);
             
         return deferred.promise.timeout(timeout || 3000).catch(function(error) {
-            _private.sendError(experience.id, 'fetchDynamicCards - ' + error);
+            _private.sendError(experience.id, 'fetchDynamicCards (' +
+                completes + ') - ' + error);
         });
     };
 
@@ -283,6 +300,11 @@ module.exports = function(deps) {
         c6.cardCache[placement] = c6.cardCache[placement] || {};
 
         return _private.loadAdtech(preloaded ? 10000 : 5000).then(function(adtech) {
+            if (!adtech) {
+                _private.sendError(experience.id, 'adtech load was blocked.');
+                return q();
+            }
+
             adtech.config.page = {
                 protocol: ($window.location.protocol === 'https:' ) ? 'https' : 'http',
                 network: experience.data.adServer.network,
