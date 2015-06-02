@@ -223,14 +223,17 @@ module.exports = function(deps) {
                     sub1: experience.id
                 },
                 complete: function onComplete() { // adtech should only call once
-                    if (completes === 0){
+                    completes++;
+                    if (completes === 1){
                         _private.sendTiming(experience.id,'adtechExecQueue',
                             (new Date().getTime() - startFetch));
+                        _private.loadCardObjects(experience, placeholders, pixels, placement)
+                        .then(deferred.resolve)
+                        .catch(deferred.reject);
+                    } else {
+                        _private.sendError(experience.id, 'fetchDynamicCards (' +
+                            completes + ') - warning, extra completes!');
                     }
-                    completes++;
-                    _private.loadCardObjects(experience, placeholders, pixels, placement)
-                    .then(deferred.resolve)
-                    .catch(deferred.reject);
                 }
             });
         });
