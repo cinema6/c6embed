@@ -427,6 +427,14 @@
                 });
             });
         
+            describe('sendTiming', function() {
+                it('should send a timing event to Google Analytics', function() {
+                    _private.sendTiming(experience.id, 'testVar',100);
+                    expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'timing',
+                        {timingCategory: 'API', timingVar: 'testVar', timingValue: 100});
+                });
+            });
+        
             describe('loadAdtech', function() {
                 beforeEach(function() {
                     importScripts.and.callFake(function(modules, cb) {
@@ -1015,9 +1023,6 @@
                     adtech.enqueueAd.and.callFake(function(cfg) {
                         complete = cfg.complete;
                     });
-                    adtech.executeQueue.and.callFake(function(cfg) {
-                        cfg.multiAd.readyCallback();
-                    });
                     adtech.showAd.and.callFake(function(placement) {
                         complete();
                     });
@@ -1050,8 +1055,7 @@
                         });
                         expect(adtech.executeQueue.calls.count()).toBe(1);
                         expect(adtech.executeQueue).toHaveBeenCalledWith({ multiAd: {
-                            disableAdInjection: true,
-                            readyCallback: jasmine.any(Function)
+                            disableAdInjection: true
                         } });
                         expect(_private.loadCardObjects).toHaveBeenCalledWith(withWildcards, [
                             {id: 'rc2', type: 'wildcard'},
@@ -1164,6 +1168,7 @@
                 });
                 
                 it('should timeout if adtech takes too long', function(done) {
+                    adtech.showAd.and.callFake(function(placement) { });
                     adtech.executeQueue.and.callFake(function(cfg) {
                         setTimeout(cfg.multiAd.readyCallback, 4000);
                     });
@@ -1172,7 +1177,7 @@
                         expect(adtech.enqueueAd.calls.count()).toBe(2);
                         expect(adtech.executeQueue.calls.count()).toBe(1);
                         expect(_private.loadCardObjects).not.toHaveBeenCalled();
-                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards - Error: Timed out after 3000 ms');
+                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards (0) - Error: Timed out after 3000 ms');
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -1187,7 +1192,7 @@
                         expect(adtech.enqueueAd.calls.count()).toBe(2);
                         expect(adtech.executeQueue.calls.count()).toBe(1);
                         expect(_private.loadCardObjects).toHaveBeenCalled();
-                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards - I GOT A PROBLEM');
+                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards (1) - I GOT A PROBLEM');
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
