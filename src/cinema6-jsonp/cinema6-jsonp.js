@@ -72,7 +72,7 @@ module.exports = function($window, $document) {
                         src: config.trackingUrl
                     });
                     delete config.trackingUrl;
-                    
+
                     var embedTracker = config.experience.id.replace(/^e-/, '');
                     /* jshint camelcase:false */
                     $window.__c6_ga__(embedTracker + '.send', 'event', {
@@ -211,6 +211,7 @@ module.exports = function($window, $document) {
 
         this.standalone = false;
         this.playerVersion = params.playerVersion || 1;
+        this.mobileMode = params.mobileMode || undefined;
 
         this.embed = container;
         this.splashDelegate = {};

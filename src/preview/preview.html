@@ -127,7 +127,8 @@
                         container       : params.container,
                         campaign        : params.campaign,
                         preview         : 'true',
-                        'player-version': params.playerVersion
+                        'player-version': params.playerVersion,
+                        'mobile-mode'   : params.mobileMode
                     });
 
                     document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload><\/script>');

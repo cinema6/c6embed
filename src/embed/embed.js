@@ -123,6 +123,7 @@ module.exports = function(win, readyState) {
             splashDelegate: {},
             standalone: false,
             playerVersion: parseInt(config.playerVersion, 10) || 1,
+            mobileMode: config.mobileMode || undefined,
             load: false,
             preload: false,
             autoLaunch: config.autoLaunch,
