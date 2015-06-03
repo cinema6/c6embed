@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Allow mobile player mode to be overridden via embed
+  property/parameter
+
 ## v2.32.0 (June 2, 2015)
 * [FIX]: Put error handling in for null adtech object in SponsoredCard fetch (adblock)
 * [FEATURE]:  Added timing event, some error detail to help figure out adtech fails
