@@ -121,14 +121,14 @@
                                 { clickUrls: ['click.me'], countUrls: ['count.me'] },
                                 1234,
                                 adtech,
-                                3000
+                                10000
                             );
                             expect(_private.fetchDynamicCards).toHaveBeenCalledWith(
                                 experience,
                                 config,
                                 { clickUrls: ['click.me'], countUrls: ['count.me'] },
                                 adtech,
-                                3000
+                                10000
                             );
                         });
                     });
@@ -149,14 +149,14 @@
                                 { clickUrls: [], countUrls: [] },
                                 1234,
                                 adtech,
-                                3000
+                                10000
                             );
                             expect(_private.fetchDynamicCards).toHaveBeenCalledWith(
                                 experience,
                                 config,
                                 { clickUrls: [], countUrls: [] },
                                 adtech,
-                                3000
+                                10000
                             );
                         });
                     });
@@ -175,7 +175,7 @@
                             { clickUrls: [], countUrls: [] },
                             1234,
                             adtech,
-                            3000
+                            10000
                         );
                     });
                 });
@@ -198,10 +198,10 @@
                         
                         expect(_private.makeAdCall.calls.count()).toBe(2);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, adtech,3000);
+                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, adtech,10000);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, adtech,3000);
-                        expect(_private.fetchDynamicCards).toHaveBeenCalledWith(experience, config, jasmine.any(Object), adtech, 3000);
+                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, adtech,10000);
+                        expect(_private.fetchDynamicCards).toHaveBeenCalledWith(experience, config, jasmine.any(Object), adtech, 10000);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -347,7 +347,7 @@
                         expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(_private.makeAdCall.calls.count()).toBe(1);
                         expect(_private.makeAdCall).toHaveBeenCalledWith({id: 'rc1', sponsored: true, campaign: {campaignId: 'camp1'}},
-                            withWildcards, jasmine.any(Object), 7654, adtech, 3000);
+                            withWildcards, jasmine.any(Object), 7654, adtech, 10000);
                         expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
                         expect(_private.trimCard).not.toHaveBeenCalled();
                         expect(_private.sendError).not.toHaveBeenCalled();
@@ -669,7 +669,7 @@
                             clickUrl: 'click.me', countUrl: 'count.me'},
                             usableFor: { 'e-1234': true }
                         } };
-                        setTimeout(opts.complete, 4000);
+                        setTimeout(opts.complete, 7000);
                     });
                     _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
                         expect(experience.data.deck).toEqual([
@@ -687,7 +687,7 @@
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                     
-                    jasmine.clock().tick(3001);
+                    jasmine.clock().tick(6001);
                 });
 
                 it('should trim card if adtech complete function throws an exception',function(done){
