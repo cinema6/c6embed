@@ -246,7 +246,7 @@ module.exports = function(deps) {
 
         adtech.showAd(placement,queueId);
             
-        return deferred.promise.timeout(timeout || 3000).catch(function(error) {
+        return deferred.promise.timeout(timeout || 6000).catch(function(error) {
             _private.sendError(experience.id, 'fetchDynamicCards (' +
                 completes + ') - ' + error);
         });
@@ -259,7 +259,7 @@ module.exports = function(deps) {
      * loading more cards to fill placeholders in the exp */
     this.fetchSponsoredCards = function(experience, config, pixels, preloaded) {
         var placement = parseInt(experience.data.wildCardPlacement),
-            timeout = preloaded ? 10000 : 3000,
+            timeout = 10000,
             sponsoredCards = _private.getCardConfigs(experience),
             placeholders = _private.getPlaceholders(experience);
             
