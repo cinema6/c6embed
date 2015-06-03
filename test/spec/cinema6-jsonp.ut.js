@@ -624,6 +624,7 @@ describe('cinema6-jsonp.js', function() {
 
                         expect(config.standalone).toBe(false);
                         expect(config.playerVersion).toBe(1);
+                        expect(config.mobileMode).toBeUndefined();
 
                         expect(config.embed).toBe($('div#c6-lightbox-container')[0]);
                         expect(config.splashDelegate).toEqual({});
@@ -681,6 +682,26 @@ describe('cinema6-jsonp.js', function() {
                     it('should set the playerVersion to the supplied version', function() {
                         c6.embeds.forEach(function(minireel) {
                             expect(minireel.playerVersion).toBe(4);
+                        });
+                    });
+                });
+
+                describe('if the mobileMode is set in the URL', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&mobileMode=swipe&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
+                    });
+
+                    it('should set the playerVersion to the supplied version', function() {
+                        c6.embeds.forEach(function(minireel) {
+                            expect(minireel.mobileMode).toBe('swipe');
                         });
                     });
                 });

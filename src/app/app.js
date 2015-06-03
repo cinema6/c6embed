@@ -51,7 +51,7 @@ module.exports = function(deps) {
                     kDevice: profile.device,
                     kEnvUrlRoot: config.urlRoot,
                     kMode: profile.device !== 'phone' ?
-                        experience.data.mode : 'mobile'
+                        experience.data.mode : (settings.mobileMode || 'mobile')
                 },
                 standalone = settings.config.container === 'jumpramp' ? false : settings.standalone,
                 player2Modes = ['mobile', 'full', 'light', 'lightbox', 'lightbox-playlist', 'solo', 'solo-ads'],

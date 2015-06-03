@@ -393,6 +393,7 @@
                     standalone: true,
                     load: true,
                     experience: experience,
+                    mobileMode: undefined,
                     splashDelegate: {
                         didShow: jasmine.createSpy('splashDelegate.didShow()'),
                         didHide: jasmine.createSpy('splashDelegate.didHide()')
@@ -739,6 +740,20 @@
 
                 it('should provide the mobile mode to the document', function() {
                     expect(mockDocumentParser).toHaveBeenCalledWith(jasmine.any(String), { mode: 'mobile' });
+                });
+
+                describe('if mobileMode is set', function() {
+                    beforeEach(function(done) {
+                        mockDocumentParser.calls.reset();
+                        delete settings.promise;
+                        settings.mobileMode = 'swipe';
+
+                        $window.c6.loadExperience(settings).finally(done);
+                    });
+
+                    it('should use that mode', function() {
+                        expect(mockDocumentParser).toHaveBeenCalledWith(jasmine.any(String), { mode: 'swipe' });
+                    });
                 });
             });
 
