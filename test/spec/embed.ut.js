@@ -400,6 +400,7 @@
                                 autoLaunch: 'data-auto-launch' in config,
                                 standalone: false,
                                 playerVersion: 1,
+                                mobileMode: undefined,
                                 experience: experience,
                                 splashDelegate: {},
                                 config: jasmine.any(Object)
@@ -438,6 +439,22 @@
 
                             it('should set the playerVersion', function() {
                                 expect(window.c6.embeds[0].playerVersion).toBe(3);
+                            });
+                        });
+
+                        describe('if the mobile-mode is specified', function() {
+                            beforeEach(function(done) {
+                                delete window.c6;
+
+                                embed({
+                                    'data-exp': 'e-123',
+                                    'data-splash': 'foo:1/1',
+                                    'data-mobile-mode': 'swipe'
+                                }, done);
+                            });
+
+                            it('should set the mobileMode', function() {
+                                expect(window.c6.embeds[0].mobileMode).toBe('swipe');
                             });
                         });
 
