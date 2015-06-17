@@ -4,25 +4,8 @@ module.exports = function(deps) {
     var $window = deps.window;
     var config = deps.config;
     var q = deps.q;
-    var importScripts = deps.importScripts.withConfig({
-        paths: {
-            adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js'
-        },
-        shim: {
-            adtech: {
-                exports: 'ADTECH',
-                onCreateFrame: function(window) {
-                    var document = window.document;
-
-                    window.c6 = window.parent.c6;
-
-                    /* jshint evil:true */
-                    document.write('<div id="ad"></div>');
-                    /* jshint evil:false */
-                }
-            }
-        }
-    });
+    var importScripts = deps.importScripts.withConfig({});
+    var adLib = deps.adLib;
 
     var c6 = $window.c6;
     var urlRoot = config.urlRoot;
@@ -65,16 +48,6 @@ module.exports = function(deps) {
         });
     };
 
-    // Load the Adtech library
-    _private.loadAdtech = function(timeout) {
-        var deferred = q.defer();
-        timeout = timeout || 5000;
-
-        importScripts(['adtech'], deferred.resolve);
-
-        return deferred.promise.timeout(timeout, 'Timed out after ' + timeout + 'ms loading adtech library');
-    };
-
     // Get all that are sponsored + have an adtech id, but don't already have clickUrl + countUrl
     _private.getCardConfigs = function(experience) {
         return (experience.data.deck || []).filter(function(card) {
@@ -93,48 +66,28 @@ module.exports = function(deps) {
     };
 
     // Retrieve the banner for a sponsored card that already exists in the minireel
-    _private.makeAdCall = function(card, experience, pixels, placement, adtech, timeout) {
-        var campaignId = String(card.campaign && card.campaign.campaignId || card.adtechId),
-            bannerId = String(card.campaign && card.campaign.bannerId || card.bannerId || '1'),
-            deferred = q.defer();
+    _private.makeAdCall = function(card, experience, pixels, placement, timeout) {
+        var campaignId  = String(card.campaign && card.campaign.campaignId || card.adtechId),
+            bannerId    = String(card.campaign && card.campaign.bannerId || card.bannerId || '1'),
+            startFetch  = new Date().getTime();
             
-        adtech.loadAd({
-            placement: placement,
-            params: {
-                target: '_blank',
-                adid: campaignId,
-                bnid: bannerId,
-                sub1: experience.id
-            },
-            complete: function() {
-                try {
-                    _private.decorateCard(card, experience, pixels, placement);
-                    deferred.resolve();
-                } catch(error){
-                    deferred.reject((error.message || error));
-                }
-            }
-        });
+        adLib.loadAd(placement, campaignId, bannerId, experience.id)
+        .then(function(banner) {
+            _private.sendTiming(experience.id, 'adtechLoadAd', (new Date().getTime() - startFetch));
 
-        return deferred.promise.timeout(timeout || 3000).catch(function(error) {
+            if (!banner) {
+                _private.sendError(experience.id, 'loadAd returned no banner');
+                return _private.trimCard(card.id, experience);
+            }
+
+            decorateCardWithPixels(card, pixels, banner);
+            c6.usedSponsoredCards[experience.id].push(banner.extId);
+        })
+        .timeout(timeout || 3000)
+        .catch(function(error) {
             _private.trimCard(card.id, experience);
             _private.sendError(experience.id, 'makeAdCall - ' + error);
         });
-    };
-
-    // Decorate the card with click + count urls, if its banners was saved in the cardCache
-    _private.decorateCard = function(card, experience, pixels, placement) {
-        var campaignId = String(card.campaign && card.campaign.campaignId || card.adtechId),
-            cardInfo = c6.cardCache[placement][campaignId];
-
-        if (!cardInfo) {
-            _private.sendError(experience.id, 'ad call finished but no cardInfo');
-            return _private.trimCard(card.id, experience);
-        }
-
-        decorateCardWithPixels(card, pixels, cardInfo);
-
-        cardInfo.usableFor[experience.id] = false;
     };
 
     // Remove the card with the given id from the experience, sending an error event with the message
@@ -146,16 +99,14 @@ module.exports = function(deps) {
 
 
     // Find banners not yet used for this experience and load their objects from the content svc
-    _private.loadCardObjects = function(experience, placeholders, pixels, placement) {
-        
-        // these are the extra cards dynamically fetched for this experience (and only this exp)
-        var banners = Object.keys(c6.cardCache[placement]).filter(function(campaignId) {
-            return c6.cardCache[placement][campaignId].usableFor[experience.id] === true;
-        }).map(function(campaignId) {
-            return c6.cardCache[placement][campaignId];
-        });
-        
+    _private.loadCardObjects = function(experience, placeholders, pixels, banners) {
         return q.all(banners.map(function(banner) {
+            if (!banner || c6.usedSponsoredCards[experience.id].indexOf(banner.extid) !== -1) {
+                return q();
+            }
+            
+            c6.usedSponsoredCards[experience.id].push(banner.extId);
+        
             var deferred = q.defer();
 
             importScripts([urlRoot + '/api/public/content/card/' + banner.extId + '.js'], function(card) {
@@ -170,7 +121,6 @@ module.exports = function(deps) {
                 
                 card.adtechId = banner.campaignId;
                 decorateCardWithPixels(card, pixels, banner);
-                banner.usableFor[experience.id] = false;
                 
                 _private.swapCard(placeholders.shift(), card, experience);
                 
@@ -195,13 +145,12 @@ module.exports = function(deps) {
     };
     
     // Make ad calls for each wildcard placeholder in the experience, calling loadCardObjects when done
-    _private.fetchDynamicCards = function(experience, config, pixels, adtech, timeout) {
-        var deferred = q.defer(),
-            placement = parseInt(experience.data.wildCardPlacement),
+    _private.fetchDynamicCards = function(experience, config, pixels, timeout) {
+        var placement = parseInt(experience.data.wildCardPlacement),
             placeholders = _private.getPlaceholders(experience),
             categories = (config && config.categories || []),
             startFetch = new Date().getTime(),
-            completes = 0;
+            keywords = {};
         categories = (typeof categories === 'string') ? categories.split(',') : categories;
         
         if (categories.length === 0) {
@@ -211,44 +160,21 @@ module.exports = function(deps) {
         if (placeholders.length === 0) {
             return q();
         }
-
-        placeholders.forEach(function() {
-            adtech.enqueueAd({
-                placement: placement,
-                params: {
-                    target: '_blank',
-                    Allowedsizes: '2x2',
-                    kwlp1: config && config.campaign,
-                    kwlp3: categories.slice(0, 4).join('+'),
-                    sub1: experience.id
-                },
-                complete: function onComplete() { // adtech should only call once
-                    completes++;
-                    if (completes === 1){
-                        _private.sendTiming(experience.id,'adtechExecQueue',
-                            (new Date().getTime() - startFetch));
-                        _private.loadCardObjects(experience, placeholders, pixels, placement)
-                        .then(deferred.resolve)
-                        .catch(deferred.reject);
-                    } else {
-                        _private.sendError(experience.id, 'fetchDynamicCards (' +
-                            completes + ') - warning, extra completes!');
-                    }
-                }
-            });
-        });
-
-        var queueId = adtech.executeQueue({
-            multiAd: {
-                disableAdInjection: true
-            }
-        });
-
-        adtech.showAd(placement,queueId);
+        
+        keywords = {
+            kwlp1: config && config.campaign,
+            kwlp3: categories.slice(0, 4).join('+')
+        };
+        
+        adLib.multiAd(placeholders.length, placement, '2x2', keywords, experience.id)
+        .then(function(banners) {
+            _private.sendTiming(experience.id,'adtechExecQueue', (new Date().getTime() - startFetch));
             
-        return deferred.promise.timeout(timeout || 6000).catch(function(error) {
-            _private.sendError(experience.id, 'fetchDynamicCards (' +
-                completes + ') - ' + error);
+            return _private.loadCardObjects(experience, placeholders, pixels, placement, banners);
+        })
+        .timeout(timeout || 6000)
+        .catch(function(error) {
+            _private.sendError(experience.id, 'fetchDynamicCards - ' + error);
         });
     };
 
@@ -257,7 +183,7 @@ module.exports = function(deps) {
 
     /* Handle fetching banners for sponsored cards already in the exp, as well as dynamically
      * loading more cards to fill placeholders in the exp */
-    this.fetchSponsoredCards = function(experience, config, pixels, preloaded) {
+    this.fetchSponsoredCards = function(experience, config, pixels) {
         var placement = parseInt(experience.data.wildCardPlacement),
             timeout = 10000,
             sponsoredCards = _private.getCardConfigs(experience),
@@ -281,61 +207,25 @@ module.exports = function(deps) {
 
         pixels = withDefaults(pixels, { clickUrls: [], countUrls: [] });
 
-        c6.cardCache = c6.cardCache || {};
+        c6.usedSponsoredCards = c6.usedSponsoredCards || {};
 
-        c6.addSponsoredCard = function(placementId, campaignId, extId, clickUrl, countUrl, requestor) {
-            if (!c6.cardCache[placementId][campaignId]) {
-                c6.cardCache[placementId][campaignId] = {
-                    campaignId  : campaignId,
-                    extId       : extId,
-                    clickUrl    : clickUrl,
-                    countUrl    : countUrl,
-                    usableFor   : {}
-                };
-            }
-            
-            // keep track of which experiences requested a card, and if card has been used for an experience
-            if (c6.cardCache[placementId][campaignId].usableFor[requestor] === undefined) {
-                c6.cardCache[placementId][campaignId].usableFor[requestor] = true;
-            }
-        };
+        c6.usedSponsoredCards[experience.id] = [];
 
-        c6.cardCache[placement] = c6.cardCache[placement] || {};
+        adLib.configure({
+            network: experience.data.adServer.network,
+            server:  experience.data.adServer.server
+        });
 
-        return _private.loadAdtech(preloaded ? 10000 : 5000).then(function(adtech) {
-            if (!adtech) {
-                _private.sendError(experience.id, 'adtech load was blocked.');
+        // load statically mapped cards first
+        return q.all(sponsoredCards.map(function(card) {
+            return _private.makeAdCall(card, experience, pixels, placement, timeout);
+        }))
+        .then(function() {
+            if (!config.hasSponsoredCards) {
+                return _private.fetchDynamicCards(experience, config, pixels, timeout);
+            } else {
                 return q();
             }
-
-            adtech.config.page = {
-                protocol: ($window.location.protocol === 'https:' ) ? 'https' : 'http',
-                network: experience.data.adServer.network,
-                server:  experience.data.adServer.server,
-                enableMultiAd: true
-            };
-
-            adtech.config.placements[placement] = {
-                adContainerId: 'ad'
-            };
-        
-            // load statically mapped cards first
-            return q.all(sponsoredCards.map(function(card) {
-                return _private.makeAdCall(card, experience, pixels, placement, adtech, timeout);
-            }))
-            .then(function() {
-                if (!config.hasSponsoredCards) {
-                    return _private.fetchDynamicCards(experience, config, pixels, adtech, timeout);
-                } else {
-                    return q();
-                }
-            });
-        }, function(error) {
-            sponsoredCards.map(function(card) {
-                return _private.trimCard(card.id, experience);
-            });
-            _private.sendError(experience.id, 'loading adtech failed - ' + error);
-            return q();
         });
     };
 

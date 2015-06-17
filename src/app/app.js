@@ -165,7 +165,7 @@ module.exports = function(deps) {
                 return spCardService.fetchSponsoredCards(experience, settings.config, {
                     clickUrls: clickUrls,
                     countUrls: countUrls
-                }, preload).then(function(){
+                }).then(function(){
                     /* jshint camelcase:false */
                     window.__c6_ga__(embedTracker + '.send', 'timing', {
                         'timingCategory' : 'API',
