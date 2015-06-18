@@ -71,8 +71,9 @@ module.exports = function(deps) {
             bannerId    = String(card.campaign && card.campaign.bannerId || card.bannerId || '1'),
             startFetch  = new Date().getTime();
             
-        adLib.loadAd(placement, campaignId, bannerId, experience.id)
+        return adLib.loadAd(placement, campaignId, bannerId)
         .then(function(banner) {
+            // /*TODO*/ console.log('ASDF: loadAd got banner ' + banner.extId);
             _private.sendTiming(experience.id, 'adtechLoadAd', (new Date().getTime() - startFetch));
 
             if (!banner) {
@@ -85,6 +86,7 @@ module.exports = function(deps) {
         })
         .timeout(timeout || 3000)
         .catch(function(error) {
+            // /*TODO*/ console.log('ASDF: loadAd got a problem - ' + error);
             _private.trimCard(card.id, experience);
             _private.sendError(experience.id, 'makeAdCall - ' + error);
         });
@@ -92,6 +94,7 @@ module.exports = function(deps) {
 
     // Remove the card with the given id from the experience, sending an error event with the message
     _private.trimCard = function(id, experience) {
+        // /*TODO*/ console.log('ASDF: trimming card ' + id);
         experience.data.deck = experience.data.deck.filter(function(card) {
             return card.id !== id;
         });
@@ -101,7 +104,7 @@ module.exports = function(deps) {
     // Find banners not yet used for this experience and load their objects from the content svc
     _private.loadCardObjects = function(experience, placeholders, pixels, banners) {
         return q.all(banners.map(function(banner) {
-            if (!banner || c6.usedSponsoredCards[experience.id].indexOf(banner.extid) !== -1) {
+            if (!banner || c6.usedSponsoredCards[experience.id].indexOf(banner.extId) !== -1) {
                 return q();
             }
             
@@ -116,6 +119,8 @@ module.exports = function(deps) {
                     _private.sendError(experience.id, 'card ' + banner.extId + ' not found');
                     return deferred.resolve();
                 }
+                
+                // /*TODO*/ console.log('ASDF: got card ' + card.id);
 
                 campaign = card.campaign;
                 
@@ -133,12 +138,16 @@ module.exports = function(deps) {
     
     // Search through the experience's deck and swap the placeholder with the newCard
     _private.swapCard = function(placeholder, newCard, experience) {
+        // /*TODO*/ console.log('ASDF: swapping ' + newCard.id + ' for ' + (placeholder && placeholder.id));
+        // /*TODO*/ console.log(newCard);
+        // /*TODO*/ console.log(experience);
         if (!placeholder) {
             return;
         }
     
         experience.data.deck.forEach(function(card, idx) {
             if (card.id === placeholder.id) {
+                // /*TODO*/ console.log('ASDF: swapping newCard in at pos ' + idx);
                 experience.data.deck[idx] = newCard;
             }
         });
@@ -146,11 +155,12 @@ module.exports = function(deps) {
     
     // Make ad calls for each wildcard placeholder in the experience, calling loadCardObjects when done
     _private.fetchDynamicCards = function(experience, config, pixels, timeout) {
-        var placement = parseInt(experience.data.wildCardPlacement),
-            placeholders = _private.getPlaceholders(experience),
-            categories = (config && config.categories || []),
-            startFetch = new Date().getTime(),
-            keywords = {};
+        var placement       = parseInt(experience.data.wildCardPlacement),
+            placeholders    = _private.getPlaceholders(experience),
+            categories      = (config && config.categories || []),
+            startFetch      = new Date().getTime(),
+            keywords        = {};
+
         categories = (typeof categories === 'string') ? categories.split(',') : categories;
         
         if (categories.length === 0) {
@@ -166,14 +176,16 @@ module.exports = function(deps) {
             kwlp3: categories.slice(0, 4).join('+')
         };
         
-        adLib.multiAd(placeholders.length, placement, '2x2', keywords, experience.id)
+        return adLib.multiAd(placeholders.length, placement, '2x2', keywords)
         .then(function(banners) {
+            // /*TODO*/ console.log('ASDF: multiAd got banners ' + JSON.stringify(banners));
             _private.sendTiming(experience.id,'adtechExecQueue', (new Date().getTime() - startFetch));
             
-            return _private.loadCardObjects(experience, placeholders, pixels, placement, banners);
+            return _private.loadCardObjects(experience, placeholders, pixels, banners || []);
         })
         .timeout(timeout || 6000)
         .catch(function(error) {
+            // /*TODO*/ console.log('ASDF: multiAd got a problem - ' + error);
             _private.sendError(experience.id, 'fetchDynamicCards - ' + error);
         });
     };

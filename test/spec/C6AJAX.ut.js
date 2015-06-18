@@ -175,6 +175,18 @@
                 ]
             });
         });
+        
+        it('should support sending an XHR with credentials', function() {
+            c6Ajax({
+                method: 'GET',
+                url: 'http://adtech.com/someBanner',
+                withCredentials: true
+            });
+
+            expect(xhr.open).toHaveBeenCalledWith('GET', 'http://adtech.com/someBanner', true);
+            expect(xhr.withCredentials).toBe(true);
+
+        });
 
         it('should properly encode params for the url', function() {
             c6Ajax({

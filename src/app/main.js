@@ -79,6 +79,7 @@
     var AdLib = require('./AdLib.js'),
         adLib = new AdLib({
             c6Ajax: c6Ajax,
+            window: window,
             q: q
         });
 
