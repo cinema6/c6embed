@@ -4,10 +4,13 @@ module.exports = function(deps) {
     var c6Ajax = deps.c6Ajax;
     var q = deps.q;
     var $window = deps.window;
-    var _private = { config: {} };
+    var _private = { config: {
+        server  : 'adserver.adtechus.com',
+        network : '5473.1'
+    } };
 
     
-    //TODO: comment, test. Maybe simplify this?
+    // Build an Adtech tag url. params should be an object containing param names + values.
     _private.buildUrl = function(tagType, placement, params) {
         var parts = [
                 _private.config.server,
@@ -36,7 +39,7 @@ module.exports = function(deps) {
         return $window.location.protocol + '//' + parts.join('/') + '/' + paramString;
     };
     
-    //TODO: comment, test
+    // Parse the text of a script banner and return an object represenation. Sponsored cards only for now.
     _private.parseBanner = function(str) {
         var regex = /^window\.c6\.addSponsoredCard\('\s*(\d+)'\s*,\s*'(\d+)'\s*,\s*'([\w-]+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'/,
             matchObj = (str || '').match(regex);
@@ -54,14 +57,14 @@ module.exports = function(deps) {
         };
     };
     
-    //TODO: comment, test
+    // Sets the Adtech network + server vars; mimics setting up adtech.config when using DAC.js
     this.configure = function(cfg) {
         cfg = cfg || {};
         _private.config.network = cfg.network;
         _private.config.server = cfg.server;
     };
     
-    //TODO: comment, test
+    // Request a single banner from Adtech, using the banner's campaign and banner ids.
     this.loadAd = function(placement, campaignId, bannerId) {
         var url = _private.buildUrl('addyn', placement, {
             adid    : campaignId,
@@ -80,8 +83,8 @@ module.exports = function(deps) {
         });
     };
     
-    //TODO: comment, test
-    /*jslint camelcase: false */
+    /* Request multiple banners from Adtech. num is the number of banners. sizes should be a CSV
+       list of Adtech sizes (2x2, 1x1, etc.) keywords should resemble { kwlp1: '...', kwlp3: '...' } */
     this.multiAd = function(num, placement, sizes, keywords) {
         var plcids = Array.apply(null, new Array(num)).map(function() { return placement; }).join(','); // CSV string repeating placement num times
 
@@ -95,6 +98,7 @@ module.exports = function(deps) {
             kwlp3           : keywords.kwlp3
         });
         
+        /*jslint camelcase: false */
         return c6Ajax.get(url, { withCredentials: true }).then(
             function parseMultiAdResponse(response) {
                 try {
@@ -112,8 +116,8 @@ module.exports = function(deps) {
                 }
             }
         );
+        /*jslint camelcase: true */
     };
-    /*jslint camelcase: true */
 
     if (window.__karma__) { this._private = _private; }
 };
