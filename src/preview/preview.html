@@ -128,7 +128,8 @@
                         campaign        : params.campaign,
                         preview         : 'true',
                         'player-version': params.playerVersion,
-                        'mobile-mode'   : params.mobileMode
+                        'mobile-mode'   : params.mobileMode,
+                        mode            : params.mode
                     });
 
                     document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload><\/script>');

@@ -212,6 +212,7 @@ module.exports = function($window, $document) {
         this.standalone = false;
         this.playerVersion = params.playerVersion || 1;
         this.mobileMode = params.mobileMode || undefined;
+        this.mode = params.mode || undefined;
 
         this.embed = container;
         this.splashDelegate = {};

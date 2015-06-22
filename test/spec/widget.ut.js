@@ -857,6 +857,7 @@
                                         expect(minireel.standalone).toBe(false);
                                         expect(minireel.playerVersion).toBe(1);
                                         expect(minireel.mobileMode).toBeUndefined();
+                                        expect(minireel.mode).toBeUndefined();
                                         expect(minireel.config).toEqual({
                                             exp: experience.id,
                                             title: experience.data.title,
@@ -967,6 +968,39 @@
                                     it('should set the mobileMode', function() {
                                         c6.embeds.forEach(function(minireel) {
                                             expect(minireel.mobileMode).toBe('swipe');
+                                        });
+                                    });
+                                });
+
+                                describe('if the mode is specified', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+                                        c6.embeds.length = 0;
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710',
+                                            mode: 'fullnp'
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should set the mode', function() {
+                                        c6.embeds.forEach(function(minireel) {
+                                            expect(minireel.mode).toBe('fullnp');
                                         });
                                     });
                                 });
