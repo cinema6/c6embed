@@ -401,6 +401,7 @@
                                 standalone: false,
                                 playerVersion: 1,
                                 mobileMode: undefined,
+                                mode: undefined,
                                 experience: experience,
                                 splashDelegate: {},
                                 config: jasmine.any(Object)
@@ -455,6 +456,22 @@
 
                             it('should set the mobileMode', function() {
                                 expect(window.c6.embeds[0].mobileMode).toBe('swipe');
+                            });
+                        });
+
+                        describe('if the mode is specified', function() {
+                            beforeEach(function(done) {
+                                delete window.c6;
+
+                                embed({
+                                    'data-exp': 'e-123',
+                                    'data-splash': 'foo:1/1',
+                                    'data-mode': 'fullnp'
+                                }, done);
+                            });
+
+                            it('should set the mode', function() {
+                                expect(window.c6.embeds[0].mode).toBe('fullnp');
                             });
                         });
 

@@ -124,6 +124,7 @@ module.exports = function(win, readyState) {
             standalone: false,
             playerVersion: parseInt(config.playerVersion, 10) || 1,
             mobileMode: config.mobileMode || undefined,
+            mode: config.mode || undefined,
             load: false,
             preload: false,
             autoLaunch: config.autoLaunch,

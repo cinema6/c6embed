@@ -196,6 +196,7 @@ module.exports = function($window, $document) {
                 this.standalone = false;
                 this.playerVersion = config.playerVersion || 1;
                 this.mobileMode = config.mobileMode || undefined;
+                this.mode = config.mode || undefined;
                 this.trackingUrl = trackingUrl;
                 this.embed = splash;
                 this.splashDelegate = splashJS({

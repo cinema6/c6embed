@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add ability to override player mode via embed
+  attribute/parameter/property
+
 ## v2.33.0 (June 3, 2015)
 * [FEATURE]: Allow mobile player mode to be overridden via embed
   property/parameter

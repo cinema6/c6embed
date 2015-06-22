@@ -394,6 +394,7 @@
                     load: true,
                     experience: experience,
                     mobileMode: undefined,
+                    mode: undefined,
                     splashDelegate: {
                         didShow: jasmine.createSpy('splashDelegate.didShow()'),
                         didHide: jasmine.createSpy('splashDelegate.didHide()')
@@ -717,6 +718,25 @@
                             launchUrls: settings.config.launchPixel.split(' ')
                         });
                     });
+                });
+            });
+
+            describe('if mode is set', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    mockDocumentParser.calls.reset();
+                    c6Ajax.get.calls.reset();
+                    c6Ajax.get.and.returnValue(Q.when({
+                        data: indexHTML
+                    }));
+
+                    settings.mode = 'fullnp';
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should load the player for that mode', function() {
+                    expect(mockDocumentParser).toHaveBeenCalledWith(jasmine.any(String), { mode: 'fullnp' });
                 });
             });
 
