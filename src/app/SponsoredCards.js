@@ -163,7 +163,7 @@ module.exports = function(deps) {
         }
         
         keywords = {
-            kwlp1: config && config.campaign,
+            kwlp1: config && config.campaign || '',
             kwlp3: categories.slice(0, 4).join('+')
         };
         
