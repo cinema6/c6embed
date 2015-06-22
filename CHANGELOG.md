@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.34.1 (June 22, 2015)
+* [FIX]: Properly pass kwlp1 param to Adtech when minireel has no campaign id
+
 ## v2.34.0 (June 22, 2015)
 * [FEATURE]: Add ability to override player mode via embed
   attribute/parameter/property

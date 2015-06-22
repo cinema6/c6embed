@@ -785,7 +785,7 @@
                 
                 it('should handle the campaign and categories params being undefined', function(done) {
                     _private.fetchDynamicCards(withWildcards, {}, pixels, 3000).then(function() {
-                        expect(adLib.multiAd).toHaveBeenCalledWith(2, 7654, '2x2', { kwlp1: undefined, kwlp3: '' });
+                        expect(adLib.multiAd).toHaveBeenCalledWith(2, 7654, '2x2', { kwlp1: '', kwlp3: '' });
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
