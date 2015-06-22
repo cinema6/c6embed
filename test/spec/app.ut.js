@@ -654,7 +654,7 @@
                 expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
                     clickUrls: undefined,
                     countUrls: undefined
-                },undefined);
+                });
             });
 
             describe('if the config has a startPixel and countPixel', function() {
@@ -670,7 +670,7 @@
                     expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
                         clickUrls: settings.config.startPixel.split(' '),
                         countUrls: settings.config.countPixel.split(' ')
-                    },undefined);
+                    });
                 });
             });
 

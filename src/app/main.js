@@ -66,15 +66,6 @@
         q: q
     });
 
-    /* Create SponsoredCards */
-    var SponsoredCards = require('./SponsoredCards.js'),
-        spCards = new SponsoredCards({
-            window: window,
-            config: config,
-            q: q,
-            importScripts: importScripts
-        });
-
     /* Create C6AJAX */
     var C6AJAX = require('../../lib/c6ajax/C6AJAX.js'),
         c6Ajax = new C6AJAX({
@@ -82,6 +73,24 @@
             q: q,
             browserInfo: browserInfo,
             location: $location
+        });
+        
+    /* Create AdLib */
+    var AdLib = require('./AdLib.js'),
+        adLib = new AdLib({
+            c6Ajax: c6Ajax,
+            window: window,
+            q: q
+        });
+
+    /* Create SponsoredCards */
+    var SponsoredCards = require('./SponsoredCards.js'),
+        spCards = new SponsoredCards({
+            window: window,
+            config: config,
+            q: q,
+            adLib: adLib,
+            importScripts: importScripts
         });
 
     /* Create and Configure DocumentParser */

@@ -3,10 +3,11 @@
 
     describe('SponsoredCards', function() {
         var SponsoredCards,
+            AdLib,
             q,
-            spCards,
             window,
-            adtech,
+            spCards,
+            adLib,
             _private;
 
         var importScriptsMain = require('../../lib/importScripts.js');
@@ -18,6 +19,7 @@
         beforeEach(function() {
             SponsoredCards = require('../../src/app/SponsoredCards');
             q = require('../../node_modules/q/q.js');
+            AdLib = require('../../src/app/AdLib');
             
             window = {
                 c6: { require: jasmine.createSpy('c6.require()') },
@@ -25,14 +27,6 @@
                 location: {
                     protocol: 'http:'
                 }
-            };
-            
-            adtech = {
-                config: { placements: {} },
-                loadAd: jasmine.createSpy('adtech.loadAd()'),
-                enqueueAd: jasmine.createSpy('adtech.enqueueAd()'),
-                executeQueue: jasmine.createSpy('adtech.executeQueue()'),
-                showAd: jasmine.createSpy('adtech.showAd()')
             };
             
             experience = {
@@ -77,8 +71,20 @@
                     return importFn.apply(null, arguments);
                 }));
             });
+            
+            adLib = new AdLib({
+                window: window,
+                q: q,
+                importScripts: importScriptsMain
+            });
 
-            spCards = new SponsoredCards({ q: q, config: { urlRoot: 'http://test.com' }, window: window, importScripts: importScriptsMain });
+            spCards = new SponsoredCards({
+                window: window,
+                config: { urlRoot: 'http://test.com' },
+                q: q,
+                adLib: adLib,
+                importScripts: importScriptsMain
+            });
             _private = spCards._private;
             spyOn(_private, 'trimCard').and.callThrough();
             spyOn(_private, 'sendError').and.callThrough();
@@ -97,9 +103,9 @@
                 var config;
                 beforeEach(function() {
                     config = { campaign: 'cam-1' };
+                    spyOn(adLib, 'configure').and.callThrough();
                     spyOn(_private, 'getCardConfigs').and.callThrough();
                     spyOn(_private, 'getPlaceholders').and.callThrough();
-                    spyOn(_private, 'loadAdtech').and.returnValue(q(adtech));
                     spyOn(_private, 'makeAdCall').and.returnValue(q());
                     spyOn(_private, 'fetchDynamicCards').and.returnValue(q());
                 });
@@ -120,14 +126,12 @@
                                 experience,
                                 { clickUrls: ['click.me'], countUrls: ['count.me'] },
                                 1234,
-                                adtech,
                                 10000
                             );
                             expect(_private.fetchDynamicCards).toHaveBeenCalledWith(
                                 experience,
                                 config,
                                 { clickUrls: ['click.me'], countUrls: ['count.me'] },
-                                adtech,
                                 10000
                             );
                         });
@@ -148,14 +152,12 @@
                                 experience,
                                 { clickUrls: [], countUrls: [] },
                                 1234,
-                                adtech,
                                 10000
                             );
                             expect(_private.fetchDynamicCards).toHaveBeenCalledWith(
                                 experience,
                                 config,
                                 { clickUrls: [], countUrls: [] },
-                                adtech,
                                 10000
                             );
                         });
@@ -174,7 +176,6 @@
                             experience,
                             { clickUrls: [], countUrls: [] },
                             1234,
-                            adtech,
                             10000
                         );
                     });
@@ -182,86 +183,44 @@
 
                 it('should load adtech and load static and dynamic sponsored cards', function(done) {
                     spCards.fetchSponsoredCards(experience, config).then(function() {
+                        expect(adLib.configure).toHaveBeenCalledWith({ server: 'adserver.adtechus.com', network: '5473.1' });
                         expect(_private.getCardConfigs).toHaveBeenCalledWith(experience);
                         expect(_private.getPlaceholders).toHaveBeenCalledWith(experience);
-                        expect(window.c6.cardCache).toEqual({ 1234: {} });
-                        expect(window.c6.addSponsoredCard).toEqual(jasmine.any(Function));
+                        expect(window.c6.usedSponsoredCards).toEqual({ 'e-1234': [] });
 
-                        expect(_private.loadAdtech).toHaveBeenCalled();
-                        expect(adtech.config.page).toEqual({
-                            protocol: 'http',
-                            network: '5473.1',
-                            server: 'adserver.adtechus.com',
-                            enableMultiAd: true
-                        });
-                        expect(adtech.config.placements[1234]).toEqual({ adContainerId: 'ad' });
-                        
                         expect(_private.makeAdCall.calls.count()).toBe(2);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, adtech,10000);
+                            {id:'rc1',sponsored:true,campaign:{campaignId:'camp1'}}, experience, jasmine.any(Object), 1234, 10000);
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
-                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, adtech,10000);
-                        expect(_private.fetchDynamicCards).toHaveBeenCalledWith(experience, config, jasmine.any(Object), adtech, 10000);
+                            {id:'rc3',sponsored:true,campaign:{campaignId:'camp3'}}, experience, jasmine.any(Object), 1234, 10000);
+                        expect(_private.fetchDynamicCards).toHaveBeenCalledWith(experience, config, jasmine.any(Object), 10000);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
-                it('should not overwrite existing entries in the cardCache', function(done) {
-                    window.c6.cardCache = {
-                        1234: {
-                            987: { foo: 'bar' },
-                            876: { foo: 'baz' }
-                        },
-                        4321: {
-                            567: { foo: 'buz' }
-                        }
+                it('should not overwrite existing entries c6.usedSponsoredCards', function(done) {
+                    window.c6.usedSponsoredCards = {
+                        'e-4567': ['rc-1', 'rc-2']
                     };
 
                     spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.getCardConfigs).toHaveBeenCalledWith(experience);
-                        expect(window.c6.cardCache).toEqual({
-                            1234: {
-                                987: { foo: 'bar' },
-                                876: { foo: 'baz' }
-                            },
-                            4321: {
-                                567: { foo: 'buz' }
-                            }
+                        expect(window.c6.usedSponsoredCards).toEqual({
+                            'e-4567': ['rc-1', 'rc-2'],
+                            'e-1234': []
                         });
-                        expect(window.c6.addSponsoredCard).toEqual(jasmine.any(Function));
-                        expect(_private.loadAdtech).toHaveBeenCalled();
-                        expect(_private.makeAdCall.calls.count()).toBe(2);
-                        expect(_private.fetchDynamicCards).toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
-                it('should load adtech and make ad calls with passed network', function(done) {
+                it('should configure adLib with different network + server', function(done) {
                     experience.data.adServer.network = '4444.4' ;
-                    spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).toHaveBeenCalled();
-                        expect(adtech.config.page).toEqual({
-                            protocol: 'http',
-                            network: '4444.4',
-                            server: 'adserver.adtechus.com',
-                            enableMultiAd: true
-                        });
-                    }).catch(function(error) {
-                        expect(error.toString()).not.toBeDefined();
-                    }).done(done);
-                });
-                
-                it('should load adtech and make ad calls with passed server', function(done) {
                     experience.data.adServer.server = 'somehost.com' ;
                     spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).toHaveBeenCalled();
-                        expect(adtech.config.page).toEqual({
-                            protocol: 'http',
-                            network: '5473.1',
-                            server: 'somehost.com',
-                            enableMultiAd: true
+                        expect(adLib.configure).toHaveBeenCalledWith({
+                            network: '4444.4',
+                            server: 'somehost.com'
                         });
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -271,7 +230,6 @@
                 it('should return early and trim sponsored cards if the placement is missing', function(done) {
                     delete experience.data.wildCardPlacement;
                     spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
                         expect(_private.trimCard.calls.count()).toBe(2);
@@ -288,7 +246,6 @@
                 it('should return early and trim sponsored cards if the placement is invalid', function(done) {
                     experience.data.wildCardPlacement = 'p1234';
                     spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
                         expect(_private.trimCard.calls.count()).toBe(2);
@@ -302,10 +259,9 @@
                     }).done(done);
                 });
                 
-                it('should only fetchDynamicCards if there are no sponsored cards', function(done) {
+                it('should only fetchDynamicCards if there are unused placeholders', function(done) {
                     _private.getCardConfigs.and.returnValue([]);
                     spCards.fetchSponsoredCards(withWildcards, config).then(function() {
-                        expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.fetchDynamicCards).toHaveBeenCalled();
                         expect(_private.trimCard).not.toHaveBeenCalled();
@@ -318,7 +274,6 @@
                 it('should return early if there are no sponsored cards or placeholders', function(done) {
                     _private.getCardConfigs.and.returnValue([]);
                     spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
                         expect(_private.trimCard).not.toHaveBeenCalled();
@@ -331,7 +286,6 @@
                 it('should return early if config.preview is true', function(done) {
                     config.preview = true;
                     spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).not.toHaveBeenCalled();
                         expect(_private.makeAdCall).not.toHaveBeenCalled();
                         expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
                         expect(_private.trimCard).not.toHaveBeenCalled();
@@ -344,75 +298,15 @@
                 it('should not fetchDynamicCards if config.hasSponsoredCards is true', function(done) {
                     config.hasSponsoredCards = true;
                     spCards.fetchSponsoredCards(withWildcards, config).then(function() {
-                        expect(_private.loadAdtech).toHaveBeenCalled();
                         expect(_private.makeAdCall.calls.count()).toBe(1);
                         expect(_private.makeAdCall).toHaveBeenCalledWith({id: 'rc1', sponsored: true, campaign: {campaignId: 'camp1'}},
-                            withWildcards, jasmine.any(Object), 7654, adtech, 10000);
+                            withWildcards, jasmine.any(Object), 7654, 10000);
                         expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
                         expect(_private.trimCard).not.toHaveBeenCalled();
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
-                });
-                
-                it('should still resolve if loadAdtech fails', function(done) {
-                    _private.loadAdtech.and.returnValue(q.reject('I GOT A PROBLEM'));
-                    
-                    spCards.fetchSponsoredCards(experience, config).then(function() {
-                        expect(_private.loadAdtech).toHaveBeenCalled();
-                        expect(_private.makeAdCall).not.toHaveBeenCalled();
-                        expect(_private.fetchDynamicCards).not.toHaveBeenCalled();
-                        expect(_private.trimCard.calls.count()).toBe(2);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
-                        expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
-                        expect(_private.sendError.calls.count()).toBe(1);
-                        expect(_private.sendError).toHaveBeenCalledWith('e-1234', 'loading adtech failed - I GOT A PROBLEM');
-                        expect(experience.data.deck.length).toBe(1);
-                    }).catch(function(error) {
-                        expect(error).not.toBeDefined();
-                    }).done(done);
-                });
-                
-                describe('creates c6.addSponsoredCard that', function() {
-                    beforeEach(function(done) {
-                        window.c6.cardCache = {};
-                        spCards.fetchSponsoredCards(experience, config).done(done);
-                    });
-                    
-                    it('should create an entry in the c6.cardCache if there is none', function() {
-                        window.c6.addSponsoredCard(1234, 987, 'ext1', 'click.me', 'count.me', 'e-4321');
-                        expect(window.c6.cardCache).toEqual({ 1234: { 987: {
-                            campaignId: 987, extId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me',
-                            usableFor: { 'e-4321': true }
-                        } } });
-                    });
-
-                    it('should just update the usableFor block for an existing entry', function() {
-                        window.c6.cardCache = { 1234: { 987: {
-                            campaignId: 987, extId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me',
-                            usableFor: { 'e-4321': true }
-                        } } };
-                    
-                        window.c6.addSponsoredCard(1234, 987, 'ext1', 'click.you', 'count.you', 'e-1234');
-                        expect(window.c6.cardCache).toEqual({ 1234: { 987: {
-                            campaignId: 987, extId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me',
-                            usableFor: { 'e-4321': true, 'e-1234': true }
-                        } } });
-                    });
-
-                    it('should not update an existing entry that has already been used', function() {
-                        window.c6.cardCache = { 1234: { 987: {
-                            campaignId: 987, extId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me',
-                            usableFor: { 'e-4321': false }
-                        } } };
-                    
-                        window.c6.addSponsoredCard(1234, 987, 'ext1', 'click.you', 'count.you', 'e-4321');
-                        expect(window.c6.cardCache).toEqual({ 1234: { 987: {
-                            campaignId: 987, extId: 'ext1', clickUrl: 'click.me', countUrl: 'count.me',
-                            usableFor: { 'e-4321': false }
-                        } } });
-                    });
                 });
             });
         });
@@ -435,58 +329,6 @@
                 });
             });
         
-            describe('loadAdtech', function() {
-                beforeEach(function() {
-                    importScripts.and.callFake(function(modules, cb) {
-                        cb(adtech);
-                    });
-                });
-
-                it('should setup necessary config and require in adtech', function(done) {
-                    _private.loadAdtech().then(function(resp) {
-                        expect(resp).toBe(adtech);
-                        expect(importScripts).toHaveBeenCalledWith(['adtech'], jasmine.any(Function));
-                        expect(importScriptsMain.withConfig).toHaveBeenCalledWith({
-                            paths: { adtech: '//aka-cdn.adtechus.com/dt/common/DAC.js' },
-                            shim: { adtech: {
-                                exports: 'ADTECH',
-                                onCreateFrame: jasmine.any(Function)
-                            } }
-                        });
-                    }).catch(function(error) {
-                        expect(error.toString()).not.toBeDefined();
-                    }).done(done);
-                });
-                
-                it('should timeout if require never calls back with anything', function(done) {
-                    importScripts.and.callFake(function(modules, cb) { return adtech; });
-                    
-                    _private.loadAdtech().then(function(resp) {
-                        expect(resp).not.toBeDefined();
-                    }).catch(function(error) {
-                        expect(error).toEqual(new Error('Timed out after 5000ms loading adtech library'));
-                    }).done(done);
-
-                    jasmine.clock().tick(5001);
-                });
-                
-                describe('creates onCreateFrame in require.config that', function(done) {
-                    it('should prepare the window and document', function(done) {
-                        _private.loadAdtech().then(function(resp) {
-                            var newWindow = {
-                                parent: window,
-                                document: { write: jasmine.createSpy('document.write') }
-                            };
-                            importScriptsMain.withConfig.calls.mostRecent().args[0].shim.adtech.onCreateFrame(newWindow);
-                            expect(newWindow.c6).toBe(window.c6);
-                            expect(newWindow.document.write).toHaveBeenCalledWith('<div id="ad"></div>');
-                        }).catch(function(error) {
-                            expect(error.toString()).not.toBeDefined();
-                        }).done(done);
-                    });
-                });
-            });
-            
             describe('getCardConfigs', function() {
                 it('should return a list of sponsored cards', function() {
                     expect(_private.getCardConfigs(experience)).toEqual([
@@ -558,39 +400,27 @@
 
                 beforeEach(function() {
                     pixels = { countUrls: [], clickUrls: [] };
-                    window.c6.cardCache = { 1234: {} };
-                    adtech.loadAd.and.callFake(function(opts) {
-                        window.c6.cardCache[1234].camp1 = {
-                            clickUrl: 'click.me', countUrl: 'count.me',
-                            usableFor: { 'e-1234': true }
-                        };
-                        opts.complete();
-                    });
-                    spyOn(_private, 'decorateCard').and.callThrough();
+                    window.c6.usedSponsoredCards = { 'e-1234': [] };
+                    spyOn(adLib, 'loadAd').and.returnValue(q({
+                        placementId : 1234,
+                        campaignId  : 'camp1',
+                        extId       : 'rc1',
+                        clickUrl    : 'click.me',
+                        countUrl    : 'count.me'
+                    }));
                 });
 
-                it('should call adtech.loadAd', function(done) {
-                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                it('should call adLib.loadAd', function(done) {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234).then(function() {
                         expect(experience.data.deck[0]).toEqual({
                             id: 'rc1',
                             sponsored: true,
                             campaign: { campaignId: 'camp1', clickUrls: ['click.me'], countUrls: ['count.me'] }
                         });
-                        expect(adtech.loadAd).toHaveBeenCalledWith({
-                            placement: 1234,
-                            params: {
-                                target: '_blank',
-                                adid: 'camp1',
-                                bnid: '1',
-                                sub1: 'e-1234'
-                            },
-                            complete: jasmine.any(Function)
-                        });
-                        expect(window.c6.cardCache[1234].camp1.usableFor['e-1234']).toBe(false);
-                        expect(_private.decorateCard).toHaveBeenCalledWith(experience.data.deck[0], experience, pixels, 1234);
+                        expect(adLib.loadAd).toHaveBeenCalledWith(1234, 'camp1', '1');
+                        expect(window.c6.usedSponsoredCards['e-1234']).toEqual(['rc1']);
                         expect(_private.trimCard).not.toHaveBeenCalled();
                         expect(_private.sendError).not.toHaveBeenCalled();
-                        expect(window.__c6_ga__).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -598,7 +428,7 @@
 
                 it('should use the card\'s configured bannerId, if it exists', function(done) {
                     experience.data.deck[0].campaign.bannerId = '2';
-                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234).then(function() {
                         expect(experience.data.deck[0]).toEqual({
                             id: 'rc1',
                             sponsored: true,
@@ -609,26 +439,20 @@
                                 bannerId: '2'
                             }
                         });
-                        expect(adtech.loadAd).toHaveBeenCalledWith({
-                            placement: 1234,
-                            params: {
-                                target: '_blank',
-                                adid: 'camp1',
-                                bnid: '2',
-                                sub1: 'e-1234'
-                            },
-                            complete: jasmine.any(Function)
-                        });
+                        expect(adLib.loadAd).toHaveBeenCalledWith(1234, 'camp1', '2');
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
                 it('should handle WildCard-style cards', function(done) {
-                    window.c6.cardCache[1234]['987'] = {
-                        clickUrl: 'click.me.now', countUrl: 'count.me.now',
-                        usableFor: { 'e-1234': true }
-                    };
+                    adLib.loadAd.and.returnValue(q({
+                        placementId : 1234,
+                        campaignId  : 987,
+                        extId       : 'rc1',
+                        clickUrl    : 'click.me.now',
+                        countUrl    : 'count.me.now'
+                    }));
                     experience.data.deck[0] = {
                         id: 'rc1',
                         sponsored: true,
@@ -636,7 +460,7 @@
                         bannerId: '3',
                         campaign: {}
                     };
-                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234).then(function() {
                         expect(experience.data.deck[0]).toEqual({
                             id: 'rc1',
                             sponsored: true,
@@ -647,159 +471,62 @@
                                 countUrls: ['count.me.now']
                             }
                         });
-                        expect(adtech.loadAd).toHaveBeenCalledWith({
-                            placement: 1234,
-                            params: {
-                                target: '_blank',
-                                adid: '987',
-                                bnid: '3',
-                                sub1: 'e-1234'
-                            },
-                            complete: jasmine.any(Function)
-                        });
-                        expect(window.c6.cardCache[1234]['987'].usableFor['e-1234']).toBe(false);
+                        expect(adLib.loadAd).toHaveBeenCalledWith(1234, '987', '3');
+                        expect(window.c6.usedSponsoredCards['e-1234']).toEqual(['rc1']);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
-                it('should timeout and trim the card if adtech takes too long', function(done) {
-                    adtech.loadAd.and.callFake(function(opts) {
-                        window.c6.cardCache = { 1234: { camp1: {
-                            clickUrl: 'click.me', countUrl: 'count.me'},
-                            usableFor: { 'e-1234': true }
-                        } };
-                        setTimeout(opts.complete, 7000);
+                it('should timeout and trim the card if loadAd takes too long', function(done) {
+                    adLib.loadAd.and.callFake(function() {
+                        var deferred = q.defer();
+                        setTimeout(function() {
+                            deferred.resolve({
+                                placementId : 1234,
+                                campaignId  : 'camp1',
+                                extId       : 'rc1',
+                                clickUrl    : 'click.me',
+                                countUrl    : 'count.me'
+                            });
+                        }, 4000);
+                        return deferred.promise;
                     });
-                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234).then(function() {
                         expect(experience.data.deck).toEqual([
                             { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
                             { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
                         ]);
-                        expect(adtech.loadAd).toHaveBeenCalled();
+                        expect(adLib.loadAd).toHaveBeenCalled();
                         expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
                         expect(_private.sendError).toHaveBeenCalledWith('e-1234', 'makeAdCall - Error: Timed out after 3000 ms');
                         expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                             {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
                              eventLabel: '{"message":"makeAdCall - Error: Timed out after 3000 ms"}'});
-                        expect(_private.decorateCard).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                     
-                    jasmine.clock().tick(6001);
+                    jasmine.clock().tick(2001);
+                    jasmine.clock().tick(2000);
                 });
 
-                it('should trim card if adtech complete function throws an exception',function(done){
-                    var err = new Error('test error');
-                    _private.decorateCard.and.callFake(function(){
-                        throw (err);
-                    });
-                    adtech.loadAd.and.callFake(function(opts) {
-                        window.c6.cardCache = { 1234: { camp1: {
-                            clickUrl: 'click.me', countUrl: 'count.me'},
-                            usableFor: { 'e-1234': true }
-                        } };
-                        opts.complete();
-
-                    });
-                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234, adtech).then(function() {
+                it('should trim the card if loadAd returns an error',function(done){
+                    adLib.loadAd.and.returnValue(q.reject('I GOT A PROBLEM'));
+                    _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234).then(function() {
                         expect(experience.data.deck).toEqual([
                             { id: 'rc2', sponsored: false, campaign: { campaignId: null } },
                             { id: 'rc3', sponsored: true, campaign: { campaignId: 'camp3' } }
                         ]);
-                        expect(adtech.loadAd).toHaveBeenCalled();
+                        expect(adLib.loadAd).toHaveBeenCalled();
                         expect(_private.trimCard).toHaveBeenCalledWith('rc1', experience);
-                        expect(_private.sendError).toHaveBeenCalledWith('e-1234', 'makeAdCall - test error');
+                        expect(_private.sendError).toHaveBeenCalledWith('e-1234', 'makeAdCall - I GOT A PROBLEM');
                         expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
                             {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                             eventLabel: '{"message":"makeAdCall - test error"}'});
-                        expect(_private.decorateCard).toHaveBeenCalled();
+                             eventLabel: '{"message":"makeAdCall - I GOT A PROBLEM"}'});
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
-                });
-            });
-            
-            describe('decorateCard', function() {
-                var pixels;
-                beforeEach(function() {
-                    pixels = { countUrls: ['custom.count'], clickUrls: ['custom.click'] };
-                    window.c6.cardCache = { 1234: { camp1: {
-                        clickUrl: 'click.me', countUrl: 'count.me',
-                        usableFor: { 'e-1234': true }
-                    } } };
-                });
-
-                describe('if the card already has some pixels', function() {
-                    var card;
-
-                    beforeEach(function() {
-                        card = experience.data.deck[0];
-
-                        card.campaign.clickUrls = ['my.click'];
-                        card.campaign.countUrls = ['my.count'];
-
-                        _private.decorateCard(card, experience, pixels, 1234);
-                    });
-
-                    it('should not overwrite the pixels', function() {
-                        expect(card.campaign.clickUrls).toEqual(['my.click', 'custom.click', 'click.me']);
-                        expect(card.campaign.countUrls).toEqual(['my.count', 'custom.count', 'count.me']);
-                    });
-                });
-                
-                it('should decorate a card with properties from the cardCache', function() {
-                    _private.decorateCard(experience.data.deck[0], experience, pixels, 1234);
-                    expect(experience.data.deck[0]).toEqual({
-                        id: 'rc1',
-                        sponsored: true,
-                        campaign: {
-                            campaignId: 'camp1',
-                            clickUrls: ['custom.click', 'click.me'],
-                            countUrls: ['custom.count', 'count.me']
-                        }
-                    });
-                    expect(window.c6.cardCache[1234].camp1.usableFor['e-1234']).toBe(false);
-                });
-
-                it('should handle WildCard-style cards', function() {
-                    window.c6.cardCache[1234]['987'] = {
-                        clickUrl: 'click.me.now', countUrl: 'count.me.now',
-                        usableFor: { 'e-1234': true }
-                    };
-                    experience.data.deck[0] = {
-                        id: 'rc1',
-                        sponsored: true,
-                        adtechId: 987,
-                        bannerId: '3',
-                        campaign: {}
-                    };
-                    _private.decorateCard(experience.data.deck[0], experience, pixels, 1234);
-                    expect(experience.data.deck[0]).toEqual({
-                        id: 'rc1',
-                        sponsored: true,
-                        adtechId: 987,
-                        bannerId: '3',
-                        campaign: {
-                            clickUrls: ['custom.click', 'click.me.now'],
-                            countUrls: ['custom.count', 'count.me.now']
-                        }
-                    });
-                    expect(window.c6.cardCache[1234]['987'].usableFor['e-1234']).toBe(false);
-                });
-                
-                it('should call trimCard if there\'s no entry in the cardCache', function() {
-                    _private.decorateCard(experience.data.deck[2], experience, pixels, 1234);
-                    expect(experience.data.deck).toEqual([
-                        { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
-                        { id: 'rc2', sponsored: false, campaign: { campaignId: null } }
-                    ]);
-                    expect(_private.trimCard).toHaveBeenCalledWith('rc3', experience);
-                    expect(_private.sendError).toHaveBeenCalledWith('e-1234', 'ad call finished but no cardInfo');
-                    expect(window.__c6_ga__).toHaveBeenCalledWith('1234.send', 'event', 
-                        {eventCategory: 'Error', eventAction: 'SponsoredCardRemoved',
-                         eventLabel: '{"message":"ad call finished but no cardInfo"}' });
                 });
             });
             
@@ -823,31 +550,21 @@
             });
             
             describe('loadCardObjects', function() {
-                var placeholders, pixels;
+                var placeholders, pixels, banners;
                 beforeEach(function() {
                     placeholders = _private.getPlaceholders(withWildcards);
                     pixels = { clickUrls: [ 'click.me' ], countUrls: [ 'count.me' ] };
                     
-                    window.c6.cardCache = {
-                        7654: {
-                            123: {
-                                extId: 'rc-sp1', campaignId: 123, clickUrl: 'click.1', countUrl: 'count.1',
-                                usableFor: { 'e-4567': false, 'e-1234': true }
-                            },
-                            234: {
-                                extId: 'rc-sp2', campaignId: 234, clickUrl: 'click.2', countUrl: 'count.2',
-                                usableFor: { 'e-4567': true, 'e-1234': true }
-                            },
-                            345: {
-                                extId: 'rc-sp3', campaignId: 345, clickUrl: 'click.3', countUrl: 'count.3',
-                                usableFor: { 'e-4567': true }
-                            },
-                            456: {
-                                extId: 'rc-sp4', campaignId: 456, clickUrl: 'click.4', countUrl: 'count.4',
-                                usableFor: { 'e-1234': true }
-                            }
-                        }
+                    window.c6.usedSponsoredCards = {
+                        'e-1234': ['rc-sp3'],
+                        'e-4567': ['rc-sp1']
                     };
+                    
+                    banners = [
+                        { extId: 'rc-sp1', campaignId: 123, clickUrl: 'click.1', countUrl: 'count.1' },
+                        { extId: 'rc-sp2', campaignId: 234, clickUrl: 'click.2', countUrl: 'count.2' },
+                        { extId: 'rc-sp3', campaignId: 345, clickUrl: 'click.3', countUrl: 'count.3' }
+                    ];
                     spyOn(_private, 'swapCard').and.callThrough();
 
                     importScripts.and.callFake(function(urls, cb) {
@@ -863,7 +580,7 @@
                             cb({id: id, campaign: { clickUrls: ['click.custom'], countUrls: ['count.custom'] } });
                         });
 
-                        _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).finally(done);
+                        _private.loadCardObjects(withWildcards, placeholders, pixels, banners).finally(done);
                     });
 
                     it('should combine the existing pixels with the campaign ones', function() {
@@ -885,7 +602,7 @@
                 });
 
                 it('should filter banners in the cache and load card objects from c6.require', function(done) {
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).then(function() {
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc-sp2', adtechId: 234, campaign: {
@@ -903,8 +620,32 @@
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc3', type: 'wildcard'}, withWildcards.data.deck[2], withWildcards);
                         expect(_private.sendError).not.toHaveBeenCalled();
-                        expect(window.c6.cardCache[7654][234].usableFor).toEqual({'e-4567': false, 'e-1234': true});
-                        expect(window.c6.cardCache[7654][345].usableFor).toEqual({'e-4567': false});
+                        expect(window.c6.usedSponsoredCards['e-4567']).toEqual(['rc-sp1', 'rc-sp2', 'rc-sp3']);
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
+                it('should not allow a sponsored card to be repeated', function(done) {
+                    banners = [
+                        { extId: 'rc-sp2', campaignId: 234, clickUrl: 'click.2', countUrl: 'count.2' },
+                        { extId: 'rc-sp2', campaignId: 234, clickUrl: 'click.2', countUrl: 'count.2' }
+                    ];
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
+                        expect(withWildcards.data.deck).toEqual([
+                            { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
+                            { id: 'rc-sp2', adtechId: 234, campaign: {
+                                clickUrls: ['click.me', 'click.2'], countUrls: ['count.me', 'count.2']
+                            } },
+                            { id: 'rc3', type: 'wildcard' },
+                            { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
+                        ]);
+                        expect(importScripts.calls.count()).toBe(1);
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js'], jasmine.any(Function));
+                        expect(_private.swapCard.calls.count()).toBe(1);
+                        expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
+                        expect(_private.sendError).not.toHaveBeenCalled();
+                        expect(window.c6.usedSponsoredCards['e-4567']).toEqual(['rc-sp1', 'rc-sp2']);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -913,7 +654,7 @@
                 it('should send errors if the cards cannot be found', function(done) {
                     importScripts.and.callFake(function(urls, cb) { cb(); });
 
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).then(function() {
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc2', type: 'wildcard' },
@@ -925,39 +666,15 @@
                         expect(_private.sendError.calls.count()).toBe(2);
                         expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'card rc-sp2 not found');
                         expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'card rc-sp3 not found');
-                        expect(window.c6.cardCache[7654][234].usableFor).toEqual({'e-4567': true, 'e-1234': true});
-                        expect(window.c6.cardCache[7654][345].usableFor).toEqual({'e-4567': true});
-                    }).catch(function(error) {
-                        expect(error.toString()).not.toBeDefined();
-                    }).done(done);
-                });
-                
-                it('should leave some placeholders intact if there aren\'t enough usable banners', function(done) {
-                    window.c6.cardCache[7654][234].usableFor['e-4567'] = false;
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).then(function() {
-                        expect(withWildcards.data.deck).toEqual([
-                            { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
-                            { id: 'rc-sp3', adtechId: 345, campaign: {
-                                clickUrls: ['click.me', 'click.3'], countUrls: ['count.me', 'count.3']
-                            } },
-                            { id: 'rc3', type: 'wildcard' },
-                            { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
-                        ]);
-                        expect(importScripts.calls.count()).toBe(1);
-                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js'], jasmine.any(Function));
-                        expect(_private.swapCard.calls.count()).toBe(1);
-                        expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
-                        expect(_private.sendError).not.toHaveBeenCalled();
-                        expect(window.c6.cardCache[7654][234].usableFor).toEqual({'e-4567': false, 'e-1234': true});
+                        expect(window.c6.usedSponsoredCards['e-4567']).toEqual(['rc-sp1', 'rc-sp2', 'rc-sp3']);
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
                 it('should do nothing if there are no usable banners', function(done) {
-                    window.c6.cardCache[7654][234].usableFor['e-4567'] = false;
-                    window.c6.cardCache[7654][345].usableFor['e-4567'] = false;
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, 7654).then(function() {
+                    window.c6.usedSponsoredCards['e-4567'] = ['rc-sp1', 'rc-sp2', 'rc-sp3'];
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc2', type: 'wildcard' },
@@ -1020,47 +737,25 @@
                     pixels = { pixels: 'yes' };
                     
                     spyOn(_private, 'loadCardObjects').and.returnValue(q());
-                    adtech.enqueueAd.and.callFake(function(cfg) {
-                        complete = cfg.complete;
-                    });
-                    adtech.showAd.and.callFake(function(placement) {
-                        complete();
-                    });
+                    
+                    spyOn(adLib, 'multiAd').and.returnValue(q(['bann1', 'bann2']));
                 });
                     
                 it('should skip if there are no placeholders', function(done) {
-                    _private.fetchDynamicCards(experience, config, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd).not.toHaveBeenCalled();
-                        expect(adtech.executeQueue).not.toHaveBeenCalled();
+                    _private.fetchDynamicCards(experience, config, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
-                it('should make an ad call for each placeholder', function(done) {
-                    _private.fetchDynamicCards(withWildcards, config, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
-                            expect(args).toEqual([{
-                                placement: 7654,
-                                params: {
-                                    target: '_blank',
-                                    Allowedsizes: '2x2',
-                                    kwlp1: 'cam-1',
-                                    kwlp3: 'foo+bar',
-                                    sub1: 'e-4567'
-                                },
-                                complete: jasmine.any(Function)
-                            }]);
-                        });
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
-                        expect(adtech.executeQueue).toHaveBeenCalledWith({ multiAd: {
-                            disableAdInjection: true
-                        } });
+                it('should call multiAd to get multiple banners', function(done) {
+                    _private.fetchDynamicCards(withWildcards, config, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalledWith(2, 7654, '2x2', { kwlp1: 'cam-1', kwlp3: 'foo+bar' });
                         expect(_private.loadCardObjects).toHaveBeenCalledWith(withWildcards, [
                             {id: 'rc2', type: 'wildcard'},
                             {id: 'rc3', type: 'wildcard'}
-                        ], pixels, 7654);
+                        ], pixels, ['bann1', 'bann2']);
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -1069,48 +764,8 @@
                 
                 it('should handle categories formatted as an array', function(done) {
                     config.categories = ['foo', 'bar', 'baz'];
-                    _private.fetchDynamicCards(withWildcards, config, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
-                            expect(args).toEqual([{
-                                placement: 7654,
-                                params: {
-                                    target: '_blank',
-                                    Allowedsizes: '2x2',
-                                    kwlp1: 'cam-1',
-                                    kwlp3: 'foo+bar+baz',
-                                    sub1: 'e-4567'
-                                },
-                                complete: jasmine.any(Function)
-                            }]);
-                        });
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
-                        expect(_private.loadCardObjects).toHaveBeenCalled();
-                        expect(_private.sendError).not.toHaveBeenCalled();
-                    }).catch(function(error) {
-                        expect(error.toString()).not.toBeDefined();
-                    }).done(done);
-                });
-                
-                it('should only use the first four categories', function(done) {
-                    config.categories = 'one,two,three,four,five,six';
-                    _private.fetchDynamicCards(withWildcards, config, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
-                            expect(args).toEqual([{
-                                placement: 7654,
-                                params: {
-                                    target: '_blank',
-                                    Allowedsizes: '2x2',
-                                    kwlp1: 'cam-1',
-                                    kwlp3: 'one+two+three+four',
-                                    sub1: 'e-4567'
-                                },
-                                complete: jasmine.any(Function)
-                            }]);
-                        });
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
-                        expect(_private.loadCardObjects).toHaveBeenCalled();
+                    _private.fetchDynamicCards(withWildcards, config, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalledWith(2, 7654, '2x2', { kwlp1: 'cam-1', kwlp3: 'foo+bar+baz' });
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -1120,23 +775,8 @@
                 it('should default to categories on the experience', function(done) {
                     config.categories = '';
                     withWildcards.categories = ['blah', 'bloop'];
-                    _private.fetchDynamicCards(withWildcards, config, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
-                            expect(args).toEqual([{
-                                placement: 7654,
-                                params: {
-                                    target: '_blank',
-                                    Allowedsizes: '2x2',
-                                    kwlp1: 'cam-1',
-                                    kwlp3: 'blah+bloop',
-                                    sub1: 'e-4567'
-                                },
-                                complete: jasmine.any(Function)
-                            }]);
-                        });
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
-                        expect(_private.loadCardObjects).toHaveBeenCalled();
+                    _private.fetchDynamicCards(withWildcards, config, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalledWith(2, 7654, '2x2', { kwlp1: 'cam-1', kwlp3: 'blah+bloop' });
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
@@ -1144,40 +784,27 @@
                 });
                 
                 it('should handle the campaign and categories params being undefined', function(done) {
-                    _private.fetchDynamicCards(withWildcards, {}, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        adtech.enqueueAd.calls.allArgs().forEach(function(args) {
-                            expect(args).toEqual([{
-                                placement: 7654,
-                                params: {
-                                    target: '_blank',
-                                    Allowedsizes: '2x2',
-                                    kwlp1: undefined,
-                                    kwlp3: '',
-                                    sub1: 'e-4567'
-                                },
-                                complete: jasmine.any(Function)
-                            }]);
-                        });
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
-                        expect(_private.loadCardObjects).toHaveBeenCalled();
+                    _private.fetchDynamicCards(withWildcards, {}, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalledWith(2, 7654, '2x2', { kwlp1: undefined, kwlp3: '' });
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
                 });
                 
-                it('should timeout if adtech takes too long', function(done) {
-                    adtech.showAd.and.callFake(function(placement) { });
-                    adtech.executeQueue.and.callFake(function(cfg) {
-                        setTimeout(cfg.multiAd.readyCallback, 4000);
+                it('should timeout if multiAd takes too long', function(done) {
+                    adLib.multiAd.and.callFake(function() {
+                        var deferred = q.defer();
+                        setTimeout(function() {
+                            deferred.resolve(['bann1', 'bann2']);
+                        }, 4000);
+                        return deferred.promise;
                     });
                     
-                    _private.fetchDynamicCards(withWildcards, {}, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
+                    _private.fetchDynamicCards(withWildcards, {}, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalled();
                         expect(_private.loadCardObjects).not.toHaveBeenCalled();
-                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards (0) - Error: Timed out after 3000 ms');
+                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards - Error: Timed out after 3000 ms');
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
@@ -1185,14 +812,25 @@
                     jasmine.clock().tick(3001);
                 });
                 
+                it('should send an error if multiAd rejects', function(done) {
+                    adLib.multiAd.and.returnValue(q.reject('I GOT A PROBLEM'));
+
+                    _private.fetchDynamicCards(withWildcards, {}, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalled();
+                        expect(_private.loadCardObjects).not.toHaveBeenCalled();
+                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards - I GOT A PROBLEM');
+                    }).catch(function(error) {
+                        expect(error.toString()).not.toBeDefined();
+                    }).done(done);
+                });
+                
                 it('should send an error if loadCardObjects rejects', function(done) {
                     _private.loadCardObjects.and.returnValue(q.reject('I GOT A PROBLEM'));
 
-                    _private.fetchDynamicCards(withWildcards, {}, pixels, adtech, 3000).then(function() {
-                        expect(adtech.enqueueAd.calls.count()).toBe(2);
-                        expect(adtech.executeQueue.calls.count()).toBe(1);
+                    _private.fetchDynamicCards(withWildcards, {}, pixels, 3000).then(function() {
+                        expect(adLib.multiAd).toHaveBeenCalled();
                         expect(_private.loadCardObjects).toHaveBeenCalled();
-                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards (1) - I GOT A PROBLEM');
+                        expect(_private.sendError).toHaveBeenCalledWith('e-4567', 'fetchDynamicCards - I GOT A PROBLEM');
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();
                     }).done(done);
