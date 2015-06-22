@@ -1,7 +1,9 @@
 # C6Embed Changelog
 
+## v2.34.0 (June 22, 2015)
 * [FEATURE]: Add ability to override player mode via embed
   attribute/parameter/property
+* [PERFORMANCE]: Replace Adtech's DAC.js library with our own that requests banners directly.
 
 ## v2.33.0 (June 3, 2015)
 * [FEATURE]: Allow mobile player mode to be overridden via embed
