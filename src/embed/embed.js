@@ -277,7 +277,9 @@ module.exports = function(win, readyState) {
                     cx: config.context,
                     ct: config.container,
                     bd: experience.data.branding,
-                    al: config.autoLaunch
+                    al: config.autoLaunch,
+                    ex: config.ex,
+                    vr: config.vr
                 }));
 
             window.__c6_ga__('create', c6.gaAcctIdPlayer, {

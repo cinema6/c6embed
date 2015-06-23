@@ -543,6 +543,39 @@ describe('cinema6-jsonp.js', function() {
                 });
             });
 
+            describe('if an experiment and variant are specified', function() {
+                beforeEach(function(done) {
+                    c6.embeds.length = 0;
+                    load(function() {
+                        adtech.config.placements['108542'].complete();
+                        waitForDeps(expIds.map(function(id) {
+                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                        }), done);
+                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&ex=my-experiment&vr=my-variant&cb=' + Date.now(), {
+                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                    });
+                });
+
+                it('should set ex and vr on the config', function() {
+                    expect(c6.embeds.length).toBe(expIds.length);
+                    c6.embeds.forEach(function(embed) {
+                        expect(embed.config.ex).toBe('my-experiment');
+                        expect(embed.config.vr).toBe('my-variant');
+                    });
+                });
+
+                it('should add the experiment and variant to the GA page URL', function() {
+                    expect(c6.embeds.length).toBe(expIds.length);
+                    c6.embeds.forEach(function(embed) {
+                        var embedTracker = embed.experience.id.replace(/^e-/, '');
+
+                        expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', jasmine.objectContaining({
+                            page: '/embed/' + embed.experience.id + '/?cx=jsonp&ct=jsonp&bd=digitaljournal&ex=my-experiment&vr=my-variant'
+                        }));
+                    });
+                });
+            });
+
             describe('after the experiences have been fetched', function() {
                 var exps;
 
@@ -642,7 +675,9 @@ describe('cinema6-jsonp.js', function() {
                             startPixel: undefined,
                             countPixel: undefined,
                             launchPixel: undefined,
-                            preview: undefined
+                            preview: undefined,
+                            ex: undefined,
+                            vr: undefined
                         });
                     });
                 });

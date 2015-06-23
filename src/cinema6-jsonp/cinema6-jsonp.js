@@ -229,7 +229,9 @@ module.exports = function($window, $document) {
             container: params.src,
             hasSponsoredCards: true,
             context: 'jsonp',
-            preview: params.preview
+            preview: params.preview,
+            ex: params.ex,
+            vr: params.vr
         };
     }
 
@@ -271,7 +273,9 @@ module.exports = function($window, $document) {
                         cx:minireel.config.context,
                         ct:minireel.config.container,
                         gp:minireel.config.adId,
-                        bd: pageBranding
+                        bd: pageBranding,
+                        ex:minireel.config.ex,
+                        vr:minireel.config.vr
                     }));
 
                 if (!(/lightbox/).test(experience.data.mode)) {

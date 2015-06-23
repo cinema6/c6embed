@@ -233,6 +233,8 @@ module.exports = function($window, $document) {
                     hasSponsoredCards: true,
                     adId : adId,
                     preview: config.preview,
+                    ex: config.ex,
+                    vr: config.vr
                 };
             }
 
@@ -298,7 +300,9 @@ module.exports = function($window, $document) {
                                 ct:minireel.config.container,
                                 cx:minireel.config.context,
                                 gp:minireel.config.adId,
-                                bd:pageBranding
+                                bd:pageBranding,
+                                ex:minireel.config.ex,
+                                vr:minireel.config.vr
                             }));
 
                         if (!(/lightbox/).test(experience.data.mode)) {
