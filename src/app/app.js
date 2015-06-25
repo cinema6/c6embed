@@ -217,6 +217,7 @@ module.exports = function(deps) {
                 /* jshint camelcase:false */
                 window.__c6_ga__(function(){
                     var tracker = window.__c6_ga__.getByName('c6'), clientId;
+
                     try {
                         clientId = tracker.get('clientId');
                     }catch(e){
@@ -228,7 +229,9 @@ module.exports = function(deps) {
                             clientId:   clientId,
                             container:  settings.config.container,
                             context:    settings.config.context,
-                            group:      settings.config.adId
+                            group:      settings.config.adId,
+                            experiment: settings.config.ex || null,
+                            variant:    settings.config.vr || null
                         });
                     }
                 });

@@ -187,7 +187,7 @@
                         for (p in q){ if(q[p]){qf.push(p + '=' + q[p]);} }
                         if (qf.length){ r += '?' + qf.join('&'); }
                         return r;
-                    }(experience.id,{cx:'standalone',ct:c6.params.src,bd:experience.data.branding}));
+                    }(experience.id,{cx:'standalone',ct:c6.params.src,bd:experience.data.branding,ex:c6.params.ex,vr:c6.params.vr}));
 
                 window.__c6_ga__('create', c6.gaAcctIdEmbed, {
                     'name'       : embedTracker,
@@ -344,7 +344,9 @@
                         startPixel: c6.params.startPixel,
                         countPixel: c6.params.countPixel,
                         launchPixel: c6.params.launchPixel,
-                        preview: c6.params.preview
+                        preview: c6.params.preview,
+                        ex: c6.params.ex,
+                        vr: c6.params.vr
                     }
                 });
 

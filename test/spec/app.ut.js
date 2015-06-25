@@ -1046,7 +1046,34 @@
                         $window.__c6_ga__.calls.argsFor(3)[0]();
                         expect($window.__c6_ga__.getByName).toHaveBeenCalledWith('c6');
                         expect(tracker.get).toHaveBeenCalledWith('clientId');
-                        expect(session.ping).toHaveBeenCalledWith('initAnalytics',{ accountId : 'abc', clientId : 'fake_client_id', container: 'test', context: 'test', group: 'xyz' } );
+                        expect(session.ping).toHaveBeenCalledWith('initAnalytics',{
+                            accountId : 'abc',
+                            clientId : 'fake_client_id',
+                            container: 'test',
+                            context: 'test',
+                            group: 'xyz',
+                            experiment: null,
+                            variant: null
+                        });
+                    });
+
+                    describe('if the MiniReel is part of an experiment', function() {
+                        beforeEach(function() {
+                            settings.config.ex = 'my-crazy-experiment';
+                            settings.config.vr = 'crazy-idea';
+                            session.ping.calls.reset();
+
+                            session.trigger('ready', true);
+                            session.ping.calls.reset();
+                            $window.__c6_ga__.calls.argsFor(3)[0]();
+                        });
+
+                        it('should send experiment and variant information to the player', function() {
+                            expect(session.ping).toHaveBeenCalledWith('initAnalytics', jasmine.objectContaining({
+                                experiment: settings.config.ex,
+                                variant: settings.config.vr
+                            }));
+                        });
                     });
 
                     it('sends no ping if it gets no clientId',function(){

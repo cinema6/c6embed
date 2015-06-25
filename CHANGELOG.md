@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add basic A/B testing support
+
 ## v2.34.1 (June 22, 2015)
 * [FIX]: Properly pass kwlp1 param to Adtech when minireel has no campaign id
 
