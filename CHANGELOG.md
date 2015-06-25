@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.35.0 (June 25, 2015)
 * [FEATURE]: Add basic A/B testing support
 
 ## v2.34.1 (June 22, 2015)
