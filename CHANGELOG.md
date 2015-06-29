@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.35.2 (June 29, 2015)
+* [FIX]: Attempt to log xhr error, if there is statusText to log.
+
 ## v2.35.1 (June 29, 2015)
 * [FIX]: Set `withCredentials` after xhr request is opened
 
