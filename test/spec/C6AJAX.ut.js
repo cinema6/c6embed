@@ -269,7 +269,23 @@
                 });
             });
 
-            describe('if the request fails', function() {
+            describe('if the request fails with statusText', function() {
+                beforeEach(function(done) {
+                    xhr.statusText = 'i am an error';
+                    xhr.onerror();
+                    setTimeout(done, 0);
+                });
+
+                it('should reject the promise', function() {
+                    expect(failure).toHaveBeenCalledWith({
+                        status: null,
+                        data: 'i am an error',//jasmine.any(Error),
+                        headers: jasmine.any(Function)
+                    });
+                });
+            });
+            
+            describe('if the request fails without statusText', function() {
                 beforeEach(function(done) {
                     xhr.onerror();
                     setTimeout(done, 0);
