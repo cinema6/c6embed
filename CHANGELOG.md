@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.35.3 (June 30, 2015)
+* [FIX]: Force cfp=1 to on all the time to try and fix Android Browser xhr issue.
+
 ## v2.35.2 (June 29, 2015)
 * [FIX]: Attempt to log xhr error, if there is statusText to log.
 
