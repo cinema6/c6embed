@@ -26,11 +26,17 @@ module.exports = function(deps) {
         params.target = params.target || '_blank';
         params.misc = params.misc || new Date().valueOf();
         params.cors = 'yes';
-        
-        // can't make cross-origin requests with cookies using XDR, so need this param instead
-        if (!!$window.XDomainRequest) {
-            params.cfp = 1;
-        }
+      
+        //
+        // Setting cfp =1 all the time to try to address potential issue with
+        // Android Browser and CORS.  Note: without cookies, certain adtech features
+        // like frequency capping will be disabled.
+        //
+        //// can't make cross-origin requests with cookies using XDR, so need this param instead
+        //if (!!$window.XDomainRequest) {
+        //    params.cfp = 1;
+        //}
+        params.cfp = 1;
         
         var paramString = Object.keys(params).map(function(key) {
             return key + '=' + params[key];

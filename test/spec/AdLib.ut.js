@@ -34,12 +34,12 @@
             describe('buildUrl', function() {
                 it('should combine params and url parts into a final url', function() {
                     var url = _private.buildUrl('fakeType', 12345, { foo: 'bar', blah: 'bloop' });
-                    expect(url).toMatch(/\/\/adtech\.com\/fakeType\/3\.0\/1111\.1\/12345\/0\/-1\/foo=bar;blah=bloop;target=_blank;misc=\d+;cors=yes$/);
+                    expect(url).toMatch(/\/\/adtech\.com\/fakeType\/3\.0\/1111\.1\/12345\/0\/-1\/foo=bar;blah=bloop;target=_blank;misc=\d+;cors=yes;cfp=1$/);
                 });
                 
                 it('should handle a case where no custom params are provided', function() {
                     var url = _private.buildUrl('addyn', 98765);
-                    expect(url).toMatch(/\/\/adtech\.com\/addyn\/3\.0\/1111\.1\/98765\/0\/-1\/target=_blank;misc=\d+;cors=yes$/);
+                    expect(url).toMatch(/\/\/adtech\.com\/addyn\/3\.0\/1111\.1\/98765\/0\/-1\/target=_blank;misc=\d+;cors=yes;cfp=1$/);
                 });
                 
                 it('should set the cfp param if the browser will use an XDR', function() {
