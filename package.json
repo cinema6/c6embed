@@ -52,6 +52,7 @@
     "load-grunt-config": "git://github.com/firstandthird/load-grunt-config",
     "prompt": "~0.2.12",
     "protractor": "~0.14.0",
+    "proxyquireify": "^2.1.0",
     "q": "^1.1.0",
     "requirejs": "^2.1.11",
     "underscore": "~1.5.2"

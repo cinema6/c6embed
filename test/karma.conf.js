@@ -75,7 +75,8 @@ module.exports = function(config) {
         singleRun: true,
 
         browserify: {
-            debug: true
+            debug: true,
+            plugin: ['proxyquireify/plugin']
         }
     });
 };
