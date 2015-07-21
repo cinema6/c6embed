@@ -44,5 +44,19 @@ module.exports = {
                 dest: '<%= settings.appDir %>/c6embed.js'
             }
         ]
+    },
+    'mraid-server': {
+        options: {
+            debug: true,
+            browserifyOptions: {
+                standalone: 'c6mraid'
+            }
+        },
+        files: [
+            {
+                src: 'src/c6mraid/c6mraid.js',
+                dest: 'app/c6mraid.js'
+            }
+        ]
     }
 };
