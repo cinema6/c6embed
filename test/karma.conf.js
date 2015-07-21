@@ -76,6 +76,7 @@ module.exports = function(config) {
 
         browserify: {
             debug: true,
+            transform: ['browserify-shim'],
             plugin: ['proxyquireify/plugin']
         }
     });
