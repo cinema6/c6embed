@@ -28,12 +28,13 @@ module.exports = function(deps) {
             this.prop('c6Loaded', function(win) {
                 deferred.resolve(cb(win));
             });
-            this.attr('data-srcdoc', document.toString());
-            /* jshint scripturl:true */
-            // NOTE: It is very important that the "prop()" method and not the "attr()" method is
-            // used here. Using "attr()" will cause this to fail in IE.
-            this.prop('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
-            /* jshint scripturl:false */
+
+            // It is important that document.write() is used to inject the document into the
+            // iframe. A regression in Chrome 44 prevents
+            // [this other technique](https://github.com/jugglinmike/srcdoc-polyfill/blob/v0.1.1/srcdoc-polyfill.js#L33)
+            // from working.
+            this.prop('contentWindow').document.write(document.toString());
+            this.prop('contentWindow').document.close();
 
             return deferred.promise;
         };

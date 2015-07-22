@@ -93,6 +93,11 @@
             beforeEach(function() {
                 $result = frameFactory();
                 $iframe = $result;
+                $('body').append($iframe);
+            });
+
+            afterEach(function() {
+                $iframe.remove();
             });
 
             describe('load(html, cb)', function() {
@@ -103,6 +108,8 @@
                     success = jasmine.createSpy('success');
                     cb = jasmine.createSpy('callback()').and.returnValue(true);
                     spyOn($result, 'prop').and.callThrough();
+                    spyOn($result[0].contentWindow.document, 'write').and.callThrough();
+                    spyOn($result[0].contentWindow.document, 'close').and.callThrough();
 
                     $result.load(mockHtml, cb).then(success);
                 });
@@ -157,15 +164,9 @@
                     });
                 });
 
-                it('should put the HTML on the iframe as an attribute', function() {
-                    expect($iframe.attr('data-srcdoc')).toBe(parsedDoc.toString());
-                });
-
-                it('should set the src to a jsurl that will load the document', function() {
-                    /* jshint scripturl:true */
-                    expect($result.prop).toHaveBeenCalledWith('src', 'javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
-                    expect($iframe.attr('src')).toBe('javascript: window.frameElement.getAttribute(\'data-srcdoc\')');
-                    /* jshint scripturl:false */
+                it('should write the document into the iframe', function() {
+                    expect($result[0].contentWindow.document.write).toHaveBeenCalledWith(parsedDoc.toString());
+                    expect($result[0].contentWindow.document.close).toHaveBeenCalled();
                 });
             });
 
