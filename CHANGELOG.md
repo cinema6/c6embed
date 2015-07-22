@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.35.4 (July 22, 2015)
+* [FIX]: Fix for an issue that caused the player not to render in Chrome
+  44
+
 ## v2.35.3 (June 30, 2015)
 * [FIX]: Force cfp=1 to on all the time to try and fix Android Browser xhr issue.
 
