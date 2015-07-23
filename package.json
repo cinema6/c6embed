@@ -10,7 +10,7 @@
     "q": "~1.0.0"
   },
   "browser": {
-    "Modernizr": "./ext/modernizr.custom.71747.js"
+    "Modernizr": "./ext/modernizr.custom.01697.js"
   },
   "browserify-shim": {
     "Modernizr": "Modernizr"
