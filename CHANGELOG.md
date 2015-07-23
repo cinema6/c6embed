@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.35.5 (July 23, 2015)
+* [FIX]: Fix for an issue that caused IE 10 E2E tests to fail on Sauce Labs
+
 ## v2.35.4 (July 22, 2015)
 * [FIX]: Fix for an issue that caused the player not to render in Chrome
   44
