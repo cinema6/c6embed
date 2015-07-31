@@ -2,6 +2,7 @@ module.exports = {
     options: {
         transform: ['browserify-shim']
     },
+
     dist: {
         files: [
             {
@@ -22,6 +23,20 @@ module.exports = {
             }
         ]
     },
+    'mraid-dist': {
+        options: {
+            browserifyOptions: {
+                standalone: 'c6mraid'
+            }
+        },
+        files: [
+            {
+                src: 'src/c6mraid/c6mraid.js',
+                dest: '.tmp/build/<%= settings.distDir %>/c6mraid.js'
+            }
+        ]
+    },
+
     server: {
         options: {
             debug: true
