@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add script for embedding the MiniReel as an MRAID unit
+
 ## v2.35.5 (July 23, 2015)
 * [FIX]: Fix for an issue that caused IE 10 E2E tests to fail on Sauce Labs
 
