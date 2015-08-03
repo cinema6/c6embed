@@ -75,7 +75,9 @@ module.exports = function(config) {
         singleRun: true,
 
         browserify: {
-            debug: true
+            debug: true,
+            transform: ['browserify-shim'],
+            plugin: ['proxyquireify/plugin']
         }
     });
 };

@@ -19,6 +19,10 @@
                 {
                     src: ['.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'],
                     dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.min.js'
+                },
+                {
+                    src: ['.tmp/build/<%= settings.distDir %>/c6mraid.js'],
+                    dest: '.tmp/build/<%= settings.distDir %>/c6mraid.min.js'
                 }
             ]
         }

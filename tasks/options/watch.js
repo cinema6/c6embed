@@ -59,6 +59,17 @@
             },
             tasks: ['browserify:server','copy:jsonp']
         },
+        mraid: {
+            files: [
+                '<%= settings.appDir %>/mraid.html',
+                'src/**/*.js',
+                'lib/**/*.js'
+            ],
+            options: {
+                livereload: true
+            },
+            tasks: ['browserify:mraid-server','copy:mraid']
+        },
         e2e: {
             files: [
                 '<%= settings.appDir %>/*.html',

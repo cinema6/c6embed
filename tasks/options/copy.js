@@ -51,6 +51,14 @@ module.exports = {
             }
         ]
     },
+    mraid: {
+        files: [
+            {
+                src: 'app/mraid.html',
+                dest: 'app/index.html'
+            }
+        ]
+    },
     tmp: {
         files: [
             {

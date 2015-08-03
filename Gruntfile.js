@@ -47,6 +47,7 @@ module.exports = function(grunt) {
 
         grunt.task.run('connect:server');
         grunt.task.run('browserify:server');
+        grunt.task.run('browserify:mraid-server');
         grunt.task.run('copy:' + target);
         grunt.task.run('open');
         grunt.task.run('watch:' + target);
@@ -108,6 +109,7 @@ module.exports = function(grunt) {
         'test:unit',
         'copy:tmp',
         'browserify:dist',
+        'browserify:mraid-dist',
         'uglify:dist',
         'usebanner:dist',
         'htmlmin:dist',
