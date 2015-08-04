@@ -19,7 +19,7 @@ module.exports = {
             },
             {
                 src: ['src/app/main.js'],
-                dest: '.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.js'
+                dest: '.tmp/build/<%= settings.distDir %>/app.js'
             }
         ]
     },
