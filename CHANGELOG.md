@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.36.0 (August 4, 2015)
 * [FEATURE]: Add script for embedding the MiniReel as an MRAID unit
 * Upload un-versioned app.js
 
