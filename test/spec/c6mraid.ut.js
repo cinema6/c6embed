@@ -120,7 +120,8 @@ describe('[c6mraid(config)]', function() {
 
     it('should create a new MRAID instance', function() {
         expect(MRAID).toHaveBeenCalledWith({
-            forceOrientation: 'portrait'
+            forceOrientation: 'portrait',
+            useCustomClose: true
         });
     });
 
@@ -276,7 +277,8 @@ describe('[c6mraid(config)]', function() {
                 load: true,
                 preload: true,
 
-                standalone: true,
+                standalone: false,
+                interstitial: true,
                 playerVersion: 3,
                 mobileMode: 'swipe',
                 mode: 'full-np',

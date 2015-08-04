@@ -39,6 +39,8 @@ describe('MRAID()', function() {
             }),
             setOrientationProperties: jasmine.createSpy('mraid.setOrientationProperties()'),
 
+            useCustomClose: jasmine.createSpy('mraid.useCustomClose()'),
+
             open: jasmine.createSpy('mraid.open()'),
             expand: jasmine.createSpy('mraid.expand()'),
             close: jasmine.createSpy('mraid.close()')
@@ -177,6 +179,7 @@ describe('MRAID()', function() {
                     allowOrientationChange: false,
                     forceOrientation: 'portrait'
                 });
+                expect(window.mraid.useCustomClose).toHaveBeenCalledWith(true);
             });
         });
     });
@@ -204,6 +207,7 @@ describe('MRAID()', function() {
                 allowOrientationChange: window.mraid.getOrientationProperties().allowOrientationChange,
                 forceOrientation: 'landscape'
             });
+            expect(window.mraid.useCustomClose).toHaveBeenCalledWith(false);
         });
     });
 
@@ -218,6 +222,7 @@ describe('MRAID()', function() {
         it('should call setExpandProperties() and setOrientationProperties() with the current values', function() {
             expect(window.mraid.setExpandProperties).toHaveBeenCalledWith(window.mraid.getExpandProperties());
             expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith(window.mraid.getOrientationProperties());
+            expect(window.mraid.useCustomClose).toHaveBeenCalledWith(false);
         });
     });
 

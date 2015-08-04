@@ -391,6 +391,7 @@
                 settings = {
                     embed: $('<div style="padding: 10px; margin-top: 10px;"><div></div></div>')[0],
                     standalone: true,
+                    interstitial: true,
                     load: true,
                     experience: experience,
                     mobileMode: undefined,
@@ -993,7 +994,8 @@
                     expect(player.bootstrap).toHaveBeenCalledWith({
                         experience: experience,
                         profile: browserInfo.profile,
-                        standalone: settings.standalone
+                        standalone: settings.standalone,
+                        interstitial: settings.interstitial
                     });
                 });
 

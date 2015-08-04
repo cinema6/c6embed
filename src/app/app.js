@@ -202,7 +202,8 @@ module.exports = function(deps) {
                 player.bootstrap({
                     experience: experience,
                     profile: settings.profile || browserInfo.profile,
-                    standalone: standalone
+                    standalone: standalone,
+                    interstitial: settings.interstitial
                 });
 
                 return player.getReadySession();

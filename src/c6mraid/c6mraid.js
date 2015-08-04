@@ -180,7 +180,7 @@ module.exports = function c6mraid(config) {
     var START_TIME = Date.now();
     var apiRoot = config.apiRoot || 'http://portal.cinema6.com';
     var loadExperience = getLoader(apiRoot);
-    var mraid = new MRAID({ forceOrientation: 'portrait' });
+    var mraid = new MRAID({ forceOrientation: 'portrait', useCustomClose: true });
     var ga = null;
 
     return q.all([
@@ -229,7 +229,8 @@ module.exports = function c6mraid(config) {
                 load: true,
                 preload: true,
 
-                standalone: true,
+                standalone: false,
+                interstitial: true,
                 playerVersion: config.playerVersion || 1,
                 mobileMode: config.mobileMode,
                 mode: config.mode,
