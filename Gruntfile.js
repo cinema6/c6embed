@@ -110,6 +110,7 @@ module.exports = function(grunt) {
         'copy:tmp',
         'browserify:dist',
         'browserify:mraid-dist',
+        'copy:versionate',
         'uglify:dist',
         'usebanner:dist',
         'htmlmin:dist',
