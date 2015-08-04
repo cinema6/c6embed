@@ -192,7 +192,8 @@ module.exports = function c6mraid(config) {
             placementId: config.adPlacementId,
             campaign: config.campaign,
             container: config.src,
-            wildCardPlacement: config.wp
+            wildCardPlacement: config.wp,
+            preview: config.preview
         }).then(function(experience) {
             var gaId = window.c6.gaAcctIdEmbed;
 
