@@ -39,6 +39,16 @@ function omit(object, keys) {
 function getLoader(apiRoot) {
     'use strict';
 
+    window.c6 = {
+        embeds: [],
+        gaAcctIdPlayer: (function(acc,mi,mx){
+            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
+        }('UA-44457821',31,35)),
+        gaAcctIdEmbed: (function(acc,mi,mx){
+            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
+        }('UA-44457821',6,30))
+    };
+
     window.__C6_URL_ROOT__ = apiRoot;
 
     /* Create C6Query */
@@ -127,16 +137,6 @@ function getLoader(apiRoot) {
 
     /* Create and Configure Observable */
     var Observable = new ObservableProvider();
-
-    window.c6 = {
-        embeds: [],
-        gaAcctIdPlayer: (function(acc,mi,mx){
-            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
-        }('UA-44457821',31,35)),
-        gaAcctIdEmbed: (function(acc,mi,mx){
-            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
-        }('UA-44457821',6,30))
-    };
 
     /* Run the Application! */
     app({
