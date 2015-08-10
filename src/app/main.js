@@ -3,6 +3,12 @@
 
     var app = require('./app.js');
 
+    /* Create Location */
+    var Location = require('./utils/Location.js'),
+        $location = new Location({
+            window: window
+        });
+
     /* Create C6Query */
     var C6Query = require('../../lib/C6Query.js'),
         c6Query = new C6Query({
@@ -15,7 +21,7 @@
         config = new Config({
             window: window,
             document: window.document,
-            $: c6Query
+            location: $location
         });
 
     /* Fetch Q */
@@ -41,12 +47,6 @@
         postmessage = new PostMessage({
             asEvented: asEvented,
             q: q,
-            window: window
-        });
-
-    /* Create Location */
-    var Location = require('./utils/Location.js'),
-        $location = new Location({
             window: window
         });
 
@@ -79,7 +79,7 @@
     var AdLib = require('./AdLib.js'),
         adLib = new AdLib({
             c6Ajax: c6Ajax,
-            window: window,
+            location: $location,
             q: q
         });
 

@@ -7,11 +7,15 @@
             adLib,
             c6Ajax,
             window,
+            Location,
             _private;
+
+        var $location;
 
         beforeEach(function() {
             AdLib = require('../../src/app/AdLib');
             q = require('../../node_modules/q/q.js');
+            Location = require('../../src/app/utils/Location');
             
             window = {
                 c6: {},
@@ -20,11 +24,13 @@
                 }
             };
 
+            $location = new Location({ window: window });
+
             c6Ajax = {
                 get: jasmine.createSpy('c6Ajax.get()')
             };
 
-            adLib = new AdLib({ q: q, window: window, c6Ajax: c6Ajax });
+            adLib = new AdLib({ q: q, location: $location, c6Ajax: c6Ajax });
             _private = adLib._private;
             _private.config.network = '1111.1';
             _private.config.server = 'adtech.com';

@@ -2,10 +2,11 @@ module.exports = function(deps) {
     'use strict';
 
     var $window = deps.window;
+    var $location = deps.location;
 
     this.debug          = !!$window.__C6_DEBUG__;
     this.urlRoot        = ($window.__C6_URL_ROOT__ ||
-        ($window.location.protocol + '//portal.cinema6.com'));
+        ($location.protocol + '//portal.cinema6.com'));
     this.appBase        = (this.urlRoot + '/apps');
     this.apiBase        = (this.urlRoot + '/api');
 };

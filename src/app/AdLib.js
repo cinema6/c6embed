@@ -3,7 +3,7 @@ module.exports = function(deps) {
 
     var c6Ajax = deps.c6Ajax;
     var q = deps.q;
-    var $window = deps.window;
+    var $location = deps.location;
     var _private = { config: {
         server  : 'adserver.adtechus.com',
         network : '5473.1'
@@ -42,7 +42,7 @@ module.exports = function(deps) {
             return key + '=' + params[key];
         }).join(';');
         
-        return $window.location.protocol + '//' + parts.join('/') + '/' + paramString;
+        return $location.protocol + '//' + parts.join('/') + '/' + paramString;
     };
     
     // Parse the text of a script banner and return an object represenation. Sponsored cards only for now.

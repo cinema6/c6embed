@@ -51,6 +51,11 @@ function getLoader(apiRoot) {
 
     window.__C6_URL_ROOT__ = apiRoot;
 
+    /* Create Location */
+    var $location = new Location({
+        window: window
+    });
+
     /* Create C6Query */
     var c6Query = new C6Query({
         document: document,
@@ -61,7 +66,7 @@ function getLoader(apiRoot) {
     var config = new Config({
         window: window,
         document: window.document,
-        $: c6Query
+        location: $location
     });
 
     /* Create UserAgent */
@@ -73,11 +78,6 @@ function getLoader(apiRoot) {
     var postmessage = new PostMessage({
         asEvented: asEvented,
         q: q,
-        window: window
-    });
-
-    /* Create Location */
-    var $location = new Location({
         window: window
     });
 
@@ -106,7 +106,7 @@ function getLoader(apiRoot) {
     /* Create AdLib */
     var adLib = new AdLib({
         c6Ajax: c6Ajax,
-        window: window,
+        location: $location,
         q: q
     });
 

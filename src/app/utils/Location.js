@@ -27,6 +27,13 @@ module.exports = function(deps) {
             get: function() {
                 return this.originOf($window.location.href);
             }
+        },
+
+        protocol: {
+            get: function() {
+                return (/https?:/).test($window.location.protocol) ?
+                    $window.location.protocol : 'http:';
+            }
         }
     });
 };
