@@ -39,7 +39,22 @@ function omit(object, keys) {
 function getLoader(apiRoot) {
     'use strict';
 
+    window.c6 = {
+        embeds: [],
+        gaAcctIdPlayer: (function(acc,mi,mx){
+            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
+        }('UA-44457821',31,35)),
+        gaAcctIdEmbed: (function(acc,mi,mx){
+            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
+        }('UA-44457821',6,30))
+    };
+
     window.__C6_URL_ROOT__ = apiRoot;
+
+    /* Create Location */
+    var $location = new Location({
+        window: window
+    });
 
     /* Create C6Query */
     var c6Query = new C6Query({
@@ -51,7 +66,7 @@ function getLoader(apiRoot) {
     var config = new Config({
         window: window,
         document: window.document,
-        $: c6Query
+        location: $location
     });
 
     /* Create UserAgent */
@@ -63,11 +78,6 @@ function getLoader(apiRoot) {
     var postmessage = new PostMessage({
         asEvented: asEvented,
         q: q,
-        window: window
-    });
-
-    /* Create Location */
-    var $location = new Location({
         window: window
     });
 
@@ -96,7 +106,7 @@ function getLoader(apiRoot) {
     /* Create AdLib */
     var adLib = new AdLib({
         c6Ajax: c6Ajax,
-        window: window,
+        location: $location,
         q: q
     });
 
@@ -127,16 +137,6 @@ function getLoader(apiRoot) {
 
     /* Create and Configure Observable */
     var Observable = new ObservableProvider();
-
-    window.c6 = {
-        embeds: [],
-        gaAcctIdPlayer: (function(acc,mi,mx){
-            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
-        }('UA-44457821',31,35)),
-        gaAcctIdEmbed: (function(acc,mi,mx){
-            return acc+'-'+parseInt(((Math.random()*999999999)%(mx-mi+1))+mi,10);
-        }('UA-44457821',6,30))
-    };
 
     /* Run the Application! */
     app({
@@ -193,7 +193,8 @@ module.exports = function c6mraid(config) {
             campaign: config.campaign,
             container: config.src,
             wildCardPlacement: config.wp,
-            preview: config.preview
+            preview: config.preview,
+            pageUrl: config.pageUrl || 'cinema6.com'
         }).then(function(experience) {
             var gaId = window.c6.gaAcctIdEmbed;
 

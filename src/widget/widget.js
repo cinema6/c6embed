@@ -247,7 +247,8 @@ module.exports = function($window, $document) {
                     container: config.container,
                     branding: config.branding,
                     placementId: config.adPlacementId,
-                    wildCardPlacement: config.wp
+                    wildCardPlacement: config.wp,
+                    pageUrl: config.pageUrl
                 }),
                 requireStart = (new Date()).getTime();
 

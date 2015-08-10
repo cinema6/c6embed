@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v2.37.0 (August 10, 2015)
+* [FIX]: Fix for an issue that caused sponsored cards not to load via
+  MRAID
+* [FEATURE]: Add ability to override site/container lookup via pageUrl
+  property/parameter/attribute
+
 ## v2.36.0 (August 4, 2015)
 * [FEATURE]: Add script for embedding the MiniReel as an MRAID unit
 * Upload un-versioned app.js

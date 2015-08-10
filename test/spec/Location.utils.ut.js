@@ -10,7 +10,8 @@
         beforeEach(function() {
             $window = {
                 location: {
-                    href: 'http://www.cinema6.com'
+                    href: 'http://www.cinema6.com',
+                    protocol: 'http:'
                 }
             };
 
@@ -36,6 +37,32 @@
 
                         $window.location.href = 'https://my.apple.com:4444/icloud?name=josh';
                         expect($location.origin).toBe('https://my.apple.com:4444');
+                    });
+                });
+
+                describe('protocol', function() {
+                    ['http:', 'https:'].forEach(function(protocol) {
+                        describe('if the location.protocol is ' + protocol, function() {
+                            beforeEach(function() {
+                                $window.location.protocol = protocol;
+                            });
+
+                            it('should be the protocol', function() {
+                                expect($location.protocol).toBe(protocol);
+                            });
+                        });
+                    });
+
+                    ['applewebdata:'].forEach(function(protocol) {
+                        describe('if the location.protocol is ' + protocol, function() {
+                            beforeEach(function() {
+                                $window.location.protocol = protocol;
+                            });
+
+                            it('should be "http:"', function() {
+                                expect($location.protocol).toBe('http:');
+                            });
+                        });
                     });
                 });
             });

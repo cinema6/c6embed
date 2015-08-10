@@ -612,6 +612,38 @@
                                     });
                                 });
 
+                                describe('if a pageUrl is specified', function() {
+                                    beforeEach(function(done) {
+                                        $('div.c6_widget').remove();
+
+                                        c6.createWidget({
+                                            template: 'collateral/mr2/templates/test',
+                                            id: '3330710',
+                                            pageUrl: 'apple.com'
+                                        });
+
+                                        minireelIds.forEach(function(id) {
+                                            c6.addReel(id, '3330710', 'http://www.cinema6.com/track/' + id + '.jpg');
+                                        });
+
+                                        adtech.config.placements['3330710'].complete();
+
+                                        waitForDeps(minireelIds.map(function(id) {
+                                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=mr2&pageUrl=apple.com';
+                                        }), function(_minireels) {
+                                            minireels = _minireels;
+
+                                            done();
+                                        });
+                                    });
+
+                                    it('should load MiniReels with a pageUrl', function() {
+                                        minireels.forEach(function(experience) {
+                                            expect(experience.data).toEqual(jasmine.any(Object));
+                                        });
+                                    });
+                                });
+
                                 describe('if startPixels are specified', function() {
                                     beforeEach(function(done) {
                                         $('div.c6_widget').remove();

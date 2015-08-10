@@ -244,6 +244,7 @@ module.exports = function(win, readyState) {
     }({
         container: config.container,
         campaign: config.campaign,
+        pageUrl: config.pageUrl,
         preview: config.preview,
         branding: config.branding,
         placementId: config.adPlacementId,
