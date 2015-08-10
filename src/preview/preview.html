@@ -69,7 +69,8 @@
                 window.src = base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
                     container: params.container || 'embed',
                     campaign: params.campaign,
-                    preview: 'true'
+                    preview: 'true',
+                    pageUrl: params.pageUrl
                 });
                 writeScript(src);
             }());

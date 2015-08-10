@@ -193,7 +193,8 @@ module.exports = function c6mraid(config) {
             campaign: config.campaign,
             container: config.src,
             wildCardPlacement: config.wp,
-            preview: config.preview
+            preview: config.preview,
+            pageUrl: config.pageUrl || 'cinema6.com'
         }).then(function(experience) {
             var gaId = window.c6.gaAcctIdEmbed;
 
