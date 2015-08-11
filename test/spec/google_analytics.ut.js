@@ -14,7 +14,7 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
         scripts = [];
         analytics = [];
 
-        $location = new Location({ window: window });
+        $location = new Location({ window: window, document: document });
 
         googleAnalytics = jasmine.createSpy('googleAnalytics()').and.callFake(__googleAnalytics__);
 

@@ -2,24 +2,34 @@ module.exports = function(deps) {
     'use strict';
 
     var $window = deps.window;
+    var $document = deps.document;
+
+    var parseUrl = (function() {
+        var parser = $document.createElement('a');
+        var needsDoubleSet = (function() {
+            parser.setAttribute('href', '/foo');
+            return !parser.protocol;
+        }());
+
+        return function parseUrl(url) {
+            parser.setAttribute('href', url);
+            if (needsDoubleSet) { parser.setAttribute('href', parser.href); }
+
+            return parser;
+        };
+    }());
 
     this.originOf = function(url) {
-        var isAbs = url.search(/^\w+:\/\//) > -1;
+        function getOriginOf(url) {
+            var parsed = parseUrl(url);
+            var protocol = parsed.protocol;
+            var hostname = parsed.hostname;
+            var port = parseInt(parsed.port, 10) || (protocol === 'https:' ? 443 : 80);
 
-        function getOriginOfAbsUrl(url) {
-            var protocol = url.match(/^\w+:/)[0].slice(0, -1),
-                portMatcher = url.match(/:\d+/),
-                port = portMatcher && portMatcher[0].slice(1),
-                host = url.match(/\/\/(\w|\d+|\.)+/)[0].slice(2);
-
-            if (!port) {
-                port = (protocol === 'https') ? '443' : '80';
-            }
-
-            return protocol + '://' + host + ':' + port;
+            return (hostname || null) && (protocol + '//' + hostname + ':' + port);
         }
 
-        return getOriginOfAbsUrl(isAbs ? url : $window.location.href);
+        return getOriginOf(url);
     };
 
     Object.defineProperties(this, {

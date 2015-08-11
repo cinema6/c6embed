@@ -16,7 +16,7 @@
             };
 
             Location = require('../../src/app/utils/Location');
-            $location = new Location({ window: $window });
+            $location = new Location({ window: $window, document: document });
         });
 
         it('should exist', function() {
@@ -83,17 +83,64 @@
                     });
 
                     it('should return the origin of the current page if a relative url is provided', function() {
-                        expect($location.originOf('foo.html')).toBe('http://www.cinema6.com:80');
+                        var protocol = window.location.protocol;
+                        var hostname = window.location.hostname;
+                        var port = parseInt(window.location.port, 10) || (protocol === 'https:' ? 443 : 80);
+                        var origin = protocol + '//' + hostname + ':' + port;
 
-                        expect($location.originOf('/test/foo.html')).toBe('http://www.cinema6.com:80');
-
-                        expect($location.originOf('/test/foo.html?test')).toBe('http://www.cinema6.com:80');
+                        expect($location.originOf('foo.html')).toBe(origin);
+                        expect($location.originOf('/test/foo.html')).toBe(origin);
+                        expect($location.originOf('/test/foo.html?test')).toBe(origin);
                     });
 
                     it('should handle localhost and IP urls', function() {
                         expect($location.originOf('http://localhost:9000')).toBe('http://localhost:9000');
 
                         expect($location.originOf('http://10.61.32.32:3000')).toBe('http://10.61.32.32:3000');
+                    });
+
+                    it('should handle about:blank', function() {
+                        expect($location.originOf('about:blank')).toBeNull();
+                    });
+                });
+
+                describe('in internet explorer', function() {
+                    var a;
+
+                    beforeEach(function() {
+                        var createElement = document.createElement;
+                        spyOn(document, 'createElement').and.callFake(function(tag) {
+                            if (tag === 'a') {
+                                var real = createElement.apply(document, arguments);
+
+                                return (a = {
+                                    setAttribute: jasmine.createSpy('a.setAttribute()').and.callFake(function(name, value) {
+                                        real.setAttribute(name, value);
+
+                                        this.href = real.href;
+
+                                        if (value === real.href) {
+                                            this.protocol = real.protocol;
+                                            this.hostname = real.hostname;
+                                            this.port = real.port;
+                                        }
+                                    })
+                                });
+                            }
+
+                            return createElement.apply(document, arguments);
+                        });
+
+                        $location = new Location({ window: $window, document: document });
+                    });
+
+                    it('should work for realative URLs', function() {
+                        var protocol = window.location.protocol;
+                        var hostname = window.location.hostname;
+                        var port = parseInt(window.location.port, 10) || (protocol === 'https:' ? 443 : 80);
+                        var origin = protocol + '//' + hostname + ':' + port;
+
+                        expect($location.originOf('/foo')).toBe(origin);
                     });
                 });
             });

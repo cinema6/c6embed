@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.37.1 (August 11, 2015)
+* [FIX]: Fix for an issue that caused the player not to load in the [IAB
+  MRAID Tester](http://webtester.mraid.org/)
+
 ## v2.37.0 (August 10, 2015)
 * [FIX]: Fix for an issue that caused sponsored cards not to load via
   MRAID
