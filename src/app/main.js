@@ -6,7 +6,8 @@
     /* Create Location */
     var Location = require('./utils/Location.js'),
         $location = new Location({
-            window: window
+            window: window,
+            document: document
         });
 
     /* Create C6Query */

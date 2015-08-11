@@ -53,7 +53,8 @@ function getLoader(apiRoot) {
 
     /* Create Location */
     var $location = new Location({
-        window: window
+        window: window,
+        document: document
     });
 
     /* Create C6Query */

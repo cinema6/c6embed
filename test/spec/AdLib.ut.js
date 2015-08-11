@@ -24,7 +24,7 @@
                 }
             };
 
-            $location = new Location({ window: window });
+            $location = new Location({ window: window, document: document });
 
             c6Ajax = {
                 get: jasmine.createSpy('c6Ajax.get()')

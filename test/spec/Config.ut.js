@@ -15,7 +15,7 @@
             Location = require('../../src/app/utils/Location');
 
             $window = { location : { protocol: 'http:' } };
-            $location = new Location({ window: $window });
+            $location = new Location({ window: $window, document: document });
 
             config = new Config({ window: $window, location: $location });
         });
