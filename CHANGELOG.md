@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.37.2 (August 20, 2015)
 * [FIX]: Make Player Google Analytics events work in MRAID
 
 ## v2.37.1 (August 11, 2015)
