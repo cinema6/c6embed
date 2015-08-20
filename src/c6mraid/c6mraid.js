@@ -198,6 +198,12 @@ module.exports = function c6mraid(config) {
             pageUrl: config.pageUrl || 'cinema6.com'
         }).then(function(experience) {
             var gaId = window.c6.gaAcctIdEmbed;
+            var playerGaID = window.c6.gaAcctIdPlayer;
+
+            googleAnalytics('__c6_ga__', 'c6', playerGaID, {
+                storage: 'none',
+                cookieDomain: 'none'
+            });
 
             ga = googleAnalytics('__c6_ga__', experience.id.replace(/^e-/, ''), gaId, {
                 storage: 'none',
