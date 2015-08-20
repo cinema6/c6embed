@@ -235,6 +235,13 @@ describe('[c6mraid(config)]', function() {
             q().then(function() {}).then(done);
         });
 
+        it('should create a GA tracker for the player', function() {
+            expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'c6', window.c6.gaAcctIdPlayer, {
+                storage: 'none',
+                cookieDomain: 'none'
+            });
+        });
+
         it('should create a GA tracker for the embed', function() {
             expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', experience.id.replace(/^e-/, ''), window.c6.gaAcctIdEmbed, {
                 storage: 'none',
