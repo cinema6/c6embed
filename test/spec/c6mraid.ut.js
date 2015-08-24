@@ -109,7 +109,8 @@ describe('[c6mraid(config)]', function() {
             campaign: 'cam-9c9692e33a8e98',
             wp: '12345678',
             apiRoot: 'https://staging.cinema6.com',
-            pageUrl: 'staging.cinema6.com'
+            pageUrl: 'staging.cinema6.com',
+            forceOrientation: 'none'
         }).then(success, failure);
     });
 
@@ -121,7 +122,7 @@ describe('[c6mraid(config)]', function() {
 
     it('should create a new MRAID instance', function() {
         expect(MRAID).toHaveBeenCalledWith({
-            forceOrientation: 'portrait',
+            forceOrientation: 'none',
             useCustomClose: true
         });
     });
@@ -179,6 +180,7 @@ describe('[c6mraid(config)]', function() {
                 }
             };
             importScripts.calls.reset();
+            MRAID.calls.reset();
             delete window.__C6_URL_ROOT__;
 
             c6mraid({ exp: 'e-75d32a97a6193c' });
@@ -188,6 +190,10 @@ describe('[c6mraid(config)]', function() {
 
         afterEach(function() {
             jasmine.clock().install();
+        });
+
+        it('should create a portrait MRAID instance', function() {
+            expect(MRAID).toHaveBeenCalledWith(jasmine.objectContaining({ forceOrientation: 'portrait' }));
         });
 
         it('should call c6.loadExperience() with some default configuration', function() {

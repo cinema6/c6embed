@@ -180,8 +180,9 @@ module.exports = function c6mraid(config) {
 
     var START_TIME = Date.now();
     var apiRoot = config.apiRoot || 'http://portal.cinema6.com';
+    var orientation = config.forceOrientation || 'portrait';
     var loadExperience = getLoader(apiRoot);
-    var mraid = new MRAID({ forceOrientation: 'portrait', useCustomClose: true });
+    var mraid = new MRAID({ forceOrientation: orientation, useCustomClose: true });
     var ga = null;
 
     return q.all([
