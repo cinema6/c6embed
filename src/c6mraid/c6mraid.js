@@ -51,6 +51,11 @@ function getLoader(apiRoot) {
 
     window.__C6_URL_ROOT__ = apiRoot;
 
+    googleAnalytics('__c6_ga__', 'c6', window.c6.gaAcctIdPlayer, {
+        storage: 'none',
+        cookieDomain: 'none'
+    });
+
     /* Create Location */
     var $location = new Location({
         window: window,
@@ -183,7 +188,48 @@ module.exports = function c6mraid(config) {
     var orientation = config.forceOrientation || 'portrait';
     var loadExperience = getLoader(apiRoot);
     var mraid = new MRAID({ forceOrientation: orientation, useCustomClose: true });
-    var ga = null;
+    var ga = googleAnalytics('__c6_ga__', config.exp.replace(/^e-/, ''), window.c6.gaAcctIdEmbed, {
+        storage: 'none',
+        cookieDomain: 'none'
+    });
+    var controller = null;
+
+    ga('require', 'displayfeatures');
+    ga('set', {
+        dimension1: 'mraid',
+        page: pagePathFor(config.exp, {
+            cx: 'mraid',
+            ct: config.src,
+            ex: config.ex,
+            vr: config.vr
+        })
+    });
+    ga('send', 'pageview', {
+        sessionControl: 'start'
+    });
+
+    mraid.waitUntilViewable().then(function sendVisibleEvent() {
+        var visibleStart = Date.now();
+
+        ga('send', 'event', {
+            eventCategory: 'Display',
+            eventAction: 'Visible'
+        });
+
+        mraid.on('stateChange', function(state) {
+            var timeVisible = Date.now() - visibleStart;
+            var wasActive = !!controller;
+
+            if (state !== 'hidden')  { return; }
+
+            ga('send', 'timing', {
+                timingCategory: 'API',
+                timingVar: wasActive ? 'closePageAfterLoad' : 'closePageBeforeLoad',
+                timingValue: timeVisible,
+                timingLabel: 'c6'
+            });
+        });
+    });
 
     return q.all([
         fetchExperience({
@@ -198,34 +244,7 @@ module.exports = function c6mraid(config) {
             preview: config.preview,
             pageUrl: config.pageUrl || 'cinema6.com'
         }).then(function(experience) {
-            var gaId = window.c6.gaAcctIdEmbed;
-            var playerGaID = window.c6.gaAcctIdPlayer;
-
-            googleAnalytics('__c6_ga__', 'c6', playerGaID, {
-                storage: 'none',
-                cookieDomain: 'none'
-            });
-
-            ga = googleAnalytics('__c6_ga__', experience.id.replace(/^e-/, ''), gaId, {
-                storage: 'none',
-                cookieDomain: 'none'
-            });
-            ga('require', 'displayfeatures');
-            ga('set', {
-                dimension1: 'mraid',
-                page: pagePathFor(experience.id, {
-                    cx: 'mraid',
-                    ct: config.src,
-                    bd: experience.data.branding,
-                    ex: config.ex,
-                    vr: config.vr
-                }),
-                title: experience.data.title
-            });
-
-            ga('send', 'pageview', {
-                sessionControl: 'start'
-            });
+            ga('set', { title: experience.data.title });
             ga('send', 'timing', {
                 timingCategory: 'API',
                 timingVar: 'fetchExperience',
@@ -263,17 +282,21 @@ module.exports = function c6mraid(config) {
                 }
             }, true);
         }),
-        mraid.waitUntilViewable().delay(600)
+        mraid.waitUntilViewable().delay(600).then(function recordReadyTime() {
+            return Date.now();
+        })
     ]).then(function activatePlayer(data) {
-        var controller = data[0];
+        var waitTime = Date.now() - data[1];
+        controller = data[0];
 
-        controller.state.set('active', true);
-        ga('send', 'event', {
-            eventCategory: 'Display',
-            eventAction: 'Visible',
-            eventLabel: controller.experience.data.title
+        ga('send', 'timing', {
+            timingCategory: 'API',
+            timingVar: 'loadDelay',
+            timingValue: waitTime,
+            timingLabel: 'c6'
         });
 
+        controller.state.set('active', true);
         controller.state.observe('active', function observeActive(active) {
             if (!active) {
                 mraid.close();

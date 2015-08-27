@@ -160,6 +160,36 @@ describe('[c6mraid(config)]', function() {
         }));
     });
 
+    it('should create a GA tracker for the player', function() {
+        expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'c6', window.c6.gaAcctIdPlayer, {
+            storage: 'none',
+            cookieDomain: 'none'
+        });
+    });
+
+    it('should create a GA tracker for the embed', function() {
+        expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'f75a93d62976aa', window.c6.gaAcctIdEmbed, {
+            storage: 'none',
+            cookieDomain: 'none'
+        });
+        expect(tracker).toHaveBeenCalledWith('require', 'displayfeatures');
+        expect(tracker).toHaveBeenCalledWith('set', {
+            dimension1: 'mraid',
+            page: pagePathFor('e-f75a93d62976aa', {
+                cx: 'mraid',
+                ct: 'some-src',
+                ex: 'my-experiment',
+                vr: 'my-variant'
+            })
+        });
+    });
+
+    it('should send a pageview', function() {
+        expect(tracker).toHaveBeenCalledWith('send', 'pageview', {
+            sessionControl: 'start'
+        });
+    });
+
     describe('if called with minimal configuration', function() {
         var experience;
 
@@ -217,6 +247,92 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
+    describe('when the ad is visible', function() {
+        beforeEach(function(done) {
+            waitUntilViewableDeferred.resolve(true);
+            waitUntilViewableDeferred.promise.then(done, done);
+        });
+
+        it('should send a visible event to GA', function() {
+            expect(tracker).toHaveBeenCalledWith('send', 'event', {
+                eventCategory: 'Display',
+                eventAction: 'Visible'
+            });
+        });
+
+        ['default', 'expanded', 'resized', 'hidden'].forEach(function(state) {
+            describe('when the state changes to ' + state, function() {
+                beforeEach(function() {
+                    jasmine.clock().tick(10234);
+                });
+
+                describe('before the player has loaded', function() {
+                    beforeEach(function() {
+                        tracker.calls.reset();
+                        mraid.emit('stateChange', state);
+                    });
+
+                    if (state === 'hidden') {
+                        it('should send a closeBeforeShow timing to GA', function() {
+                            expect(tracker).toHaveBeenCalledWith('send', 'timing', {
+                                timingCategory: 'API',
+                                timingVar: 'closePageBeforeLoad',
+                                timingValue: 10234,
+                                timingLabel: 'c6'
+                            });
+                        });
+                    } else {
+                        it('should send nothing to GA', function() {
+                            expect(tracker).not.toHaveBeenCalled();
+                        });
+                    }
+                });
+
+                describe('after the player has loaded', function() {
+                    beforeEach(function(done) {
+                        importScripts.calls.mostRecent().args[1]({
+                            id: 'e-f75a93d62976aa',
+                            data: {
+                                branding: 'cool-pub',
+                                title: 'My Awesome MiniReel',
+                                deck: [
+                                    {
+                                        id: 'rc-718ba68784dc63',
+                                        title: 'My Card',
+                                        data: {}
+                                    }
+                                ]
+                            }
+                        });
+                        q().then(function() {}).then(function() {
+                            loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
+                            return loadExperienceDeferred.promise;
+                        }).then(function() {
+                            tracker.calls.reset();
+                            loadExperienceSettings.state.set('active', false);
+                            mraid.emit('stateChange', state);
+                        }).then(done, done);
+                    });
+
+                    if (state === 'hidden') {
+                        it('should send a closePageAfterLoad timing to GA', function() {
+                            expect(tracker).toHaveBeenCalledWith('send', 'timing', {
+                                timingCategory: 'API',
+                                timingVar: 'closePageAfterLoad',
+                                timingValue: 10234,
+                                timingLabel: 'c6'
+                            });
+                        });
+                    } else {
+                        it('should send nothing to GA', function() {
+                            expect(tracker).not.toHaveBeenCalled();
+                        });
+                    }
+                });
+            });
+        });
+    });
+
     describe('when the experience is fetched', function() {
         var experience;
 
@@ -241,36 +357,8 @@ describe('[c6mraid(config)]', function() {
             q().then(function() {}).then(done);
         });
 
-        it('should create a GA tracker for the player', function() {
-            expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'c6', window.c6.gaAcctIdPlayer, {
-                storage: 'none',
-                cookieDomain: 'none'
-            });
-        });
-
-        it('should create a GA tracker for the embed', function() {
-            expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', experience.id.replace(/^e-/, ''), window.c6.gaAcctIdEmbed, {
-                storage: 'none',
-                cookieDomain: 'none'
-            });
-            expect(tracker).toHaveBeenCalledWith('require', 'displayfeatures');
-            expect(tracker).toHaveBeenCalledWith('set', {
-                dimension1: 'mraid',
-                page: pagePathFor(experience.id, {
-                    cx: 'mraid',
-                    ct: 'some-src',
-                    bd: experience.data.branding,
-                    ex: 'my-experiment',
-                    vr: 'my-variant'
-                }),
-                title: experience.data.title
-            });
-        });
-
-        it('should send a pageview', function() {
-            expect(tracker).toHaveBeenCalledWith('send', 'pageview', {
-                sessionControl: 'start'
-            });
+        it('should set the title in ga', function() {
+            expect(tracker).toHaveBeenCalledWith('set', { title: experience.data.title });
         });
 
         it('should send the amount of time it took to fetch the experience', function() {
@@ -342,6 +430,27 @@ describe('[c6mraid(config)]', function() {
             });
         });
 
+        describe('when loading the player happens after MRAID is ready to show it', function() {
+            beforeEach(function(done) {
+                waitUntilViewableDeferred.resolve(true);
+                waitUntilViewableDeferred.promise.then(function() {
+                    jasmine.clock().tick(600);
+                }).then(function() {
+                    jasmine.clock().tick(321);
+                    loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
+                }).then(function() {}).then(function() {}).then(done, done);
+            });
+
+            it('should send the amount of time the user was waiting', function() {
+                expect(tracker).toHaveBeenCalledWith('send', 'timing', {
+                    timingCategory: 'API',
+                    timingVar: 'loadDelay',
+                    timingValue: 321,
+                    timingLabel: 'c6'
+                });
+            });
+        });
+
         describe('when the player is preloaded and the ad is visible', function() {
             beforeEach(function(done) {
                 loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
@@ -357,19 +466,11 @@ describe('[c6mraid(config)]', function() {
             describe('after 600 ms', function() {
                 beforeEach(function(done) {
                     jasmine.clock().tick(600);
-                    q().then(function() {}).then(done);
+                    q().then(function() {}).then(function() {}).then(done);
                 });
 
                 it('should activate the player', function() {
                     expect(loadExperienceSettings.state.set).toHaveBeenCalledWith('active', true);
-                });
-
-                it('should send a visible event to GA', function() {
-                    expect(tracker).toHaveBeenCalledWith('send', 'event', {
-                        eventCategory: 'Display',
-                        eventAction: 'Visible',
-                        eventLabel: experience.data.title
-                    });
                 });
 
                 describe('if the player closes', function() {

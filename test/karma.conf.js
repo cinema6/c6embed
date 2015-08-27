@@ -23,7 +23,7 @@ module.exports = function(config) {
             { pattern: 'test/helpers/api/**/*.js', included: false },
             { pattern: 'test/helpers/scripts/**/*.js', included: false },
             { pattern: 'test/helpers/**/*.html', included: false },
-            'test/spec/**/*.js'
+            { pattern: 'test/spec/**/*.js', watched: false }
         ],
 
         preprocessors: {
