@@ -430,6 +430,27 @@ describe('[c6mraid(config)]', function() {
             });
         });
 
+        describe('when loading the player happens after MRAID is ready to show it', function() {
+            beforeEach(function(done) {
+                waitUntilViewableDeferred.resolve(true);
+                waitUntilViewableDeferred.promise.then(function() {
+                    jasmine.clock().tick(600);
+                }).then(function() {
+                    jasmine.clock().tick(321);
+                    loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
+                }).then(function() {}).then(function() {}).then(done, done);
+            });
+
+            it('should send the amount of time the user was waiting', function() {
+                expect(tracker).toHaveBeenCalledWith('send', 'timing', {
+                    timingCategory: 'API',
+                    timingVar: 'loadDelay',
+                    timingValue: 321,
+                    timingLabel: 'c6'
+                });
+            });
+        });
+
         describe('when the player is preloaded and the ad is visible', function() {
             beforeEach(function(done) {
                 loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
@@ -445,7 +466,7 @@ describe('[c6mraid(config)]', function() {
             describe('after 600 ms', function() {
                 beforeEach(function(done) {
                     jasmine.clock().tick(600);
-                    q().then(function() {}).then(done);
+                    q().then(function() {}).then(function() {}).then(done);
                 });
 
                 it('should activate the player', function() {

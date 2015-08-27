@@ -282,9 +282,19 @@ module.exports = function c6mraid(config) {
                 }
             }, true);
         }),
-        mraid.waitUntilViewable().delay(600)
+        mraid.waitUntilViewable().delay(600).then(function recordReadyTime() {
+            return Date.now();
+        })
     ]).then(function activatePlayer(data) {
+        var waitTime = Date.now() - data[1];
         controller = data[0];
+
+        ga('send', 'timing', {
+            timingCategory: 'API',
+            timingVar: 'loadDelay',
+            timingValue: waitTime,
+            timingLabel: 'c6'
+        });
 
         controller.state.set('active', true);
         controller.state.observe('active', function observeActive(active) {
