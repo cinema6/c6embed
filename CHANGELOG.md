@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.38.0 (August 27, 2015)
 * [FEATURE]: Allow MRAID device orientation to be specified in configuration
 * Send more GA timings for MRAID
 
