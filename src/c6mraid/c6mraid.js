@@ -192,6 +192,7 @@ module.exports = function c6mraid(config) {
         storage: 'none',
         cookieDomain: 'none'
     });
+    var controller = null;
 
     ga('require', 'displayfeatures');
     ga('set', {
@@ -208,9 +209,25 @@ module.exports = function c6mraid(config) {
     });
 
     mraid.waitUntilViewable().then(function sendVisibleEvent() {
+        var visibleStart = Date.now();
+
         ga('send', 'event', {
             eventCategory: 'Display',
             eventAction: 'Visible'
+        });
+
+        mraid.on('stateChange', function(state) {
+            var timeVisible = Date.now() - visibleStart;
+            var wasActive = !!controller;
+
+            if (state !== 'hidden')  { return; }
+
+            ga('send', 'timing', {
+                timingCategory: 'API',
+                timingVar: wasActive ? 'closePageAfterLoad' : 'closePageBeforeLoad',
+                timingValue: timeVisible,
+                timingLabel: 'c6'
+            });
         });
     });
 
@@ -267,7 +284,7 @@ module.exports = function c6mraid(config) {
         }),
         mraid.waitUntilViewable().delay(600)
     ]).then(function activatePlayer(data) {
-        var controller = data[0];
+        controller = data[0];
 
         controller.state.set('active', true);
         controller.state.observe('active', function observeActive(active) {

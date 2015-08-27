@@ -259,6 +259,78 @@ describe('[c6mraid(config)]', function() {
                 eventAction: 'Visible'
             });
         });
+
+        ['default', 'expanded', 'resized', 'hidden'].forEach(function(state) {
+            describe('when the state changes to ' + state, function() {
+                beforeEach(function() {
+                    jasmine.clock().tick(10234);
+                });
+
+                describe('before the player has loaded', function() {
+                    beforeEach(function() {
+                        tracker.calls.reset();
+                        mraid.emit('stateChange', state);
+                    });
+
+                    if (state === 'hidden') {
+                        it('should send a closeBeforeShow timing to GA', function() {
+                            expect(tracker).toHaveBeenCalledWith('send', 'timing', {
+                                timingCategory: 'API',
+                                timingVar: 'closePageBeforeLoad',
+                                timingValue: 10234,
+                                timingLabel: 'c6'
+                            });
+                        });
+                    } else {
+                        it('should send nothing to GA', function() {
+                            expect(tracker).not.toHaveBeenCalled();
+                        });
+                    }
+                });
+
+                describe('after the player has loaded', function() {
+                    beforeEach(function(done) {
+                        importScripts.calls.mostRecent().args[1]({
+                            id: 'e-f75a93d62976aa',
+                            data: {
+                                branding: 'cool-pub',
+                                title: 'My Awesome MiniReel',
+                                deck: [
+                                    {
+                                        id: 'rc-718ba68784dc63',
+                                        title: 'My Card',
+                                        data: {}
+                                    }
+                                ]
+                            }
+                        });
+                        q().then(function() {}).then(function() {
+                            loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
+                            return loadExperienceDeferred.promise;
+                        }).then(function() {
+                            tracker.calls.reset();
+                            loadExperienceSettings.state.set('active', false);
+                            mraid.emit('stateChange', state);
+                        }).then(done, done);
+                    });
+
+                    if (state === 'hidden') {
+                        it('should send a closePageAfterLoad timing to GA', function() {
+                            expect(tracker).toHaveBeenCalledWith('send', 'timing', {
+                                timingCategory: 'API',
+                                timingVar: 'closePageAfterLoad',
+                                timingValue: 10234,
+                                timingLabel: 'c6'
+                            });
+                        });
+                    } else {
+                        it('should send nothing to GA', function() {
+                            expect(tracker).not.toHaveBeenCalled();
+                        });
+                    }
+                });
+            });
+        });
     });
 
     describe('when the experience is fetched', function() {
