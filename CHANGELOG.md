@@ -1,6 +1,7 @@
 # C6Embed Changelog
 
 * [FEATURE]: Allow MRAID device orientation to be specified in configuration
+* Send more GA timings for MRAID
 
 ## v2.37.2 (August 20, 2015)
 * [FIX]: Make Player Google Analytics events work in MRAID
