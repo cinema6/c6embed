@@ -207,6 +207,13 @@ module.exports = function c6mraid(config) {
         sessionControl: 'start'
     });
 
+    mraid.waitUntilViewable().then(function sendVisibleEvent() {
+        ga('send', 'event', {
+            eventCategory: 'Display',
+            eventAction: 'Visible'
+        });
+    });
+
     return q.all([
         fetchExperience({
             id: config.exp,
@@ -263,12 +270,6 @@ module.exports = function c6mraid(config) {
         var controller = data[0];
 
         controller.state.set('active', true);
-        ga('send', 'event', {
-            eventCategory: 'Display',
-            eventAction: 'Visible',
-            eventLabel: controller.experience.data.title
-        });
-
         controller.state.observe('active', function observeActive(active) {
             if (!active) {
                 mraid.close();

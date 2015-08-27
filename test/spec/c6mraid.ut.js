@@ -247,6 +247,20 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
+    describe('when the ad is visible', function() {
+        beforeEach(function(done) {
+            waitUntilViewableDeferred.resolve(true);
+            waitUntilViewableDeferred.promise.then(done, done);
+        });
+
+        it('should send a visible event to GA', function() {
+            expect(tracker).toHaveBeenCalledWith('send', 'event', {
+                eventCategory: 'Display',
+                eventAction: 'Visible'
+            });
+        });
+    });
+
     describe('when the experience is fetched', function() {
         var experience;
 
@@ -364,14 +378,6 @@ describe('[c6mraid(config)]', function() {
 
                 it('should activate the player', function() {
                     expect(loadExperienceSettings.state.set).toHaveBeenCalledWith('active', true);
-                });
-
-                it('should send a visible event to GA', function() {
-                    expect(tracker).toHaveBeenCalledWith('send', 'event', {
-                        eventCategory: 'Display',
-                        eventAction: 'Visible',
-                        eventLabel: experience.data.title
-                    });
                 });
 
                 describe('if the player closes', function() {
