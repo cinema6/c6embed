@@ -160,6 +160,36 @@ describe('[c6mraid(config)]', function() {
         }));
     });
 
+    it('should create a GA tracker for the player', function() {
+        expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'c6', window.c6.gaAcctIdPlayer, {
+            storage: 'none',
+            cookieDomain: 'none'
+        });
+    });
+
+    it('should create a GA tracker for the embed', function() {
+        expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'f75a93d62976aa', window.c6.gaAcctIdEmbed, {
+            storage: 'none',
+            cookieDomain: 'none'
+        });
+        expect(tracker).toHaveBeenCalledWith('require', 'displayfeatures');
+        expect(tracker).toHaveBeenCalledWith('set', {
+            dimension1: 'mraid',
+            page: pagePathFor('e-f75a93d62976aa', {
+                cx: 'mraid',
+                ct: 'some-src',
+                ex: 'my-experiment',
+                vr: 'my-variant'
+            })
+        });
+    });
+
+    it('should send a pageview', function() {
+        expect(tracker).toHaveBeenCalledWith('send', 'pageview', {
+            sessionControl: 'start'
+        });
+    });
+
     describe('if called with minimal configuration', function() {
         var experience;
 
@@ -241,36 +271,8 @@ describe('[c6mraid(config)]', function() {
             q().then(function() {}).then(done);
         });
 
-        it('should create a GA tracker for the player', function() {
-            expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', 'c6', window.c6.gaAcctIdPlayer, {
-                storage: 'none',
-                cookieDomain: 'none'
-            });
-        });
-
-        it('should create a GA tracker for the embed', function() {
-            expect(googleAnalytics).toHaveBeenCalledWith('__c6_ga__', experience.id.replace(/^e-/, ''), window.c6.gaAcctIdEmbed, {
-                storage: 'none',
-                cookieDomain: 'none'
-            });
-            expect(tracker).toHaveBeenCalledWith('require', 'displayfeatures');
-            expect(tracker).toHaveBeenCalledWith('set', {
-                dimension1: 'mraid',
-                page: pagePathFor(experience.id, {
-                    cx: 'mraid',
-                    ct: 'some-src',
-                    bd: experience.data.branding,
-                    ex: 'my-experiment',
-                    vr: 'my-variant'
-                }),
-                title: experience.data.title
-            });
-        });
-
-        it('should send a pageview', function() {
-            expect(tracker).toHaveBeenCalledWith('send', 'pageview', {
-                sessionControl: 'start'
-            });
+        it('should set the title in ga', function() {
+            expect(tracker).toHaveBeenCalledWith('set', { title: experience.data.title });
         });
 
         it('should send the amount of time it took to fetch the experience', function() {
