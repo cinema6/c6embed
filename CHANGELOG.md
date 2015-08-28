@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.38.1 (August 28, 2015)
+* [FIX]: Fix for an issue that caused GA events coming from MRAID not to
+  be reported
+
 ## v2.38.0 (August 27, 2015)
 * [FEATURE]: Allow MRAID device orientation to be specified in configuration
 * Send more GA timings for MRAID

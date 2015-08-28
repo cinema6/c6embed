@@ -174,6 +174,7 @@ describe('[c6mraid(config)]', function() {
         });
         expect(tracker).toHaveBeenCalledWith('require', 'displayfeatures');
         expect(tracker).toHaveBeenCalledWith('set', {
+            checkProtocolTask: null,
             dimension1: 'mraid',
             page: pagePathFor('e-f75a93d62976aa', {
                 cx: 'mraid',
