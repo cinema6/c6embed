@@ -196,6 +196,7 @@ module.exports = function c6mraid(config) {
 
     ga('require', 'displayfeatures');
     ga('set', {
+        checkProtocolTask: null,
         dimension1: 'mraid',
         page: pagePathFor(config.exp, {
             cx: 'mraid',
