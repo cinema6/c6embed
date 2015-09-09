@@ -50,7 +50,7 @@
                 var data = (function() {
                     try { return JSON.parse(event.data); } catch(e) { return {}; }
                 }());
-                var events = ['launch', 'adStart', 'adCount'];
+                var events = ['launch', 'adStart', 'adCount', 'adEnded'];
 
                 if (events.indexOf(data.event) > -1) {
                     window.parent.postMessage(JSON.stringify(data), '*');
