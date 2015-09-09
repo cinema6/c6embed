@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add support for player 'adEnded' event in the solo player
+
 ## v2.38.1 (August 28, 2015)
 * [FIX]: Fix for an issue that caused GA events coming from MRAID not to
   be reported
