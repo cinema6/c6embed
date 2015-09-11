@@ -6,6 +6,8 @@ var googleAnalytics = require('../../lib/google_analytics');
 var pagePathFor = require('../ga_helpers').pagePath;
 var formatUrl = require('url').format;
 var parseUrl = require('url').parse;
+var globalLogger = require('../../lib/logger').default;
+var logger = globalLogger.context('c6mraid.js');
 
 var modernizr = require('Modernizr');
 var C6Query = require('../../lib/C6Query');
@@ -24,6 +26,8 @@ var FrameFactory = require('../app/FrameFactory');
 var HostDocument = require('../app/HostDocument');
 var ObservableProvider = require('../../lib/ObservableProvider');
 
+logger.tasks.send.push(sendLog);
+
 function omit(object, keys) {
     'use strict';
 
@@ -34,6 +38,21 @@ function omit(object, keys) {
 
         return result;
     }, {});
+}
+
+function sendLog(logger, method, args) {
+    'use strict';
+
+    var img = new Image();
+    img.src = formatUrl({
+        protocol: 'https:',
+        hostname: 'logging.cinema6.com',
+        pathname: 'pixel.gif',
+        query: {
+            v: args.join(', '),
+            cb: Date.now()
+        }
+    });
 }
 
 function getLoader(apiRoot) {
@@ -183,6 +202,8 @@ function fetchExperience(config) {
 module.exports = function c6mraid(config) {
     'use strict';
 
+    globalLogger.levels(config.debug ? ['log', 'info', 'warn', 'error'] : ['error']);
+
     var START_TIME = Date.now();
     var apiRoot = config.apiRoot || 'http://portal.cinema6.com';
     var orientation = config.forceOrientation || 'portrait';
@@ -193,6 +214,8 @@ module.exports = function c6mraid(config) {
         cookieDomain: 'none'
     });
     var controller = null;
+
+    logger.info('Initialize.');
 
     ga('require', 'displayfeatures');
     ga('set', {
@@ -217,9 +240,13 @@ module.exports = function c6mraid(config) {
             eventAction: 'Visible'
         });
 
+        logger.info('MRAID is reporting ad is viewable.');
+
         mraid.on('stateChange', function(state) {
             var timeVisible = Date.now() - visibleStart;
             var wasActive = !!controller;
+
+            logger.info('MRAID reports state changed to', state);
 
             if (state !== 'hidden')  { return; }
 
@@ -245,6 +272,8 @@ module.exports = function c6mraid(config) {
             preview: config.preview,
             pageUrl: config.pageUrl || 'cinema6.com'
         }).then(function(experience) {
+            logger.info('Experience was fetched.');
+
             ga('set', { title: experience.data.title });
             ga('send', 'timing', {
                 timingCategory: 'API',
@@ -282,6 +311,9 @@ module.exports = function c6mraid(config) {
                     vr: config.vr
                 }
             }, true);
+        }).then(function logSuccess(controller) {
+            logger.log('Player loaded.');
+            return controller;
         }),
         mraid.waitUntilViewable().delay(600).then(function recordReadyTime() {
             return Date.now();
@@ -289,6 +321,8 @@ module.exports = function c6mraid(config) {
     ]).then(function activatePlayer(data) {
         var waitTime = Date.now() - data[1];
         controller = data[0];
+
+        logger.info('Showing player.');
 
         ga('send', 'timing', {
             timingCategory: 'API',
@@ -305,6 +339,7 @@ module.exports = function c6mraid(config) {
         });
         mraid.on('stateChange', function handleAdStateChange(state) {
             if (state === 'hidden') {
+                logger.info('Hiding player.');
                 controller.state.set('active', false);
             }
         });

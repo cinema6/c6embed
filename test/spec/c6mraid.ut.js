@@ -4,7 +4,7 @@ var pagePathFor = require('../../src/ga_helpers').pagePath;
 describe('[c6mraid(config)]', function() {
     'use strict';
 
-    var c6mraid, q, Config, SponsoredCards, HostDocument, BrowserInfo, ObservableProvider;
+    var c6mraid, q, Config, SponsoredCards, HostDocument, BrowserInfo, ObservableProvider, logger;
 
     var app, importScripts, MRAID, googleAnalytics;
     var stubs;
@@ -27,6 +27,7 @@ describe('[c6mraid(config)]', function() {
         HostDocument = require('../../src/app/HostDocument');
         BrowserInfo = require('../../lib/BrowserInfo');
         ObservableProvider = require('../../lib/ObservableProvider');
+        logger = require('../../lib/logger').default;
 
         Observable = new ObservableProvider({});
 
@@ -66,6 +67,7 @@ describe('[c6mraid(config)]', function() {
             },
             'q': q,
             '../../lib/google_analytics': googleAnalytics,
+            '../../lib/logger': require('../../lib/logger'),
 
             '@noCallThru': true
         };
@@ -74,6 +76,7 @@ describe('[c6mraid(config)]', function() {
     });
 
     beforeEach(function() {
+        logger.enabled(false);
         app.calls.reset();
         importScripts.calls.reset();
         MRAID.calls.reset();
@@ -91,6 +94,8 @@ describe('[c6mraid(config)]', function() {
 
         success = jasmine.createSpy('success()');
         failure = jasmine.createSpy('failure()');
+
+        spyOn(logger, 'levels').and.callThrough();
 
         c6mraid({
             exp: 'e-f75a93d62976aa',
@@ -110,7 +115,8 @@ describe('[c6mraid(config)]', function() {
             wp: '12345678',
             apiRoot: 'https://staging.cinema6.com',
             pageUrl: 'staging.cinema6.com',
-            forceOrientation: 'none'
+            forceOrientation: 'none',
+            debug: true
         }).then(success, failure);
     });
 
@@ -118,6 +124,32 @@ describe('[c6mraid(config)]', function() {
         delete window.mraid;
         delete window.c6;
         jasmine.clock().uninstall();
+    });
+
+    describe('the send function it adds to the logger', function() {
+        var fn;
+        var img;
+
+        function MockImage() {
+            this.src = null;
+
+            img = this;
+        }
+
+        beforeEach(function() {
+            spyOn(window, 'Image').and.callFake(MockImage);
+            fn = logger.tasks.send[logger.tasks.send.length - 1];
+
+            fn(logger, 'log', ['hello world', 'what\'s up?']);
+        });
+
+        it('should fire a pixel to the C6 Log endpoint', function() {
+            expect(img.src).toBe('https://logging.cinema6.com/pixel.gif?v=hello%20world%2C%20what\'s%20up%3F&cb=' + Date.now());
+        });
+    });
+
+    it('should enabled all log levels', function() {
+        expect(logger.levels).toHaveBeenCalledWith(['log', 'info', 'warn', 'error']);
     });
 
     it('should create a new MRAID instance', function() {
@@ -212,6 +244,7 @@ describe('[c6mraid(config)]', function() {
             };
             importScripts.calls.reset();
             MRAID.calls.reset();
+            logger.levels.calls.reset();
             delete window.__C6_URL_ROOT__;
 
             c6mraid({ exp: 'e-75d32a97a6193c' });
@@ -221,6 +254,10 @@ describe('[c6mraid(config)]', function() {
 
         afterEach(function() {
             jasmine.clock().install();
+        });
+
+        it('should only enable error logging', function() {
+            expect(logger.levels).toHaveBeenCalledWith(['error']);
         });
 
         it('should create a portrait MRAID instance', function() {
@@ -307,7 +344,7 @@ describe('[c6mraid(config)]', function() {
                         });
                         q().then(function() {}).then(function() {
                             loadExperienceDeferred.resolve(window.c6.loadExperience.calls.mostRecent().args[0]);
-                            return loadExperienceDeferred.promise;
+                            return loadExperienceDeferred.promise.then(function() {});
                         }).then(function() {
                             tracker.calls.reset();
                             loadExperienceSettings.state.set('active', false);
