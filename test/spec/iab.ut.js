@@ -1,5 +1,6 @@
 var iab = require('../../lib/iab');
 var q = require('q');
+var logger = require('../../lib/logger').default;
 
 describe('MRAID()', function() {
     'use strict';
@@ -10,6 +11,7 @@ describe('MRAID()', function() {
 
     beforeEach(function() {
         events = {};
+        logger.enabled(false);
 
         window.mraid = {
             addEventListener: function addEventListener(event, handler) {
