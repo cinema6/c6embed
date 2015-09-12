@@ -273,7 +273,8 @@ describe('[c6mraid(config)]', function() {
                 config: jasmine.objectContaining({
                     startPixel: '',
                     countPixel: '',
-                    launchPixel: ''
+                    launchPixel: '',
+                    pageUrl: 'cinema6.com'
                 })
             }), true);
         });
@@ -439,7 +440,10 @@ describe('[c6mraid(config)]', function() {
                     context: 'mraid',
                     preview: false,
                     ex: 'my-experiment',
-                    vr: 'my-variant'
+                    vr: 'my-variant',
+                    hostApp: 'Talking Tom',
+                    network: 'omax',
+                    pageUrl: 'staging.cinema6.com'
                 }
             }), true);
         });

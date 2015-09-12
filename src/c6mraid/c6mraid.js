@@ -206,6 +206,7 @@ module.exports = function c6mraid(config) {
 
     var START_TIME = Date.now();
     var apiRoot = config.apiRoot || 'http://portal.cinema6.com';
+    var pageUrl = config.pageUrl || 'cinema6.com';
     var orientation = config.forceOrientation || 'portrait';
     var loadExperience = getLoader(apiRoot);
     var mraid = new MRAID({ forceOrientation: orientation, useCustomClose: true });
@@ -270,7 +271,7 @@ module.exports = function c6mraid(config) {
             container: config.src,
             wildCardPlacement: config.wp,
             preview: config.preview,
-            pageUrl: config.pageUrl || 'cinema6.com',
+            pageUrl: pageUrl,
             hostApp: config.app,
             network: config.network
         }).then(function(experience) {
@@ -310,7 +311,10 @@ module.exports = function c6mraid(config) {
                     context: 'mraid',
                     preview: config.preview,
                     ex: config.ex,
-                    vr: config.vr
+                    vr: config.vr,
+                    hostApp: config.app,
+                    network: config.network,
+                    pageUrl: pageUrl
                 }
             }, true);
         }).then(function logSuccess(controller) {
