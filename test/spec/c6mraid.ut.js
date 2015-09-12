@@ -96,6 +96,7 @@ describe('[c6mraid(config)]', function() {
         failure = jasmine.createSpy('failure()');
 
         spyOn(logger, 'levels').and.callThrough();
+        spyOn(logger, 'prefix').and.callThrough();
 
         c6mraid({
             exp: 'e-f75a93d62976aa',
@@ -152,6 +153,20 @@ describe('[c6mraid(config)]', function() {
 
     it('should enabled all log levels', function() {
         expect(logger.levels).toHaveBeenCalledWith(['log', 'info', 'warn', 'error']);
+    });
+
+    it('should give the logger a descriptive prefix', function() {
+        var prefixParts = logger.prefix().split('|');
+        var uuid = prefixParts[0];
+        var container = prefixParts[1];
+        var appParts = prefixParts[2].split(':');
+        var network = appParts[0];
+        var app = appParts[1];
+
+        expect(uuid).toMatch(/[0-9a-z]{14}/);
+        expect(container).toBe('some-src');
+        expect(network).toBe('omax');
+        expect(app).toBe('Talking Tom');
     });
 
     it('should create a new MRAID instance', function() {
@@ -247,6 +262,7 @@ describe('[c6mraid(config)]', function() {
             importScripts.calls.reset();
             MRAID.calls.reset();
             logger.levels.calls.reset();
+            logger.prefix.calls.reset();
             delete window.__C6_URL_ROOT__;
 
             c6mraid({ exp: 'e-75d32a97a6193c' });
@@ -260,6 +276,10 @@ describe('[c6mraid(config)]', function() {
 
         it('should only enable error logging', function() {
             expect(logger.levels).toHaveBeenCalledWith(['error']);
+        });
+
+        it('should only add a uuid to the logger', function() {
+            expect(logger.prefix()).toMatch(/^[0-9a-z]{14}$/);
         });
 
         it('should create a portrait MRAID instance', function() {
