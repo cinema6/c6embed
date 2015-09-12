@@ -270,7 +270,9 @@ module.exports = function c6mraid(config) {
             container: config.src,
             wildCardPlacement: config.wp,
             preview: config.preview,
-            pageUrl: config.pageUrl || 'cinema6.com'
+            pageUrl: config.pageUrl || 'cinema6.com',
+            hostApp: config.app,
+            network: config.network
         }).then(function(experience) {
             logger.info('Experience was fetched.');
 

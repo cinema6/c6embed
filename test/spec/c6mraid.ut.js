@@ -116,7 +116,9 @@ describe('[c6mraid(config)]', function() {
             apiRoot: 'https://staging.cinema6.com',
             pageUrl: 'staging.cinema6.com',
             forceOrientation: 'none',
-            debug: true
+            debug: true,
+            app: 'Talking Tom',
+            network: 'omax'
         }).then(success, failure);
     });
 
@@ -164,7 +166,7 @@ describe('[c6mraid(config)]', function() {
     });
 
     it('should fetch the experience from the content service', function() {
-        expect(importScripts).toHaveBeenCalledWith(['https://staging.cinema6.com/api/public/content/experience/e-f75a93d62976aa.js?branding=some-pub&placementId=87654321&campaign=cam-9c9692e33a8e98&container=some-src&wildCardPlacement=12345678&preview=false&pageUrl=staging.cinema6.com'], jasmine.any(Function));
+        expect(importScripts).toHaveBeenCalledWith(['https://staging.cinema6.com/api/public/content/experience/e-f75a93d62976aa.js?branding=some-pub&placementId=87654321&campaign=cam-9c9692e33a8e98&container=some-src&wildCardPlacement=12345678&preview=false&pageUrl=staging.cinema6.com&hostApp=Talking%20Tom&network=omax'], jasmine.any(Function));
     });
 
     it('should create a c6 object', function() {
@@ -277,7 +279,7 @@ describe('[c6mraid(config)]', function() {
         });
 
         it('should send no query params when fetching from the content service', function() {
-            expect(importScripts).toHaveBeenCalledWith(['http://portal.cinema6.com/api/public/content/experience/e-75d32a97a6193c.js?branding=&placementId=&campaign=&container=&wildCardPlacement=&preview=&pageUrl=cinema6.com'], jasmine.any(Function));
+            expect(importScripts).toHaveBeenCalledWith(['http://portal.cinema6.com/api/public/content/experience/e-75d32a97a6193c.js?branding=&placementId=&campaign=&container=&wildCardPlacement=&preview=&pageUrl=cinema6.com&hostApp=&network='], jasmine.any(Function));
         });
 
         it('should set window.__C6_URL_ROOT__ to point to cinema6 production', function() {
