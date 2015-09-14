@@ -6,6 +6,7 @@
   easier
 * [FEATURE]: Do required work to enable tracking of billable events
   in-house
+* Make date appear first (before log level) in log statements
 
 ## v2.38.1 (August 28, 2015)
 * [FIX]: Fix for an issue that caused GA events coming from MRAID not to
