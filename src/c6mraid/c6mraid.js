@@ -28,6 +28,23 @@ var ObservableProvider = require('../../lib/ObservableProvider');
 
 logger.tasks.send.push(sendLog);
 
+var uuid = (function() {
+    'use strict';
+
+    var POSSIBILITIES = '0123456789abcdefghijklmnopqrstuvwxyz';
+    var NUM_OF_POSSIBILITIES = POSSIBILITIES.length;
+
+    return function uuid(length) {
+        var result = '';
+
+        while (length--) {
+            result += POSSIBILITIES.charAt(Math.floor(Math.random() * (NUM_OF_POSSIBILITIES - 1)));
+        }
+
+        return result;
+    };
+}());
+
 function omit(object, keys) {
     'use strict';
 
@@ -199,13 +216,26 @@ function fetchExperience(config) {
     });
 }
 
+function initLogger(config) {
+    'use strict';
+
+    var app = [config.network, config.app].filter(truthy).join(':');
+    var prefix = [uuid(14), config.src, app].filter(truthy).join('|');
+
+    function truthy(value) { return !!value; }
+
+    globalLogger.levels(config.debug ? ['log', 'info', 'warn', 'error'] : ['error']);
+    globalLogger.prefix(prefix);
+}
+
 module.exports = function c6mraid(config) {
     'use strict';
 
-    globalLogger.levels(config.debug ? ['log', 'info', 'warn', 'error'] : ['error']);
+    initLogger(config);
 
     var START_TIME = Date.now();
     var apiRoot = config.apiRoot || 'http://portal.cinema6.com';
+    var pageUrl = config.pageUrl || 'cinema6.com';
     var orientation = config.forceOrientation || 'portrait';
     var loadExperience = getLoader(apiRoot);
     var mraid = new MRAID({ forceOrientation: orientation, useCustomClose: true });
@@ -270,7 +300,9 @@ module.exports = function c6mraid(config) {
             container: config.src,
             wildCardPlacement: config.wp,
             preview: config.preview,
-            pageUrl: config.pageUrl || 'cinema6.com'
+            pageUrl: pageUrl,
+            hostApp: config.app,
+            network: config.network
         }).then(function(experience) {
             logger.info('Experience was fetched.');
 
@@ -308,7 +340,10 @@ module.exports = function c6mraid(config) {
                     context: 'mraid',
                     preview: config.preview,
                     ex: config.ex,
-                    vr: config.vr
+                    vr: config.vr,
+                    hostApp: config.app,
+                    network: config.network,
+                    pageUrl: pageUrl
                 }
             }, true);
         }).then(function logSuccess(controller) {

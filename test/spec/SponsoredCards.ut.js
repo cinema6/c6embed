@@ -1,6 +1,8 @@
 (function() {
     'use strict';
 
+    var formatURL = require('url').format;
+
     describe('SponsoredCards', function() {
         var SponsoredCards,
             AdLib,
@@ -550,8 +552,17 @@
             });
             
             describe('loadCardObjects', function() {
-                var placeholders, pixels, banners;
+                var placeholders, pixels, banners, config;
                 beforeEach(function() {
+                    config = {
+                        campaign: 'cam-1',
+                        categories: 'foo,bar',
+                        container: 'pocketmath',
+                        hostApp: 'Talking Tom',
+                        network: 'omax',
+                        exp: 'e-bea7342862e825',
+                        pageUrl: 'cinema6.com'
+                    };
                     placeholders = _private.getPlaceholders(withWildcards);
                     pixels = { clickUrls: [ 'click.me' ], countUrls: [ 'count.me' ] };
                     
@@ -580,7 +591,7 @@
                             cb({id: id, campaign: { clickUrls: ['click.custom'], countUrls: ['count.custom'] } });
                         });
 
-                        _private.loadCardObjects(withWildcards, placeholders, pixels, banners).finally(done);
+                        _private.loadCardObjects(withWildcards, placeholders, pixels, banners, config).finally(done);
                     });
 
                     it('should combine the existing pixels with the campaign ones', function() {
@@ -602,7 +613,7 @@
                 });
 
                 it('should filter banners in the cache and load card objects from c6.require', function(done) {
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners, config).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc-sp2', adtechId: 234, campaign: {
@@ -614,8 +625,24 @@
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
                         expect(importScripts.calls.count()).toBe(2);
-                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js'], jasmine.any(Function));
-                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js'], jasmine.any(Function));
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js' + formatURL({
+                            query: {
+                                container: config.container,
+                                hostApp: config.hostApp,
+                                network: config.network,
+                                experience: config.exp,
+                                pageUrl: config.pageUrl
+                            }
+                        })], jasmine.any(Function));
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp3.js' + formatURL({
+                            query: {
+                                container: config.container,
+                                hostApp: config.hostApp,
+                                network: config.network,
+                                experience: config.exp,
+                                pageUrl: config.pageUrl
+                            }
+                        })], jasmine.any(Function));
                         expect(_private.swapCard.calls.count()).toBe(2);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc3', type: 'wildcard'}, withWildcards.data.deck[2], withWildcards);
@@ -631,7 +658,7 @@
                         { extId: 'rc-sp2', campaignId: 234, clickUrl: 'click.2', countUrl: 'count.2' },
                         { extId: 'rc-sp2', campaignId: 234, clickUrl: 'click.2', countUrl: 'count.2' }
                     ];
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners, config).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc-sp2', adtechId: 234, campaign: {
@@ -641,7 +668,15 @@
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
                         expect(importScripts.calls.count()).toBe(1);
-                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js'], jasmine.any(Function));
+                        expect(importScripts).toHaveBeenCalledWith(['http://test.com/api/public/content/card/rc-sp2.js' + formatURL({
+                            query: {
+                                container: config.container,
+                                hostApp: config.hostApp,
+                                network: config.network,
+                                experience: config.exp,
+                                pageUrl: config.pageUrl
+                            }
+                        })], jasmine.any(Function));
                         expect(_private.swapCard.calls.count()).toBe(1);
                         expect(_private.swapCard).toHaveBeenCalledWith({id: 'rc2', type: 'wildcard'}, withWildcards.data.deck[1], withWildcards);
                         expect(_private.sendError).not.toHaveBeenCalled();
@@ -654,7 +689,7 @@
                 it('should send errors if the cards cannot be found', function(done) {
                     importScripts.and.callFake(function(urls, cb) { cb(); });
 
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners, config).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc2', type: 'wildcard' },
@@ -674,7 +709,7 @@
                 
                 it('should do nothing if there are no usable banners', function(done) {
                     window.c6.usedSponsoredCards['e-4567'] = ['rc-sp1', 'rc-sp2', 'rc-sp3'];
-                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners).then(function() {
+                    _private.loadCardObjects(withWildcards, placeholders, pixels, banners, config).then(function() {
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc2', type: 'wildcard' },
@@ -755,7 +790,7 @@
                         expect(_private.loadCardObjects).toHaveBeenCalledWith(withWildcards, [
                             {id: 'rc2', type: 'wildcard'},
                             {id: 'rc3', type: 'wildcard'}
-                        ], pixels, ['bann1', 'bann2']);
+                        ], pixels, ['bann1', 'bann2'], config);
                         expect(_private.sendError).not.toHaveBeenCalled();
                     }).catch(function(error) {
                         expect(error.toString()).not.toBeDefined();

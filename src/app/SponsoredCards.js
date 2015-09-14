@@ -1,6 +1,8 @@
 module.exports = function(deps) {
     'use strict';
 
+    var formatURL = require('url').format;
+
     var $window = deps.window;
     var config = deps.config;
     var q = deps.q;
@@ -99,7 +101,7 @@ module.exports = function(deps) {
 
 
     // Find banners not yet used for this experience and load their objects from the content svc
-    _private.loadCardObjects = function(experience, placeholders, pixels, banners) {
+    _private.loadCardObjects = function(experience, placeholders, pixels, banners, config) {
         return q.all(banners.map(function(banner) {
             if (!banner || c6.usedSponsoredCards[experience.id].indexOf(banner.extId) !== -1) {
                 return q();
@@ -108,8 +110,17 @@ module.exports = function(deps) {
             c6.usedSponsoredCards[experience.id].push(banner.extId);
         
             var deferred = q.defer();
+            var url = urlRoot + '/api/public/content/card/' + banner.extId + '.js' + formatURL({
+                query: {
+                    container: config.container,
+                    hostApp: config.hostApp,
+                    network: config.network,
+                    experience: config.exp,
+                    pageUrl: config.pageUrl
+                }
+            });
 
-            importScripts([urlRoot + '/api/public/content/card/' + banner.extId + '.js'], function(card) {
+            importScripts([url], function(card) {
                 var campaign;
 
                 if (!card || !card.campaign) {
@@ -171,7 +182,7 @@ module.exports = function(deps) {
         .then(function(banners) {
             _private.sendTiming(experience.id,'adtechExecQueue', (new Date().getTime() - startFetch));
             
-            return _private.loadCardObjects(experience, placeholders, pixels, banners || []);
+            return _private.loadCardObjects(experience, placeholders, pixels, banners || [], config);
         })
         .timeout(timeout || 6000)
         .catch(function(error) {
