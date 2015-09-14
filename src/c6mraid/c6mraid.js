@@ -262,6 +262,10 @@ module.exports = function c6mraid(config) {
         sessionControl: 'start'
     });
 
+    mraid.on('error', function logError(message, action) {
+        logger.error('MRAID Error:', message, action);
+    });
+
     mraid.waitUntilViewable().then(function sendVisibleEvent() {
         var visibleStart = Date.now();
 

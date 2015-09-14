@@ -4,7 +4,7 @@ var pagePathFor = require('../../src/ga_helpers').pagePath;
 describe('[c6mraid(config)]', function() {
     'use strict';
 
-    var c6mraid, q, Config, SponsoredCards, HostDocument, BrowserInfo, ObservableProvider, logger;
+    var c6mraid, q, Config, SponsoredCards, HostDocument, BrowserInfo, ObservableProvider, logger, globalLogger;
 
     var app, importScripts, MRAID, googleAnalytics;
     var stubs;
@@ -27,7 +27,7 @@ describe('[c6mraid(config)]', function() {
         HostDocument = require('../../src/app/HostDocument');
         BrowserInfo = require('../../lib/BrowserInfo');
         ObservableProvider = require('../../lib/ObservableProvider');
-        logger = require('../../lib/logger').default;
+        globalLogger = require('../../lib/logger').default;
 
         Observable = new ObservableProvider({});
 
@@ -59,6 +59,8 @@ describe('[c6mraid(config)]', function() {
             return (tracker = jasmine.createSpy(name + '()'));
         });
 
+        spyOn(require('../../lib/logger').default, 'context').and.callThrough();
+
         stubs = {
             '../app/app': app,
             '../../lib/importScripts': importScripts,
@@ -73,10 +75,12 @@ describe('[c6mraid(config)]', function() {
         };
 
         c6mraid = proxyquire('../../src/c6mraid/c6mraid', stubs);
+
+        logger = require('../../lib/logger').default.context.calls.mostRecent().returnValue;
     });
 
     beforeEach(function() {
-        logger.enabled(false);
+        globalLogger.enabled(false);
         app.calls.reset();
         importScripts.calls.reset();
         MRAID.calls.reset();
@@ -95,8 +99,8 @@ describe('[c6mraid(config)]', function() {
         success = jasmine.createSpy('success()');
         failure = jasmine.createSpy('failure()');
 
-        spyOn(logger, 'levels').and.callThrough();
-        spyOn(logger, 'prefix').and.callThrough();
+        spyOn(globalLogger, 'levels').and.callThrough();
+        spyOn(globalLogger, 'prefix').and.callThrough();
 
         c6mraid({
             exp: 'e-f75a93d62976aa',
@@ -141,9 +145,9 @@ describe('[c6mraid(config)]', function() {
 
         beforeEach(function() {
             spyOn(window, 'Image').and.callFake(MockImage);
-            fn = logger.tasks.send[logger.tasks.send.length - 1];
+            fn = globalLogger.tasks.send[globalLogger.tasks.send.length - 1];
 
-            fn(logger, 'log', ['hello world', 'what\'s up?']);
+            fn(globalLogger, 'log', ['hello world', 'what\'s up?']);
         });
 
         it('should fire a pixel to the C6 Log endpoint', function() {
@@ -152,11 +156,11 @@ describe('[c6mraid(config)]', function() {
     });
 
     it('should enabled all log levels', function() {
-        expect(logger.levels).toHaveBeenCalledWith(['log', 'info', 'warn', 'error']);
+        expect(globalLogger.levels).toHaveBeenCalledWith(['log', 'info', 'warn', 'error']);
     });
 
     it('should give the logger a descriptive prefix', function() {
-        var prefixParts = logger.prefix().split('|');
+        var prefixParts = globalLogger.prefix().split('|');
         var uuid = prefixParts[0];
         var container = prefixParts[1];
         var appParts = prefixParts[2].split(':');
@@ -261,8 +265,8 @@ describe('[c6mraid(config)]', function() {
             };
             importScripts.calls.reset();
             MRAID.calls.reset();
-            logger.levels.calls.reset();
-            logger.prefix.calls.reset();
+            globalLogger.levels.calls.reset();
+            globalLogger.prefix.calls.reset();
             delete window.__C6_URL_ROOT__;
 
             c6mraid({ exp: 'e-75d32a97a6193c' });
@@ -275,11 +279,11 @@ describe('[c6mraid(config)]', function() {
         });
 
         it('should only enable error logging', function() {
-            expect(logger.levels).toHaveBeenCalledWith(['error']);
+            expect(globalLogger.levels).toHaveBeenCalledWith(['error']);
         });
 
         it('should only add a uuid to the logger', function() {
-            expect(logger.prefix()).toMatch(/^[0-9a-z]{14}$/);
+            expect(globalLogger.prefix()).toMatch(/^[0-9a-z]{14}$/);
         });
 
         it('should create a portrait MRAID instance', function() {
@@ -305,6 +309,23 @@ describe('[c6mraid(config)]', function() {
 
         it('should set window.__C6_URL_ROOT__ to point to cinema6 production', function() {
             expect(window.__C6_URL_ROOT__).toBe('http://portal.cinema6.com');
+        });
+    });
+
+    describe('if there is an mraid error', function() {
+        var message, action;
+
+        beforeEach(function() {
+            spyOn(logger, 'error').and.callThrough();
+
+            message = 'There was an awful problem.';
+            action = 'Doing something that should work...';
+
+            mraid.emit('error', message, action);
+        });
+
+        it('should log an error', function() {
+            expect(logger.error).toHaveBeenCalledWith('MRAID Error:', message, action);
         });
     });
 
