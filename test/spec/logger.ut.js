@@ -68,7 +68,7 @@ describe('logger', function() {
                     });
 
                     it('should prefix the args', function() {
-                        expect(fn(logger, 'error', ['hello', 'world'])).toEqual(['[error] {' + new Date().toISOString() + '} (MRAID)', 'hello', 'world']);
+                        expect(fn(logger, 'error', ['hello', 'world'])).toEqual(['{' + new Date().toISOString() + '} [error] (MRAID)', 'hello', 'world']);
                     });
                 });
             });
