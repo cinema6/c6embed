@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.39.1 (September 15, 2015)
 * Improve compatibility with Phunware
 
 ## v2.39.0 (September 14, 2015)
