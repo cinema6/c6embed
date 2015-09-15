@@ -256,23 +256,27 @@ describe('MRAID()', function() {
         });
 
         describe('[viewable]', function() {
-            describe('if isViewable() returns true', function() {
-                beforeEach(function() {
-                    window.mraid.isViewable.and.returnValue(true);
-                });
+            [true, 1].forEach(function(value) {
+                describe('if isViewable() returns ' + value, function() {
+                    beforeEach(function() {
+                        window.mraid.isViewable.and.returnValue(value);
+                    });
 
-                it('should be true', function() {
-                    expect(mraid.viewable).toBe(true);
+                    it('should be true', function() {
+                        expect(mraid.viewable).toBe(true);
+                    });
                 });
             });
 
-            describe('if isViewable() returns false', function() {
-                beforeEach(function() {
-                    window.mraid.isViewable.and.returnValue(false);
-                });
+            [false, 0].forEach(function(value) {
+                describe('if isViewable() returns ' + value, function() {
+                    beforeEach(function() {
+                        window.mraid.isViewable.and.returnValue(value);
+                    });
 
-                it('should be false', function() {
-                    expect(mraid.viewable).toBe(false);
+                    it('should be false', function() {
+                        expect(mraid.viewable).toBe(false);
+                    });
                 });
             });
         });
