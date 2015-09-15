@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* Improve compatibility with Phunware
+
 ## v2.39.0 (September 14, 2015)
 * [FEATURE]: Add support for player 'adEnded' event in the solo player
 * Add log statements to MRAID to try to make debugging integrations
