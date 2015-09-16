@@ -263,6 +263,18 @@ module.exports = function c6mraid(config) {
         logger.error('MRAID Error:', message, action);
     });
 
+    if (config.debug > 1) {
+        mraid.on('pollProperty', function checkViewable(property, value) {
+            function getViewable() {
+                try { return mraid.viewable; } catch(e) { return e; }
+            }
+
+            if (property === 'ready') {
+                logger.log('Ready is', value, 'Viewable is', getViewable());
+            }
+        });
+    }
+
     mraid.waitUntilViewable().then(function sendVisibleEvent() {
         var visibleStart = Date.now();
 
