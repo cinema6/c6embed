@@ -155,16 +155,10 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
-    it('should give the logger a descriptive prefix', function() {
-        var prefixParts = globalLogger.prefix().split('|');
-        var container = prefixParts[0];
-        var appParts = prefixParts[1].split(':');
-        var network = appParts[0];
-        var app = appParts[1];
-
-        expect(container).toBe('some-src');
-        expect(network).toBe('omax');
-        expect(app).toBe('Talking Tom');
+    it('should decorate the logger with information about the app', function() {
+        expect(globalLogger.meta.container).toBe('some-src');
+        expect(globalLogger.meta.network).toBe('omax');
+        expect(globalLogger.meta.app).toBe('Talking Tom');
     });
 
     it('should create a new MRAID instance', function() {

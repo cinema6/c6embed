@@ -202,8 +202,6 @@ function fetchExperience(config) {
 function initLogger(config) {
     'use strict';
 
-    var app = [config.network, config.app].filter(truthy).join(':');
-    var prefix = [config.src, app].filter(truthy).join('|');
     var levels = [
         { value: 0, levels: ['error'] },
         { value: 1, levels: ['info', 'warn'] },
@@ -214,10 +212,11 @@ function initLogger(config) {
         return result.concat(params.levels);
     }, []);
 
-    function truthy(value) { return !!value; }
 
+    globalLogger.meta.container = config.src;
+    globalLogger.meta.network = config.network;
+    globalLogger.meta.app = config.app;
     globalLogger.levels(levels);
-    globalLogger.prefix(prefix);
 }
 
 module.exports = function c6mraid(config) {
