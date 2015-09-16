@@ -89,6 +89,12 @@ describe('logger', function() {
                 });
             });
         });
+
+        describe('meta', function() {
+            it('should be an Object', function() {
+                expect(logger.meta).toEqual({});
+            });
+        });
     });
 
     describe('methods:', function() {
@@ -391,6 +397,7 @@ describe('logger', function() {
                 expect(result.prefix()).toEqual(logger.prefix() + ' TEST');
 
                 expect(result.tasks).toBe(logger.tasks);
+                expect(result.meta).toBe(logger.meta);
             });
 
             describe('if the parent has no prefix', function() {
