@@ -28,23 +28,6 @@ var ObservableProvider = require('../../lib/ObservableProvider');
 
 logger.tasks.send.push(sendLog);
 
-var uuid = (function() {
-    'use strict';
-
-    var POSSIBILITIES = '0123456789abcdefghijklmnopqrstuvwxyz';
-    var NUM_OF_POSSIBILITIES = POSSIBILITIES.length;
-
-    return function uuid(length) {
-        var result = '';
-
-        while (length--) {
-            result += POSSIBILITIES.charAt(Math.floor(Math.random() * (NUM_OF_POSSIBILITIES - 1)));
-        }
-
-        return result;
-    };
-}());
-
 function omit(object, keys) {
     'use strict';
 
@@ -67,7 +50,13 @@ function sendLog(logger, method, args) {
         pathname: 'pixel.gif',
         query: {
             v: args.join(', '),
-            cb: Date.now()
+            t: Date.now(),
+            c: logger.meta.container,
+            n: logger.meta.network,
+            a: logger.meta.app,
+            l: method,
+            p: logger.prefix(),
+            u: logger.uuid()
         }
     });
 }
@@ -219,13 +208,21 @@ function fetchExperience(config) {
 function initLogger(config) {
     'use strict';
 
-    var app = [config.network, config.app].filter(truthy).join(':');
-    var prefix = [uuid(14), config.src, app].filter(truthy).join('|');
+    var levels = [
+        { value: 0, levels: ['error'] },
+        { value: 1, levels: ['info', 'warn'] },
+        { value: 2, levels: ['log'] }
+    ].filter(function(params) {
+        return config.debug >= params.value;
+    }).reduce(function(result, params) {
+        return result.concat(params.levels);
+    }, []);
 
-    function truthy(value) { return !!value; }
 
-    globalLogger.levels(config.debug ? ['log', 'info', 'warn', 'error'] : ['error']);
-    globalLogger.prefix(prefix);
+    globalLogger.meta.container = config.src;
+    globalLogger.meta.network = config.network;
+    globalLogger.meta.app = config.app;
+    globalLogger.levels(levels);
 }
 
 module.exports = function c6mraid(config) {
@@ -245,7 +242,7 @@ module.exports = function c6mraid(config) {
     });
     var controller = null;
 
-    logger.info('Initialize.');
+    logger.info('Initialize.', config);
 
     ga('require', 'displayfeatures');
     ga('set', {
@@ -351,7 +348,7 @@ module.exports = function c6mraid(config) {
                 }
             }, true);
         }).then(function logSuccess(controller) {
-            logger.log('Player loaded.');
+            logger.info('Player loaded.');
             return controller;
         }),
         mraid.waitUntilViewable().delay(600).then(function recordReadyTime() {

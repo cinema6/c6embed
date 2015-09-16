@@ -68,7 +68,7 @@ describe('logger', function() {
                     });
 
                     it('should prefix the args', function() {
-                        expect(fn(logger, 'error', ['hello', 'world'])).toEqual(['{' + new Date().toISOString() + '} [error] (MRAID)', 'hello', 'world']);
+                        expect(fn(logger, 'error', ['hello', 'world'])).toEqual(['[error] (MRAID)', 'hello', 'world']);
                     });
                 });
             });
@@ -78,20 +78,46 @@ describe('logger', function() {
                 describe('[0]', function() {
                     beforeEach(function() {
                         fn = logger.tasks.send[0];
+                        jasmine.clock().install();
+                        jasmine.clock().mockDate();
 
                         spyOn(console, 'log');
                         fn(logger, 'log', ['foo', 'bar']);
                     });
 
+                    afterEach(function() {
+                        jasmine.clock().uninstall();
+                    });
+
                     it('should send commands to the console', function() {
-                        expect(console.log).toHaveBeenCalledWith('foo', 'bar');
+                        expect(console.log).toHaveBeenCalledWith(new Date(), 'foo', 'bar');
                     });
                 });
+            });
+        });
+
+        describe('meta', function() {
+            it('should be an Object', function() {
+                expect(logger.meta).toEqual({});
             });
         });
     });
 
     describe('methods:', function() {
+        describe('uuid()', function() {
+            it('should return a unique identifier', function() {
+                expect(logger.uuid()).toMatch(/[0-9a-z]{14}/);
+            });
+
+            it('should return the same identifier', function() {
+                expect(logger.uuid()).toBe(logger.uuid());
+            });
+
+            it('should give the children the same uuid', function() {
+                expect(logger.context('foo').uuid()).toBe(logger.uuid());
+            });
+        });
+
         describe('levels()', function() {
             var setLevels;
 
@@ -377,6 +403,7 @@ describe('logger', function() {
                 expect(result.prefix()).toEqual(logger.prefix() + ' TEST');
 
                 expect(result.tasks).toBe(logger.tasks);
+                expect(result.meta).toBe(logger.meta);
             });
 
             describe('if the parent has no prefix', function() {

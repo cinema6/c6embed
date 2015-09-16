@@ -146,31 +146,20 @@ describe('[c6mraid(config)]', function() {
         beforeEach(function() {
             spyOn(window, 'Image').and.callFake(MockImage);
             fn = globalLogger.tasks.send[globalLogger.tasks.send.length - 1];
+            globalLogger.prefix.and.returnValue('my-prefix');
 
             fn(globalLogger, 'log', ['hello world', 'what\'s up?']);
         });
 
         it('should fire a pixel to the C6 Log endpoint', function() {
-            expect(img.src).toBe('https://logging.cinema6.com/pixel.gif?v=hello%20world%2C%20what\'s%20up%3F&cb=' + Date.now());
+            expect(img.src).toBe('https://logging.cinema6.com/pixel.gif?v=hello%20world%2C%20what\'s%20up%3F&t=' + Date.now() + '&c=some-src&n=omax&a=Talking%20Tom&l=log&p=my-prefix&u=' + globalLogger.uuid());
         });
     });
 
-    it('should enabled all log levels', function() {
-        expect(globalLogger.levels).toHaveBeenCalledWith(['log', 'info', 'warn', 'error']);
-    });
-
-    it('should give the logger a descriptive prefix', function() {
-        var prefixParts = globalLogger.prefix().split('|');
-        var uuid = prefixParts[0];
-        var container = prefixParts[1];
-        var appParts = prefixParts[2].split(':');
-        var network = appParts[0];
-        var app = appParts[1];
-
-        expect(uuid).toMatch(/[0-9a-z]{14}/);
-        expect(container).toBe('some-src');
-        expect(network).toBe('omax');
-        expect(app).toBe('Talking Tom');
+    it('should decorate the logger with information about the app', function() {
+        expect(globalLogger.meta.container).toBe('some-src');
+        expect(globalLogger.meta.network).toBe('omax');
+        expect(globalLogger.meta.app).toBe('Talking Tom');
     });
 
     it('should create a new MRAID instance', function() {
@@ -244,6 +233,45 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
+    [0, false].forEach(function(value) {
+        describe('if called with debug: ' + value, function() {
+            beforeEach(function() {
+                globalLogger.levels.calls.reset();
+                c6mraid({ exp: 'e-d83a40ac1437f5', debug: value });
+            });
+
+            it('should only enable error logging', function() {
+                expect(globalLogger.levels).toHaveBeenCalledWith(['error']);
+            });
+        });
+    });
+
+    [1, true].forEach(function(value) {
+        describe('if called with debug: ' + value, function() {
+            beforeEach(function() {
+                globalLogger.levels.calls.reset();
+                c6mraid({ exp: 'e-d83a40ac1437f5', debug: value });
+            });
+
+            it('should enable everything but log-level logging', function() {
+                expect(globalLogger.levels).toHaveBeenCalledWith(['error', 'info', 'warn']);
+            });
+        });
+    });
+
+    [2].forEach(function(value) {
+        describe('if called with debug: ' + value, function() {
+            beforeEach(function() {
+                globalLogger.levels.calls.reset();
+                c6mraid({ exp: 'e-d83a40ac1437f5', debug: value });
+            });
+
+            it('should enable all log levels', function() {
+                expect(globalLogger.levels).toHaveBeenCalledWith(['error', 'info', 'warn', 'log']);
+            });
+        });
+    });
+
     describe('if called with minimal configuration', function() {
         var experience;
 
@@ -278,12 +306,8 @@ describe('[c6mraid(config)]', function() {
             jasmine.clock().install();
         });
 
-        it('should only enable error logging', function() {
-            expect(globalLogger.levels).toHaveBeenCalledWith(['error']);
-        });
-
-        it('should only add a uuid to the logger', function() {
-            expect(globalLogger.prefix()).toMatch(/^[0-9a-z]{14}$/);
+        it('should not give the logger a prefix', function() {
+            expect(globalLogger.prefix()).toBe('');
         });
 
         it('should create a portrait MRAID instance', function() {
