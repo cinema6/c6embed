@@ -28,23 +28,6 @@ var ObservableProvider = require('../../lib/ObservableProvider');
 
 logger.tasks.send.push(sendLog);
 
-var uuid = (function() {
-    'use strict';
-
-    var POSSIBILITIES = '0123456789abcdefghijklmnopqrstuvwxyz';
-    var NUM_OF_POSSIBILITIES = POSSIBILITIES.length;
-
-    return function uuid(length) {
-        var result = '';
-
-        while (length--) {
-            result += POSSIBILITIES.charAt(Math.floor(Math.random() * (NUM_OF_POSSIBILITIES - 1)));
-        }
-
-        return result;
-    };
-}());
-
 function omit(object, keys) {
     'use strict';
 
@@ -220,7 +203,7 @@ function initLogger(config) {
     'use strict';
 
     var app = [config.network, config.app].filter(truthy).join(':');
-    var prefix = [uuid(14), config.src, app].filter(truthy).join('|');
+    var prefix = [config.src, app].filter(truthy).join('|');
     var levels = [
         { value: 0, levels: ['error'] },
         { value: 1, levels: ['info', 'warn'] },

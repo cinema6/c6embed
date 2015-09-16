@@ -157,13 +157,11 @@ describe('[c6mraid(config)]', function() {
 
     it('should give the logger a descriptive prefix', function() {
         var prefixParts = globalLogger.prefix().split('|');
-        var uuid = prefixParts[0];
-        var container = prefixParts[1];
-        var appParts = prefixParts[2].split(':');
+        var container = prefixParts[0];
+        var appParts = prefixParts[1].split(':');
         var network = appParts[0];
         var app = appParts[1];
 
-        expect(uuid).toMatch(/[0-9a-z]{14}/);
         expect(container).toBe('some-src');
         expect(network).toBe('omax');
         expect(app).toBe('Talking Tom');
@@ -313,8 +311,8 @@ describe('[c6mraid(config)]', function() {
             jasmine.clock().install();
         });
 
-        it('should only add a uuid to the logger', function() {
-            expect(globalLogger.prefix()).toMatch(/^[0-9a-z]{14}$/);
+        it('should not give the logger a prefix', function() {
+            expect(globalLogger.prefix()).toBe('');
         });
 
         it('should create a portrait MRAID instance', function() {
