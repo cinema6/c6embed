@@ -325,6 +325,25 @@ describe('MRAID()', function() {
                     expect(failure).not.toHaveBeenCalled();
                 });
 
+                describe('as time passes', function() {
+                    var pollProperty;
+
+                    beforeEach(function() {
+                        pollProperty = jasmine.createSpy('pollProperty()');
+                        mraid.on('pollProperty', pollProperty);
+                    });
+
+                    it('should emit the "pollProperty" event', function() {
+                        jasmine.clock().tick(1000);
+                        expect(pollProperty).toHaveBeenCalledWith('foo', 'foo', 'bar');
+                        pollProperty.calls.reset();
+
+                        mraid.foo = 'HEY!';
+                        jasmine.clock().tick(1000);
+                        expect(pollProperty).toHaveBeenCalledWith('foo', 'HEY!', 'bar');
+                    });
+                });
+
                 describe('if time passes and the value still has not become the expected one', function() {
                     beforeEach(function(done) {
                         mraid.foo = 'hello';
