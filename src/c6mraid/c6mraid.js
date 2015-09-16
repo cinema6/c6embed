@@ -254,7 +254,7 @@ module.exports = function c6mraid(config) {
     });
     var controller = null;
 
-    logger.info('Initialize.');
+    logger.info('Initialize.', config);
 
     ga('require', 'displayfeatures');
     ga('set', {
