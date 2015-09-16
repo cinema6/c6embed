@@ -287,8 +287,14 @@ describe('MRAID()', function() {
             var success, failure;
 
             beforeEach(function() {
+                jasmine.clock().install();
+
                 success = jasmine.createSpy('success()');
                 failure = jasmine.createSpy('failure()');
+            });
+
+            afterEach(function() {
+                jasmine.clock().uninstall();
             });
 
             describe('if the prop is already the value', function() {
@@ -315,6 +321,33 @@ describe('MRAID()', function() {
                 it('should not fulfill the promise', function() {
                     expect(success).not.toHaveBeenCalled();
                     expect(failure).not.toHaveBeenCalled();
+                });
+
+                describe('if time passes and the value still has not become the expected one', function() {
+                    beforeEach(function(done) {
+                        mraid.foo = 'hello';
+                        jasmine.clock().tick(1000);
+                        mraid.foo = 'world';
+                        jasmine.clock().tick(1000);
+
+                        q().then(done);
+                    });
+
+                    it('should not fulfill the promise', function() {
+                        expect(success).not.toHaveBeenCalled();
+                    });
+                });
+
+                describe('if the value becomes the expected one', function() {
+                    beforeEach(function(done) {
+                        mraid.foo = 'bar';
+                        jasmine.clock().tick(1000);
+                        q().then(done);
+                    });
+
+                    it('should fulfill the promise', function() {
+                        expect(success).toHaveBeenCalledWith('bar');
+                    });
                 });
 
                 describe('when the provided event is emitted', function() {
