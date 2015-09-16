@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.39.3 (September 16, 2015)
 * Send log statements that will indicate if MRAID reports ad is viewable
   but not ready
 
