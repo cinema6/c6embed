@@ -68,7 +68,7 @@ describe('logger', function() {
                     });
 
                     it('should prefix the args', function() {
-                        expect(fn(logger, 'error', ['hello', 'world'])).toEqual(['{' + new Date().toISOString() + '} [error] (MRAID)', 'hello', 'world']);
+                        expect(fn(logger, 'error', ['hello', 'world'])).toEqual(['[error] (MRAID)', 'hello', 'world']);
                     });
                 });
             });
@@ -78,13 +78,19 @@ describe('logger', function() {
                 describe('[0]', function() {
                     beforeEach(function() {
                         fn = logger.tasks.send[0];
+                        jasmine.clock().install();
+                        jasmine.clock().mockDate();
 
                         spyOn(console, 'log');
                         fn(logger, 'log', ['foo', 'bar']);
                     });
 
+                    afterEach(function() {
+                        jasmine.clock().uninstall();
+                    });
+
                     it('should send commands to the console', function() {
-                        expect(console.log).toHaveBeenCalledWith('foo', 'bar');
+                        expect(console.log).toHaveBeenCalledWith(new Date(), 'foo', 'bar');
                     });
                 });
             });
