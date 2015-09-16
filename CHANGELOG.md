@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+* Make checks for MRAID properties more robust in the attempt of
+  improving compatibility
+* Enable multiple levels of debug mode
+
 ## v2.39.1 (September 15, 2015)
 * Improve compatibility with Phunware
 
