@@ -50,7 +50,13 @@ function sendLog(logger, method, args) {
         pathname: 'pixel.gif',
         query: {
             v: args.join(', '),
-            cb: Date.now()
+            t: Date.now(),
+            c: logger.meta.container,
+            n: logger.meta.network,
+            a: logger.meta.app,
+            l: method,
+            p: logger.prefix(),
+            u: logger.uuid()
         }
     });
 }

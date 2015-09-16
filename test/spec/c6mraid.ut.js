@@ -146,12 +146,13 @@ describe('[c6mraid(config)]', function() {
         beforeEach(function() {
             spyOn(window, 'Image').and.callFake(MockImage);
             fn = globalLogger.tasks.send[globalLogger.tasks.send.length - 1];
+            globalLogger.prefix.and.returnValue('my-prefix');
 
             fn(globalLogger, 'log', ['hello world', 'what\'s up?']);
         });
 
         it('should fire a pixel to the C6 Log endpoint', function() {
-            expect(img.src).toBe('https://logging.cinema6.com/pixel.gif?v=hello%20world%2C%20what\'s%20up%3F&cb=' + Date.now());
+            expect(img.src).toBe('https://logging.cinema6.com/pixel.gif?v=hello%20world%2C%20what\'s%20up%3F&t=' + Date.now() + '&c=some-src&n=omax&a=Talking%20Tom&l=log&p=my-prefix&u=' + globalLogger.uuid());
         });
     });
 
