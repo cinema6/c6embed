@@ -360,7 +360,7 @@ module.exports = function c6mraid(config) {
                 }
             }, true);
         }).then(function logSuccess(controller) {
-            logger.log('Player loaded.');
+            logger.info('Player loaded.');
             return controller;
         }),
         mraid.waitUntilViewable().delay(600).then(function recordReadyTime() {
