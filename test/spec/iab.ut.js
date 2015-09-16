@@ -106,6 +106,8 @@ describe('MRAID()', function() {
         var ready1, ready2, ready3;
 
         beforeEach(function() {
+            mraid.removeAllListeners('ready');
+
             ready1 = jasmine.createSpy('ready1()');
             ready2 = jasmine.createSpy('ready2()');
             ready3 = jasmine.createSpy('ready3()');
@@ -165,7 +167,7 @@ describe('MRAID()', function() {
         describe('when the api is ready', function() {
             beforeEach(function(done) {
                 window.mraid.getState.and.returnValue('default');
-                mraid.emit('stateChange');
+                mraid.emit('ready');
 
                 q().then(function() {}).then(done);
             });
@@ -323,6 +325,25 @@ describe('MRAID()', function() {
                     expect(failure).not.toHaveBeenCalled();
                 });
 
+                describe('as time passes', function() {
+                    var pollProperty;
+
+                    beforeEach(function() {
+                        pollProperty = jasmine.createSpy('pollProperty()');
+                        mraid.on('pollProperty', pollProperty);
+                    });
+
+                    it('should emit the "pollProperty" event', function() {
+                        jasmine.clock().tick(1000);
+                        expect(pollProperty).toHaveBeenCalledWith('foo', 'foo', 'bar');
+                        pollProperty.calls.reset();
+
+                        mraid.foo = 'HEY!';
+                        jasmine.clock().tick(1000);
+                        expect(pollProperty).toHaveBeenCalledWith('foo', 'HEY!', 'bar');
+                    });
+                });
+
                 describe('if time passes and the value still has not become the expected one', function() {
                     beforeEach(function(done) {
                         mraid.foo = 'hello';
@@ -409,7 +430,7 @@ describe('MRAID()', function() {
                 expect(mraid.waitUntil).toHaveBeenCalledWith({
                     prop: 'ready',
                     value: true,
-                    event: 'stateChange'
+                    event: 'ready'
                 });
                 expect(result).toBe(waitUntilPromise);
             });
