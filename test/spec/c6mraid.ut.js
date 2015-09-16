@@ -155,10 +155,6 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
-    it('should enabled all log levels', function() {
-        expect(globalLogger.levels).toHaveBeenCalledWith(['log', 'info', 'warn', 'error']);
-    });
-
     it('should give the logger a descriptive prefix', function() {
         var prefixParts = globalLogger.prefix().split('|');
         var uuid = prefixParts[0];
@@ -244,6 +240,45 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
+    [0, false].forEach(function(value) {
+        describe('if called with debug: ' + value, function() {
+            beforeEach(function() {
+                globalLogger.levels.calls.reset();
+                c6mraid({ exp: 'e-d83a40ac1437f5', debug: value });
+            });
+
+            it('should only enable error logging', function() {
+                expect(globalLogger.levels).toHaveBeenCalledWith(['error']);
+            });
+        });
+    });
+
+    [1, true].forEach(function(value) {
+        describe('if called with debug: ' + value, function() {
+            beforeEach(function() {
+                globalLogger.levels.calls.reset();
+                c6mraid({ exp: 'e-d83a40ac1437f5', debug: value });
+            });
+
+            it('should enable everything but log-level logging', function() {
+                expect(globalLogger.levels).toHaveBeenCalledWith(['error', 'info', 'warn']);
+            });
+        });
+    });
+
+    [2].forEach(function(value) {
+        describe('if called with debug: ' + value, function() {
+            beforeEach(function() {
+                globalLogger.levels.calls.reset();
+                c6mraid({ exp: 'e-d83a40ac1437f5', debug: value });
+            });
+
+            it('should enable all log levels', function() {
+                expect(globalLogger.levels).toHaveBeenCalledWith(['error', 'info', 'warn', 'log']);
+            });
+        });
+    });
+
     describe('if called with minimal configuration', function() {
         var experience;
 
@@ -276,10 +311,6 @@ describe('[c6mraid(config)]', function() {
 
         afterEach(function() {
             jasmine.clock().install();
-        });
-
-        it('should only enable error logging', function() {
-            expect(globalLogger.levels).toHaveBeenCalledWith(['error']);
         });
 
         it('should only add a uuid to the logger', function() {

@@ -221,10 +221,19 @@ function initLogger(config) {
 
     var app = [config.network, config.app].filter(truthy).join(':');
     var prefix = [uuid(14), config.src, app].filter(truthy).join('|');
+    var levels = [
+        { value: 0, levels: ['error'] },
+        { value: 1, levels: ['info', 'warn'] },
+        { value: 2, levels: ['log'] }
+    ].filter(function(params) {
+        return config.debug >= params.value;
+    }).reduce(function(result, params) {
+        return result.concat(params.levels);
+    }, []);
 
     function truthy(value) { return !!value; }
 
-    globalLogger.levels(config.debug ? ['log', 'info', 'warn', 'error'] : ['error']);
+    globalLogger.levels(levels);
     globalLogger.prefix(prefix);
 }
 
