@@ -92,6 +92,20 @@ describe('logger', function() {
     });
 
     describe('methods:', function() {
+        describe('uuid()', function() {
+            it('should return a unique identifier', function() {
+                expect(logger.uuid()).toMatch(/[0-9a-z]{14}/);
+            });
+
+            it('should return the same identifier', function() {
+                expect(logger.uuid()).toBe(logger.uuid());
+            });
+
+            it('should give the children the same uuid', function() {
+                expect(logger.context('foo').uuid()).toBe(logger.uuid());
+            });
+        });
+
         describe('levels()', function() {
             var setLevels;
 
