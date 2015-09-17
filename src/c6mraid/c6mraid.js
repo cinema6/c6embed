@@ -26,6 +26,8 @@ var FrameFactory = require('../app/FrameFactory');
 var HostDocument = require('../app/HostDocument');
 var ObservableProvider = require('../../lib/ObservableProvider');
 
+var PLAYER_EVENTS = ['launch', 'adStart', 'adCount', 'adEnded'];
+
 logger.tasks.send.push(sendLog);
 
 function omit(object, keys) {
@@ -288,6 +290,15 @@ module.exports = function c6mraid(config) {
                 timingLabel: 'c6'
             });
         });
+    });
+
+    window.addEventListener('message', function(event) {
+        var data = (function() {
+            try { return JSON.parse(event.data) || {}; } catch(e) { return {}; }
+        }());
+        if (PLAYER_EVENTS.indexOf(data.event) < 0) { return; }
+
+        logger.info('Player event: ' + data.event, data);
     });
 
     return q.all([
