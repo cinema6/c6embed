@@ -280,39 +280,6 @@ describe('[c6mraid(config)]', function() {
             it('should enable all log levels', function() {
                 expect(globalLogger.levels).toHaveBeenCalledWith(['error', 'info', 'warn', 'log']);
             });
-
-            describe('when "pollProperty" is emitted', function() {
-                var value, expected;
-
-                beforeEach(function() {
-                    value = { value: 'value' }; expected = { expected: 'expected' };
-                    spyOn(logger, 'log').and.callThrough();
-                });
-
-                ['viewable', 'foo', 'bar'].forEach(function(prop) {
-                    describe('if the prop is ' + prop, function() {
-                        beforeEach(function() {
-                            mraid.emit('pollProperty', prop, value, expected);
-                        });
-
-                        it('should not log anything', function() {
-                            expect(logger.log).not.toHaveBeenCalled();
-                        });
-                    });
-                });
-
-                ['ready'].forEach(function(prop) {
-                    describe('if the prop is ' + prop, function() {
-                        beforeEach(function() {
-                            mraid.emit('pollProperty', prop, value, expected);
-                        });
-
-                        it('should not log something', function() {
-                            expect(logger.log).toHaveBeenCalledWith('Ready is', value, 'Viewable is', mraid.viewable);
-                        });
-                    });
-                });
-            });
         });
     });
 
