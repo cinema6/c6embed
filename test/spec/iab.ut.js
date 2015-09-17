@@ -14,15 +14,15 @@ describe('MRAID()', function() {
         logger.enabled(false);
 
         window.mraid = {
-            addEventListener: function addEventListener(event, handler) {
+            addEventListener: jasmine.createSpy('mraid.addEventListener()').and.callFake(function addEventListener(event, handler) {
                 (events[event] || (events[event] = [])).push(handler);
-            },
+            }),
 
-            removeEventListener: function removeEventListener(event, handler) {
+            removeEventListener: jasmine.createSpy('mraid.removeEventListener()').and.callFake(function removeEventListener(event, handler) {
                 events[event] = (event[events] || []).filter(function(item) {
                     return item !== handler;
                 });
-            },
+            }),
 
             getState: jasmine.createSpy('mraid.getState()').and.returnValue('loading'),
             isViewable: jasmine.createSpy('mraid.isViewable()').and.returnValue(false),
@@ -67,6 +67,18 @@ describe('MRAID()', function() {
 
     it('should exist', function() {
         expect(mraid).toEqual(jasmine.any(Object));
+    });
+
+    describe('when non-mraid event listeners are added', function() {
+        beforeEach(function() {
+            window.mraid.addEventListener.calls.reset();
+            mraid.on('pollProperty', function() {});
+            mraid.on('removeListener', function() {});
+        });
+
+        it('should not call mraid.addEventListener()', function() {
+            expect(window.mraid.addEventListener).not.toHaveBeenCalled();
+        });
     });
 
     describe('when mraid events are emitted', function() {
