@@ -603,12 +603,34 @@ describe('MRAID()', function() {
 
             beforeEach(function() {
                 url = 'http://www.apple.com/';
-
-                mraid.open(url);
             });
 
-            it('should open the url', function() {
-                expect(window.mraid.open).toHaveBeenCalledWith(url);
+            ['default', 'expanded', 'resized'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.open(url);
+                    });
+
+                    it('should open the url', function() {
+                        expect(window.mraid.open).toHaveBeenCalledWith(url);
+                    });
+                });
+            });
+
+            ['loading', 'hidden'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.open(url);
+                    });
+
+                    it('should do nothing', function() {
+                        expect(window.mraid.open).not.toHaveBeenCalled();
+                    });
+                });
             });
         });
 
@@ -617,22 +639,64 @@ describe('MRAID()', function() {
 
             beforeEach(function() {
                 url = 'http://www.google.com';
-
-                mraid.expand(url);
             });
 
-            it('should expand the url', function() {
-                expect(window.mraid.expand).toHaveBeenCalledWith(url);
+            ['default', 'expanded', 'resized'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.expand(url);
+                    });
+
+                    it('should expand the url', function() {
+                        expect(window.mraid.expand).toHaveBeenCalledWith(url);
+                    });
+                });
+            });
+
+            ['loading', 'hidden'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.expand(url);
+                    });
+
+                    it('should do nothing', function() {
+                        expect(window.mraid.expand).not.toHaveBeenCalled();
+                    });
+                });
             });
         });
 
         describe('[close()]', function() {
-            beforeEach(function() {
-                mraid.close();
+            ['default', 'expanded', 'resized'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.close();
+                    });
+
+                    it('should close the ad', function() {
+                        expect(window.mraid.close).toHaveBeenCalled();
+                    });
+                });
             });
 
-            it('should close the ad', function() {
-                expect(window.mraid.close).toHaveBeenCalled();
+            ['loading', 'hidden'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.close();
+                    });
+
+                    it('should do nothing', function() {
+                        expect(window.mraid.close).not.toHaveBeenCalled();
+                    });
+                });
             });
         });
     });
