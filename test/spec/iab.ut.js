@@ -392,8 +392,19 @@ describe('MRAID()', function() {
             });
 
             describe('if the prop is not already the value', function() {
+                var value;
+                var get, set;
+
                 beforeEach(function(done) {
-                    mraid.foo = 'foo';
+                    value = 'foo';
+                    get = jasmine.createSpy('get() foo').and.callFake(function() {
+                            return value;
+                    });
+                    set = jasmine.createSpy('set() foo').and.callFake(function(val) {
+                        value = val;
+                    });
+
+                    Object.defineProperty(mraid, 'foo', { get: get, set: set });
 
                     mraid.waitUntil({ prop: 'foo', value: 'bar', event: 'fooChange' }).then(success, failure);
                     q().then(done);
@@ -410,16 +421,20 @@ describe('MRAID()', function() {
                     beforeEach(function() {
                         pollProperty = jasmine.createSpy('pollProperty()');
                         mraid.on('pollProperty', pollProperty);
+                        get.calls.reset();
                     });
 
                     it('should emit the "pollProperty" event', function() {
                         jasmine.clock().tick(1000);
                         expect(pollProperty).toHaveBeenCalledWith('foo', 'foo', 'bar');
+                        expect(get.calls.count()).toBe(1);
                         pollProperty.calls.reset();
+                        get.calls.reset();
 
                         mraid.foo = 'HEY!';
                         jasmine.clock().tick(1000);
                         expect(pollProperty).toHaveBeenCalledWith('foo', 'HEY!', 'bar');
+                        expect(get.calls.count()).toBe(1);
                     });
                 });
 
