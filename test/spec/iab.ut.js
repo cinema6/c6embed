@@ -42,6 +42,7 @@ describe('MRAID()', function() {
             setOrientationProperties: jasmine.createSpy('mraid.setOrientationProperties()'),
 
             getVersion: jasmine.createSpy('mraid.getVersion()').and.returnValue('2.0'),
+            supports: jasmine.createSpy('mraid.supports()').and.returnValue(false),
 
             useCustomClose: jasmine.createSpy('mraid.useCustomClose()'),
 
@@ -298,6 +299,7 @@ describe('MRAID()', function() {
             window.mraid.getState.and.returnValue('default');
             window.mraid.getOrientationProperties.calls.reset();
             window.mraid.setOrientationProperties.calls.reset();
+            window.mraid.supports.calls.reset();
 
             mraid = new iab.MRAID();
             q().then(done);
@@ -306,6 +308,10 @@ describe('MRAID()', function() {
         it('should not call getOrientationProperties() or setOrientationProperties()', function() {
             expect(window.mraid.getOrientationProperties).not.toHaveBeenCalled();
             expect(window.mraid.setOrientationProperties).not.toHaveBeenCalled();
+        });
+
+        it('should not call supports()', function() {
+            expect(window.mraid.supports).not.toHaveBeenCalled();
         });
     });
 
