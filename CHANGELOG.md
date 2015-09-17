@@ -1,5 +1,12 @@
 # C6Embed Changelog
 
+* Fix a slew of non-fatal MRAID errors
+* Log if MRAID environment supports inline video
+* Remove gratuitous logging during polling
+* Log if close button is hidden when MRAID ad is shown
+* Log when the player reports that it launched, that the video started
+  playing, that the minViewTime was reached and that the video ended
+
 ## v2.39.3 (September 16, 2015)
 * Send log statements that will indicate if MRAID reports ad is viewable
   but not ready
