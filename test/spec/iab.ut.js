@@ -196,7 +196,7 @@ describe('MRAID()', function() {
 
             mraid = new iab.MRAID({
                 width: 800,
-                forceOrientation: 'landscape'
+                forceOrientation: 'none'
             });
 
             q().then(done);
@@ -211,7 +211,7 @@ describe('MRAID()', function() {
             });
             expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith({
                 allowOrientationChange: window.mraid.getOrientationProperties().allowOrientationChange,
-                forceOrientation: 'landscape'
+                forceOrientation: 'none'
             });
             expect(window.mraid.useCustomClose).toHaveBeenCalledWith(false);
         });
@@ -229,6 +229,54 @@ describe('MRAID()', function() {
             expect(window.mraid.setExpandProperties).toHaveBeenCalledWith(window.mraid.getExpandProperties());
             expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith(window.mraid.getOrientationProperties());
             expect(window.mraid.useCustomClose).toHaveBeenCalledWith(false);
+        });
+    });
+
+    ['portrait', 'landscape'].forEach(function(orientation) {
+        describe('if forceOrientation is ' + orientation, function() {
+            beforeEach(function(done) {
+                window.mraid.getState.and.returnValue('default');
+                window.mraid.setOrientationProperties.calls.reset();
+
+                mraid = new iab.MRAID({
+                    forceOrientation: orientation,
+                    allowOrientationChange: true
+                });
+                q().then(done);
+            });
+
+            it('should make allowOrientationChange false', function() {
+                expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith({
+                    allowOrientationChange: false,
+                    forceOrientation: orientation
+                });
+            });
+        });
+    });
+
+    ['none'].forEach(function(orientation) {
+        describe('if forceOrientation is ' + orientation, function() {
+            [true, false].forEach(function(allow) {
+                describe('and allowOrientationChange is ' + allow, function() {
+                    beforeEach(function(done) {
+                        window.mraid.getState.and.returnValue('default');
+                        window.mraid.setOrientationProperties.calls.reset();
+
+                        mraid = new iab.MRAID({
+                            forceOrientation: orientation,
+                            allowOrientationChange: allow
+                        });
+                        q().then(done);
+                    });
+
+                    it('should make allowOrientationChange ' + allow, function() {
+                        expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith({
+                            allowOrientationChange: allow,
+                            forceOrientation: orientation
+                        });
+                    });
+                });
+            });
         });
     });
 
