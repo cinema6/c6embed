@@ -271,7 +271,7 @@ module.exports = function c6mraid(config) {
             eventAction: 'Visible'
         });
 
-        logger.info('MRAID is reporting ad is viewable.');
+        logger.info('MRAID is reporting ad is viewable. useCustomClose is', mraid.useCustomClose);
 
         mraid.on('stateChange', function(state) {
             var timeVisible = Date.now() - visibleStart;

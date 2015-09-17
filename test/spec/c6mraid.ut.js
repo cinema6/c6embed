@@ -94,7 +94,8 @@ describe('[c6mraid(config)]', function() {
             addEventListener: function() {},
             removeEventListener: function() {},
             getState: jasmine.createSpy('mraid.getState()').and.returnValue('loading'),
-            isViewable: jasmine.createSpy('mraid.isViewable()').and.returnValue(false)
+            isViewable: jasmine.createSpy('mraid.isViewable()').and.returnValue(false),
+            getExpandProperties: jasmine.createSpy('mraid.getExpandProperties()').and.returnValue({ useCustomClose: true })
         };
         delete window.__C6_URL_ROOT__;
 
