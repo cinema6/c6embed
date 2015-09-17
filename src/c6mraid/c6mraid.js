@@ -26,6 +26,8 @@ var FrameFactory = require('../app/FrameFactory');
 var HostDocument = require('../app/HostDocument');
 var ObservableProvider = require('../../lib/ObservableProvider');
 
+var PLAYER_EVENTS = ['launch', 'adStart', 'adCount', 'adEnded'];
+
 logger.tasks.send.push(sendLog);
 
 function omit(object, keys) {
@@ -263,18 +265,6 @@ module.exports = function c6mraid(config) {
         logger.error('MRAID Error:', message, action);
     });
 
-    if (config.debug > 1) {
-        mraid.on('pollProperty', function checkViewable(property, value) {
-            function getViewable() {
-                try { return mraid.viewable; } catch(e) { return e; }
-            }
-
-            if (property === 'ready') {
-                logger.log('Ready is', value, 'Viewable is', getViewable());
-            }
-        });
-    }
-
     mraid.waitUntilViewable().then(function sendVisibleEvent() {
         var visibleStart = Date.now();
 
@@ -283,7 +273,7 @@ module.exports = function c6mraid(config) {
             eventAction: 'Visible'
         });
 
-        logger.info('MRAID is reporting ad is viewable.');
+        logger.info('MRAID is reporting ad is viewable. useCustomClose is', mraid.useCustomClose);
 
         mraid.on('stateChange', function(state) {
             var timeVisible = Date.now() - visibleStart;
@@ -300,6 +290,15 @@ module.exports = function c6mraid(config) {
                 timingLabel: 'c6'
             });
         });
+    });
+
+    window.addEventListener('message', function(event) {
+        var data = (function() {
+            try { return JSON.parse(event.data) || {}; } catch(e) { return {}; }
+        }());
+        if (PLAYER_EVENTS.indexOf(data.event) < 0) { return; }
+
+        logger.info('Player event: ' + data.event, data);
     });
 
     return q.all([

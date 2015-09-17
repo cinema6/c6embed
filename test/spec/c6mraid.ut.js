@@ -94,7 +94,8 @@ describe('[c6mraid(config)]', function() {
             addEventListener: function() {},
             removeEventListener: function() {},
             getState: jasmine.createSpy('mraid.getState()').and.returnValue('loading'),
-            isViewable: jasmine.createSpy('mraid.isViewable()').and.returnValue(false)
+            isViewable: jasmine.createSpy('mraid.isViewable()').and.returnValue(false),
+            getExpandProperties: jasmine.createSpy('mraid.getExpandProperties()').and.returnValue({ useCustomClose: true })
         };
         delete window.__C6_URL_ROOT__;
 
@@ -280,39 +281,6 @@ describe('[c6mraid(config)]', function() {
             it('should enable all log levels', function() {
                 expect(globalLogger.levels).toHaveBeenCalledWith(['error', 'info', 'warn', 'log']);
             });
-
-            describe('when "pollProperty" is emitted', function() {
-                var value, expected;
-
-                beforeEach(function() {
-                    value = { value: 'value' }; expected = { expected: 'expected' };
-                    spyOn(logger, 'log').and.callThrough();
-                });
-
-                ['viewable', 'foo', 'bar'].forEach(function(prop) {
-                    describe('if the prop is ' + prop, function() {
-                        beforeEach(function() {
-                            mraid.emit('pollProperty', prop, value, expected);
-                        });
-
-                        it('should not log anything', function() {
-                            expect(logger.log).not.toHaveBeenCalled();
-                        });
-                    });
-                });
-
-                ['ready'].forEach(function(prop) {
-                    describe('if the prop is ' + prop, function() {
-                        beforeEach(function() {
-                            mraid.emit('pollProperty', prop, value, expected);
-                        });
-
-                        it('should not log something', function() {
-                            expect(logger.log).toHaveBeenCalledWith('Ready is', value, 'Viewable is', mraid.viewable);
-                        });
-                    });
-                });
-            });
         });
     });
 
@@ -377,6 +345,40 @@ describe('[c6mraid(config)]', function() {
 
         it('should set window.__C6_URL_ROOT__ to point to cinema6 production', function() {
             expect(window.__C6_URL_ROOT__).toBe('http://portal.cinema6.com');
+        });
+    });
+
+    describe('when random messages are emitted', function() {
+        beforeEach(function() {
+            spyOn(logger, 'info').and.callThrough();
+
+            [{ event: 'jfefhfr' }, JSON.stringify({ event: 'fuiy34' }), 'foo=bar', 33, true, false, null, 0].forEach(function(payload) {
+                var event = document.createEvent('CustomEvent');
+                event.initCustomEvent('message');
+                event.data = payload;
+                window.dispatchEvent(event);
+            });
+        });
+
+        it('should not do anything', function() {
+            expect(logger.info).not.toHaveBeenCalled();
+        });
+    });
+
+    [{ event: 'launch' }, { event: 'adStart' }, { event: 'adCount' }, { event: 'adEnded' }].forEach(function(payload) {
+        describe('when the player emits ' + payload.event, function() {
+            beforeEach(function() {
+                spyOn(logger, 'info').and.callThrough();
+
+                var event = document.createEvent('CustomEvent');
+                event.initCustomEvent('message');
+                event.data = JSON.stringify(payload);
+                window.dispatchEvent(event);
+            });
+
+            it('should log something', function() {
+                expect(logger.info).toHaveBeenCalledWith('Player event: ' + payload.event, payload);
+            });
         });
     });
 

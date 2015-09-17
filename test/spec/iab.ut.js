@@ -14,15 +14,15 @@ describe('MRAID()', function() {
         logger.enabled(false);
 
         window.mraid = {
-            addEventListener: function addEventListener(event, handler) {
+            addEventListener: jasmine.createSpy('mraid.addEventListener()').and.callFake(function addEventListener(event, handler) {
                 (events[event] || (events[event] = [])).push(handler);
-            },
+            }),
 
-            removeEventListener: function removeEventListener(event, handler) {
+            removeEventListener: jasmine.createSpy('mraid.removeEventListener()').and.callFake(function removeEventListener(event, handler) {
                 events[event] = (event[events] || []).filter(function(item) {
                     return item !== handler;
                 });
-            },
+            }),
 
             getState: jasmine.createSpy('mraid.getState()').and.returnValue('loading'),
             isViewable: jasmine.createSpy('mraid.isViewable()').and.returnValue(false),
@@ -40,6 +40,9 @@ describe('MRAID()', function() {
                 forceOrientation: 'none'
             }),
             setOrientationProperties: jasmine.createSpy('mraid.setOrientationProperties()'),
+
+            getVersion: jasmine.createSpy('mraid.getVersion()').and.returnValue('2.0'),
+            supports: jasmine.createSpy('mraid.supports()').and.returnValue(false),
 
             useCustomClose: jasmine.createSpy('mraid.useCustomClose()'),
 
@@ -65,6 +68,18 @@ describe('MRAID()', function() {
 
     it('should exist', function() {
         expect(mraid).toEqual(jasmine.any(Object));
+    });
+
+    describe('when non-mraid event listeners are added', function() {
+        beforeEach(function() {
+            window.mraid.addEventListener.calls.reset();
+            mraid.on('pollProperty', function() {});
+            mraid.on('removeListener', function() {});
+        });
+
+        it('should not call mraid.addEventListener()', function() {
+            expect(window.mraid.addEventListener).not.toHaveBeenCalled();
+        });
     });
 
     describe('when mraid events are emitted', function() {
@@ -194,7 +209,7 @@ describe('MRAID()', function() {
 
             mraid = new iab.MRAID({
                 width: 800,
-                forceOrientation: 'landscape'
+                forceOrientation: 'none'
             });
 
             q().then(done);
@@ -209,7 +224,7 @@ describe('MRAID()', function() {
             });
             expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith({
                 allowOrientationChange: window.mraid.getOrientationProperties().allowOrientationChange,
-                forceOrientation: 'landscape'
+                forceOrientation: 'none'
             });
             expect(window.mraid.useCustomClose).toHaveBeenCalledWith(false);
         });
@@ -227,6 +242,76 @@ describe('MRAID()', function() {
             expect(window.mraid.setExpandProperties).toHaveBeenCalledWith(window.mraid.getExpandProperties());
             expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith(window.mraid.getOrientationProperties());
             expect(window.mraid.useCustomClose).toHaveBeenCalledWith(false);
+        });
+    });
+
+    ['portrait', 'landscape'].forEach(function(orientation) {
+        describe('if forceOrientation is ' + orientation, function() {
+            beforeEach(function(done) {
+                window.mraid.getState.and.returnValue('default');
+                window.mraid.setOrientationProperties.calls.reset();
+
+                mraid = new iab.MRAID({
+                    forceOrientation: orientation,
+                    allowOrientationChange: true
+                });
+                q().then(done);
+            });
+
+            it('should make allowOrientationChange false', function() {
+                expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith({
+                    allowOrientationChange: false,
+                    forceOrientation: orientation
+                });
+            });
+        });
+    });
+
+    ['none'].forEach(function(orientation) {
+        describe('if forceOrientation is ' + orientation, function() {
+            [true, false].forEach(function(allow) {
+                describe('and allowOrientationChange is ' + allow, function() {
+                    beforeEach(function(done) {
+                        window.mraid.getState.and.returnValue('default');
+                        window.mraid.setOrientationProperties.calls.reset();
+
+                        mraid = new iab.MRAID({
+                            forceOrientation: orientation,
+                            allowOrientationChange: allow
+                        });
+                        q().then(done);
+                    });
+
+                    it('should make allowOrientationChange ' + allow, function() {
+                        expect(window.mraid.setOrientationProperties).toHaveBeenCalledWith({
+                            allowOrientationChange: allow,
+                            forceOrientation: orientation
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+    describe('if the version is 1.0', function() {
+        beforeEach(function(done) {
+            window.mraid.getVersion.and.returnValue('1.0');
+            window.mraid.getState.and.returnValue('default');
+            window.mraid.getOrientationProperties.calls.reset();
+            window.mraid.setOrientationProperties.calls.reset();
+            window.mraid.supports.calls.reset();
+
+            mraid = new iab.MRAID();
+            q().then(done);
+        });
+
+        it('should not call getOrientationProperties() or setOrientationProperties()', function() {
+            expect(window.mraid.getOrientationProperties).not.toHaveBeenCalled();
+            expect(window.mraid.setOrientationProperties).not.toHaveBeenCalled();
+        });
+
+        it('should not call supports()', function() {
+            expect(window.mraid.supports).not.toHaveBeenCalled();
         });
     });
 
@@ -282,6 +367,20 @@ describe('MRAID()', function() {
                 });
             });
         });
+
+        describe('[useCustomClose]', function() {
+            [true, false].forEach(function(value) {
+                describe('if mraid.getExpandProperties().useCustomClose is ' + value, function() {
+                    beforeEach(function() {
+                        window.mraid.getExpandProperties.and.returnValue({ useCustomClose: value });
+                    });
+
+                    it('should be ' + value, function() {
+                        expect(mraid.useCustomClose).toBe(value);
+                    });
+                });
+            });
+        });
     });
 
     describe('methods:', function() {
@@ -313,8 +412,19 @@ describe('MRAID()', function() {
             });
 
             describe('if the prop is not already the value', function() {
+                var value;
+                var get, set;
+
                 beforeEach(function(done) {
-                    mraid.foo = 'foo';
+                    value = 'foo';
+                    get = jasmine.createSpy('get() foo').and.callFake(function() {
+                            return value;
+                    });
+                    set = jasmine.createSpy('set() foo').and.callFake(function(val) {
+                        value = val;
+                    });
+
+                    Object.defineProperty(mraid, 'foo', { get: get, set: set });
 
                     mraid.waitUntil({ prop: 'foo', value: 'bar', event: 'fooChange' }).then(success, failure);
                     q().then(done);
@@ -331,16 +441,20 @@ describe('MRAID()', function() {
                     beforeEach(function() {
                         pollProperty = jasmine.createSpy('pollProperty()');
                         mraid.on('pollProperty', pollProperty);
+                        get.calls.reset();
                     });
 
                     it('should emit the "pollProperty" event', function() {
                         jasmine.clock().tick(1000);
                         expect(pollProperty).toHaveBeenCalledWith('foo', 'foo', 'bar');
+                        expect(get.calls.count()).toBe(1);
                         pollProperty.calls.reset();
+                        get.calls.reset();
 
                         mraid.foo = 'HEY!';
                         jasmine.clock().tick(1000);
                         expect(pollProperty).toHaveBeenCalledWith('foo', 'HEY!', 'bar');
+                        expect(get.calls.count()).toBe(1);
                     });
                 });
 
@@ -503,12 +617,34 @@ describe('MRAID()', function() {
 
             beforeEach(function() {
                 url = 'http://www.apple.com/';
-
-                mraid.open(url);
             });
 
-            it('should open the url', function() {
-                expect(window.mraid.open).toHaveBeenCalledWith(url);
+            ['default', 'expanded', 'resized'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.open(url);
+                    });
+
+                    it('should open the url', function() {
+                        expect(window.mraid.open).toHaveBeenCalledWith(url);
+                    });
+                });
+            });
+
+            ['loading', 'hidden'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.open(url);
+                    });
+
+                    it('should do nothing', function() {
+                        expect(window.mraid.open).not.toHaveBeenCalled();
+                    });
+                });
             });
         });
 
@@ -517,22 +653,64 @@ describe('MRAID()', function() {
 
             beforeEach(function() {
                 url = 'http://www.google.com';
-
-                mraid.expand(url);
             });
 
-            it('should expand the url', function() {
-                expect(window.mraid.expand).toHaveBeenCalledWith(url);
+            ['default', 'expanded', 'resized'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.expand(url);
+                    });
+
+                    it('should expand the url', function() {
+                        expect(window.mraid.expand).toHaveBeenCalledWith(url);
+                    });
+                });
+            });
+
+            ['loading', 'hidden'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.expand(url);
+                    });
+
+                    it('should do nothing', function() {
+                        expect(window.mraid.expand).not.toHaveBeenCalled();
+                    });
+                });
             });
         });
 
         describe('[close()]', function() {
-            beforeEach(function() {
-                mraid.close();
+            ['default', 'expanded', 'resized'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.close();
+                    });
+
+                    it('should close the ad', function() {
+                        expect(window.mraid.close).toHaveBeenCalled();
+                    });
+                });
             });
 
-            it('should close the ad', function() {
-                expect(window.mraid.close).toHaveBeenCalled();
+            ['loading', 'hidden'].forEach(function(state) {
+                describe('if the state is ' + state, function() {
+                    beforeEach(function() {
+                        window.mraid.getState.and.returnValue(state);
+
+                        mraid.close();
+                    });
+
+                    it('should do nothing', function() {
+                        expect(window.mraid.close).not.toHaveBeenCalled();
+                    });
+                });
             });
         });
     });
