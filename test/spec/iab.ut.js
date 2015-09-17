@@ -367,6 +367,20 @@ describe('MRAID()', function() {
                 });
             });
         });
+
+        describe('[useCustomClose]', function() {
+            [true, false].forEach(function(value) {
+                describe('if mraid.getExpandProperties().useCustomClose is ' + value, function() {
+                    beforeEach(function() {
+                        window.mraid.getExpandProperties.and.returnValue({ useCustomClose: value });
+                    });
+
+                    it('should be ' + value, function() {
+                        expect(mraid.useCustomClose).toBe(value);
+                    });
+                });
+            });
+        });
     });
 
     describe('methods:', function() {
