@@ -22,8 +22,8 @@ module.exports = function(deps) {
     }
 
     function decorateCardWithPixels(card, pixels, banner) {
-        card.campaign.clickUrls = (card.campaign.clickUrls || [])
-            .concat(pixels.clickUrls, [banner.clickUrl]);
+        card.campaign.playUrls = (card.campaign.playUrls || [])
+            .concat(pixels.playUrls, [banner.clickUrl]);
         card.campaign.countUrls = (card.campaign.countUrls || [])
             .concat(pixels.countUrls, [banner.countUrl]);
     }
@@ -217,7 +217,7 @@ module.exports = function(deps) {
             return q();
         }
 
-        pixels = withDefaults(pixels, { clickUrls: [], countUrls: [] });
+        pixels = withDefaults(pixels, { playUrls: [], countUrls: [] });
 
         c6.usedSponsoredCards = c6.usedSponsoredCards || {};
 

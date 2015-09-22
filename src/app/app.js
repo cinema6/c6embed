@@ -160,11 +160,11 @@ module.exports = function(deps) {
 
             function getSponsoredCards() {
                 var startFetch = (new Date()).getTime();
-                var clickUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
+                var playUrls = settings.config.startPixel && settings.config.startPixel.split(' ');
                 var countUrls = settings.config.countPixel && settings.config.countPixel.split(' ');
 
                 return spCardService.fetchSponsoredCards(experience, settings.config, {
-                    clickUrls: clickUrls,
+                    playUrls: playUrls,
                     countUrls: countUrls
                 }).then(function(){
                     /* jshint camelcase:false */
