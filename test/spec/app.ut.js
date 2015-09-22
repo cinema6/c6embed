@@ -654,7 +654,7 @@
 
             it('should fetch the sponsoredCards', function() {
                 expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
-                    clickUrls: undefined,
+                    playUrls: undefined,
                     countUrls: undefined
                 });
             });
@@ -670,7 +670,7 @@
 
                 it('should fetch the sponosred cards with the additional pixels', function() {
                     expect(spCardService.fetchSponsoredCards).toHaveBeenCalledWith(experience, settings.config, {
-                        clickUrls: settings.config.startPixel.split(' '),
+                        playUrls: settings.config.startPixel.split(' '),
                         countUrls: settings.config.countPixel.split(' ')
                     });
                 });

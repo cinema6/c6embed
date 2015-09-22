@@ -116,7 +116,7 @@
                     describe('if there are pixels defined', function() {
                         beforeEach(function(done) {
                             spCards.fetchSponsoredCards(experience, config, {
-                                clickUrls: ['click.me'],
+                                playUrls: ['click.me'],
                                 countUrls: ['count.me']
                             }).finally(done);
                         });
@@ -126,14 +126,14 @@
                             expect(_private.makeAdCall).toHaveBeenCalledWith(
                                 jasmine.any(Object),
                                 experience,
-                                { clickUrls: ['click.me'], countUrls: ['count.me'] },
+                                { playUrls: ['click.me'], countUrls: ['count.me'] },
                                 1234,
                                 10000
                             );
                             expect(_private.fetchDynamicCards).toHaveBeenCalledWith(
                                 experience,
                                 config,
-                                { clickUrls: ['click.me'], countUrls: ['count.me'] },
+                                { playUrls: ['click.me'], countUrls: ['count.me'] },
                                 10000
                             );
                         });
@@ -142,7 +142,7 @@
                     describe('if there are no pixels defined', function() {
                         beforeEach(function(done) {
                             spCards.fetchSponsoredCards(experience, config, {
-                                clickUrls: undefined,
+                                playUrls: undefined,
                                 countUrls: undefined
                             }).done(done);
                         });
@@ -152,14 +152,14 @@
                             expect(_private.makeAdCall).toHaveBeenCalledWith(
                                 jasmine.any(Object),
                                 experience,
-                                { clickUrls: [], countUrls: [] },
+                                { playUrls: [], countUrls: [] },
                                 1234,
                                 10000
                             );
                             expect(_private.fetchDynamicCards).toHaveBeenCalledWith(
                                 experience,
                                 config,
-                                { clickUrls: [], countUrls: [] },
+                                { playUrls: [], countUrls: [] },
                                 10000
                             );
                         });
@@ -176,7 +176,7 @@
                         expect(_private.makeAdCall).toHaveBeenCalledWith(
                             jasmine.any(Object),
                             experience,
-                            { clickUrls: [], countUrls: [] },
+                            { playUrls: [], countUrls: [] },
                             1234,
                             10000
                         );
@@ -401,7 +401,7 @@
                 var pixels;
 
                 beforeEach(function() {
-                    pixels = { countUrls: [], clickUrls: [] };
+                    pixels = { countUrls: [], playUrls: [] };
                     window.c6.usedSponsoredCards = { 'e-1234': [] };
                     spyOn(adLib, 'loadAd').and.returnValue(q({
                         placementId : 1234,
@@ -417,7 +417,7 @@
                         expect(experience.data.deck[0]).toEqual({
                             id: 'rc1',
                             sponsored: true,
-                            campaign: { campaignId: 'camp1', clickUrls: ['click.me'], countUrls: ['count.me'] }
+                            campaign: { campaignId: 'camp1', playUrls: ['click.me'], countUrls: ['count.me'] }
                         });
                         expect(adLib.loadAd).toHaveBeenCalledWith(1234, 'camp1', '1');
                         expect(window.c6.usedSponsoredCards['e-1234']).toEqual(['rc1']);
@@ -436,7 +436,7 @@
                             sponsored: true,
                             campaign: {
                                 campaignId: 'camp1',
-                                clickUrls: ['click.me'],
+                                playUrls: ['click.me'],
                                 countUrls: ['count.me'],
                                 bannerId: '2'
                             }
@@ -469,7 +469,7 @@
                             adtechId: 987,
                             bannerId: '3',
                             campaign: {
-                                clickUrls: ['click.me.now'],
+                                playUrls: ['click.me.now'],
                                 countUrls: ['count.me.now']
                             }
                         });
@@ -564,7 +564,7 @@
                         pageUrl: 'cinema6.com'
                     };
                     placeholders = _private.getPlaceholders(withWildcards);
-                    pixels = { clickUrls: [ 'click.me' ], countUrls: [ 'count.me' ] };
+                    pixels = { playUrls: [ 'click.me' ], countUrls: [ 'count.me' ] };
                     
                     window.c6.usedSponsoredCards = {
                         'e-1234': ['rc-sp3'],
@@ -588,7 +588,7 @@
                     beforeEach(function(done) {
                         importScripts.and.callFake(function(urls, cb) {
                             var id = urls[0].match(/[^\/]+(?=\.js)/)[0];
-                            cb({id: id, campaign: { clickUrls: ['click.custom'], countUrls: ['count.custom'] } });
+                            cb({id: id, campaign: { playUrls: ['click.custom'], countUrls: ['count.custom'] } });
                         });
 
                         _private.loadCardObjects(withWildcards, placeholders, pixels, banners, config).finally(done);
@@ -599,12 +599,12 @@
                             jasmine.any(Object),
                             jasmine.objectContaining({
                                 campaign: {
-                                    clickUrls: ['click.custom', 'click.me', 'click.2'], countUrls: ['count.custom', 'count.me', 'count.2']
+                                    playUrls: ['click.custom', 'click.me', 'click.2'], countUrls: ['count.custom', 'count.me', 'count.2']
                                 }
                             }),
                             jasmine.objectContaining({
                                 campaign: {
-                                    clickUrls: ['click.custom', 'click.me', 'click.3'], countUrls: ['count.custom', 'count.me', 'count.3']
+                                    playUrls: ['click.custom', 'click.me', 'click.3'], countUrls: ['count.custom', 'count.me', 'count.3']
                                 }
                             }),
                             jasmine.any(Object)
@@ -617,10 +617,10 @@
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc-sp2', adtechId: 234, campaign: {
-                                clickUrls: ['click.me', 'click.2'], countUrls: ['count.me', 'count.2']
+                                playUrls: ['click.me', 'click.2'], countUrls: ['count.me', 'count.2']
                             } },
                             { id: 'rc-sp3', adtechId: 345, campaign: {
-                                clickUrls: ['click.me', 'click.3'], countUrls: ['count.me', 'count.3']
+                                playUrls: ['click.me', 'click.3'], countUrls: ['count.me', 'count.3']
                             } },
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
                         ]);
@@ -662,7 +662,7 @@
                         expect(withWildcards.data.deck).toEqual([
                             { id: 'rc1', sponsored: true, campaign: { campaignId: 'camp1' } },
                             { id: 'rc-sp2', adtechId: 234, campaign: {
-                                clickUrls: ['click.me', 'click.2'], countUrls: ['count.me', 'count.2']
+                                playUrls: ['click.me', 'click.2'], countUrls: ['count.me', 'count.2']
                             } },
                             { id: 'rc3', type: 'wildcard' },
                             { id: 'rc4', sponsored: false, type: 'tamecard', foo: 'bar' }
@@ -766,8 +766,6 @@
             describe('fetchDynamicCards', function() {
                 var config, pixels;
                 beforeEach(function() {
-                    var complete = null;
-                    
                     config = { campaign: 'cam-1', categories: 'foo,bar' };
                     pixels = { pixels: 'yes' };
                     
