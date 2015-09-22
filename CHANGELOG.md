@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FIX]: Fix firing of AdClick pixels to ADTECH
+
 ## v2.39.4 (September 17, 2015)
 * Fix a slew of non-fatal MRAID errors
 * Log if MRAID environment supports inline video
