@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* Update copyright date on preview page to 2015
+
 ## v2.39.5 (September 22, 2015)
 * [FIX]: Fix firing of AdClick pixels to ADTECH
 
