@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.39.5 (September 22, 2015)
 * [FIX]: Fix firing of AdClick pixels to ADTECH
 
 ## v2.39.4 (September 17, 2015)
