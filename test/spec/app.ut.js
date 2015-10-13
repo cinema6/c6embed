@@ -96,6 +96,11 @@
                     loadExperience: function() {},
                     embeds: []
                 },
+                performance: {
+                    timing: {
+                        requestStart: Date.now()
+                    }
+                },
                 __c6_ga__: jasmine.createSpy('window.__c6_ga__')
             };
 
@@ -855,7 +860,24 @@
                         group: settings.config.adId,
                         ex: settings.config.ex,
                         vr: settings.config.vr
-                    }
+                    },
+                    kLoadStart: $window.performance.timing.requestStart
+                });
+            });
+
+            describe('if there is no performance API', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    delete $window.performance;
+                    parsedDoc.setGlobalObject.calls.reset();
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should set c6.kLoadStart to undefined', function() {
+                    expect(parsedDoc.setGlobalObject).toHaveBeenCalledWith('c6', jasmine.objectContaining({
+                        kLoadStart: undefined
+                    }));
                 });
             });
 
