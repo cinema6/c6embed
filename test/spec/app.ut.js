@@ -404,6 +404,10 @@
                         exp: 'e-68cde3e4177b8a',
                         showStartTime : 1,
                         context: 'embed',
+                        container: 'pocketmath',
+                        adId: '487589435',
+                        ex: 'my-experiment',
+                        vr: 'my-variant',
                         responsive: true
                     }
                 };
@@ -844,7 +848,14 @@
                     kDebug: config.debug,
                     kMode: experience.data.mode,
                     kDevice: browserInfo.profile.device,
-                    kEnvUrlRoot: config.urlRoot
+                    kEnvUrlRoot: config.urlRoot,
+                    kParams: {
+                        context: settings.config.context,
+                        container: settings.config.container,
+                        group: settings.config.adId,
+                        ex: settings.config.ex,
+                        vr: settings.config.vr
+                    }
                 });
             });
 
@@ -1054,8 +1065,8 @@
                             container: 'test',
                             context: 'test',
                             group: 'xyz',
-                            experiment: null,
-                            variant: null
+                            experiment: 'my-experiment',
+                            variant: 'my-variant'
                         });
                     });
 
