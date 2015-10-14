@@ -96,6 +96,11 @@
                     loadExperience: function() {},
                     embeds: []
                 },
+                performance: {
+                    timing: {
+                        requestStart: Date.now()
+                    }
+                },
                 __c6_ga__: jasmine.createSpy('window.__c6_ga__')
             };
 
@@ -404,6 +409,10 @@
                         exp: 'e-68cde3e4177b8a',
                         showStartTime : 1,
                         context: 'embed',
+                        container: 'pocketmath',
+                        adId: '487589435',
+                        ex: 'my-experiment',
+                        vr: 'my-variant',
                         responsive: true
                     }
                 };
@@ -844,7 +853,31 @@
                     kDebug: config.debug,
                     kMode: experience.data.mode,
                     kDevice: browserInfo.profile.device,
-                    kEnvUrlRoot: config.urlRoot
+                    kEnvUrlRoot: config.urlRoot,
+                    kParams: {
+                        context: settings.config.context,
+                        container: settings.config.container,
+                        group: settings.config.adId,
+                        ex: settings.config.ex,
+                        vr: settings.config.vr
+                    },
+                    kLoadStart: $window.performance.timing.requestStart
+                });
+            });
+
+            describe('if there is no performance API', function() {
+                beforeEach(function(done) {
+                    delete settings.promise;
+                    delete $window.performance;
+                    parsedDoc.setGlobalObject.calls.reset();
+
+                    $window.c6.loadExperience(settings).finally(done);
+                });
+
+                it('should set c6.kLoadStart to undefined', function() {
+                    expect(parsedDoc.setGlobalObject).toHaveBeenCalledWith('c6', jasmine.objectContaining({
+                        kLoadStart: undefined
+                    }));
                 });
             });
 
@@ -1054,8 +1087,8 @@
                             container: 'test',
                             context: 'test',
                             group: 'xyz',
-                            experiment: null,
-                            variant: null
+                            experiment: 'my-experiment',
+                            variant: 'my-variant'
                         });
                     });
 

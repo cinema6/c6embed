@@ -52,7 +52,15 @@ module.exports = function(deps) {
                     kEnvUrlRoot: config.urlRoot,
                     kMode: profile.device !== 'phone' ?
                         (settings.mode || experience.data.mode) :
-                        (settings.mobileMode || 'mobile')
+                        (settings.mobileMode || 'mobile'),
+                    kParams: {
+                        context: settings.config.context,
+                        container: settings.config.container,
+                        group: settings.config.adId,
+                        ex: settings.config.ex,
+                        vr: settings.config.vr
+                    },
+                    kLoadStart: ((window.performance || {}).timing || {}).requestStart
                 },
                 standalone = settings.config.container === 'jumpramp' ? false : settings.standalone,
                 player2Modes = ['mobile', 'full', 'light', 'lightbox', 'lightbox-playlist', 'solo', 'solo-ads'],

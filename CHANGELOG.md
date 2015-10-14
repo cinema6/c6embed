@@ -1,6 +1,8 @@
 # C6Embed Changelog
 
 * Update copyright date on preview page to 2015
+* [FEATURE]: Add support for tracking E2E player loading time
+* Support player self-initializing analytics
 
 ## v2.39.5 (September 22, 2015)
 * [FIX]: Fix firing of AdClick pixels to ADTECH
