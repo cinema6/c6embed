@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.40.0 (October 14, 2015)
 * Update copyright date on preview page to 2015
 * [FEATURE]: Add support for tracking E2E player loading time
 * Support player self-initializing analytics
