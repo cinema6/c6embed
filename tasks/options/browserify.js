@@ -36,6 +36,19 @@ module.exports = {
             }
         ]
     },
+    'vpaid-dist': {
+        options: {
+            browserifyOptions: {
+                standalone: 'getVPAIDAd'
+            }
+        },
+        files: [
+            {
+                src: 'src/vpaid/vpaid.js',
+                dest: '.tmp/build/<%= settings.distDir %>/vpaid.js'
+            }
+        ]
+    },
 
     server: {
         options: {
