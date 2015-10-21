@@ -440,142 +440,6 @@ describe('cinema6-jsonp.js', function() {
                 adtech.config.placements['108542'].complete();
             });
 
-            describe('if called with extra params', function() {
-                beforeEach(function(done) {
-                    load(function() {
-                        adtech.config.placements['108542'].complete();
-                        done();
-                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&pageUrl=foo.bar.com&cb=' + Date.now(), {
-                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
-                    });
-                });
-
-                it('should fetch minireels from the content service with additional params', function(done) {
-                    waitForDeps(expIds.map(function(id) {
-                        return baseUrl + '/api/public/content/experience/' + id + '.js?branding=techcrunch&placementId=12345&wildCardPlacement=333&container=veeseo&pageUrl=foo.bar.com';
-                    }), function(experiences) {
-                        expect(experiences.length).toBe(4);
-                        experiences.forEach(function(exp){
-                            switch(exp.id) {
-                                case 'e-fcb95ef54b22f5':
-                                case 'e-4b843ea93ed9d4':
-                                case 'e-60196c3751eb52':
-                                    {
-                                    expect(exp.data.mode).toEqual('lightbox');
-                                    break;
-                                    }
-                                case 'e-6b5ead50d4a1ed': 
-                                    {
-                                    expect(exp.data.mode).toEqual('lightbox-playlist');
-                                    break;
-                                    }
-                                default:
-                                    expect(exp.data.mode).not
-                                        .toBeDefined();
-                            }
-                        });
-
-                        done();
-                    });
-                });
-            });
-
-            describe('if a startPixel is specified', function() {
-                beforeEach(function(done) {
-                    c6.embeds.length = 0;
-                    load(function() {
-                        adtech.config.placements['108542'].complete();
-                        waitForDeps(expIds.map(function(id) {
-                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
-                        }), done);
-                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
-                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
-                    });
-                });
-
-                it('should set the startPixel on the config', function() {
-                    expect(c6.embeds.length).toBe(expIds.length);
-                    c6.embeds.forEach(function(embed) {
-                        expect(embed.config.startPixel).toBe('http://tracking.com/pixel');
-                    });
-                });
-            });
-
-            describe('if a countPixel is specified', function() {
-                beforeEach(function(done) {
-                    c6.embeds.length = 0;
-                    load(function() {
-                        adtech.config.placements['108542'].complete();
-                        waitForDeps(expIds.map(function(id) {
-                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
-                        }), done);
-                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
-                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
-                    });
-                });
-
-                it('should set the startPixel on the config', function() {
-                    expect(c6.embeds.length).toBe(expIds.length);
-                    c6.embeds.forEach(function(embed) {
-                        expect(embed.config.countPixel).toBe('http://tracking.com/pixel');
-                    });
-                });
-            });
-
-            describe('if a launchPixel is specified', function() {
-                beforeEach(function(done) {
-                    c6.embeds.length = 0;
-                    load(function() {
-                        adtech.config.placements['108542'].complete();
-                        waitForDeps(expIds.map(function(id) {
-                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
-                        }), done);
-                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
-                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
-                    });
-                });
-
-                it('should set the startPixel on the config', function() {
-                    expect(c6.embeds.length).toBe(expIds.length);
-                    c6.embeds.forEach(function(embed) {
-                        expect(embed.config.launchPixel).toBe('http://tracking.com/pixel');
-                    });
-                });
-            });
-
-            describe('if an experiment and variant are specified', function() {
-                beforeEach(function(done) {
-                    c6.embeds.length = 0;
-                    load(function() {
-                        adtech.config.placements['108542'].complete();
-                        waitForDeps(expIds.map(function(id) {
-                            return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
-                        }), done);
-                    }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&ex=my-experiment&vr=my-variant&cb=' + Date.now(), {
-                        '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
-                    });
-                });
-
-                it('should set ex and vr on the config', function() {
-                    expect(c6.embeds.length).toBe(expIds.length);
-                    c6.embeds.forEach(function(embed) {
-                        expect(embed.config.ex).toBe('my-experiment');
-                        expect(embed.config.vr).toBe('my-variant');
-                    });
-                });
-
-                it('should add the experiment and variant to the GA page URL', function() {
-                    expect(c6.embeds.length).toBe(expIds.length);
-                    c6.embeds.forEach(function(embed) {
-                        var embedTracker = embed.experience.id.replace(/^e-/, '');
-
-                        expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', jasmine.objectContaining({
-                            page: '/embed/' + embed.experience.id + '/?cx=jsonp&ct=jsonp&bd=digitaljournal&ex=my-experiment&vr=my-variant'
-                        }));
-                    });
-                });
-            });
-
             describe('after the experiences have been fetched', function() {
                 var exps;
 
@@ -586,6 +450,142 @@ describe('cinema6-jsonp.js', function() {
                         exps = experiences;
 
                         done();
+                    });
+                });
+
+                describe('if called with extra params', function() {
+                    beforeEach(function(done) {
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            done();
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&branding=techcrunch&adPlacementId=12345&wp=333&count=3&src=veeseo&pageUrl=foo.bar.com&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
+                    });
+
+                    it('should fetch minireels from the content service with additional params', function(done) {
+                        waitForDeps(expIds.map(function(id) {
+                            return baseUrl + '/api/public/content/experience/' + id + '.js?branding=techcrunch&placementId=12345&wildCardPlacement=333&container=veeseo&pageUrl=foo.bar.com';
+                        }), function(experiences) {
+                            expect(experiences.length).toBe(4);
+                            experiences.forEach(function(exp){
+                                switch(exp.id) {
+                                    case 'e-fcb95ef54b22f5':
+                                    case 'e-4b843ea93ed9d4':
+                                    case 'e-60196c3751eb52':
+                                        {
+                                        expect(exp.data.mode).toEqual('lightbox');
+                                        break;
+                                        }
+                                    case 'e-6b5ead50d4a1ed': 
+                                        {
+                                        expect(exp.data.mode).toEqual('lightbox-playlist');
+                                        break;
+                                        }
+                                    default:
+                                        expect(exp.data.mode).not
+                                            .toBeDefined();
+                                }
+                            });
+
+                            done();
+                        });
+                    });
+                });
+
+                describe('if a startPixel is specified', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&startPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
+                    });
+
+                    it('should set the startPixel on the config', function() {
+                        expect(c6.embeds.length).toBe(expIds.length);
+                        c6.embeds.forEach(function(embed) {
+                            expect(embed.config.startPixel).toBe('http://tracking.com/pixel');
+                        });
+                    });
+                });
+
+                describe('if a countPixel is specified', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&countPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
+                    });
+
+                    it('should set the startPixel on the config', function() {
+                        expect(c6.embeds.length).toBe(expIds.length);
+                        c6.embeds.forEach(function(embed) {
+                            expect(embed.config.countPixel).toBe('http://tracking.com/pixel');
+                        });
+                    });
+                });
+
+                describe('if a launchPixel is specified', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&launchPixel=http%3A%2F%2Ftracking.com%2Fpixel&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
+                    });
+
+                    it('should set the startPixel on the config', function() {
+                        expect(c6.embeds.length).toBe(expIds.length);
+                        c6.embeds.forEach(function(embed) {
+                            expect(embed.config.launchPixel).toBe('http://tracking.com/pixel');
+                        });
+                    });
+                });
+
+                describe('if an experiment and variant are specified', function() {
+                    beforeEach(function(done) {
+                        c6.embeds.length = 0;
+                        load(function() {
+                            adtech.config.placements['108542'].complete();
+                            waitForDeps(expIds.map(function(id) {
+                                return baseUrl + '/api/public/content/experience/' + id + '.js?container=jsonp';
+                            }), done);
+                        }, '/base/test/helpers/scripts/cinema6-jsonp.js?callback=onC6AdLoad&id=108542&ex=my-experiment&vr=my-variant&cb=' + Date.now(), {
+                            '//aka-cdn.adtechus.com/dt/common/DAC.js': adtech
+                        });
+                    });
+
+                    it('should set ex and vr on the config', function() {
+                        expect(c6.embeds.length).toBe(expIds.length);
+                        c6.embeds.forEach(function(embed) {
+                            expect(embed.config.ex).toBe('my-experiment');
+                            expect(embed.config.vr).toBe('my-variant');
+                        });
+                    });
+
+                    it('should add the experiment and variant to the GA page URL', function() {
+                        expect(c6.embeds.length).toBe(expIds.length);
+                        c6.embeds.forEach(function(embed) {
+                            var embedTracker = embed.experience.id.replace(/^e-/, '');
+
+                            expect($window.__c6_ga__).toHaveBeenCalledWith(embedTracker + '.set', jasmine.objectContaining({
+                                page: '/embed/' + embed.experience.id + '/?cx=jsonp&ct=jsonp&bd=digitaljournal&ex=my-experiment&vr=my-variant'
+                            }));
+                        });
                     });
                 });
 
