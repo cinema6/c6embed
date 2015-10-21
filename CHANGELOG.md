@@ -1,5 +1,7 @@
 # C6Embed Changelog
 
+* [FEATURE]: Add support for VPAID 2.0
+
 ## v2.40.0 (October 14, 2015)
 * Update copyright date on preview page to 2015
 * [FEATURE]: Add support for tracking E2E player loading time
