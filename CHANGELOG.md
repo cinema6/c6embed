@@ -1,5 +1,6 @@
 # C6Embed Changelog
 
+## v2.41.0 (October 26, 2015)
 * [FEATURE]: Add support for VPAID 2.0
 
 ## v2.40.0 (October 14, 2015)
