@@ -6,6 +6,7 @@ describe('getVPAIDAd()', function() {
     var PlayerSession;
     var EventEmitter;
     var querystring;
+    var parseURL;
     var extend;
     var q;
     var getVPAIDAd;
@@ -17,6 +18,7 @@ describe('getVPAIDAd()', function() {
         PlayerSession = require('../../lib/PlayerSession');
         EventEmitter = require('events').EventEmitter;
         querystring = require('querystring');
+        parseURL = require('url').parse;
         extend = require('../../lib/fns').extend;
         q = require('q');
 
@@ -83,7 +85,9 @@ describe('getVPAIDAd()', function() {
                             experience: 'e-d0817b1227cc37',
                             campaign: 'cam-c8cd8927915d1b',
                             preview: true,
-                            autoLaunch: true
+                            autoLaunch: true,
+                            context: 'standalone',
+                            container: 'q1'
                         }
                     };
                     slot = document.createElement('div');
@@ -118,9 +122,10 @@ describe('getVPAIDAd()', function() {
 
                 it('should create an iframe', function() {
                     expect(document.createElement).toHaveBeenCalledWith('iframe');
-                    expect(iframe.src).toBe(config.uri + '?' + querystring.stringify(extend(config.params, {
+                    expect(iframe.src).toBe(config.uri + '?' + querystring.stringify(extend({ container: config.params.container }, config.params, {
                         vpaid: true,
-                        autoLaunch: false
+                        autoLaunch: false,
+                        context: 'vpaid'
                     })));
                     expect(iframe.width).toBe(width + 'px');
                     expect(iframe.height).toBe(height + 'px');
@@ -282,6 +287,22 @@ describe('getVPAIDAd()', function() {
 
                     it('should call vpaid.stopAd()', function() {
                         expect(vpaid.stopAd).toHaveBeenCalled();
+                    });
+                });
+
+                describe('if a container is not specified', function() {
+                    beforeEach(function() {
+                        delete config.params.container;
+                        creativeData = { AdParameters: JSON.stringify(config) };
+
+                        vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
+                        iframe = document.createElement.calls.mostRecent().returnValue;
+                    });
+
+                    it('should give the iframe a container', function() {
+                        var params = parseURL(iframe.src, true).query;
+
+                        expect(params.container).toBe('vpaid');
                     });
                 });
             });

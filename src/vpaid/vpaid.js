@@ -87,9 +87,12 @@ function getVPAIDAd() {
         initAd: function initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars) {
             var self = this;
             var config = JSON.parse(creativeData.AdParameters);
-            var playerURI = config.uri + '?' + querystring.stringify(extend(config.params, {
+            var playerURI = config.uri + '?' + querystring.stringify(extend({
+                container: 'vpaid'
+            }, config.params, {
                 vpaid: true,
-                autoLaunch: false
+                autoLaunch: false,
+                context: 'vpaid'
             }));
 
             player = createPlayer(environmentVars.slot, playerURI, width, height);
