@@ -38,7 +38,7 @@
         it('should set urlBase to $location.protocl + //portal.cinema6.com if __C6_URL_ROOT__ is not set',function(){
             $window.location.protocol = 'applewebdata:';
             config = new Config({ window: $window, location: $location });
-            expect(config.urlRoot).toBe('http://portal.cinema6.com');
+            expect(config.urlRoot).toBe('https://portal.cinema6.com');
         });
 
         it('should set urlBase to __C6_URL_ROOT__ if set',function(){

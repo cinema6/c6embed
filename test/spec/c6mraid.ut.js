@@ -340,11 +340,11 @@ describe('[c6mraid(config)]', function() {
         });
 
         it('should send no query params when fetching from the content service', function() {
-            expect(importScripts).toHaveBeenCalledWith(['http://portal.cinema6.com/api/public/content/experience/e-75d32a97a6193c.js?branding=&placementId=&campaign=&container=&wildCardPlacement=&preview=&pageUrl=cinema6.com&hostApp=&network='], jasmine.any(Function));
+            expect(importScripts).toHaveBeenCalledWith(['https://portal.cinema6.com/api/public/content/experience/e-75d32a97a6193c.js?branding=&placementId=&campaign=&container=&wildCardPlacement=&preview=&pageUrl=cinema6.com&hostApp=&network='], jasmine.any(Function));
         });
 
         it('should set window.__C6_URL_ROOT__ to point to cinema6 production', function() {
-            expect(window.__C6_URL_ROOT__).toBe('http://portal.cinema6.com');
+            expect(window.__C6_URL_ROOT__).toBe('https://portal.cinema6.com');
         });
     });
 

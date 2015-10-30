@@ -233,7 +233,7 @@ module.exports = function c6mraid(config) {
     initLogger(config);
 
     var START_TIME = Date.now();
-    var apiRoot = config.apiRoot || 'http://portal.cinema6.com';
+    var apiRoot = config.apiRoot || 'https://portal.cinema6.com';
     var pageUrl = config.pageUrl || 'cinema6.com';
     var orientation = config.forceOrientation || 'portrait';
     var loadExperience = getLoader(apiRoot);

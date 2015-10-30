@@ -42,7 +42,7 @@ module.exports = function(deps) {
         protocol: {
             get: function() {
                 return (/https?:/).test($window.location.protocol) ?
-                    $window.location.protocol : 'http:';
+                    $window.location.protocol : 'https:';
             }
         }
     });
