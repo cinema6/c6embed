@@ -87,7 +87,9 @@ describe('getVPAIDAd()', function() {
                             preview: true,
                             autoLaunch: true,
                             context: 'standalone',
-                            container: 'q1'
+                            container: 'q1',
+                            standalone: true,
+                            interstitial: false
                         }
                     };
                     slot = document.createElement('div');
@@ -122,7 +124,11 @@ describe('getVPAIDAd()', function() {
 
                 it('should create an iframe', function() {
                     expect(document.createElement).toHaveBeenCalledWith('iframe');
-                    expect(iframe.src).toBe(config.uri + '?' + querystring.stringify(extend({ container: config.params.container }, config.params, {
+                    expect(iframe.src).toBe(config.uri + '?' + querystring.stringify(extend({
+                        standalone: config.params.standalone,
+                        interstitial: config.params.interstitial,
+                        container: config.params.container
+                    }, config.params, {
                         vpaid: true,
                         autoLaunch: false,
                         context: 'vpaid'
@@ -290,19 +296,23 @@ describe('getVPAIDAd()', function() {
                     });
                 });
 
-                describe('if a container is not specified', function() {
+                describe('if container, standalone or interstitial are not specified', function() {
                     beforeEach(function() {
                         delete config.params.container;
+                        delete config.params.standalone;
+                        delete config.params.interstitial;
                         creativeData = { AdParameters: JSON.stringify(config) };
 
                         vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
                         iframe = document.createElement.calls.mostRecent().returnValue;
                     });
 
-                    it('should give the iframe a container', function() {
+                    it('should give the iframe a container, standalone and interstitial', function() {
                         var params = parseURL(iframe.src, true).query;
 
                         expect(params.container).toBe('vpaid');
+                        expect(params.standalone).toBe('false');
+                        expect(params.interstitial).toBe('true');
                     });
                 });
             });

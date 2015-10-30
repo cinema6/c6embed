@@ -88,6 +88,8 @@ function getVPAIDAd() {
             var self = this;
             var config = JSON.parse(creativeData.AdParameters);
             var playerURI = config.uri + '?' + querystring.stringify(extend({
+                standalone: false,
+                interstitial: true,
                 container: 'vpaid'
             }, config.params, {
                 vpaid: true,
