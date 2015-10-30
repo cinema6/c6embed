@@ -80,7 +80,7 @@ describe('getVPAIDAd()', function() {
 
                 beforeEach(function() {
                     config = {
-                        uri: 'https://staging.cinema6.com/api/public/players/solo',
+                        uri: 'https://dev.cinema6.com/api/public/players/solo',
                         params: {
                             experience: 'e-d0817b1227cc37',
                             campaign: 'cam-c8cd8927915d1b',
@@ -383,7 +383,7 @@ describe('getVPAIDAd()', function() {
 
                 beforeEach(function() {
                     config = {
-                        uri: 'https://staging.cinema6.com/api/public/players/solo',
+                        uri: 'https://dev.cinema6.com/api/public/players/solo',
                         params: {
                             experience: 'e-d0817b1227cc37',
                             campaign: 'cam-c8cd8927915d1b',
