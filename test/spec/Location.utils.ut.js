@@ -59,8 +59,8 @@
                                 $window.location.protocol = protocol;
                             });
 
-                            it('should be "http:"', function() {
-                                expect($location.protocol).toBe('http:');
+                            it('should be "https:"', function() {
+                                expect($location.protocol).toBe('https:');
                             });
                         });
                     });

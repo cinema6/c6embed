@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+## v2.41.1 (October 30, 2015)
+* Add support for MRAID over HTTPS
+* Provide better VPAID player configuration defaults
+
 ## v2.41.0 (October 26, 2015)
 * [FEATURE]: Add support for VPAID 2.0
 
