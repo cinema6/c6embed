@@ -3,31 +3,38 @@ var proxyquire = require('proxyquireify')(require);
 describe('getVPAIDAd()', function() {
     'use strict';
 
-    var PlayerSession;
     var EventEmitter;
     var querystring;
-    var parseURL;
     var extend;
     var q;
     var getVPAIDAd;
 
     var stubs;
-    var sessionInitDeferred;
+    var playerBootstrapDeferred;
+
+    beforeAll(function() {
+        Function.prototype.bind = require('function-bind');
+    });
 
     beforeEach(function() {
-        PlayerSession = require('../../lib/PlayerSession');
         EventEmitter = require('events').EventEmitter;
         querystring = require('querystring');
-        parseURL = require('url').parse;
         extend = require('../../lib/fns').extend;
         q = require('q');
 
         stubs = {
-            '../../lib/PlayerSession': jasmine.createSpy('PlayerSession()').and.callFake(function(win) {
-                var session = new PlayerSession(win);
-                spyOn(session, 'init').and.returnValue((sessionInitDeferred = q.defer()).promise);
+            '../../lib/Player': jasmine.createSpy('Player()').and.callFake(function(endpoint, params, data) {
+                var Player = require('../../lib/Player');
+                var player = new Player(endpoint, params, data);
 
-                return session;
+                playerBootstrapDeferred = q.defer();
+                spyOn(player, 'bootstrap').and.callFake(function() {
+                    Player.prototype.bootstrap.apply(this, arguments);
+
+                    return playerBootstrapDeferred.promise;
+                });
+
+                return player;
             }),
             'events': {
                 EventEmitter: jasmine.createSpy('EventEmitter()').and.callFake(function() {
@@ -76,7 +83,7 @@ describe('getVPAIDAd()', function() {
                 var width, height, viewMode, desiredBitrate, creativeData, environmentVars;
                 var result;
 
-                var iframe, session;
+                var player, iframe, session;
 
                 beforeEach(function() {
                     config = {
@@ -107,11 +114,11 @@ describe('getVPAIDAd()', function() {
                         videoSlotCanAutoPlay: false
                     };
 
-                    spyOn(document, 'createElement').and.callThrough();
-
                     result = vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
-                    iframe = document.createElement.calls.mostRecent().returnValue;
-                    session = stubs['../../lib/PlayerSession'].calls.mostRecent().returnValue;
+
+                    player = stubs['../../lib/Player'].calls.mostRecent().returnValue;
+                    iframe = player.frame;
+                    session = player.session;
                 });
 
                 afterEach(function() {
@@ -122,44 +129,30 @@ describe('getVPAIDAd()', function() {
                     expect(result).toBeUndefined();
                 });
 
-                it('should create an iframe', function() {
-                    expect(document.createElement).toHaveBeenCalledWith('iframe');
-                    expect(iframe.src).toBe(config.uri + '?' + querystring.stringify(extend({
-                        standalone: config.params.standalone,
-                        interstitial: config.params.interstitial,
-                        container: config.params.container
-                    }, config.params, {
+                it('should create a Player', function() {
+                    expect(stubs['../../lib/Player']).toHaveBeenCalledWith(config.uri, extend(config.params, {
                         vpaid: true,
                         autoLaunch: false,
                         context: 'vpaid'
-                    })));
-                    expect(iframe.width).toBe(width + 'px');
-                    expect(iframe.height).toBe(height + 'px');
-                    expect(iframe.style.border).toBe('none');
-                    expect(iframe.style.opacity).toBe('0');
-                    expect(iframe.style.position).toBe('absolute');
-                    expect(iframe.style.top).toBe('0px');
-                    expect(iframe.style.left).toBe('0px');
+                    }));
                 });
 
-                it('should put the iframe in the slot', function() {
-                    expect(slot.contains(iframe)).toBe(true);
+                it('should bootstrap the player', function() {
+                    expect(player.bootstrap).toHaveBeenCalledWith(slot, {
+                        width: width + 'px',
+                        height: height + 'px',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0
+                    });
                 });
 
-                it('should create a new PlayerSession for the iframe', function() {
-                    expect(stubs['../../lib/PlayerSession']).toHaveBeenCalledWith(iframe.contentWindow);
-                });
-
-                it('should initialize the session', function() {
-                    expect(session.init).toHaveBeenCalledWith({});
-                });
-
-                describe('when the session is ready', function() {
+                describe('when the player is bootstrapped', function() {
                     beforeEach(function(done) {
                         spyOn(emitter, 'emit').and.callThrough();
-                        sessionInitDeferred.fulfill(session);
+                        playerBootstrapDeferred.fulfill(player);
 
-                        sessionInitDeferred.promise.then(done);
+                        playerBootstrapDeferred.promise.then(done);
                     });
 
                     it('should emit "AdLoaded"', function() {
@@ -298,21 +291,22 @@ describe('getVPAIDAd()', function() {
 
                 describe('if container, standalone or interstitial are not specified', function() {
                     beforeEach(function() {
+                        stubs['../../lib/Player'].calls.reset();
+
                         delete config.params.container;
                         delete config.params.standalone;
                         delete config.params.interstitial;
                         creativeData = { AdParameters: JSON.stringify(config) };
 
                         vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
-                        iframe = document.createElement.calls.mostRecent().returnValue;
                     });
 
-                    it('should give the iframe a container, standalone and interstitial', function() {
-                        var params = parseURL(iframe.src, true).query;
-
-                        expect(params.container).toBe('vpaid');
-                        expect(params.standalone).toBe('false');
-                        expect(params.interstitial).toBe('true');
+                    it('should give the player a container, standalone and interstitial', function() {
+                        expect(stubs['../../lib/Player']).toHaveBeenCalledWith(jasmine.any(String), jasmine.objectContaining({
+                            container: 'vpaid',
+                            standalone: false,
+                            interstitial: true
+                        }));
                     });
                 });
             });
@@ -389,7 +383,7 @@ describe('getVPAIDAd()', function() {
             describe('(that may be called after initAd())', function() {
                 var config, slot;
                 var width, height, viewMode, desiredBitrate, creativeData, environmentVars;
-                var iframe, session;
+                var player, iframe, session;
 
                 beforeEach(function() {
                     config = {
@@ -416,12 +410,11 @@ describe('getVPAIDAd()', function() {
                         videoSlotCanAutoPlay: false
                     };
 
-                    spyOn(document, 'createElement').and.callThrough();
-
                     vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
 
-                    iframe = document.createElement.calls.mostRecent().returnValue;
-                    session = stubs['../../lib/PlayerSession'].calls.mostRecent().returnValue;
+                    player = stubs['../../lib/Player'].calls.mostRecent().returnValue;
+                    iframe = player.frame;
+                    session = player.session;
 
                     spyOn(emitter, 'emit').and.callThrough();
                 });
@@ -530,9 +523,12 @@ describe('getVPAIDAd()', function() {
 
                 describe('startAd()', function() {
                     var result;
+                    var showDeferred;
 
                     beforeEach(function() {
-                        spyOn(session, 'ping').and.callThrough();
+                        showDeferred = q.defer();
+
+                        spyOn(player, 'show').and.returnValue(showDeferred.promise);
 
                         result = vpaid.startAd();
                     });
@@ -541,19 +537,16 @@ describe('getVPAIDAd()', function() {
                         expect(result).toBeUndefined();
                     });
 
-                    it('should ping the player with "show"', function() {
-                        expect(session.ping).toHaveBeenCalledWith('show');
+                    it('should show the player', function() {
+                        expect(player.show).toHaveBeenCalled();
                     });
 
-                    it('should not show the iframe', function() {
-                        expect(iframe.style.opacity).toBe('0');
-                    });
-
-                    describe('when the session emits "open"', function() {
-                        beforeEach(function() {
+                    describe('when the player is shown', function() {
+                        beforeEach(function(done) {
                             emitter.emit.calls.reset();
 
-                            session.emit('open');
+                            showDeferred.fulfill(player);
+                            showDeferred.promise.finally(done);
                         });
 
                         it('should emit "AdStarted"', function() {
@@ -562,10 +555,6 @@ describe('getVPAIDAd()', function() {
 
                         it('should emit "AdImpression"', function() {
                             expect(emitter.emit).toHaveBeenCalledWith('AdImpression');
-                        });
-
-                        it('should show the iframe', function() {
-                            expect(iframe.style.opacity).toBe('1');
                         });
                     });
                 });
