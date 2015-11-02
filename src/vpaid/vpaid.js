@@ -1,30 +1,12 @@
 /* jshint strict:false */
 var extend = require('../../lib/fns').extend;
-var querystring = require('querystring');
-var PlayerSession = require('../../lib/PlayerSession');
+var Player = require('../../lib/Player');
 var EventEmitter = require('events').EventEmitter;
-
-function createPlayer(slot, src, width, height) {
-    var iframe = document.createElement('iframe');
-    iframe.src = src;
-    iframe.width = width + 'px';
-    iframe.height = height + 'px';
-    iframe.style.border = 'none';
-    iframe.style.opacity = '0';
-    iframe.style.position = 'absolute';
-    iframe.style.top = '0';
-    iframe.style.left = '0';
-
-    slot.appendChild(iframe);
-
-    return iframe;
-}
 
 function getVPAIDAd() {
     var emitter = new EventEmitter();
 
     var player = null;
-    var session = null;
     var state = {
         adLinear: true,
         adWidth: null,
@@ -87,7 +69,8 @@ function getVPAIDAd() {
         initAd: function initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars) {
             var self = this;
             var config = JSON.parse(creativeData.AdParameters);
-            var playerURI = config.uri + '?' + querystring.stringify(extend({
+
+            player = new Player(config.uri, extend({
                 standalone: false,
                 interstitial: true,
                 container: 'vpaid'
@@ -97,14 +80,18 @@ function getVPAIDAd() {
                 context: 'vpaid'
             }));
 
-            player = createPlayer(environmentVars.slot, playerURI, width, height);
-            session = new PlayerSession(player.contentWindow);
-            session.init({}).then(function() { emitter.emit('AdLoaded'); });
+            player.bootstrap(environmentVars.slot, {
+                width: width + 'px',
+                height: height + 'px',
+                position: 'absolute',
+                top: 0,
+                left: 0
+            }).then(function() { emitter.emit('AdLoaded'); });
 
             state.adWidth = width;
             state.adHeight = height;
 
-            session.on('vpaid:stateUpdated', function updateState(update) {
+            player.session.on('vpaid:stateUpdated', function updateState(update) {
                 var prop = update.prop;
                 var value = update.value;
                 var event = update.event;
@@ -121,23 +108,23 @@ function getVPAIDAd() {
                 }
             });
 
-            session.on('error', function emitAdError(message) {
+            player.session.on('error', function emitAdError(message) {
                 emitter.emit('AdError', message);
                 self.stopAd();
             });
 
-            session.on('cardComplete', function stopAd() {
+            player.session.on('cardComplete', function stopAd() {
                 self.stopAd();
             });
 
-            session.on('close', function skipAd() {
+            player.session.on('close', function skipAd() {
                 self.skipAd();
             });
         },
 
         resizeAd: function resizeAd(width, height/*, viewMode*/) {
-            player.width = width + 'px';
-            player.height = height + 'px';
+            player.frame.width = width + 'px';
+            player.frame.height = height + 'px';
 
             state.adWidth = width;
             state.adHeight = height;
@@ -145,29 +132,26 @@ function getVPAIDAd() {
         },
 
         startAd: function startAd() {
-            session.ping('show');
-            session.once('open', function showPlayer() {
-                player.style.opacity = '1';
+            player.show().then(function emitShowEvents() {
                 emitter.emit('AdStarted');
                 emitter.emit('AdImpression');
             });
         },
 
         stopAd: function stopAd() {
-            player.parentNode.removeChild(player);
+            player.frame.parentNode.removeChild(player.frame);
             emitter.emit('AdStopped');
 
             emitter.removeAllListeners();
             player = null;
-            session = null;
         },
 
         pauseAd: function pauseAd() {
-            session.ping('vpaid:pauseAd');
+            player.session.ping('vpaid:pauseAd');
         },
 
         resumeAd: function resumeAd() {
-            session.ping('vpaid:resumeAd');
+            player.session.ping('vpaid:resumeAd');
         },
 
         expandAd: function expandAd() {},

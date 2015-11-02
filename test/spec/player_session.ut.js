@@ -5,6 +5,10 @@ describe('PlayerSession(win)', function() {
     var PostMessageSession;
     var extend;
 
+    beforeAll(function() {
+        Function.prototype.bind = require('function-bind');
+    });
+
     beforeEach(function() {
         PlayerSession = require('../../lib/PlayerSession');
         PostMessageSession = require('../../lib/PostMessageSession');
