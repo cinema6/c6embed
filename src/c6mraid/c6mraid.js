@@ -70,7 +70,7 @@ module.exports = function c6mraid(/*config*/) {
         'experience', 'campaign', 'container', 'hostApp', 'network',
         'branding', 'placementId', 'wildCardPlacement', 'pageUrl',
         'preview'
-    ]), { standalone: false, interstitial: true, context: 'mraid' }));
+    ]), { standalone: false, interstitial: true, context: 'mraid', autoLaunch: false }));
     var mraid = new MRAID({ forceOrientation: config.forceOrientation, useCustomClose: true });
 
     player.bootstrap(document.body, {

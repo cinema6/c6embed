@@ -99,7 +99,8 @@ describe('[c6mraid(config)]', function() {
             forceOrientation: 'none',
             debug: true,
             hostApp: 'Talking Tom',
-            network: 'omax'
+            network: 'omax',
+            autoLaunch: true
         }).then(success, failure);
     });
 
@@ -159,7 +160,8 @@ describe('[c6mraid(config)]', function() {
             network: 'omax',
             standalone: false,
             interstitial: true,
-            context: 'mraid'
+            context: 'mraid',
+            autoLaunch: false
         });
     });
 
