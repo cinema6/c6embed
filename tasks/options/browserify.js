@@ -18,6 +18,10 @@ module.exports = {
                 dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
             },
             {
+                src: 'src/embed/embed-html.js',
+                dest: '.tmp/build/<%= settings.distDir %>/embed-html.js'
+            },
+            {
                 src: ['src/app/main.js'],
                 dest: '.tmp/build/<%= settings.distDir %>/app.js'
             }
@@ -46,6 +50,19 @@ module.exports = {
             {
                 src: 'src/vpaid/vpaid.js',
                 dest: '.tmp/build/<%= settings.distDir %>/vpaid.js'
+            }
+        ]
+    },
+    'embed-js-dist': {
+        options: {
+            browserifyOptions: {
+                standalone: 'c6embed'
+            }
+        },
+        files: [
+            {
+                src: 'src/embed/embed-js.js',
+                dest: '.tmp/build/<%= settings.distDir %>/embed-js.js'
             }
         ]
     },
