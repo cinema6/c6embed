@@ -13,48 +13,31 @@
             (function() {
                 'use strict';
 
-                var isProduction = (/^(www\.)?(cinema6\.com|ci6\.co)$/).test(window.location.hostname),
-                    base = isProduction ? '//portal.cinema6.com' : '//staging.cinema6.com',
-                    params = window._c6Params = window.location.search.replace(/^\?/, '')
-                        .split('&')
-                        .reduce(function(params, segment) {
-                            var pair = segment.split('=')
-                                .map(decodeURIComponent),
-                                key = pair[0], value = pair[1];
+                var isProduction = (/^(www\.)?(cinema6\.com|ci6\.co)$/).test(window.location.hostname);
+                var isLocal = (/^(localhost|[\d\.]+)$/).test(window.location.hostname);
+                var base = isProduction ? '//portal.cinema6.com/' : '//staging.cinema6.com/';
+                var params = window.location.search.replace(/^\?/, '')
+                    .split('&')
+                    .reduce(function(params, segment) {
+                        var pair = segment.split('=')
+                            .map(decodeURIComponent),
+                            key = pair[0], value = pair[1];
 
-                            if (key) {
-                                params[key] = value;
-                            }
+                        if (key) {
+                            params[key] = value;
+                        }
 
-                            return params;
-                        }, {}),
-                    c6 = window.c6 = {
-                        isProduction: isProduction,
-                        embeds: [],
-                        gaAcctIdPlayer: (function(acc,mi,mx){
-                            return acc+'-'+parseInt(
-                                ((Math.random()*999999999)%(mx-mi+1))+mi,10
-                            );
-                        }('UA-44457821',31,35)),
-                        gaAcctIdEmbed: (function(acc,mi,mx){
-                            return acc+'-'+parseInt(
-                                ((Math.random()*999999999)%(mx-mi+1))+mi,10
-                            );
-                        }('UA-44457821',6,30))
-                    };
-
-                function toQueryParams(object) {
-                    return Object.keys(object)
-                        .filter(function(key) {
-                            return object[key] !== undefined;
-                        })
-                        .map(function(key) {
-                            return [key, object[key]]
-                                .map(encodeURIComponent)
-                                .join('=');
-                        })
-                        .join('&');
-                }
+                        return params;
+                    }, {});
+                var embedSrc = (function() {
+                    if (isProduction) {
+                        return '//lib.cinema6.com/c6embed/v1/embed-js.min.js';
+                    } else if (isLocal) {
+                        return './embed-js.js';
+                    } else {
+                        return '//s3.amazonaws.com/c6.dev/ext/c6embed/v1/embed-js.js'
+                    }
+                }());
 
                 function writeScript(src) {
                     document.write('<script src="' + src +'" charset="utf-8"><\/script>');
@@ -64,35 +47,12 @@
                     exports: {}
                 };
 
-                window.writeScript = writeScript;
+                writeScript(embedSrc);
+                writeScript(base + 'api/public/content/experience/' + params.experience + '.js?preview=true');
 
-                window.src = base + '/api/public/content/experience/' + params.id + '.js?' + toQueryParams({
-                    container: params.container || 'embed',
-                    campaign: params.campaign,
-                    preview: 'true',
-                    pageUrl: params.pageUrl
-                });
-                writeScript(src);
+                window.params = params;
+                window.apiRoot = base;
             }());
-        </script>
-        <script>
-            var embedSrc;
-            if (window.c6.isProduction) {
-                embedSrc = '//lib.cinema6.com/c6embed/v1/c6embed.min.js';
-            } else {
-                window.__C6_DEBUG__ = true;
-                window.__C6_URL_ROOT__ = window.location.protocol + '//staging.cinema6.com';
-                window.__C6_APP_JS__ = 'https://s3.amazonaws.com/c6.dev/ext/c6embed/v1/app.js';
-                embedSrc = '//s3.amazonaws.com/c6.dev/ext/c6embed/v1/c6embed.js';
-                // embedSrc = './embed.js';
-            }
-        </script>
-        <script>
-            var experience = window.module.exports;
-            window.c6 = {
-                requireCache: {}
-            };
-            window.c6.requireCache[src] = experience;
         </script>
     </head>
     <body>
@@ -102,40 +62,33 @@
                     <div class="c6Brand c6Brand--logo c6Sprite--alpha">
                         <span class="ir">Cinema6</span>
                     </div>
-                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+experience.data.title+'<\/strong>')</script></em>&rdquo;</h1>
+                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+module.exports.data.title+'<\/strong>')</script></em>&rdquo;</h1>
                 </header>
             </div>
 
             <div class="ui__previewHolder clearfix">
+                <span id="embed-target"></span>
                 <script>
-                    var experience = window.module.exports,
-                        params = window._c6Params,
-                        splashData = experience.data.splash,
-                        splashString = splashData.theme + ':' + splashData.ratio.replace('-', '/');
+                    (function() {
+                        var experience = window.module.exports;
+                        var params = window.params;
+                        var apiRoot = window.apiRoot;
 
-                    var attrString = (function toDataAttributes(obj) {
-                        return Object.keys(obj)
-                        .filter(function(key) {
-                            return obj[key] !== undefined;
-                        })
-                        .map(function(key) {
-                            return 'data-' + key + '=' + obj[key];
-                        })
-                        .join(' ');
-                    })({
-                        exp             : experience.id,
-                        splash          : splashString,
-                        container       : params.container,
-                        campaign        : params.campaign,
-                        preview         : 'true',
-                        'player-version': params.playerVersion,
-                        'mobile-mode'   : params.mobileMode,
-                        mode            : params.mode,
-                        ex              : params.ex,
-                        vr              : params.vr
-                    });
-
-                    document.write('<script src="' + embedSrc + '" ' + attrString + ' data-preload><\/script>');
+                        c6embed(document.getElementById('embed-target'), {
+                            apiRoot:    apiRoot,
+                            experience: experience.id,
+                            type:       params.type || experience.data.mode,
+                            title:      experience.data.title,
+                            image:      experience.data.collateral.splash,
+                            branding:   params.branding,
+                            splash:     { type: experience.data.splash.theme, ratio: experience.data.splash.ratio.replace('-', ':') },
+                            container:  params.container,
+                            campaign:   params.campaign,
+                            preview:    true,
+                            mobileType: params.mobileType,
+                            preload:    true
+                        });
+                    }());
                 </script>
             </div>
 
