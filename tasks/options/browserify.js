@@ -6,16 +6,16 @@ module.exports = {
     dist: {
         files: [
             {
-                src: 'src/embed/main.js',
-                dest: '.tmp/build/<%= settings.distDir %>/c6embed.js'
-            },
-            {
                 src: 'src/widget/main.js',
                 dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
             },
             {
                 src: 'src/cinema6-jsonp/main.js',
                 dest: '.tmp/build/<%= settings.distDir %>/cinema6-jsonp.js'
+            },
+            {
+                src: 'src/embed/embed-html.js',
+                dest: '.tmp/build/<%= settings.distDir %>/embed-html.js'
             },
             {
                 src: ['src/app/main.js'],
@@ -49,16 +49,25 @@ module.exports = {
             }
         ]
     },
+    'embed-js-dist': {
+        options: {
+            browserifyOptions: {
+                standalone: 'c6embed'
+            }
+        },
+        files: [
+            {
+                src: 'src/embed/embed-js.js',
+                dest: '.tmp/build/<%= settings.distDir %>/embed-js.js'
+            }
+        ]
+    },
 
     server: {
         options: {
             debug: true
         },
         files: [
-            {
-                src: ['src/embed/main.js'],
-                dest: '<%= settings.appDir %>/embed.js'
-            },
             {
                 src: ['src/widget/main.js'],
                 dest: '<%= settings.appDir %>/widget.js'

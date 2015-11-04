@@ -7,7 +7,9 @@
   ],
   "dependencies": {
     "asEvented": "~0.4.3",
-    "q": "~1.0.0"
+    "q": "~1.0.0",
+    "twobits.js": "git+ssh://git@github.com:cinema6/twobits.js#v0.3.1",
+    "cwrx": "git+ssh://git@github.com:cinema6/cwrx"
   },
   "browser": {
     "Modernizr": "./ext/modernizr.custom.01697.js"

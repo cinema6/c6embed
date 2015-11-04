@@ -28,7 +28,7 @@
                     dest: '<%= settings.s3.test.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60',
+                        CacheControl: 'max-age=0',
                         ContentEncoding: 'gzip'
                     }
                 },
@@ -53,7 +53,7 @@
                     dest: '<%= settings.s3.testStandalone.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60',
+                        CacheControl: 'max-age=0',
                         ContentType: 'text/html',
                         ContentEncoding: 'gzip'
                     }
@@ -70,13 +70,14 @@
                     dest: '<%= settings.s3.testPreview.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60',
+                        CacheControl: 'max-age=0',
                         ContentType: 'text/html',
                         ContentEncoding: 'gzip'
                     }
                 }
             ]
         },
+
         production: {
             options: {
                 bucket: '<%= settings.s3.production.bucket %>'
@@ -87,7 +88,7 @@
                     dest: '<%= settings.s3.production.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60',
+                        CacheControl: 'max-age=300',
                         ContentEncoding: 'gzip'
                     }
                 },
@@ -112,7 +113,7 @@
                     dest: '<%= settings.s3.productionStandalone.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60',
+                        CacheControl: 'max-age=300',
                         ContentType: 'text/html',
                         ContentEncoding: 'gzip'
                     }
@@ -129,7 +130,7 @@
                     dest: '<%= settings.s3.productionPreview.app %>',
                     rel : '<%= settings.distDir %>/',
                     options: {
-                        CacheControl: 'max-age=60',
+                        CacheControl: 'max-age=300',
                         ContentType: 'text/html',
                         ContentEncoding: 'gzip'
                     }

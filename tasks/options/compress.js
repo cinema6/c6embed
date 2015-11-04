@@ -1,6 +1,7 @@
 module.exports = {
     options: {
-        mode: 'gzip'
+        mode: 'gzip',
+        level: 9
     },
 
     dist: {

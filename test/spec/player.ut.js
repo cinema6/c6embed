@@ -5,6 +5,7 @@ describe('Player', function() {
     var extend;
     var parseUrl;
     var PlayerSession;
+    var EventEmitter;
 
     var Player;
 
@@ -13,6 +14,7 @@ describe('Player', function() {
         extend = require('../../lib/fns').extend;
         parseUrl = require('url').parse;
         PlayerSession = require('../../lib/PlayerSession');
+        EventEmitter = require('events').EventEmitter;
 
         Player = require('../../lib/Player');
     });
@@ -38,6 +40,10 @@ describe('Player', function() {
             data = { foo: 'bar' };
 
             player = new Player(endpoint, params, data);
+        });
+
+        it('should be an EventEmitter', function() {
+            expect(player).toEqual(jasmine.any(EventEmitter));
         });
 
         describe('properties:', function() {
@@ -82,12 +88,19 @@ describe('Player', function() {
                     expect(player.shown).toBe(false);
                 });
             });
+
+            describe('bootstrapped', function() {
+                it('should be false', function() {
+                    expect(player.bootstrapped).toBe(false);
+                });
+            });
         });
 
         describe('methods:', function() {
             describe('bootstrap(container, styles)', function() {
                 var container, styles;
                 var success, failure;
+                var bootstrap;
 
                 var playerSessionInitDeferred;
 
@@ -111,12 +124,26 @@ describe('Player', function() {
                     playerSessionInitDeferred = q.defer();
                     spyOn(PlayerSession.prototype, 'init').and.returnValue(playerSessionInitDeferred.promise);
 
+                    bootstrap = jasmine.createSpy('bootstrap()').and.callFake(function() {
+                        expect(player.frame).not.toBeNull();
+                        expect(player.session).not.toBeNull();
+                    });
+                    player.on('bootstrap', bootstrap);
+
                     player.bootstrap(container, styles).then(success, failure);
                     setTimeout(done, 1);
                 });
 
                 afterEach(function() {
                     document.body.removeChild(container);
+                });
+
+                it('should set bootstrapped to true', function() {
+                    expect(player.bootstrapped).toBe(true);
+                });
+
+                it('should emit "bootstrap"', function() {
+                    expect(bootstrap).toHaveBeenCalled();
                 });
 
                 it('should create an iframe', function() {
@@ -161,6 +188,34 @@ describe('Player', function() {
 
                     it('should fulfill the promsie', function() {
                         expect(success).toHaveBeenCalledWith(player);
+                    });
+                });
+
+                describe('if called again', function() {
+                    var frame, session;
+
+                    beforeEach(function(done) {
+                        success.calls.reset();
+                        failure.calls.reset();
+                        bootstrap.calls.reset();
+
+                        frame = player.frame;
+                        session = player.session;
+
+                        player.bootstrap().then(success, failure).finally(done);
+                    });
+
+                    it('should return a rejected promise', function() {
+                        expect(failure).toHaveBeenCalledWith(new Error('Player cannot be bootstrapped again.'));
+                    });
+
+                    it('should not create a new iframe or frame', function() {
+                        expect(player.frame).toBe(frame);
+                        expect(player.session).toBe(session);
+                    });
+
+                    it('should not emit "bootstrap"', function() {
+                        expect(bootstrap).not.toHaveBeenCalled();
                     });
                 });
 
