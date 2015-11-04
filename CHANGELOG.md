@@ -1,6 +1,7 @@
 # C6Embed Changelog
 
 * Switch MRAID to use the Player Service
+* Add new scripts for embedding on the open web with the Player Service
 
 ## v2.41.1 (October 30, 2015)
 * Add support for MRAID over HTTPS
