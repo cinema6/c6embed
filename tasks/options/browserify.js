@@ -69,16 +69,22 @@ module.exports = {
         },
         files: [
             {
-                src: ['src/widget/main.js'],
-                dest: '<%= settings.appDir %>/widget.js'
-            },
+                src: 'src/embed/embed-html.js',
+                dest: 'app/embed-html.js'
+            }
+        ]
+    },
+    'embed-js-server': {
+        options: {
+            debug: true,
+            browserifyOptions: {
+                standalone: 'c6embed'
+            }
+        },
+        files: [
             {
-                src: 'src/cinema6-jsonp/main.js',
-                dest: 'app/cinema6-jsonp.js'
-            },
-            {
-                src: ['src/app/main.js'],
-                dest: '<%= settings.appDir %>/c6embed.js'
+                src: 'src/embed/embed-js.js',
+                dest: 'app/embed-js.js'
             }
         ]
     },
