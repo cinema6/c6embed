@@ -1,6 +1,10 @@
 # C6Embed Changelog
 
 ## v3.0.0 (November 5, 2015)
+* *[v3.0.0-rc2]*
+  * [FIX]: Fix for an issue that caused deployment to S3 to fail
+* *[/v3.0.0-rc2]*
+
 * *[v3.0.0-rc1]*
   * Switch MRAID to use the Player Service
   * Add new scripts for embedding on the open web with the Player Service
