@@ -43,14 +43,6 @@ module.exports = {
             }
         ]
     },
-    jsonp: {
-        files: [
-            {
-                src: 'app/jsonp.html',
-                dest: 'app/index.html'
-            }
-        ]
-    },
     mraid: {
         files: [
             {

@@ -47,18 +47,6 @@
             },
             tasks: ['copy:preview']
         },
-        jsonp: {
-            files: [
-                '<%= settings.appDir %>/jsonp.html',
-                'src/**/*.js',
-                'lib/**/*.js',
-                'lite/**/*.js',
-            ],
-            options: {
-                livereload: true
-            },
-            tasks: ['browserify:server','copy:jsonp']
-        },
         mraid: {
             files: [
                 '<%= settings.appDir %>/mraid.html',
