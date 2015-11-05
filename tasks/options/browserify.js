@@ -6,10 +6,6 @@ module.exports = {
     dist: {
         files: [
             {
-                src: 'src/widget/main.js',
-                dest: '.tmp/build/<%= settings.distDir %>/mr2.js'
-            },
-            {
                 src: 'src/embed/embed-html.js',
                 dest: '.tmp/build/<%= settings.distDir %>/embed-html.js'
             },

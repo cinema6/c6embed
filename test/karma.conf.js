@@ -30,7 +30,6 @@ module.exports = function(config) {
             'lib/**/*.js': ['jshint', 'browserify'],
             'src/app/**/*.js': ['jshint', 'browserify'],
             'src/embed/**/*.js': ['jshint', 'browserify'],
-            'src/widget/**/*.js': ['jshint', 'browserify'],
             'src/**/*.js': ['jshint'],
             'test/spec/**/*.js': ['browserify'],
             'test/helpers/*.js': ['browserify']

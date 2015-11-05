@@ -7,14 +7,6 @@ module.exports = {
             }
         ]
     },
-    widget: {
-        files: [
-            {
-                src: 'app/widget.html',
-                dest: 'app/index.html'
-            }
-        ]
-    },
     standalone: {
         files: [
             {
