@@ -269,60 +269,6 @@ describe('c6embed(beforeElement, params)', function() {
             });
         });
 
-        describe('if called with minimal params', function() {
-            beforeEach(function(done) {
-                Player.calls.reset();
-                document.createElement.calls.reset();
-
-                params = {
-                    experience: 'e-3f3b58482741e3',
-                    splash: {
-                        type: 'img-text-overlay',
-                        ratio: '16:9'
-                    }
-                };
-
-                c6embed(beforeElement, params).then(success, failure);
-                setTimeout(done, 1);
-
-                player = Player.calls.mostRecent().returnValue;
-                embed = document.createElement.calls.all()[0].returnValue;
-                splash = document.createElement.calls.all()[1].returnValue;
-            });
-
-            it('should create a player with some defaults', function() {
-                expect(Player).toHaveBeenCalledWith('https://portal.cinema6.com/api/public/players/light', {
-                    experience: 'e-3f3b58482741e3',
-                    campaign: undefined,
-                    branding: undefined,
-                    placementId: undefined,
-                    container: 'embed',
-                    wildCardPlacement: undefined,
-                    pageUrl: undefined,
-                    hostApp: undefined,
-                    network: undefined,
-                    preview: undefined,
-                    categories: undefined,
-                    playUrls: undefined,
-                    countUrls: undefined,
-                    launchUrls: undefined,
-                    mobileType: 'mobile',
-                    autoLaunch: false,
-                    standalone: false,
-                    context: 'embed'
-                });
-            });
-
-            it('should not give the embed <div> a width or height', function() {
-                expect(embed.style.width).toBe('');
-                expect(embed.style.height).toBe('');
-            });
-
-            it('should not load any branding stylesheets', function() {
-                expect(document.getElementById('c6-undefined')).toBeNull();
-            });
-        });
-
         describe('if the device is mobile', function() {
             beforeEach(function(done) {
                 Player.calls.reset();
@@ -397,6 +343,72 @@ describe('c6embed(beforeElement, params)', function() {
             it('should append the embed to the DOM', function() {
                 expect(container.contains(embed)).toBe(true);
                 expect(embed.previousSibling).toBe(container.querySelector('span#one'));
+            });
+
+            describe('if called with minimal params', function() {
+                beforeEach(function(done) {
+                    Player.calls.reset();
+                    document.createElement.calls.reset();
+                    importScripts.calls.reset();
+                    twobits.parse.calls.reset();
+
+                    params = {
+                        experience: 'e-3f3b58482741e3',
+                        splash: {
+                            type: 'img-text-overlay',
+                            ratio: '16:9'
+                        }
+                    };
+
+                    c6embed(beforeElement, params).then(success, failure);
+                    setTimeout(done, 1);
+
+                    player = Player.calls.mostRecent().returnValue;
+                    embed = document.createElement.calls.all()[0].returnValue;
+                    splash = document.createElement.calls.all()[1].returnValue;
+
+                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                    setTimeout(done, 1);
+                });
+
+                it('should create a player with some defaults', function() {
+                    expect(Player).toHaveBeenCalledWith('https://portal.cinema6.com/api/public/players/light', {
+                        experience: 'e-3f3b58482741e3',
+                        campaign: undefined,
+                        branding: undefined,
+                        placementId: undefined,
+                        container: 'embed',
+                        wildCardPlacement: undefined,
+                        pageUrl: undefined,
+                        hostApp: undefined,
+                        network: undefined,
+                        preview: undefined,
+                        categories: undefined,
+                        playUrls: undefined,
+                        countUrls: undefined,
+                        launchUrls: undefined,
+                        mobileType: 'mobile',
+                        autoLaunch: false,
+                        standalone: false,
+                        context: 'embed'
+                    });
+                });
+
+                it('should not give the embed <div> a width or height', function() {
+                    expect(embed.style.width).toBe('');
+                    expect(embed.style.height).toBe('');
+                });
+
+                it('should not load any branding stylesheets', function() {
+                    expect(document.getElementById('c6-undefined')).toBeNull();
+                });
+
+                it('should set the splash and title to null when compiling the template', function() {
+                    expect(twobits.parse.calls.mostRecent().returnValue).toHaveBeenCalledWith(jasmine.objectContaining({
+                        title: null,
+                        splash: null
+                    }));
+                });
             });
 
             describe('if preload is true', function() {
