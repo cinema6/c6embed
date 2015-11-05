@@ -13,9 +13,10 @@
             (function() {
                 'use strict';
 
-                var isProduction = (/^(www\.)?(cinema6\.com|ci6\.co)$/).test(window.location.hostname);
+                var isProduction = (/^(www\.)?(cinema6|reelcontent)\.com$/).test(window.location.hostname);
                 var isLocal = (/^(localhost|[\d\.]+)$/).test(window.location.hostname);
-                var base = isProduction ? '//portal.cinema6.com/' : '//staging.cinema6.com/';
+                var host = (window.location.hostname.match(/^(www\.)?(.+)\.com$/) || [])[2] || 'cinema6';
+                var base = '//' + (isProduction ? 'portal' : 'staging') + '.' + host + '.com/';
                 var params = window.location.search.replace(/^\?/, '')
                     .split('&')
                     .reduce(function(params, segment) {
