@@ -129,7 +129,6 @@ module.exports = function(grunt) {
     grunt.registerTask('publish', 'build and upload the application to s3', function(target) {
         grunt.task.run('build');
         grunt.task.run('s3:' + target);
-        grunt.task.run('s3:' + target + '-standalone');
         grunt.task.run('s3:' + target + '-preview');
     });
 };
