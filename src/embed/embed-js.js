@@ -93,6 +93,7 @@ function c6embed(beforeElement/*, params*/) {
 
         return lightboxes;
     }(document.createElement('div')));
+    var splashImage = params.image && resolveUrl(apiRoot, params.image);
 
     function loadBranding(branding, splash) {
         var id = 'c6-' + branding;
@@ -170,8 +171,8 @@ function c6embed(beforeElement/*, params*/) {
 
             splash.innerHTML = splashHtml;
             twobits.parse(splash)({
-                title: params.title,
-                splash: resolveUrl(apiRoot, params.image)
+                title: params.title || null,
+                splash: splashImage || null
             });
             splashDelegate = extend(
                 { didShow: noop, didHide: noop },
