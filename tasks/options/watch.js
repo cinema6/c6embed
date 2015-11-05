@@ -14,18 +14,6 @@
             },
             tasks: ['browserify:server', 'copy:embed']
         },
-        standalone: {
-            files: [
-                'src/standalone.html',
-                'src/**/*.js',
-                'lib/**/*.js',
-                'lite/**/*.js'
-            ],
-            options: {
-                livereload: true
-            },
-            tasks: ['browserify:server', 'copy:standalone']
-        },
         preview: {
             files: [
                 'src/preview/preview.html'

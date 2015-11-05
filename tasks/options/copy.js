@@ -7,14 +7,6 @@ module.exports = {
             }
         ]
     },
-    standalone: {
-        files: [
-            {
-                src: 'src/standalone/standalone.html',
-                dest: 'app/index.html'
-            }
-        ]
-    },
     preview: {
         files: [
             {

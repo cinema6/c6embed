@@ -43,23 +43,6 @@
                 }
             ]
         },
-        'test-standalone': {
-            options: {
-                bucket: '<%= settings.s3.testStandalone.bucket %>'
-            },
-            upload: [
-                {
-                    src: '<%= settings.distDir %>/standalone.html',
-                    dest: '<%= settings.s3.testStandalone.app %>',
-                    rel : '<%= settings.distDir %>/',
-                    options: {
-                        CacheControl: 'max-age=0',
-                        ContentType: 'text/html',
-                        ContentEncoding: 'gzip'
-                    }
-                }
-            ]
-        },
         'test-preview': {
             options: {
                 bucket: '<%= settings.s3.testPreview.bucket %>'
@@ -98,23 +81,6 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=31556926',
-                        ContentEncoding: 'gzip'
-                    }
-                }
-            ]
-        },
-        'production-standalone': {
-            options: {
-                bucket: '<%= settings.s3.productionStandalone.bucket %>'
-            },
-            upload: [
-                {
-                    src: '<%= settings.distDir %>/standalone.html',
-                    dest: '<%= settings.s3.productionStandalone.app %>',
-                    rel : '<%= settings.distDir %>/',
-                    options: {
-                        CacheControl: 'max-age=300',
-                        ContentType: 'text/html',
                         ContentEncoding: 'gzip'
                     }
                 }
