@@ -2,14 +2,7 @@
     'use strict';
 
     var publicJsSrcs = [
-        '<%= settings.distDir %>/**/*.js',
-        '!<%= settings.distDir %>/app--<%= git_tag %>.js',
-        '!<%= settings.distDir %>/app--<%= git_tag %>.min.js'
-    ];
-
-    var appJsSrcs = [
-        '<%= settings.distDir %>/app--<%= git_tag %>.js',
-        '<%= settings.distDir %>/app--<%= git_tag %>.min.js'
+        '<%= settings.distDir %>/**/*.js'
     ];
 
     module.exports = {
@@ -29,15 +22,6 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=0',
-                        ContentEncoding: 'gzip'
-                    }
-                },
-                {
-                    src: appJsSrcs,
-                    dest: '<%= settings.s3.test.app %>',
-                    rel : '<%= settings.distDir %>/',
-                    options: {
-                        CacheControl: 'max-age=31556926',
                         ContentEncoding: 'gzip'
                     }
                 }
@@ -72,15 +56,6 @@
                     rel : '<%= settings.distDir %>/',
                     options: {
                         CacheControl: 'max-age=300',
-                        ContentEncoding: 'gzip'
-                    }
-                },
-                {
-                    src: appJsSrcs,
-                    dest: '<%= settings.s3.production.app %>',
-                    rel : '<%= settings.distDir %>/',
-                    options: {
-                        CacheControl: 'max-age=31556926',
                         ContentEncoding: 'gzip'
                     }
                 }

@@ -50,13 +50,5 @@ module.exports = {
                 cwd: 'src/preview'
             }
         ]
-    },
-    versionate: {
-        files: [
-            {
-                src: '.tmp/build/<%= settings.distDir %>/app.js',
-                dest: '.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.js'
-            }
-        ]
     }
 };

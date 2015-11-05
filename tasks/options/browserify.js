@@ -8,10 +8,6 @@ module.exports = {
             {
                 src: 'src/embed/embed-html.js',
                 dest: '.tmp/build/<%= settings.distDir %>/embed-html.js'
-            },
-            {
-                src: ['src/app/main.js'],
-                dest: '.tmp/build/<%= settings.distDir %>/app.js'
             }
         ]
     },

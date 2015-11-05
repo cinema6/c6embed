@@ -1,10 +1,8 @@
 var __googleAnalytics__ = require('../../lib/google_analytics');
-var Location = require('../../src/app/utils/Location');
 
 describe('googleAnalytics(global, name, accountId, params)', function() {
     'use strict';
 
-    var $location;
     var scripts, analytics;
     var googleAnalytics;
     var global, name, accountId, params;
@@ -13,8 +11,6 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
     beforeEach(function() {
         scripts = [];
         analytics = [];
-
-        $location = new Location({ window: window, document: document });
 
         googleAnalytics = jasmine.createSpy('googleAnalytics()').and.callFake(__googleAnalytics__);
 
@@ -59,7 +55,7 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
     });
 
     it('should load analytics.js', function() {
-        expect(scripts.map(function(script) { return script.src; })).toContain($location.protocol + '//www.google-analytics.com/analytics.js');
+        expect(scripts.map(function(script) { return script.src; })).toContain('https://www.google-analytics.com/analytics.js');
     });
 
     it('should create the tracker', function() {
@@ -113,7 +109,7 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
 
             it('should not load the GA script again', function() {
                 expect(scripts.filter(function(script) {
-                    return script.src === $location.protocol + '//www.google-analytics.com/analytics.js';
+                    return script.src === 'https://www.google-analytics.com/analytics.js';
                 }).length).toBe(1);
             });
 
@@ -139,7 +135,7 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
 
                 it('should not load the GA script again', function() {
                     expect(scripts.filter(function(script) {
-                        return script.src === $location.protocol + '//www.google-analytics.com/analytics.js';
+                        return script.src === 'https://www.google-analytics.com/analytics.js';
                     }).length).toBe(1);
                 });
 
@@ -190,7 +186,7 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
 
             it('should create a new global', function() {
                 expect(scripts.filter(function(script) {
-                    return script.src === $location.protocol + '//www.google-analytics.com/analytics.js';
+                    return script.src === 'https://www.google-analytics.com/analytics.js';
                 }).length).toBe(2);
             });
         });
@@ -213,7 +209,7 @@ describe('googleAnalytics(global, name, accountId, params)', function() {
 
             it('should create a new global', function() {
                 expect(scripts.filter(function(script) {
-                    return script.src === ($location.protocol + '//www.google-analytics.com/analytics.js');
+                    return script.src === ('https://www.google-analytics.com/analytics.js');
                 }).length).toBe(2);
             });
         });
