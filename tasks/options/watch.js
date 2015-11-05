@@ -40,7 +40,7 @@
         },
         preview: {
             files: [
-                'src/preview.html'
+                'src/preview/preview.html'
             ],
             options: {
                 livereload: true

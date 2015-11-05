@@ -30,16 +30,16 @@ module.exports = {
                 dest: 'app/index.html'
             },
             {
-                src: 'src/styles/**',
+                src: 'styles/**',
                 dest: 'app/',
                 expand: true,
-                cwd: 'src'
+                cwd: 'src/preview/'
             },
             {
-                src: 'src/img/**',
+                src: 'img/**',
                 dest: 'app/',
                 expand: true,
-                cwd: 'src'
+                cwd: 'src/preview/'
             }
         ]
     },
