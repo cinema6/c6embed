@@ -15,7 +15,7 @@
 
                 var isProduction = (/^(www\.)?(cinema6|reelcontent)\.com$/).test(window.location.hostname);
                 var isLocal = (/^(localhost|[\d\.]+)$/).test(window.location.hostname);
-                var host = (window.location.hostname.match(/^(www\.)?(.+)\.com$/) || [])[2] || 'cinema6';
+                var host = (window.location.hostname.match(/^(www\.)?.*?(\w+)\.com$/) || [])[2] || 'cinema6';
                 var base = '//' + (isProduction ? 'portal' : 'staging') + '.' + host + '.com/';
                 var params = window.location.search.replace(/^\?/, '')
                     .split('&')

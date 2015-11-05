@@ -1,6 +1,11 @@
 # C6Embed Changelog
 
 ## v3.0.0 (November 5, 2015)
+* *[v3.0.0-rc3]*
+  * [FIX]: Fix for an issue that caused the preview page not to work in
+    staging.
+* *[/v3.0.0-rc3]*
+
 * *[v3.0.0-rc2]*
   * [FIX]: Fix for an issue that caused deployment to S3 to fail
 * *[/v3.0.0-rc2]*
