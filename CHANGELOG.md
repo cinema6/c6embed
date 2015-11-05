@@ -1,6 +1,11 @@
 # C6Embed Changelog
 
 ## v3.0.0 (November 5, 2015)
+* *[v3.0.0-rc4]*
+  * [FIX]: Fix for an issue that caused the preview page to break if the
+    loaded MiniReel had no splash image.
+* *[/v3.0.0-rc4]*
+
 * *[v3.0.0-rc3]*
   * [FIX]: Fix for an issue that caused the preview page not to work in
     staging.
