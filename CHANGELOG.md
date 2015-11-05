@@ -1,12 +1,15 @@
 # C6Embed Changelog
 
-* Switch MRAID to use the Player Service
-* Add new scripts for embedding on the open web with the Player Service
-* Switch preview page to use the Player Service
-* [DEPRECATION]: Remove standalone player
-* [DEPRECATION]: Remove jsonp script
-* [DEPRECATION]: Remove MR2 widget
-* [DEPRECATION]: Remove app.js embedding API
+## v3.0.0 (November 5, 2015)
+* *[v3.0.0-rc1]*
+  * Switch MRAID to use the Player Service
+  * Add new scripts for embedding on the open web with the Player Service
+  * Switch preview page to use the Player Service
+  * [DEPRECATION]: Remove standalone player
+  * [DEPRECATION]: Remove jsonp script
+  * [DEPRECATION]: Remove MR2 widget
+  * [DEPRECATION]: Remove app.js embedding API
+* *[/v3.0.0-rc1]*
 
 ## v2.41.1 (October 30, 2015)
 * Add support for MRAID over HTTPS
