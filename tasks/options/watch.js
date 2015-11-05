@@ -14,30 +14,6 @@
             },
             tasks: ['browserify:server', 'copy:embed']
         },
-        widget: {
-            files: [
-                '<%= settings.appDir %>/widget.html',
-                'src/**/*.js',
-                'lib/**/*.js',
-                'lite/**/*.js',
-            ],
-            options: {
-                livereload: true
-            },
-            tasks: ['browserify:server', 'copy:widget']
-        },
-        standalone: {
-            files: [
-                'src/standalone.html',
-                'src/**/*.js',
-                'lib/**/*.js',
-                'lite/**/*.js'
-            ],
-            options: {
-                livereload: true
-            },
-            tasks: ['browserify:server', 'copy:standalone']
-        },
         preview: {
             files: [
                 'src/preview/preview.html'
@@ -46,18 +22,6 @@
                 livereload: true
             },
             tasks: ['copy:preview']
-        },
-        jsonp: {
-            files: [
-                '<%= settings.appDir %>/jsonp.html',
-                'src/**/*.js',
-                'lib/**/*.js',
-                'lite/**/*.js',
-            ],
-            options: {
-                livereload: true
-            },
-            tasks: ['browserify:server','copy:jsonp']
         },
         mraid: {
             files: [

@@ -7,22 +7,6 @@ module.exports = {
             }
         ]
     },
-    widget: {
-        files: [
-            {
-                src: 'app/widget.html',
-                dest: 'app/index.html'
-            }
-        ]
-    },
-    standalone: {
-        files: [
-            {
-                src: 'src/standalone/standalone.html',
-                dest: 'app/index.html'
-            }
-        ]
-    },
     preview: {
         files: [
             {
@@ -40,14 +24,6 @@ module.exports = {
                 dest: 'app/',
                 expand: true,
                 cwd: 'src/preview/'
-            }
-        ]
-    },
-    jsonp: {
-        files: [
-            {
-                src: 'app/jsonp.html',
-                dest: 'app/index.html'
             }
         ]
     },
@@ -72,14 +48,6 @@ module.exports = {
                 dest: '.tmp/build/<%= settings.distDir %>/',
                 expand: true,
                 cwd: 'src/preview'
-            }
-        ]
-    },
-    versionate: {
-        files: [
-            {
-                src: '.tmp/build/<%= settings.distDir %>/app.js',
-                dest: '.tmp/build/<%= settings.distDir %>/app--<%= git_tag %>.js'
             }
         ]
     }

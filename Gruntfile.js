@@ -113,12 +113,10 @@ module.exports = function(grunt) {
         'browserify:mraid-dist',
         'browserify:vpaid-dist',
         'browserify:embed-js-dist',
-        'copy:versionate',
         'uglify:dist',
         'usebanner:dist',
         'htmlmin:dist',
         'inline:dist',
-        'replace:dist',
         'compress:dist'
     ]);
 
