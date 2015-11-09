@@ -60,7 +60,7 @@
                 };
 
                 writeScript(embedSrc);
-                writeScript(base + 'api/public/content/experience/' + params.experience + '.js?preview=true');
+                writeScript(base + 'api/public/content/experience/' + (params.experience || params.id) + '.js?preview=true');
 
                 window.params = params;
                 window.apiRoot = base;
