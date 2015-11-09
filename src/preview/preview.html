@@ -10,6 +10,17 @@
         <script type="text/javascript" src="//use.typekit.net/xuz8gem.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
         <script>
+            function extend(/*...objects*/) {
+                var objects = Array.prototype.slice.call(arguments);
+
+                return objects.reduce(function(result, object) {
+                    return Object.keys(object).reduce(function(result, key) {
+                        result[key] = object[key];
+                        return result;
+                    }, result);
+                }, {});
+            }
+
             (function() {
                 'use strict';
 
@@ -75,20 +86,17 @@
                         var params = window.params;
                         var apiRoot = window.apiRoot;
 
-                        c6embed(document.getElementById('embed-target'), {
+                        c6embed(document.getElementById('embed-target'), extend({
+                            type: experience.data.mode,
+                        }, params, {
                             apiRoot:    apiRoot,
                             experience: experience.id,
-                            type:       params.type || experience.data.mode,
                             title:      experience.data.title,
                             image:      experience.data.collateral.splash,
-                            branding:   params.branding,
                             splash:     { type: experience.data.splash.theme, ratio: experience.data.splash.ratio.replace('-', ':') },
-                            container:  params.container,
-                            campaign:   params.campaign,
                             preview:    true,
-                            mobileType: params.mobileType,
                             preload:    true
-                        });
+                        }));
                     }());
                 </script>
             </div>
