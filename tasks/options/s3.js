@@ -77,6 +77,23 @@
                     }
                 }
             ]
+        },
+        'reel-content-preview': {
+            options: {
+                bucket: 'com.reelcontent'
+            },
+            upload: [
+                {
+                    src: '<%= settings.distDir %>/preview.html',
+                    dest: '<%= settings.s3.productionPreview.app %>',
+                    rel : '<%= settings.distDir %>/',
+                    options: {
+                        CacheControl: 'max-age=300',
+                        ContentType: 'text/html',
+                        ContentEncoding: 'gzip'
+                    }
+                }
+            ]
         }
     };
 }());
