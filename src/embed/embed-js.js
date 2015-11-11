@@ -28,7 +28,7 @@ function pick(object, keys) {
 
 function c6embed(beforeElement/*, params*/) {
     var params = extend({
-        apiRoot: 'https://portal.cinema6.com/',
+        apiRoot: 'https://platform.reelcontent.com/',
         type: 'light',
         container: 'embed',
         mobileType: 'mobile'

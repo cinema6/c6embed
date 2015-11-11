@@ -250,8 +250,8 @@ describe('[c6mraid(config)]', function() {
         });
 
         it('should default the type, environment and pageUrl', function() {
-            expect(Player).toHaveBeenCalledWith('https://portal.cinema6.com/api/public/players/full-np', jasmine.objectContaining({
-                pageUrl: 'cinema6.com'
+            expect(Player).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/full-np', jasmine.objectContaining({
+                pageUrl: 'reelcontent.com'
             }));
         });
     });

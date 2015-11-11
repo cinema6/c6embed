@@ -58,8 +58,8 @@ function initLogger(config) {
 module.exports = function c6mraid(/*config*/) {
     var config = extend({
         type: 'full-np',
-        apiRoot: 'https://portal.cinema6.com',
-        pageUrl: 'cinema6.com',
+        apiRoot: 'https://platform.reelcontent.com/',
+        pageUrl: 'reelcontent.com',
         forceOrientation: 'portrait'
     }, arguments[0]);
 

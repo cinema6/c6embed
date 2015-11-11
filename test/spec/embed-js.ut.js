@@ -372,7 +372,7 @@ describe('c6embed(beforeElement, params)', function() {
                 });
 
                 it('should create a player with some defaults', function() {
-                    expect(Player).toHaveBeenCalledWith('https://portal.cinema6.com/api/public/players/light', {
+                    expect(Player).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/light', {
                         experience: 'e-3f3b58482741e3',
                         campaign: undefined,
                         branding: undefined,

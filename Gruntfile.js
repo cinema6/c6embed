@@ -130,5 +130,8 @@ module.exports = function(grunt) {
         grunt.task.run('build');
         grunt.task.run('s3:' + target);
         grunt.task.run('s3:' + target + '-preview');
+        if (target === 'production') {
+            grunt.task.run('s3:reel-content-preview');
+        }
     });
 };

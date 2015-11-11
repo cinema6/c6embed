@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* *[v3.0.3-rc1]*
+  * Add support for reelcontent.com
+
 ## v3.0.2 (November 9, 2015)
 * *[v3.0.2-rc1]*
   * [FIX]: Fix for an issue that caused old preview page URLs to break
