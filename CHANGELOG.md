@@ -1,7 +1,9 @@
 # C6Embed Changelog
 
+## v3.0.3 (November 11, 2015)
 * *[v3.0.3-rc1]*
   * Add support for reelcontent.com
+* *[/v3.0.3-rc1]*
 
 ## v3.0.2 (November 9, 2015)
 * *[v3.0.2-rc1]*
