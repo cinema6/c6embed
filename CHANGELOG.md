@@ -1,6 +1,10 @@
 # C6Embed Changelog
 
 ## v3.0.3 (November 11, 2015)
+* *[v3.0.3-rc2]*
+  * Update staging reelcontent hostname
+* *[/v3.0.3-rc2]*
+
 * *[v3.0.3-rc1]*
   * Add support for reelcontent.com
 * *[/v3.0.3-rc1]*
