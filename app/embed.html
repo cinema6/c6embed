@@ -8,41 +8,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
         <meta property="og:image" content="http://cdn.cnwimg.com/wp-content/uploads/2010/02/jimmy-fallon.jpg">
         <script src="//lib.cinema6.com/jquery/2.0.3-0-gf576d00/jquery.js"></script>
-        <script>
-            window.__C6_DEBUG__     = true;
-            window.__C6_URL_ROOT__  = window.location.protocol + '//staging.cinema6.com';
-            window.__C6_APP_JS__    = 'c6embed.js';
-            window.__C6_AD_NETWORK__= '5491.1';
-        </script>
     </head>
     <body>
+        <h1>This is Da Preview Page</h1>
         <article>
-            <div>
-                <span>
-                    <img id="header_img" src="http://cdn.cnwimg.com/wp-content/uploads/2010/02/jimmy-fallon.jpg">
-                </span>
-            </div>
-            <script src="embed.js" data-container="testcontainer" data-exp="e-1478efedf17ab4" data-splash="img-text-overlay:16/9" data-preload data-player-version="2"></script>
-            
-            <!-- This embed code loads a MR that contains an old, hardcoded sponsored card + a WildCard statically mapped in this campaign -->
-            <!--
-            <script src="embed.js" data-campaign="cam-db1e05c5d5f257" data-exp="e-1dba568083f443" data-splash="img-text-overlay:16/9" data-preload></script>
-            -->
-            <script>
-                (function(attrs) {
-                    var c6 = (window.c6 || (window.c6 = {})),
-                    pending = c6.pending || (c6.pending = []),
-                    id = 'c6embed-' + (Math.random() + 1).toString(36).substring(2);
-                    if (document.readyState !== 'loading') {
-                        pending.push(id);
-                    }
-                    document.write('<script id="' + id + '" src="embed.js"' +
-                        Object.keys(attrs).reduce(function(html, attr) {
-                            return html + ' ' + attr + '="' + attrs[attr] + '"';
-                        }, '') +
-                    '></scr' + 'ipt>');
-                }({'data-exp':'e-1236f792a2eec6','data-splash':'img-only:16/9','data-replace-image':'#header_img'}));
-            </script>
+            <script src="./embed-html.js" data-api-root="//platform-staging.reelcontent.com/" data-type="lightbox" data-experience="e-44600505f06f70" data-auto-launch></script>
         </article>
     </body>
 </html>
