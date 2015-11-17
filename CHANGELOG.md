@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+* *[v3.1.0-rc1]*
+  * A MiniReel's splash image is no longer rendered when
+    `autoLaunch`/`data-auto-launch` is `true` on the embed
+  * The preview page now auto-launches its experience
+
 ## v3.0.3 (November 11, 2015)
 * *[v3.0.3-rc2]*
   * Update staging reelcontent hostname
