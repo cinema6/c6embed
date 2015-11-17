@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+## v2.41.2 (November 17, 2015)
+* [FIX]: Fix sponsored card lib to load `bannerId` from correct location
+
 ## v2.41.1 (October 30, 2015)
 * Add support for MRAID over HTTPS
 * Provide better VPAID player configuration defaults

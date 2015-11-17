@@ -429,7 +429,7 @@
                 });
 
                 it('should use the card\'s configured bannerId, if it exists', function(done) {
-                    experience.data.deck[0].campaign.bannerId = '2';
+                    experience.data.deck[0].bannerId = '2';
                     _private.makeAdCall(experience.data.deck[0], experience, pixels, 1234).then(function() {
                         expect(experience.data.deck[0]).toEqual({
                             id: 'rc1',
@@ -437,9 +437,9 @@
                             campaign: {
                                 campaignId: 'camp1',
                                 playUrls: ['click.me'],
-                                countUrls: ['count.me'],
-                                bannerId: '2'
-                            }
+                                countUrls: ['count.me']
+                            },
+                            bannerId: '2'
                         });
                         expect(adLib.loadAd).toHaveBeenCalledWith(1234, 'camp1', '2');
                     }).catch(function(error) {
