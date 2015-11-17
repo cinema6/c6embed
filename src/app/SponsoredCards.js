@@ -70,7 +70,7 @@ module.exports = function(deps) {
     // Retrieve the banner for a sponsored card that already exists in the minireel
     _private.makeAdCall = function(card, experience, pixels, placement, timeout) {
         var campaignId  = String(card.campaign && card.campaign.campaignId || card.adtechId),
-            bannerId    = String(card.campaign && card.campaign.bannerId || card.bannerId || '1'),
+            bannerId    = String(card.bannerId || '1'),
             startFetch  = new Date().getTime();
             
         return adLib.loadAd(placement, campaignId, bannerId)
