@@ -26,12 +26,25 @@ function pick(object, keys) {
     }, {});
 }
 
+function importDeps(deps) {
+    return new q.Promise(function callImportScripts(resolve) {
+        return importScripts(deps, function(/*...modules*/) {
+            return resolve(Array.prototype.slice.call(arguments));
+        });
+    });
+}
+
 function c6embed(beforeElement/*, params*/) {
     var params = extend({
         apiRoot: 'https://platform.reelcontent.com/',
         type: 'light',
         container: 'embed',
-        mobileType: 'mobile'
+        mobileType: 'mobile',
+        splash: {
+            type: 'img-text-overlay',
+            ratio: '16:9'
+        },
+        autoLaunch: false
     }, arguments[1]);
 
     var browser = new BrowserInfo(window.navigator.userAgent);
@@ -44,13 +57,9 @@ function c6embed(beforeElement/*, params*/) {
         'experience', 'campaign', 'container', 'categories',
         'branding', 'placementId', 'wildCardPlacement', 'pageUrl', 'mobileType',
         'hostApp', 'network',
-        'playUrls', 'countUrls', 'launchUrls', 'preview'
-    ]), { autoLaunch: false, standalone: false, context: 'embed' }));
+        'playUrls', 'countUrls', 'launchUrls', 'preview', 'autoLaunch'
+    ]), { standalone: !!params.autoLaunch, context: 'embed' }));
     var embed = document.createElement('div');
-    var splash = document.createElement('div');
-    var splashJsUrl = resolveUrl(apiRoot, '/collateral/splash/splash.js');
-    var splashHtmlUrl = resolveUrl(apiRoot, '/collateral/splash/' + params.splash.type + '/' +
-        params.splash.ratio.split(':').join('-') + '.js');
     var styleController = (function() {
         var responsiveStyles = null;
         var originalStyles = null;
@@ -93,80 +102,59 @@ function c6embed(beforeElement/*, params*/) {
 
         return lightboxes;
     }(document.createElement('div')));
-    var splashImage = params.image && resolveUrl(apiRoot, params.image);
 
-    function loadBranding(branding, splash) {
-        var id = 'c6-' + branding;
-        var link;
-
-        if (branding && !document.getElementById(id)) {
-            link = document.createElement('link');
-            link.id = id;
-            link.rel = 'stylesheet';
-            link.href = resolveUrl(apiRoot, '/collateral/branding/' + branding + '/styles/splash.css');
-
-            document.head.appendChild(link);
+    function loadExperience(settings, preload) {
+        if (!player.bootstrapped) {
+            player.bootstrap(isLightbox ? lightboxes : embed, PLAYER_STYLES);
         }
 
-        splash.className = 'c6brand__' + branding;
+        if (!preload) {
+            player.show();
+        }
     }
 
-    loadBranding(params.branding, splash);
+    function createSplash() {
+        var splash = document.createElement('div');
+        var splashJsUrl = resolveUrl(apiRoot, '/collateral/splash/splash.js');
+        var splashHtmlUrl = resolveUrl(apiRoot, '/collateral/splash/' + params.splash.type + '/' +
+            params.splash.ratio.split(':').join('-') + '.js');
+        var splashImage = params.image && resolveUrl(apiRoot, params.image);
 
-    embed.className = 'c6embed-' + experienceId;
-    embed.style.position = 'relative';
-    embed.style.width = params.width;
-    embed.style.height = params.height;
-    embed.appendChild(splash);
+        function loadBranding(branding, splash) {
+            var id = 'c6-' + branding;
+            var link;
 
-    return new q.Promise(function loadAsyncDeps(resolve) {
-        importScripts([
-            splashJsUrl, splashHtmlUrl
-        ], function(splashJs, splashHtml) {
-            var splashDelegate;
+            if (branding && !document.getElementById(id)) {
+                link = document.createElement('link');
+                link.id = id;
+                link.rel = 'stylesheet';
+                link.href = resolveUrl(apiRoot, '/collateral/branding/' + branding + '/styles/splash.css');
 
-            function loadExperience(settings, preload) {
-                if (!player.bootstrapped) {
-                    player.bootstrap(isLightbox ? lightboxes : embed, PLAYER_STYLES);
-                }
-
-                if (!preload) {
-                    player.show();
-                }
+                document.head.appendChild(link);
             }
 
-            splash.addEventListener('mouseenter', function handleMouseenter() {
-                q().then(function preload() { return loadExperience(null, true); });
+            splash.className = 'c6brand__' + branding;
+        }
 
-                splash.removeEventListener('mouseenter', handleMouseenter, false);
-            }, false);
+        loadBranding(params.branding, splash);
+        embed.appendChild(splash);
+
+        splash.addEventListener('mouseenter', function handleMouseenter() {
+            q().then(function preload() { return loadExperience(null, true); });
+
+            splash.removeEventListener('mouseenter', handleMouseenter, false);
+        }, false);
+
+        return importDeps([splashJsUrl, splashHtmlUrl]).spread(function init(splashJs, splashHtml) {
+            var splashDelegate;
 
             player.once('bootstrap', function addPlayerListeners() {
                 player.session.on('open', function() {
                     splashDelegate.didShow();
-                    styleController.apply();
-                    player.frame.style.zIndex = '100';
                 });
                 player.session.on('close', function() {
                     splashDelegate.didHide();
-                    styleController.clear();
-                    player.frame.style.zIndex = PLAYER_STYLES.zIndex;
                 });
-                player.session.on('responsiveStyles', function(styles) {
-                    styleController.set(styles);
-
-                    if (player.shown) { styleController.apply(); }
-                });
-
-                if (isLightbox) {
-                    player.session.on('open', function fullscreen() {
-                        player.frame.style.position = 'fixed';
-                        player.frame.style.zIndex = '9007199254740992';
-                    });
-                    player.session.on('close', function unfullscreen() {
-                        player.frame.style.position = PLAYER_STYLES.position;
-                    });
-                }
             });
 
             splash.innerHTML = splashHtml;
@@ -178,19 +166,48 @@ function c6embed(beforeElement/*, params*/) {
                 { didShow: noop, didHide: noop },
                 splashJs({ loadExperience: loadExperience }, null, splash)
             );
-
-            beforeElement.parentNode.insertBefore(embed, beforeElement);
-
-            if (params.preload) {
-                loadExperience(null, true);
-            }
-
-            if (params.autoLaunch) {
-                loadExperience(null, false);
-            }
-
-            resolve(embed);
         });
+    }
+
+    embed.className = 'c6embed-' + experienceId;
+    embed.style.position = 'relative';
+    embed.style.width = params.width;
+    embed.style.height = params.height;
+
+    return (params.autoLaunch ? q() : createSplash()).then(function insertPlayer() {
+        player.once('bootstrap', function addPlayerListeners() {
+            player.session.on('open', function() {
+                styleController.apply();
+                player.frame.style.zIndex = '100';
+            });
+            player.session.on('close', function() {
+                styleController.clear();
+                player.frame.style.zIndex = PLAYER_STYLES.zIndex;
+            });
+            player.session.on('responsiveStyles', function(styles) {
+                styleController.set(styles);
+
+                if (player.shown) { styleController.apply(); }
+            });
+
+            if (isLightbox) {
+                player.session.on('open', function fullscreen() {
+                    player.frame.style.position = 'fixed';
+                    player.frame.style.zIndex = '9007199254740992';
+                });
+                player.session.on('close', function unfullscreen() {
+                    player.frame.style.position = PLAYER_STYLES.position;
+                });
+            }
+        });
+
+        beforeElement.parentNode.insertBefore(embed, beforeElement);
+
+        if (params.preload || params.autoLaunch) {
+            loadExperience(null, true);
+        }
+
+        return embed;
     });
 }
 

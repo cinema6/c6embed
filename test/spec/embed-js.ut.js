@@ -132,12 +132,14 @@ describe('c6embed(beforeElement, params)', function() {
             BrowserInfo.and.returnValue(browser);
 
             c6embed(beforeElement, params).then(success, failure);
-            setTimeout(done, 1);
+            setTimeout(function() {
+                player = Player.calls.mostRecent().returnValue;
+                embed = document.createElement.calls.all()[0].returnValue;
+                lightboxes = document.createElement.calls.all()[1].returnValue;
+                splash = document.createElement.calls.all()[2].returnValue;
 
-            player = Player.calls.mostRecent().returnValue;
-            embed = document.createElement.calls.all()[0].returnValue;
-            splash = document.createElement.calls.all()[1].returnValue;
-            lightboxes = document.createElement.calls.all()[2].returnValue;
+                done();
+            }, 1);
         });
 
         afterEach(function() {
@@ -353,11 +355,7 @@ describe('c6embed(beforeElement, params)', function() {
                     twobits.parse.calls.reset();
 
                     params = {
-                        experience: 'e-3f3b58482741e3',
-                        splash: {
-                            type: 'img-text-overlay',
-                            ratio: '16:9'
-                        }
+                        experience: 'e-3f3b58482741e3'
                     };
 
                     c6embed(beforeElement, params).then(success, failure);
@@ -369,6 +367,10 @@ describe('c6embed(beforeElement, params)', function() {
 
                     importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
                     setTimeout(done, 1);
+                });
+
+                it('should fetch a default splash image', function() {
+                    expect(importScripts).toHaveBeenCalledWith(jasmine.arrayContaining(['https://platform.reelcontent.com/collateral/splash/img-text-overlay/16-9.js']), jasmine.any(Function));
                 });
 
                 it('should create a player with some defaults', function() {
@@ -412,18 +414,22 @@ describe('c6embed(beforeElement, params)', function() {
             });
 
             describe('if preload is true', function() {
-                beforeEach(function() {
+                beforeEach(function(done) {
                     params.preload = true;
 
                     document.createElement.calls.reset();
 
-                    c6embed(beforeElement, params).then(success, failure);
+                    c6embed(beforeElement, params).then(success, failure).finally(function() {
+                        player = Player.calls.mostRecent().returnValue;
+                        embed = document.createElement.calls.all()[0].returnValue;
+                        splash = document.createElement.calls.all()[1].returnValue;
 
-                    player = Player.calls.mostRecent().returnValue;
-                    embed = document.createElement.calls.all()[0].returnValue;
-                    splash = document.createElement.calls.all()[1].returnValue;
+                        done();
+                    });
 
-                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                    setTimeout(function() {
+                        importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                    }, 1);
                 });
 
                 it('should bootstrap the player', function() {
@@ -436,26 +442,220 @@ describe('c6embed(beforeElement, params)', function() {
             });
 
             describe('if autoLaunch is true', function() {
-                beforeEach(function() {
-                    params.autoLaunch = true;
+                beforeEach(function(done) {
+                    embed.parentNode.removeChild(embed);
+
+                    params = {
+                        apiRoot: 'https://dev.cinema6.com/',
+                        type: 'desktop-card',
+                        experience: 'e-3f3b58482741e3',
+                        campaign: 'cam-f71ce1be881d10',
+                        branding: 'some-new-thing',
+                        placementId: '7475348',
+                        container: 'digitaljournal',
+                        wildCardPlacement: '485738459',
+                        pageUrl: 'cinema6.com',
+                        hostApp: 'Google Chrome',
+                        network: 'cinema6',
+                        preview: false,
+                        categories: ['food', 'tech'],
+                        playUrls: ['play1.gif', 'play2.gif'],
+                        countUrls: ['count1.gif', 'count2.gif'],
+                        launchUrls: ['launch1.gif', 'launch2.gif'],
+                        mobileType: 'swipe',
+                        autoLaunch: true,
+                        ex: 'my-experiment',
+                        vr: 'some-variant',
+                        preload: false
+                    };
 
                     document.createElement.calls.reset();
+                    importScripts.calls.reset();
+                    player.bootstrap.calls.reset();
+                    Player.calls.reset();
 
                     c6embed(beforeElement, params).then(success, failure);
 
                     player = Player.calls.mostRecent().returnValue;
                     embed = document.createElement.calls.all()[0].returnValue;
-                    splash = document.createElement.calls.all()[1].returnValue;
 
-                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                    setTimeout(done, 1);
+                });
+
+                it('should not create a splash <div>', function() {
+                    expect(document.createElement.calls.all().filter(function(call) {
+                        return call.args[0].toLowerCase() === 'div';
+                    }).length).toBe(1);
+                    expect(document.createElement).toHaveBeenCalledWith('div');
+                });
+
+                it('should not import any scripts', function() {
+                    expect(importScripts).not.toHaveBeenCalled();
+                });
+
+                it('should create a standalone player', function() {
+                    expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
+                        experience: 'e-3f3b58482741e3',
+                        campaign: 'cam-f71ce1be881d10',
+                        container: 'digitaljournal',
+                        categories: ['food', 'tech'],
+                        branding: 'some-new-thing',
+                        placementId: '7475348',
+                        wildCardPlacement: '485738459',
+                        pageUrl: 'cinema6.com',
+                        mobileType: 'swipe',
+                        hostApp: 'Google Chrome',
+                        network: 'cinema6',
+                        playUrls: ['play1.gif', 'play2.gif'],
+                        countUrls: ['count1.gif', 'count2.gif'],
+                        launchUrls: ['launch1.gif', 'launch2.gif'],
+                        preview: false,
+                        autoLaunch: true,
+                        standalone: true,
+                        context: 'embed'
+                    });
+                });
+
+                it('should append the embed to the DOM', function() {
+                    expect(container.contains(embed)).toBe(true);
+                    expect(embed.previousSibling).toBe(container.querySelector('span#one'));
                 });
 
                 it('should bootstrap the player', function() {
                     expect(player.bootstrap).toHaveBeenCalledWith(embed, jasmine.any(Object));
                 });
 
-                it('should show the player', function() {
-                    expect(player.show).toHaveBeenCalled();
+                it('should fulfill with the embed <div>', function() {
+                    expect(success).toHaveBeenCalledWith(embed);
+                });
+
+                describe('when the player is bootstrapped', function() {
+                    beforeEach(function() {
+                        player.bootstrap(document.createElement('div'));
+                    });
+
+                    describe('and opened', function() {
+                        beforeEach(function() {
+                            player.session.emit('open');
+                        });
+
+                        it('should set the player\'s z-index to 100', function() {
+                            expect(player.frame.style.zIndex).toBe('100');
+                        });
+                    });
+
+                    describe('and closed', function() {
+                        beforeEach(function() {
+                            player.session.emit('close');
+                        });
+
+                        it('should set the player\'s z-index to -100', function() {
+                            expect(player.frame.style.zIndex).toBe('-100');
+                        });
+                    });
+
+                    describe('and sends responsiveStyles', function() {
+                        var styles;
+
+                        beforeEach(function() {
+                            styles = {
+                                minWidth: '18.75em',
+                                padding: '0px 0px 85%',
+                                fontSize: '16px',
+                                height: '0px',
+                                overflow: 'hidden'
+                            };
+
+                            embed.style.minWidth = '20px';
+                            embed.style.padding = '10px';
+                            embed.style.fontSize = '50px';
+                            embed.style.height = '200px';
+                            embed.style.overflow = 'scroll';
+                        });
+
+                        describe('when the player is shown', function() {
+                            beforeEach(function() {
+                                player.shown = true;
+
+                                player.session.emit('responsiveStyles', styles);
+                            });
+
+                            it('should set the styles on the embed <div>', function() {
+                                Object.keys(styles).forEach(function(key) {
+                                    expect(embed.style[key]).toBe(styles[key]);
+                                });
+                            });
+
+                            describe('when the player closes', function() {
+                                beforeEach(function() {
+                                    player.session.emit('close');
+                                });
+
+                                it('should set the styles it changed back to their original values', function() {
+                                    expect(embed.style.minWidth).toBe('20px');
+                                    expect(embed.style.padding).toBe('10px');
+                                    expect(embed.style.fontSize).toBe('50px');
+                                    expect(embed.style.height).toBe('200px');
+                                    expect(embed.style.overflow).toBe('scroll');
+                                });
+                            });
+                        });
+
+                        describe('when the player is hidden', function() {
+                            beforeEach(function() {
+                                player.shown = false;
+
+                                player.session.emit('responsiveStyles', styles);
+                            });
+
+                            it('should not set the styles on the embed <div>', function() {
+                                expect(embed.style.minWidth).toBe('20px');
+                                expect(embed.style.padding).toBe('10px');
+                                expect(embed.style.fontSize).toBe('50px');
+                                expect(embed.style.height).toBe('200px');
+                                expect(embed.style.overflow).toBe('scroll');
+                            });
+
+                            describe('when the player opens', function() {
+                                beforeEach(function() {
+                                    player.session.emit('open');
+                                });
+
+                                it('should apply the styles', function() {
+                                    Object.keys(styles).forEach(function(key) {
+                                        expect(embed.style[key]).toBe(styles[key]);
+                                    });
+                                });
+                            });
+
+                            describe('when the player closes', function() {
+                                beforeEach(function() {
+                                    player.session.emit('open');
+                                    player.session.emit('close');
+                                });
+
+                                it('should set the styles it changed back to their original values', function() {
+                                    expect(embed.style.minWidth).toBe('20px');
+                                    expect(embed.style.padding).toBe('10px');
+                                    expect(embed.style.fontSize).toBe('50px');
+                                    expect(embed.style.height).toBe('200px');
+                                    expect(embed.style.overflow).toBe('scroll');
+                                });
+
+                                describe('but then reopens', function() {
+                                    beforeEach(function() {
+                                        player.session.emit('open');
+                                    });
+
+                                    it('should apply the styles again', function() {
+                                        Object.keys(styles).forEach(function(key) {
+                                            expect(embed.style[key]).toBe(styles[key]);
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
                 });
             });
 
@@ -717,22 +917,24 @@ describe('c6embed(beforeElement, params)', function() {
 
                     ['swipe', 'mobile', 'lightbox', 'lightbox-playlist'].forEach(function(type) {
                         describe('"' + type + '"', function() {
-                            beforeEach(function() {
+                            beforeEach(function(done) {
                                 params.type = type;
 
                                 document.createElement.calls.reset();
 
-                                c6embed(beforeElement, params).then(success, failure);
+                                c6embed(beforeElement, params).then(success, failure).finally(function() {
+                                    player = Player.calls.mostRecent().returnValue;
+                                    embed = document.createElement.calls.all()[0].returnValue;
+                                    lightboxes = document.createElement.calls.all()[1].returnValue;
+                                    splash = document.createElement.calls.all()[2].returnValue;
+                                    loadExperience = splashJs.calls.mostRecent().args[0].loadExperience;
 
-                                player = Player.calls.mostRecent().returnValue;
-                                embed = document.createElement.calls.all()[0].returnValue;
-                                splash = document.createElement.calls.all()[1].returnValue;
-                                lightboxes = document.createElement.calls.all()[2].returnValue;
+                                    loadExperience(settings, preload);
+                                }).then(done, done.fail);
 
-                                importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
-                                loadExperience = splashJs.calls.mostRecent().args[0].loadExperience;
-
-                                loadExperience(settings, preload);
+                                setTimeout(function() {
+                                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                                }, 1);
                             });
 
                             it('should bootstrap the player into the lightboxes <div>', function() {
@@ -765,21 +967,23 @@ describe('c6embed(beforeElement, params)', function() {
 
                     ['light', 'full', 'full-np', 'desktop-card', 'solo', 'solo-ads'].forEach(function(type) {
                         describe('"' + type + '"', function() {
-                            beforeEach(function() {
+                            beforeEach(function(done) {
                                 params.type = type;
 
                                 document.createElement.calls.reset();
 
-                                c6embed(beforeElement, params).then(success, failure);
+                                c6embed(beforeElement, params).then(success, failure).finally(function() {
+                                    player = Player.calls.mostRecent().returnValue;
+                                    embed = document.createElement.calls.all()[0].returnValue;
+                                    splash = document.createElement.calls.all()[1].returnValue;
+                                    loadExperience = splashJs.calls.mostRecent().args[0].loadExperience;
 
-                                player = Player.calls.mostRecent().returnValue;
-                                embed = document.createElement.calls.all()[0].returnValue;
-                                splash = document.createElement.calls.all()[1].returnValue;
+                                    loadExperience(settings, preload);
+                                }).then(done, done.fail);
 
-                                importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
-                                loadExperience = splashJs.calls.mostRecent().args[0].loadExperience;
-
-                                loadExperience(settings, preload);
+                                setTimeout(function() {
+                                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                                }, 1);
                             });
 
                             it('should bootstrap the player into the embed <div>', function() {
