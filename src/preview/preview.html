@@ -90,11 +90,8 @@
                         }, params, {
                             apiRoot:    apiRoot,
                             experience: experience.id,
-                            title:      experience.data.title,
-                            image:      experience.data.collateral.splash,
-                            splash:     { type: experience.data.splash.theme, ratio: experience.data.splash.ratio.replace('-', ':') },
                             preview:    true,
-                            preload:    true
+                            autoLaunch: true
                         }));
                     }());
                 </script>
