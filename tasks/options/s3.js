@@ -4,7 +4,8 @@
     var publicJsSrcs = [
         '<%= settings.distDir %>/**/*.js',
         '!<%= settings.distDir %>/app--<%= git_tag %>.js',
-        '!<%= settings.distDir %>/app--<%= git_tag %>.min.js'
+        '!<%= settings.distDir %>/app--<%= git_tag %>.min.js',
+        '!<%= settings.distDir %>/c6mraid.*'
     ];
 
     var appJsSrcs = [
