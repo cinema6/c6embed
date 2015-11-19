@@ -53,12 +53,10 @@ function c6embed(beforeElement/*, params*/) {
     var isLightbox = LIGHTBOX_TYPES.indexOf(type) > -1;
     var experienceId = params.experience;
     var endpoint = resolveUrl(apiRoot, '/api/public/players/' + type);
-    var player = new Player(endpoint, extend(pick(params, [
-        'experience', 'campaign', 'container', 'categories',
-        'branding', 'placementId', 'wildCardPlacement', 'pageUrl', 'mobileType',
-        'hostApp', 'network',
-        'playUrls', 'countUrls', 'launchUrls', 'preview', 'autoLaunch'
-    ]), { standalone: !!params.autoLaunch, context: 'embed' }));
+    var player = new Player(endpoint, extend(params, {
+        standalone: !!params.autoLaunch,
+        context: 'embed'
+    }));
     var embed = document.createElement('div');
     var styleController = (function() {
         var responsiveStyles = null;

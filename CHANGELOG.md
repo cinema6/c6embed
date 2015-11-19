@@ -1,6 +1,11 @@
 # C6Embed Changelog
 
 ## v3.1.0 (November 19, 2015)
+* *[v3.1.0-rc2]*
+  * [FIX]: Ensure all player parameters are supported by all embed
+    methods
+* *[/v3.1.0-rc2]*
+
 * *[v3.1.0-rc1]*
   * A MiniReel's splash image is no longer rendered when
     `autoLaunch`/`data-auto-launch` is `true` on the embed
