@@ -31,11 +31,30 @@ describe('Player', function() {
         beforeEach(function() {
             endpoint = 'https://dev.cinema6.com/api/public/players/desktop-card';
             params = {
+                experience: 'e-4158d66ede3306',
+                card: 'rc-677091d298a151',
+                campaign: 'cam-ba0444a0749644',
+                container: 'reactx',
+                context: 'vpaid',
+                categories: ['food', 'tech'],
+                branding: 'rcplatform',
+                placementId: '387489',
+                wildCardPlacement: '849758493',
+                pageUrl: 'reelcontent.com',
+                mobileType: 'swipe',
+                hostApp: 'My Talking Tom',
+                network: 'omax',
+                preview: true,
+                autoLaunch: false,
+                interstitial: true,
+                standalone: false,
+                vpaid: true,
                 playUrls: ['play1.jpg', 'play2.jpg'],
                 countUrls: ['count1.jpg', 'count2.jpg'],
                 launchUrls: ['launch1.jpg', 'launch2.jpg'],
-                experience: 'e-86cb4be8f26c4c',
-                campaign: 'cam-8363d4ede60bbe'
+                width: 800,
+                height: 600,
+                splash: {}
             };
             data = { foo: 'bar' };
 
@@ -67,11 +86,29 @@ describe('Player', function() {
                         protocol: 'https:',
                         host: 'dev.cinema6.com',
                         pathname: '/api/public/players/desktop-card',
-                        query: extend(params, {
-                            playUrls: params.playUrls.join(','),
-                            countUrls: params.countUrls.join(','),
-                            launchUrls: params.launchUrls.join(',')
-                        })
+                        query: {
+                            experience: 'e-4158d66ede3306',
+                            card: 'rc-677091d298a151',
+                            campaign: 'cam-ba0444a0749644',
+                            container: 'reactx',
+                            context: 'vpaid',
+                            categories: 'food,tech',
+                            branding: 'rcplatform',
+                            placementId: '387489',
+                            wildCardPlacement: '849758493',
+                            pageUrl: 'reelcontent.com',
+                            mobileType: 'swipe',
+                            hostApp: 'My Talking Tom',
+                            network: 'omax',
+                            preview: 'true',
+                            autoLaunch: 'false',
+                            interstitial: 'true',
+                            standalone: 'false',
+                            vpaid: 'true',
+                            playUrls: 'play1.jpg,play2.jpg',
+                            countUrls: 'count1.jpg,count2.jpg',
+                            launchUrls: 'launch1.jpg,launch2.jpg',
+                        }
                     }));
                 });
             });
