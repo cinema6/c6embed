@@ -11,13 +11,6 @@ var PLAYER_EVENTS = ['launch', 'adStart', 'adCount', 'adEnded'];
 
 logger.tasks.send.push(sendLog);
 
-function pick(object, keys) {
-    return keys.reduce(function(result, key) {
-        result[key] = object[key];
-        return result;
-    }, {});
-}
-
 function sendLog(logger, method, args) {
     var img = new Image();
     img.src = formatUrl({
@@ -66,11 +59,12 @@ module.exports = function c6mraid(/*config*/) {
     initLogger(config);
 
     var endpoint = resolveUrl(config.apiRoot, '/api/public/players/' + config.type);
-    var player = new Player(endpoint, extend(pick(config, [
-        'experience', 'campaign', 'container', 'hostApp', 'network',
-        'branding', 'placementId', 'wildCardPlacement', 'pageUrl',
-        'preview'
-    ]), { standalone: false, interstitial: true, context: 'mraid', autoLaunch: false }));
+    var player = new Player(endpoint, extend(config, {
+        standalone: false,
+        interstitial: true,
+        context: 'mraid',
+        autoLaunch: false
+    }));
     var mraid = new MRAID({ forceOrientation: config.forceOrientation, useCustomClose: true });
 
     player.bootstrap(document.body, {
