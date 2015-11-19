@@ -155,6 +155,8 @@ describe('c6embed(beforeElement, params)', function() {
 
         it('should create a Player', function() {
             expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
+                apiRoot: 'https://dev.cinema6.com/',
+                type: 'desktop-card',
                 experience: 'e-3f3b58482741e3',
                 campaign: 'cam-f71ce1be881d10',
                 branding: 'theinertia',
@@ -170,7 +172,18 @@ describe('c6embed(beforeElement, params)', function() {
                 countUrls: ['count1.gif', 'count2.gif'],
                 launchUrls: ['launch1.gif', 'launch2.gif'],
                 mobileType: 'swipe',
+                width: '800px',
+                height: '600px',
                 autoLaunch: false,
+                splash: {
+                    type: 'img-text-overlay',
+                    ratio: '16:9'
+                },
+                ex: 'my-experiment',
+                vr: 'some-variant',
+                preload: false,
+                title: 'This is an Awesome MiniReel!',
+                image: '/collateral/experiences/e-3f3b58482741e3/splash',
                 standalone: false,
                 context: 'embed'
             });
@@ -375,22 +388,16 @@ describe('c6embed(beforeElement, params)', function() {
 
                 it('should create a player with some defaults', function() {
                     expect(Player).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/light', {
-                        experience: 'e-3f3b58482741e3',
-                        campaign: undefined,
-                        branding: undefined,
-                        placementId: undefined,
+                        apiRoot: 'https://platform.reelcontent.com/',
+                        type: 'light',
                         container: 'embed',
-                        wildCardPlacement: undefined,
-                        pageUrl: undefined,
-                        hostApp: undefined,
-                        network: undefined,
-                        preview: undefined,
-                        categories: undefined,
-                        playUrls: undefined,
-                        countUrls: undefined,
-                        launchUrls: undefined,
                         mobileType: 'mobile',
+                        splash: {
+                            type: 'img-text-overlay',
+                            ratio: '16:9'
+                        },
                         autoLaunch: false,
+                        experience: 'e-3f3b58482741e3',
                         standalone: false,
                         context: 'embed'
                     });
@@ -495,22 +502,31 @@ describe('c6embed(beforeElement, params)', function() {
 
                 it('should create a standalone player', function() {
                     expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
+                        splash: {
+                            type: 'img-text-overlay',
+                            ratio: '16:9'
+                        },
+                        apiRoot: 'https://dev.cinema6.com/',
+                        type: 'desktop-card',
                         experience: 'e-3f3b58482741e3',
                         campaign: 'cam-f71ce1be881d10',
-                        container: 'digitaljournal',
-                        categories: ['food', 'tech'],
                         branding: 'some-new-thing',
                         placementId: '7475348',
+                        container: 'digitaljournal',
                         wildCardPlacement: '485738459',
                         pageUrl: 'cinema6.com',
-                        mobileType: 'swipe',
                         hostApp: 'Google Chrome',
                         network: 'cinema6',
+                        preview: false,
+                        categories: ['food', 'tech'],
                         playUrls: ['play1.gif', 'play2.gif'],
                         countUrls: ['count1.gif', 'count2.gif'],
                         launchUrls: ['launch1.gif', 'launch2.gif'],
-                        preview: false,
+                        mobileType: 'swipe',
                         autoLaunch: true,
+                        ex: 'my-experiment',
+                        vr: 'some-variant',
+                        preload: false,
                         standalone: true,
                         context: 'embed'
                     });
