@@ -216,6 +216,10 @@ describe('c6embed(beforeElement, params)', function() {
             expect(Array.prototype.slice.call(splash.classList)).toContain('c6brand__theinertia');
         });
 
+        it('should not hide the splash', function() {
+            expect(splash.style.display).toBe('');
+        });
+
         it('should load a branding stylesheet', function() {
             var link = document.getElementById('c6-theinertia');
 
@@ -543,6 +547,112 @@ describe('c6embed(beforeElement, params)', function() {
 
                 it('should fulfill with the embed <div>', function() {
                     expect(success).toHaveBeenCalledWith(embed);
+                });
+
+                describe('and so is interstitial', function() {
+                    beforeEach(function(done) {
+                        embed.parentNode.removeChild(embed);
+
+                        params.interstitial = true;
+
+                        document.createElement.calls.reset();
+                        importScripts.calls.reset();
+                        player.bootstrap.calls.reset();
+                        Player.calls.reset();
+
+                        c6embed(beforeElement, params).then(success, failure);
+
+                        player = Player.calls.mostRecent().returnValue;
+                        embed = document.createElement.calls.all()[0].returnValue;
+                        splash = document.createElement.calls.all()[1].returnValue;
+
+                        setTimeout(done, 1);
+                    });
+
+                    it('should set interstitial to true and standalone to false', function() {
+                        expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
+                            splash: {
+                                type: 'img-text-overlay',
+                                ratio: '16:9'
+                            },
+                            apiRoot: 'https://dev.cinema6.com/',
+                            type: 'desktop-card',
+                            experience: 'e-3f3b58482741e3',
+                            campaign: 'cam-f71ce1be881d10',
+                            branding: 'some-new-thing',
+                            placementId: '7475348',
+                            container: 'digitaljournal',
+                            wildCardPlacement: '485738459',
+                            pageUrl: 'cinema6.com',
+                            hostApp: 'Google Chrome',
+                            network: 'cinema6',
+                            preview: false,
+                            categories: ['food', 'tech'],
+                            playUrls: ['play1.gif', 'play2.gif'],
+                            countUrls: ['count1.gif', 'count2.gif'],
+                            launchUrls: ['launch1.gif', 'launch2.gif'],
+                            mobileType: 'swipe',
+                            autoLaunch: true,
+                            ex: 'my-experiment',
+                            vr: 'some-variant',
+                            interstitial: true,
+                            preload: false,
+                            standalone: false,
+                            context: 'embed'
+                        });
+                    });
+
+                    it('should create a splash <div>', function() {
+                        expect(document.createElement.calls.all().filter(function(call) {
+                            return call.args[0].toLowerCase() === 'div';
+                        }).length).toBe(2);
+                        expect(document.createElement).toHaveBeenCalledWith('div');
+                        expect(importScripts).toHaveBeenCalled();
+                    });
+
+                    it('should hide the splash', function() {
+                        expect(splash.style.display).toBe('none');
+                    });
+
+                    describe('when the scripts are imported', function() {
+                        var splashDelegate;
+                        var splashJs, splashHTML;
+
+                        beforeEach(function(done) {
+                            splashDelegate = {
+                                didHide: jasmine.createSpy('delegate.didHide()'),
+                                didShow: jasmine.createSpy('delegate.didShow()')
+                            };
+
+                            splashJs = jasmine.createSpy('splashJS()').and.returnValue(splashDelegate);
+                            splashHTML = require('../helpers/collateral/splash/flavorc/16-9');
+
+                            importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                            setTimeout(done, 1);
+                        });
+
+                        afterEach(function() {
+                            Array.prototype.slice.call(document.querySelectorAll('link[href$="splash.css"]')).forEach(function(link) {
+                                link.parentNode.removeChild(link);
+                            });
+                        });
+
+                        describe('when the player is bootstrapped', function() {
+                            beforeEach(function() {
+                                player.bootstrap(document.createElement('div'));
+                            });
+
+                            describe('and closed', function() {
+                                beforeEach(function() {
+                                    player.session.emit('close');
+                                });
+
+                                it('should show the splash', function() {
+                                    expect(splash.style.display).toBe('');
+                                });
+                            });
+                        });
+                    });
                 });
 
                 describe('when the player is bootstrapped', function() {
