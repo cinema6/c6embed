@@ -6,7 +6,8 @@ var ARRAY_ATTRS = ['categories', 'playUrls', 'countUrls', 'launchUrls'];
 var BOOLEANS = {
     preview: false,
     autoLaunch: false,
-    preload: false
+    preload: false,
+    interstitial: false
 };
 
 function toArray(arraylike) {

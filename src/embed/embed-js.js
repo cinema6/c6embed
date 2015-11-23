@@ -49,12 +49,16 @@ function c6embed(beforeElement/*, params*/) {
 
     var browser = new BrowserInfo(window.navigator.userAgent);
     var apiRoot = params.apiRoot;
+    var autoLaunch = !!params.autoLaunch;
+    var interstitial = !!params.interstitial;
+    var standalone = autoLaunch && !interstitial;
+    var preload = params.preload;
     var type = browser.isMobile ? params.mobileType : params.type;
     var isLightbox = LIGHTBOX_TYPES.indexOf(type) > -1;
     var experienceId = params.experience;
     var endpoint = resolveUrl(apiRoot, '/api/public/players/' + type);
     var player = new Player(endpoint, extend(params, {
-        standalone: !!params.autoLaunch,
+        standalone: standalone,
         context: 'embed'
     }));
     var embed = document.createElement('div');
@@ -134,6 +138,10 @@ function c6embed(beforeElement/*, params*/) {
             splash.className = 'c6brand__' + branding;
         }
 
+        if (autoLaunch) {
+            splash.style.display = 'none';
+        }
+
         loadBranding(params.branding, splash);
         embed.appendChild(splash);
 
@@ -152,6 +160,7 @@ function c6embed(beforeElement/*, params*/) {
                 });
                 player.session.on('close', function() {
                     splashDelegate.didHide();
+                    splash.style.display = '';
                 });
             });
 
@@ -172,7 +181,7 @@ function c6embed(beforeElement/*, params*/) {
     embed.style.width = params.width;
     embed.style.height = params.height;
 
-    return (params.autoLaunch ? q() : createSplash()).then(function insertPlayer() {
+    return (standalone ? q() : createSplash()).then(function go() {
         player.once('bootstrap', function addPlayerListeners() {
             player.session.on('open', function() {
                 styleController.apply();
@@ -201,7 +210,7 @@ function c6embed(beforeElement/*, params*/) {
 
         beforeElement.parentNode.insertBefore(embed, beforeElement);
 
-        if (params.preload || params.autoLaunch) {
+        if (preload || autoLaunch) {
             loadExperience(null, true);
         }
 
