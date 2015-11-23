@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.2.0 (November 23, 2015)
+* *[v3.2.0-rc2]*
+  * [FEAUTRE]: Add ability to enable the close button on an
+    auto-launching lightbox player
+* *[/v3.2.0-rc2]*
+
 ## v3.1.0 (November 19, 2015)
 * *[v3.1.0-rc2]*
   * [FIX]: Ensure all player parameters are supported by all embed
