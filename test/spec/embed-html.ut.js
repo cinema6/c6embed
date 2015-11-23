@@ -89,7 +89,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 'data-splash': 'img-text-overlay/16:9',
                 'data-ex': 'my-experiment',
                 'data-vr': 'some-variant'
-                //'data-preload': false
+                //'data-preload': false,
+                //'data-interstitial': false
             }, true);
         });
 
@@ -121,7 +122,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 },
                 ex: 'my-experiment',
                 vr: 'some-variant',
-                preload: false
+                preload: false,
+                interstitial: false
             });
         });
 
@@ -156,7 +158,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-splash': 'img-text-overlay/16:9',
                     'data-ex': 'my-experiment',
                     'data-vr': 'some-variant',
-                    'data-preload': '' // boolean
+                    'data-preload': '', // boolean,
+                    'data-interstitial': '' // boolean
                 }, true);
             });
 
@@ -164,7 +167,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 expect(c6embed).toHaveBeenCalledWith(script, jasmine.objectContaining({
                     preview: true,
                     autoLaunch: true,
-                    preload: true
+                    preload: true,
+                    interstitial: true
                 }));
             });
         });
@@ -196,7 +200,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-splash': 'img-text-overlay/16:9',
                     'data-ex': 'my-experiment',
                     'data-vr': 'some-variant'
-                    //'data-preload': '' // boolean
+                    //'data-preload': false,
+                    //'data-interstitial': false
                 }, false);
             });
 
@@ -228,7 +233,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     },
                     ex: 'my-experiment',
                     vr: 'some-variant',
-                    preload: false
+                    preload: false,
+                    interstitial: false
                 });
             });
 
@@ -250,7 +256,8 @@ describe('<script src="c6embed.js"></script>', function() {
                         },
                         preload: false,
                         autoLaunch: false,
-                        preview: false
+                        preview: false,
+                        interstitial: false
                     });
                 });
             });
