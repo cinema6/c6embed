@@ -54,7 +54,9 @@ describe('Player', function() {
                 launchUrls: ['launch1.jpg', 'launch2.jpg'],
                 width: 800,
                 height: 600,
-                splash: {}
+                splash: {},
+                ex: 'my-experiment',
+                vr: 'some-variant'
             };
             data = { foo: 'bar' };
 
@@ -108,6 +110,8 @@ describe('Player', function() {
                             playUrls: 'play1.jpg,play2.jpg',
                             countUrls: 'count1.jpg,count2.jpg',
                             launchUrls: 'launch1.jpg,launch2.jpg',
+                            ex: 'my-experiment',
+                            vr: 'some-variant'
                         }
                     }));
                 });
