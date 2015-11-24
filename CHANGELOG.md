@@ -1,5 +1,9 @@
 # C6Embed Changelog
 
+* *[v3.2.1-rc1]*
+  * [FIX]: Fix for an issue that caused experiments and variants not to
+    propagate to the data warehouse
+
 ## v3.2.0 (November 23, 2015)
 * *[v3.2.0-rc2]*
   * [FEAUTRE]: Add ability to enable the close button on an
