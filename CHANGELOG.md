@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.2.2 (December 2, 2015)
+* *[v3.2.2-rc1]*
+  * [FIX]: Render the splash image properly if interstitial mode is
+    enabled on the preview page
+* *[/v3.2.2-rc1]*
+
 ## v3.2.1 (November 25, 2015)
 * *[v3.2.1-rc1]*
   * [FIX]: Fix for an issue that caused experiments and variants not to
