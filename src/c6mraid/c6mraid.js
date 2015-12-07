@@ -100,7 +100,7 @@ module.exports = function c6mraid(/*config*/) {
         logger.info('Player event: ' + data.event, data);
     });
 
-    return mraid.waitUntilViewable().delay(600).then(function activatePlayer() {
+    return mraid.waitUntilViewable().then(function activatePlayer() {
         logger.info('Showing player.');
 
         player.show();

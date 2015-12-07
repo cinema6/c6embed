@@ -326,53 +326,42 @@ describe('[c6mraid(config)]', function() {
             q().then(function() {}).then(done);
         });
 
-        it('should not activate the player', function() {
-            expect(player.show).not.toHaveBeenCalled();
+        it('should activate the player', function() {
+            expect(player.show).toHaveBeenCalled();
         });
 
-        describe('after 600 ms', function() {
-            beforeEach(function(done) {
-                jasmine.clock().tick(600);
-                q().then(function() {}).then(function() {}).then(done);
+        describe('if the player closes', function() {
+            beforeEach(function() {
+                expect(mraid.close).not.toHaveBeenCalled();
+
+                player.session.emit('close');
             });
 
-            it('should activate the player', function() {
-                expect(player.show).toHaveBeenCalled();
+            it('should close the ad', function() {
+                expect(mraid.close).toHaveBeenCalled();
             });
+        });
 
-            describe('if the player closes', function() {
+        ['loading', 'expanded', 'resized', 'default'].forEach(function(state) {
+            describe('if the ad state changes to ' + state, function() {
                 beforeEach(function() {
-                    expect(mraid.close).not.toHaveBeenCalled();
-
-                    player.session.emit('close');
+                    mraid.emit('stateChange', state);
                 });
 
-                it('should close the ad', function() {
-                    expect(mraid.close).toHaveBeenCalled();
+                it('should do nothing', function() {
+                    expect(player.hide).not.toHaveBeenCalled();
                 });
             });
+        });
 
-            ['loading', 'expanded', 'resized', 'default'].forEach(function(state) {
-                describe('if the ad state changes to ' + state, function() {
-                    beforeEach(function() {
-                        mraid.emit('stateChange', state);
-                    });
-
-                    it('should do nothing', function() {
-                        expect(player.hide).not.toHaveBeenCalled();
-                    });
+        ['hidden'].forEach(function(state) {
+            describe('if the ad state changes to ' + state, function() {
+                beforeEach(function() {
+                    mraid.emit('stateChange', state);
                 });
-            });
 
-            ['hidden'].forEach(function(state) {
-                describe('if the ad state changes to ' + state, function() {
-                    beforeEach(function() {
-                        mraid.emit('stateChange', state);
-                    });
-
-                    it('should close the player', function() {
-                        expect(player.hide).toHaveBeenCalled();
-                    });
+                it('should close the player', function() {
+                    expect(player.hide).toHaveBeenCalled();
                 });
             });
         });
