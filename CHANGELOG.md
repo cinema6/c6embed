@@ -1,7 +1,9 @@
 # C6Embed Changelog
 
+## v3.2.3 (December 7, 2015)
 * *[v3.2.3-rc1]*
   * [PERFORMANCE]: Attempt to show the MRAID unit more quickly
+* *[/v3.2.3-rc1]*
 
 ## v3.2.2 (December 2, 2015)
 * *[v3.2.2-rc1]*
