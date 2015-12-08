@@ -2,6 +2,9 @@
   "name": "c6embed",
   "version": "3.2.3",
   "description": "Script to embed Cinema6 experiences.",
+  "scripts": {
+    "prepublish": "node ./scripts/validate_npm_version.js \">= v2.x\""
+  },
   "keywords": [
     "c6embed"
   ],
@@ -22,6 +25,7 @@
     "browserify-shim": "^3.8.9",
     "connect-livereload": "~0.3.0",
     "escape-regexp": "0.0.1",
+    "function-bind": "~1.0.2",
     "grunt": "^0.4.5",
     "grunt-banner": "^0.2.2",
     "grunt-browserify": "^3.8.0",
@@ -56,8 +60,8 @@
     "proxyquireify": "^2.1.0",
     "q": "^1.1.0",
     "requirejs": "^2.1.11",
-    "underscore": "~1.5.2",
-    "function-bind": "~1.0.2"
+    "semver": "^5.1.0",
+    "underscore": "~1.5.2"
   },
   "engines": {
     "node": ">=0.8.0"
