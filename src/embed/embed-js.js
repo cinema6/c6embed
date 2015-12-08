@@ -5,7 +5,7 @@ var resolveUrl = require('url').resolve;
 var extend = require('../../lib/fns').extend;
 var importScripts = require('../../lib/importScripts');
 var twobits = require('twobits.js');
-var BrowserInfo = require('cwrx/lib/browserInfo');
+var BrowserInfo = require('rc-browser-info');
 
 var LIGHTBOX_TYPES = ['mobile', 'swipe', 'lightbox', 'lightbox-playlist'];
 var PLAYER_STYLES = {
