@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.3.0 (December 8, 2015)
+* *[v3.3.0-rc1]*
+  * [FEATURE]: Publish Player library (used to create player service
+    `<iframe>`s) as a standalone JS library
+* *[/v3.3.0-rc1]*
+
 ## v3.2.3 (December 7, 2015)
 * *[v3.2.3-rc1]*
   * [PERFORMANCE]: Attempt to show the MRAID unit more quickly

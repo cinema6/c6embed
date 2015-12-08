@@ -50,6 +50,19 @@ module.exports = {
             }
         ]
     },
+    'utils-dist': {
+        options: {
+            browserifyOptions: {
+                standalone: 'c6embedUtils'
+            }
+        },
+        files: [
+            {
+                src: 'src/utils/utils.js',
+                dest: '.tmp/build/<%= settings.distDir %>/utils.js'
+            }
+        ]
+    },
 
     server: {
         options: {
