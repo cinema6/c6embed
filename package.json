@@ -9,9 +9,9 @@
     "c6embed"
   ],
   "dependencies": {
-    "q": "~1.0.0",
-    "twobits.js": "git+ssh://git@github.com:cinema6/twobits.js#v0.3.1",
-    "cwrx": "git+ssh://git@github.com:cinema6/cwrx"
+    "cwrx": "git+ssh://git@github.com:cinema6/cwrx",
+    "q": "^1.0.1",
+    "twobits.js": "git+ssh://git@github.com:cinema6/twobits.js#v0.3.1"
   },
   "browser": {
     "Modernizr": "./ext/modernizr.custom.01697.js"
@@ -58,7 +58,6 @@
     "prompt": "~0.2.12",
     "protractor": "~0.14.0",
     "proxyquireify": "^2.1.0",
-    "q": "^1.1.0",
     "requirejs": "^2.1.11",
     "semver": "^5.1.0",
     "underscore": "~1.5.2"
