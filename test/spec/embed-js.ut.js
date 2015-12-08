@@ -20,7 +20,7 @@ describe('c6embed(beforeElement, params)', function() {
         querystring = require('querystring');
         q = require('q');
         twobits = require('twobits.js');
-        require('cwrx/lib/browserInfo'); // Make sure this is a valid module
+        require('rc-browser-info'); // Make sure this is a valid module
 
         Player = jasmine.createSpy('Player()').and.callFake(function(endpoint, params, data) {
             var Player = require('../../lib/Player');
@@ -52,7 +52,7 @@ describe('c6embed(beforeElement, params)', function() {
             '../../lib/Player': Player,
             '../../lib/importScripts': importScripts,
             'twobits.js': twobits,
-            'cwrx/lib/browserInfo': BrowserInfo,
+            'rc-browser-info': BrowserInfo,
 
             '@noCallThru': true
         };

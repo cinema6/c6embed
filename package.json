@@ -6,8 +6,8 @@
     "c6embed"
   ],
   "dependencies": {
-    "cwrx": "git+ssh://git@github.com:cinema6/cwrx",
     "q": "^1.0.1",
+    "rc-browser-info": "^1.0.0",
     "twobits.js": "git+ssh://git@github.com:cinema6/twobits.js#v0.3.1"
   },
   "browser": {
