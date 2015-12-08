@@ -39,6 +39,8 @@ describe('[c6mraid(config)]', function() {
             return mraid;
         });
 
+        globalLogger.tasks.send.length = 1;
+
         spyOn(require('../../lib/logger').default, 'context').and.callThrough();
 
         stubs = {
@@ -108,6 +110,11 @@ describe('[c6mraid(config)]', function() {
         delete window.mraid;
         delete window.c6;
         jasmine.clock().uninstall();
+        globalLogger.tasks.send.length = 1;
+
+        Array.prototype.slice.call(document.querySelectorAll('iframe[src*="/api/public/players"]')).forEach(function(iframe) {
+            iframe.parentNode.removeChild(iframe);
+        });
     });
 
     describe('the send function it adds to the logger', function() {
@@ -272,7 +279,7 @@ describe('[c6mraid(config)]', function() {
 
             [{ event: 'jfefhfr' }, JSON.stringify({ event: 'fuiy34' }), 'foo=bar', 33, true, false, null, 0].forEach(function(payload) {
                 var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('message');
+                event.initCustomEvent('message', null, null, null);
                 event.data = payload;
                 window.dispatchEvent(event);
             });
@@ -289,7 +296,7 @@ describe('[c6mraid(config)]', function() {
                 spyOn(logger, 'info').and.callThrough();
 
                 var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('message');
+                event.initCustomEvent('message', null, null, null);
                 event.data = JSON.stringify(payload);
                 window.dispatchEvent(event);
             });
