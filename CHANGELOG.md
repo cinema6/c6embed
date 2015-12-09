@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v3.4.0 (December 9, 2015)
+* *[v3.4.0-rc1]*
+  * [FEATURE]: Add support for `prebuffer` player parameter.
+* *[/v3.4.0-rc1]*
+
 ## v3.3.0 (December 8, 2015)
 * *[v3.3.0-rc1]*
   * [FEATURE]: Publish Player library (used to create player service
