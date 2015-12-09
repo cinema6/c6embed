@@ -56,7 +56,8 @@ describe('Player', function() {
                 height: 600,
                 splash: {},
                 ex: 'my-experiment',
-                vr: 'some-variant'
+                vr: 'some-variant',
+                prebuffer: true
             };
             data = { foo: 'bar' };
 
@@ -111,7 +112,8 @@ describe('Player', function() {
                             countUrls: 'count1.jpg,count2.jpg',
                             launchUrls: 'launch1.jpg,launch2.jpg',
                             ex: 'my-experiment',
-                            vr: 'some-variant'
+                            vr: 'some-variant',
+                            prebuffer: 'true'
                         }
                     }));
                 });
