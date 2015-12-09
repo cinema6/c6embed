@@ -90,7 +90,9 @@ describe('<script src="c6embed.js"></script>', function() {
                 'data-ex': 'my-experiment',
                 'data-vr': 'some-variant'
                 //'data-preload': false,
-                //'data-interstitial': false
+                //'data-interstitial': false,
+                //'data-standalone': false,
+                //'data-prebuffer': false
             }, true);
         });
 
@@ -123,7 +125,9 @@ describe('<script src="c6embed.js"></script>', function() {
                 ex: 'my-experiment',
                 vr: 'some-variant',
                 preload: false,
-                interstitial: false
+                interstitial: false,
+                standalone: false,
+                prebuffer: false
             });
         });
 
@@ -159,7 +163,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-ex': 'my-experiment',
                     'data-vr': 'some-variant',
                     'data-preload': '', // boolean,
-                    'data-interstitial': '' // boolean
+                    'data-interstitial': '', // boolean
+                    'data-standalone': '', // boolean
+                    'data-prebuffer': '' // boolean
                 }, true);
             });
 
@@ -168,7 +174,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     preview: true,
                     autoLaunch: true,
                     preload: true,
-                    interstitial: true
+                    interstitial: true,
+                    standalone: true,
+                    prebuffer: true
                 }));
             });
         });
@@ -201,7 +209,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-ex': 'my-experiment',
                     'data-vr': 'some-variant'
                     //'data-preload': false,
-                    //'data-interstitial': false
+                    //'data-interstitial': false,
+                    //'data-standalone': false,
+                    //'data-prebuffer': false
                 }, false);
             });
 
@@ -234,7 +244,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     ex: 'my-experiment',
                     vr: 'some-variant',
                     preload: false,
-                    interstitial: false
+                    interstitial: false,
+                    standalone: false,
+                    prebuffer: false
                 });
             });
 
@@ -257,7 +269,9 @@ describe('<script src="c6embed.js"></script>', function() {
                         preload: false,
                         autoLaunch: false,
                         preview: false,
-                        interstitial: false
+                        interstitial: false,
+                        standalone: false,
+                        prebuffer: false
                     });
                 });
             });
