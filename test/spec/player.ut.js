@@ -57,7 +57,8 @@ describe('Player', function() {
                 splash: {},
                 ex: 'my-experiment',
                 vr: 'some-variant',
-                prebuffer: true
+                prebuffer: true,
+                embed: 'foo'
             };
             data = { foo: 'bar' };
 
@@ -113,7 +114,8 @@ describe('Player', function() {
                             launchUrls: 'launch1.jpg,launch2.jpg',
                             ex: 'my-experiment',
                             vr: 'some-variant',
-                            prebuffer: 'true'
+                            prebuffer: 'true',
+                            embed: 'true'
                         }
                     }));
                 });
