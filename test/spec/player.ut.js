@@ -70,6 +70,25 @@ describe('Player', function() {
             expect(player).toEqual(jasmine.any(EventEmitter));
         });
 
+        describe('if params are omitted', function() {
+            beforeEach(function() {
+                params = {
+                    card: 'rc-677091d298a151',
+                    container: 'reactx'
+                };
+
+                player = new Player(endpoint, params, data);
+            });
+
+            it('should only include the specified params in the url', function() {
+                expect(parseUrl(player.url, true).query).toEqual({
+                    card: 'rc-677091d298a151',
+                    container: 'reactx',
+                    embed: 'true'
+                });
+            });
+        });
+
         describe('properties:', function() {
             describe('frame', function() {
                 it('should be null', function() {
