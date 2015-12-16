@@ -58,7 +58,8 @@ describe('Player', function() {
                 ex: 'my-experiment',
                 vr: 'some-variant',
                 prebuffer: true,
-                embed: 'foo'
+                embed: 'foo',
+                skip: 15
             };
             data = { foo: 'bar' };
 
@@ -115,7 +116,8 @@ describe('Player', function() {
                             ex: 'my-experiment',
                             vr: 'some-variant',
                             prebuffer: 'true',
-                            embed: 'true'
+                            embed: 'true',
+                            skip: '15'
                         }
                     }));
                 });
