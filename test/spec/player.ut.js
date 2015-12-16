@@ -58,7 +58,8 @@ describe('Player', function() {
                 ex: 'my-experiment',
                 vr: 'some-variant',
                 prebuffer: true,
-                embed: 'foo'
+                embed: 'foo',
+                skip: 15
             };
             data = { foo: 'bar' };
 
@@ -67,6 +68,25 @@ describe('Player', function() {
 
         it('should be an EventEmitter', function() {
             expect(player).toEqual(jasmine.any(EventEmitter));
+        });
+
+        describe('if params are omitted', function() {
+            beforeEach(function() {
+                params = {
+                    card: 'rc-677091d298a151',
+                    container: 'reactx'
+                };
+
+                player = new Player(endpoint, params, data);
+            });
+
+            it('should only include the specified params in the url', function() {
+                expect(parseUrl(player.url, true).query).toEqual({
+                    card: 'rc-677091d298a151',
+                    container: 'reactx',
+                    embed: 'true'
+                });
+            });
         });
 
         describe('properties:', function() {
@@ -115,7 +135,8 @@ describe('Player', function() {
                             ex: 'my-experiment',
                             vr: 'some-variant',
                             prebuffer: 'true',
-                            embed: 'true'
+                            embed: 'true',
+                            skip: '15'
                         }
                     }));
                 });

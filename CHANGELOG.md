@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.5.0 (December 16, 2015)
+* *[v3.5.0-rc1]*
+  * [FEATURE]: Add support for passing a skip timer value to the Player
+  * Make generated player service URLs shorter
+* *[/v3.5.0-rc1]*
+
 ## v3.4.1 (December 14, 2015)
 * *[v3.4.1-rc1]*
   * Let the player know when it is instantiated with c6embed
