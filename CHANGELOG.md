@@ -1,6 +1,10 @@
 # C6Embed Changelog
 
 ## v3.5.0 (December 16, 2015)
+* *[v3.5.0-rc2]*
+  * Rename `skip` parameter to `countdown`.
+* *[/v3.5.0-rc2]*
+
 * *[v3.5.0-rc1]*
   * [FEATURE]: Add support for passing a skip timer value to the Player
   * Make generated player service URLs shorter
