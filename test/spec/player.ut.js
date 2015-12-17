@@ -59,7 +59,7 @@ describe('Player', function() {
                 vr: 'some-variant',
                 prebuffer: true,
                 embed: 'foo',
-                skip: 15
+                countdown: 15
             };
             data = { foo: 'bar' };
 
@@ -136,7 +136,7 @@ describe('Player', function() {
                             vr: 'some-variant',
                             prebuffer: 'true',
                             embed: 'true',
-                            skip: '15'
+                            countdown: '15'
                         }
                     }));
                 });
