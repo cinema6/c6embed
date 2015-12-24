@@ -5,7 +5,7 @@ describe('[c6mraid(config)]', function() {
 
     var c6mraid, q, logger, globalLogger;
 
-    var Player, MRAID;
+    var Player, MRAID, viaPixel;
     var stubs;
 
     var player, mraid;
@@ -16,7 +16,7 @@ describe('[c6mraid(config)]', function() {
 
     beforeAll(function() {
         q = require('q');
-        globalLogger = require('../../lib/logger').default;
+        globalLogger = require('rc-logger').default;
 
         Player = jasmine.createSpy('Player()').and.callFake(function(endpoint, params, data) {
             var Player = require('../../lib/Player');
@@ -39,9 +39,11 @@ describe('[c6mraid(config)]', function() {
             return mraid;
         });
 
+        viaPixel = jasmine.createSpy('viaPixel()').and.callFake(require('rc-logger/senders/pixel'));
+
         globalLogger.tasks.send.length = 1;
 
-        spyOn(require('../../lib/logger').default, 'context').and.callThrough();
+        spyOn(require('rc-logger').default, 'context').and.callThrough();
 
         stubs = {
             '../../lib/iab': {
@@ -49,14 +51,15 @@ describe('[c6mraid(config)]', function() {
             },
             '../../lib/Player': Player,
             'q': q,
-            '../../lib/logger': require('../../lib/logger'),
+            'rc-logger': require('rc-logger'),
+            'rc-logger/senders/pixel': viaPixel,
 
             '@noCallThru': true
         };
 
         c6mraid = proxyquire('../../src/c6mraid/c6mraid', stubs);
 
-        logger = require('../../lib/logger').default.context.calls.mostRecent().returnValue;
+        logger = require('rc-logger').default.context.calls.mostRecent().returnValue;
     });
 
     beforeEach(function() {
@@ -117,26 +120,18 @@ describe('[c6mraid(config)]', function() {
         });
     });
 
-    describe('the send function it adds to the logger', function() {
-        var fn;
-        var img;
-
-        function MockImage() {
-            this.src = null;
-
-            img = this;
-        }
-
-        beforeEach(function() {
-            spyOn(window, 'Image').and.callFake(MockImage);
-            fn = globalLogger.tasks.send[globalLogger.tasks.send.length - 1];
-            globalLogger.prefix.and.returnValue('my-prefix');
-
-            fn(globalLogger, 'log', ['hello world', 'what\'s up?']);
+    it('should configure the logger to send pixels', function() {
+        expect(viaPixel).toHaveBeenCalledWith({
+            url: 'https://logging.cinema6.com/pixel.gif',
+            addParams: jasmine.any(Function)
         });
+        expect(viaPixel.calls.count()).toBe(1);
+        expect(globalLogger.tasks.send[globalLogger.tasks.send.length - 1]).toBe(viaPixel.calls.mostRecent().returnValue);
 
-        it('should fire a pixel to the C6 Log endpoint', function() {
-            expect(img.src).toBe('https://logging.cinema6.com/pixel.gif?v=hello%20world%2C%20what\'s%20up%3F&t=' + Date.now() + '&c=some-src&n=omax&a=Talking%20Tom&l=log&p=my-prefix&u=' + globalLogger.uuid());
+        expect(viaPixel.calls.mostRecent().args[0].addParams(logger)).toEqual({
+            c: logger.meta.container,
+            n: logger.meta.network,
+            a: logger.meta.app
         });
     });
 

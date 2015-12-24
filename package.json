@@ -8,6 +8,7 @@
   "dependencies": {
     "q": "^1.0.1",
     "rc-browser-info": "^1.0.0",
+    "rc-logger": "^1.0.0",
     "rc-post-message-session": "^1.0.0",
     "twobits.js": "git+ssh://git@github.com:cinema6/twobits.js#v0.3.1"
   },
