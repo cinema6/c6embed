@@ -1,34 +1,13 @@
 /* jshint strict:false */
 var MRAID = require('../../lib/iab').MRAID;
 var Player = require('../../lib/Player');
-var formatUrl = require('url').format;
 var resolveUrl = require('url').resolve;
 var extend = require('../../lib/fns').extend;
-var globalLogger = require('../../lib/logger').default;
+var globalLogger = require('rc-logger').default;
+var viaPixel = require('rc-logger/senders/pixel');
 var logger = globalLogger.context('c6mraid.js');
 
 var PLAYER_EVENTS = ['launch', 'adStart', 'adCount', 'adEnded'];
-
-logger.tasks.send.push(sendLog);
-
-function sendLog(logger, method, args) {
-    var img = new Image();
-    img.src = formatUrl({
-        protocol: 'https:',
-        hostname: 'logging.cinema6.com',
-        pathname: 'pixel.gif',
-        query: {
-            v: args.join(', '),
-            t: Date.now(),
-            c: logger.meta.container,
-            n: logger.meta.network,
-            a: logger.meta.app,
-            l: method,
-            p: logger.prefix(),
-            u: logger.uuid()
-        }
-    });
-}
 
 function initLogger(config) {
     var levels = [
@@ -47,6 +26,17 @@ function initLogger(config) {
     globalLogger.meta.app = config.hostApp;
     globalLogger.levels(levels);
 }
+
+globalLogger.tasks.send.push(viaPixel({
+    url: 'https://logging.cinema6.com/pixel.gif',
+    addParams: function addParams(logger) {
+        return {
+            c: logger.meta.container,
+            n: logger.meta.network,
+            a: logger.meta.app
+        };
+    }
+}));
 
 module.exports = function c6mraid(/*config*/) {
     var config = extend({

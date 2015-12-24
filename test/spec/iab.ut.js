@@ -1,6 +1,6 @@
 var iab = require('../../lib/iab');
 var q = require('q');
-var logger = require('../../lib/logger').default;
+var logger = require('rc-logger').default;
 
 describe('MRAID()', function() {
     'use strict';
