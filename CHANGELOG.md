@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* *[v3.5.1-rc1]*
+  * Ensure log pixels cannot be fired for more than an hour
+
 ## v3.5.0 (December 16, 2015)
 * *[v3.5.0-rc2]*
   * Rename `skip` parameter to `countdown`.
