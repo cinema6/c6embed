@@ -178,7 +178,30 @@ a:focus, button:focus, input:focus, textarea:focus {
 .c6Brand--logo {
   width: 3.375em;
 }
-
+.rc--logo {
+    background: url('../img/rc-logo-square.png');
+    background-size: 64px;
+    display: block;
+    height: 64px;
+    width: 64px;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+    @media 
+    (-webkit-min-device-pixel-ratio: 2), 
+    (min-resolution: 192dpi) {
+        .rcBrand--logo {
+            background: url('../img/rc-logo-square-2x.png');
+            background-size: 64px;
+            display: block;
+            height: 64px;
+            width: 64px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
 /*  ======================================================
     generic form styles
     ====================================================== */
@@ -188,7 +211,7 @@ a:focus, button:focus, input:focus, textarea:focus {
     ====================================================== */
 
 .mast__group {
-  min-height: 2.8125em;
+  min-height: 4em;
   background: #eee;
   color: #626262;
   border-bottom: 1px solid #dddddd;
@@ -212,7 +235,7 @@ a:focus, button:focus, input:focus, textarea:focus {
 }
 
 .mast__group--previewMode .mast__title {
-  margin: 0.75em 4em;
+  margin: 1.25em 4em;
 }
 
 @media screen and (max-width:55em) {
