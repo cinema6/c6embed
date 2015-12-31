@@ -309,6 +309,74 @@ describe('getVPAIDAd()', function() {
                         }));
                     });
                 });
+
+                describe('if the config is in query params format', function() {
+                    beforeEach(function() {
+                        stubs['../../lib/Player'].calls.reset();
+
+                        config = querystring.stringify({
+                            apiRoot: 'https://dev.cinema6.com/',
+                            type: 'solo',
+                            experience: 'e-d0817b1227cc37',
+                            campaign: 'cam-c8cd8927915d1b',
+                            preview: true,
+                            autoLaunch: true,
+                            context: 'standalone',
+                            container: 'q1',
+                            standalone: true,
+                            interstitial: false
+                        });
+
+                        creativeData.AdParameters = config;
+
+                        vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
+                    });
+
+                    it('should create a Player', function() {
+                        expect(stubs['../../lib/Player']).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/solo', {
+                            apiRoot: 'https://dev.cinema6.com/',
+                            type: 'solo',
+                            experience: 'e-d0817b1227cc37',
+                            campaign: 'cam-c8cd8927915d1b',
+                            preview: 'true',
+                            container: 'q1',
+                            standalone: 'true',
+                            interstitial: 'false',
+                            vpaid: true,
+                            autoLaunch: false,
+                            context: 'vpaid'
+                        });
+                    });
+
+                    describe('if container, standalone, interstitial, apiRoot or type are not specified', function() {
+                        beforeEach(function() {
+                            stubs['../../lib/Player'].calls.reset();
+
+                            config = querystring.stringify({
+                                experience: 'e-d0817b1227cc37',
+                                campaign: 'cam-c8cd8927915d1b',
+                                preview: true,
+                                autoLaunch: true,
+                                context: 'standalone'
+                            });
+                            creativeData = { AdParameters: config };
+
+                            vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
+                        });
+
+                        it('should load the desktop-card player from production', function() {
+                            expect(stubs['../../lib/Player']).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/desktop-card', jasmine.any(Object));
+                        });
+
+                        it('should give the player a container, standalone and interstitial', function() {
+                            expect(stubs['../../lib/Player']).toHaveBeenCalledWith(jasmine.any(String), jasmine.objectContaining({
+                                container: 'vpaid',
+                                standalone: false,
+                                interstitial: true
+                            }));
+                        });
+                    });
+                });
             });
 
             describe('subscribe(fn, event, listenerScope)', function() {

@@ -2,6 +2,8 @@
 var extend = require('../../lib/fns').extend;
 var Player = require('../../lib/Player');
 var EventEmitter = require('events').EventEmitter;
+var querystring = require('querystring');
+var resolveUrl = require('url').resolve;
 
 function getVPAIDAd() {
     var emitter = new EventEmitter();
@@ -68,13 +70,19 @@ function getVPAIDAd() {
 
         initAd: function initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars) {
             var self = this;
-            var config = JSON.parse(creativeData.AdParameters);
+            var adParams = creativeData.AdParameters;
+            var config = adParams.charAt(0) === '{' ?
+                JSON.parse(adParams) : querystring.parse(adParams);
+            var apiRoot = config.apiRoot || 'https://platform.reelcontent.com/';
+            var type = config.type || 'desktop-card';
+            var uri = config.uri || resolveUrl(apiRoot, '/api/public/players/' + type);
+            var params = config.params || config;
 
-            player = new Player(config.uri, extend({
+            player = new Player(uri, extend({
                 standalone: false,
                 interstitial: true,
                 container: 'vpaid'
-            }, config.params, {
+            }, params, {
                 vpaid: true,
                 autoLaunch: false,
                 context: 'vpaid'
