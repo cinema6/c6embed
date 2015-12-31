@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VPAID Test Page</title>
+        <script src="./vpaid.js"></script>
+    </head>
+    <body>
+        <script>
+            window.initAd = function initAd() {
+                var width = 800;
+                var height = 600;
+                var viewMode = null;
+                var desiredBitrate = null;
+                var creativeData = {
+                    AdParameters: 'card=rc-3b7f835c34bec9&container=demo'
+                };
+                var environmentVars = {
+                    slot: document.body,
+                    videoSlot: document.createElement('video'),
+                    videoSlotCanAutoPlay: false
+                };
+                var vpaid = window.getVPAIDAd();
+
+                vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
+
+                return vpaid;
+            };
+        </script>
+    </body>
+</html>

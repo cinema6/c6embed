@@ -1,8 +1,10 @@
 # C6Embed Changelog
 
-* *[v3.5.1-rc1]*
+* *[v3.6.0-rc1]*
   * Ensure log pixels cannot be fired for more than an hour
   * Updated preview page branding from Cinema6 to Reelcontent
+  * Add support for VPAID AdParameters in the form of URL query
+    parameters
 
 ## v3.5.0 (December 16, 2015)
 * *[v3.5.0-rc2]*

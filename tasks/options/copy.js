@@ -35,6 +35,14 @@ module.exports = {
             }
         ]
     },
+    vpaid: {
+        files: [
+            {
+                src: 'app/vpaid.html',
+                dest: 'app/index.html'
+            }
+        ]
+    },
     tmp: {
         files: [
             {
