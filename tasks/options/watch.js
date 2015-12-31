@@ -34,6 +34,17 @@
             },
             tasks: ['browserify:mraid-server','copy:mraid']
         },
+        vpaid: {
+            files: [
+                '<%= settings.appDir %>/vpaid.html',
+                'src/**/*.js',
+                'lib/**/*.js'
+            ],
+            options: {
+                livereload: true
+            },
+            tasks: ['browserify:vpaid-server','copy:vpaid']
+        },
         e2e: {
             files: [
                 '<%= settings.appDir %>/*.html',

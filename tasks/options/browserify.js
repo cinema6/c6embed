@@ -102,5 +102,19 @@ module.exports = {
                 dest: 'app/c6mraid.js'
             }
         ]
-    }
+    },
+    'vpaid-server': {
+        options: {
+            debug: true,
+            browserifyOptions: {
+                standalone: 'getVPAIDAd'
+            }
+        },
+        files: [
+            {
+                src: 'src/vpaid/vpaid.js',
+                dest: 'app/vpaid.js'
+            }
+        ]
+    },
 };
