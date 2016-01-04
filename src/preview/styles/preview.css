@@ -179,7 +179,7 @@ a:focus, button:focus, input:focus, textarea:focus {
   width: 3.375em;
 }
 .rc--logo {
-    background: url('../img/rc-logo-square.png');
+    background: url('../img/rc-logo-square.png?__inline=true');
     background-size: 64px;
     display: block;
     height: 64px;
@@ -192,7 +192,7 @@ a:focus, button:focus, input:focus, textarea:focus {
     (-webkit-min-device-pixel-ratio: 2), 
     (min-resolution: 192dpi) {
         .rcBrand--logo {
-            background: url('../img/rc-logo-square-2x.png');
+            background: url('../img/rc-logo-square-2x.png?__inline=true');
             background-size: 64px;
             display: block;
             height: 64px;
