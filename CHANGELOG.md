@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* *[v3.6.1-rc1]*
+  * [FIX] Updated the Reelcontent logo path parameters
+
 ## v3.6.0 (January 4, 2016)
 * *[v3.6.0-rc1]*
   * Ensure log pixels cannot be fired for more than an hour
