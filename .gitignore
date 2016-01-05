@@ -19,3 +19,4 @@ reports/
 app/*.js
 app/index.html
 .tern-project
+src/**/*.swf
