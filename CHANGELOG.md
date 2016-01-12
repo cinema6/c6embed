@@ -1,11 +1,13 @@
 # C6Embed Changelog
 
+## v3.7.0 (January 12, 2016)
 * *[v3.7.0-rc1]*
   * [FIX] Updated the Reelcontent logo path parameters
   * [FEATURE]: Add ability to load JS VPAID creative in a flash video
     player
   * Make the VPAID "AdStarted" and "AdImpression" events correspond with
     a video play
+* *[/v3.7.0-rc1]*
 
 ## v3.6.0 (January 4, 2016)
 * *[v3.6.0-rc1]*
