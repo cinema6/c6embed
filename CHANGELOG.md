@@ -1,6 +1,10 @@
 # C6Embed Changelog
 
 ## v3.7.0 (January 12, 2016)
+* *[v3.7.0-rc2]*
+  * [FIX]: Emit "AdStarted" before "AdImpression"
+* *[/v3.7.0-rc2]*
+
 * *[v3.7.0-rc1]*
   * [FIX] Updated the Reelcontent logo path parameters
   * [FEATURE]: Add ability to load JS VPAID creative in a flash video
