@@ -260,6 +260,11 @@ describe('getVPAIDAd()', function() {
                         expect(emitter.emit).toHaveBeenCalledWith('AdStarted');
                     });
 
+                    it('should emit "AdStarted" before "AdImpression"', function() {
+                        expect(emitter.emit.calls.argsFor(0)[0]).toBe('AdStarted');
+                        expect(emitter.emit.calls.argsFor(1)[0]).toBe('AdImpression');
+                    });
+
                     describe('a second time', function() {
                         beforeEach(function() {
                             emitter.emit.calls.reset();

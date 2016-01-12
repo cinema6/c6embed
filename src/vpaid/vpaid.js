@@ -130,8 +130,8 @@ function getVPAIDAd() {
             });
 
             player.session.once('video:play', function countImpression() {
-                emitter.emit('AdImpression');
                 emitter.emit('AdStarted');
+                emitter.emit('AdImpression');
             });
         },
 
