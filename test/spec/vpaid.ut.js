@@ -245,6 +245,34 @@ describe('getVPAIDAd()', function() {
                     });
                 });
 
+                describe('when the session emits "video:play"', function() {
+                    beforeEach(function() {
+                        spyOn(emitter, 'emit').and.callThrough();
+
+                        session.emit('video:play');
+                    });
+
+                    it('should emit "AdImpression"', function() {
+                        expect(emitter.emit).toHaveBeenCalledWith('AdImpression');
+                    });
+
+                    it('should emit "AdStarted"', function() {
+                        expect(emitter.emit).toHaveBeenCalledWith('AdStarted');
+                    });
+
+                    describe('a second time', function() {
+                        beforeEach(function() {
+                            emitter.emit.calls.reset();
+
+                            session.emit('video:play');
+                        });
+
+                        it('should not emit any events', function() {
+                            expect(emitter.emit).not.toHaveBeenCalled();
+                        });
+                    });
+                });
+
                 describe('when the session emits "error"', function() {
                     var message;
 
@@ -617,12 +645,8 @@ describe('getVPAIDAd()', function() {
                             showDeferred.promise.finally(done);
                         });
 
-                        it('should emit "AdStarted"', function() {
-                            expect(emitter.emit).toHaveBeenCalledWith('AdStarted');
-                        });
-
-                        it('should emit "AdImpression"', function() {
-                            expect(emitter.emit).toHaveBeenCalledWith('AdImpression');
+                        it('should not emit any events', function() {
+                            expect(emitter.emit).not.toHaveBeenCalled();
                         });
                     });
                 });

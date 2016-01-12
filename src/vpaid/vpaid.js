@@ -128,6 +128,11 @@ function getVPAIDAd() {
             player.session.on('close', function skipAd() {
                 self.skipAd();
             });
+
+            player.session.once('video:play', function countImpression() {
+                emitter.emit('AdImpression');
+                emitter.emit('AdStarted');
+            });
         },
 
         resizeAd: function resizeAd(width, height/*, viewMode*/) {
@@ -140,10 +145,7 @@ function getVPAIDAd() {
         },
 
         startAd: function startAd() {
-            player.show().then(function emitShowEvents() {
-                emitter.emit('AdStarted');
-                emitter.emit('AdImpression');
-            });
+            player.show();
         },
 
         stopAd: function stopAd() {
