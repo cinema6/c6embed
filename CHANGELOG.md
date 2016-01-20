@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.8.0 (January 20, 2016)
+* *[v3.8.0-rc1]*
+  * [FEATURE]: Add support for third-party `clickUrls` that will be fired
+    whenever a link click/share occurs
+* *[/v3.8.0-rc1]*
+
 ## v3.7.0 (January 12, 2016)
 * *[v3.7.0-rc2]*
   * [FIX]: Emit "AdStarted" before "AdImpression"
