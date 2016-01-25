@@ -9,6 +9,8 @@ describe('getVPAIDAd()', function() {
     var q;
     var getVPAIDAd;
 
+    var Player;
+
     var stubs;
     var playerBootstrapDeferred;
 
@@ -22,20 +24,27 @@ describe('getVPAIDAd()', function() {
         extend = require('../../lib/fns').extend;
         q = require('q');
 
+        Player = jasmine.createSpy('Player()').and.callFake(function(endpoint, params, data) {
+            var Player = require('../../lib/Player');
+            var player = new Player(endpoint, params, data);
+
+            playerBootstrapDeferred = q.defer();
+            spyOn(player, 'bootstrap').and.callFake(function() {
+                Player.prototype.bootstrap.apply(this, arguments);
+
+                return playerBootstrapDeferred.promise;
+            });
+
+            return player;
+        });
+        Player.getParams = jasmine.createSpy('Player.getParams()').and.callFake(function() {
+            return require('../../lib/Player').getParams.apply(this, arguments).then(function(params) {
+                return extend(params, { processed: true });
+            });
+        });
+
         stubs = {
-            '../../lib/Player': jasmine.createSpy('Player()').and.callFake(function(endpoint, params, data) {
-                var Player = require('../../lib/Player');
-                var player = new Player(endpoint, params, data);
-
-                playerBootstrapDeferred = q.defer();
-                spyOn(player, 'bootstrap').and.callFake(function() {
-                    Player.prototype.bootstrap.apply(this, arguments);
-
-                    return playerBootstrapDeferred.promise;
-                });
-
-                return player;
-            }),
+            '../../lib/Player': Player,
             'events': {
                 EventEmitter: jasmine.createSpy('EventEmitter()').and.callFake(function() {
                     return new EventEmitter();
@@ -83,8 +92,6 @@ describe('getVPAIDAd()', function() {
                 var width, height, viewMode, desiredBitrate, creativeData, environmentVars;
                 var result;
 
-                var player, iframe, session;
-
                 beforeEach(function() {
                     config = {
                         uri: 'https://dev.cinema6.com/api/public/players/solo',
@@ -115,10 +122,6 @@ describe('getVPAIDAd()', function() {
                     };
 
                     result = vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
-
-                    player = stubs['../../lib/Player'].calls.mostRecent().returnValue;
-                    iframe = player.frame;
-                    session = player.session;
                 });
 
                 afterEach(function() {
@@ -129,284 +132,271 @@ describe('getVPAIDAd()', function() {
                     expect(result).toBeUndefined();
                 });
 
-                it('should create a Player', function() {
-                    expect(stubs['../../lib/Player']).toHaveBeenCalledWith(config.uri, extend(config.params, {
-                        vpaid: true,
-                        autoLaunch: false,
-                        context: 'vpaid'
-                    }));
-                });
-
-                it('should bootstrap the player', function() {
-                    expect(player.bootstrap).toHaveBeenCalledWith(slot, {
-                        width: width + 'px',
-                        height: height + 'px',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0
+                it('should get the params', function() {
+                    expect(Player.getParams).toHaveBeenCalledWith(config.params, {
+                        type: 'desktop-card',
+                        standalone: false,
+                        interstitial: true,
+                        container: 'vpaid'
                     });
                 });
 
-                describe('when the player is bootstrapped', function() {
+                describe('when the params are fetched', function() {
+                    var options, player, iframe, session;
+
                     beforeEach(function(done) {
-                        spyOn(emitter, 'emit').and.callThrough();
-                        playerBootstrapDeferred.fulfill(player);
+                        Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                            options = arguments[0];
 
-                        playerBootstrapDeferred.promise.then(done);
+                            player = Player.calls.mostRecent().returnValue;
+                            iframe = player.frame;
+                            session = player.session;
+                        }).then(done, done.fail);
                     });
 
-                    it('should emit "AdLoaded"', function() {
-                        expect(emitter.emit).toHaveBeenCalledWith('AdLoaded');
-                    });
-                });
-
-                describe('when the session emits "vpaid:stateUpdated"', function() {
-                    var state;
-
-                    beforeEach(function() {
-                        state = {
-                            prop: 'adSkippableState',
-                            value: false,
-                            event: 'AdSkippableStateChange'
-                        };
-
-                        spyOn(emitter, 'emit').and.callThrough();
-
-                        session.emit('vpaid:stateUpdated', state);
+                    it('should create a Player', function() {
+                        expect(Player).toHaveBeenCalledWith(config.uri, extend(options, {
+                            vpaid: true,
+                            autoLaunch: false,
+                            context: 'vpaid'
+                        }));
                     });
 
-                    it('should update the specified prop', function() {
-                        expect(vpaid.getAdSkippableState()).toBe(state.value);
-                    });
-
-                    it('should emit the specified event', function() {
-                        expect(emitter.emit).toHaveBeenCalledWith(state.event);
-                    });
-
-                    describe('if the value is not changing', function() {
-                        beforeEach(function() {
-                            state.value = vpaid.getAdSkippableState();
-                            emitter.emit.calls.reset();
-
-                            session.emit('vpaid:stateUpdated', state);
-                        });
-
-                        it('should not emit the event', function() {
-                            expect(emitter.emit).not.toHaveBeenCalled();
+                    it('should bootstrap the player', function() {
+                        expect(player.bootstrap).toHaveBeenCalledWith(slot, {
+                            width: width + 'px',
+                            height: height + 'px',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
                         });
                     });
 
-                    describe('if no event is specified', function() {
-                        beforeEach(function() {
-                            state = { prop: 'adRemainingTime', value: 30 };
-                            emitter.emit.calls.reset();
+                    describe('when the player is bootstrapped', function() {
+                        beforeEach(function(done) {
+                            spyOn(emitter, 'emit').and.callThrough();
+                            playerBootstrapDeferred.fulfill(player);
 
-                            session.emit('vpaid:stateUpdated', state);
+                            playerBootstrapDeferred.promise.then(done);
                         });
 
-                        it('should update the value', function() {
-                            expect(vpaid.getAdRemainingTime()).toBe(state.value);
-                        });
-
-                        it('should not emit an event', function() {
-                            expect(emitter.emit).not.toHaveBeenCalled();
+                        it('should emit "AdLoaded"', function() {
+                            expect(emitter.emit).toHaveBeenCalledWith('AdLoaded');
                         });
                     });
 
-                    describe('if just an event is specified', function() {
-                        beforeEach(function() {
-                            state = { event: 'AdVideoStart' };
-                            emitter.emit.calls.reset();
+                    describe('when the session emits "vpaid:stateUpdated"', function() {
+                        var state;
 
-                            session.emit('vpaid:stateUpdated', state);
-                        });
-
-                        it('should emit the event', function() {
-                            expect(emitter.emit).toHaveBeenCalledWith(state.event);
-                        });
-                    });
-
-                    describe('if params are specified', function() {
                         beforeEach(function() {
                             state = {
-                                event: 'AdClickThru',
-                                params: ['foo', 'bar', 'blegh']
+                                prop: 'adSkippableState',
+                                value: false,
+                                event: 'AdSkippableStateChange'
                             };
-                            emitter.emit.calls.reset();
+
+                            spyOn(emitter, 'emit').and.callThrough();
 
                             session.emit('vpaid:stateUpdated', state);
                         });
 
-                        it('should emit the event with the params', function() {
-                            var expectation = expect(emitter.emit);
+                        it('should update the specified prop', function() {
+                            expect(vpaid.getAdSkippableState()).toBe(state.value);
+                        });
 
-                            expectation.toHaveBeenCalledWith.apply(expectation, [state.event].concat(state.params));
+                        it('should emit the specified event', function() {
+                            expect(emitter.emit).toHaveBeenCalledWith(state.event);
+                        });
+
+                        describe('if the value is not changing', function() {
+                            beforeEach(function() {
+                                state.value = vpaid.getAdSkippableState();
+                                emitter.emit.calls.reset();
+
+                                session.emit('vpaid:stateUpdated', state);
+                            });
+
+                            it('should not emit the event', function() {
+                                expect(emitter.emit).not.toHaveBeenCalled();
+                            });
+                        });
+
+                        describe('if no event is specified', function() {
+                            beforeEach(function() {
+                                state = { prop: 'adRemainingTime', value: 30 };
+                                emitter.emit.calls.reset();
+
+                                session.emit('vpaid:stateUpdated', state);
+                            });
+
+                            it('should update the value', function() {
+                                expect(vpaid.getAdRemainingTime()).toBe(state.value);
+                            });
+
+                            it('should not emit an event', function() {
+                                expect(emitter.emit).not.toHaveBeenCalled();
+                            });
+                        });
+
+                        describe('if just an event is specified', function() {
+                            beforeEach(function() {
+                                state = { event: 'AdVideoStart' };
+                                emitter.emit.calls.reset();
+
+                                session.emit('vpaid:stateUpdated', state);
+                            });
+
+                            it('should emit the event', function() {
+                                expect(emitter.emit).toHaveBeenCalledWith(state.event);
+                            });
+                        });
+
+                        describe('if params are specified', function() {
+                            beforeEach(function() {
+                                state = {
+                                    event: 'AdClickThru',
+                                    params: ['foo', 'bar', 'blegh']
+                                };
+                                emitter.emit.calls.reset();
+
+                                session.emit('vpaid:stateUpdated', state);
+                            });
+
+                            it('should emit the event with the params', function() {
+                                var expectation = expect(emitter.emit);
+
+                                expectation.toHaveBeenCalledWith.apply(expectation, [state.event].concat(state.params));
+                            });
                         });
                     });
-                });
 
-                describe('when the session emits "video:play"', function() {
-                    beforeEach(function() {
-                        spyOn(emitter, 'emit').and.callThrough();
-
-                        session.emit('video:play');
-                    });
-
-                    it('should emit "AdImpression"', function() {
-                        expect(emitter.emit).toHaveBeenCalledWith('AdImpression');
-                    });
-
-                    it('should emit "AdStarted"', function() {
-                        expect(emitter.emit).toHaveBeenCalledWith('AdStarted');
-                    });
-
-                    it('should emit "AdStarted" before "AdImpression"', function() {
-                        expect(emitter.emit.calls.argsFor(0)[0]).toBe('AdStarted');
-                        expect(emitter.emit.calls.argsFor(1)[0]).toBe('AdImpression');
-                    });
-
-                    describe('a second time', function() {
+                    describe('when the session emits "video:play"', function() {
                         beforeEach(function() {
-                            emitter.emit.calls.reset();
+                            spyOn(emitter, 'emit').and.callThrough();
 
                             session.emit('video:play');
                         });
 
-                        it('should not emit any events', function() {
-                            expect(emitter.emit).not.toHaveBeenCalled();
-                        });
-                    });
-                });
-
-                describe('when the session emits "error"', function() {
-                    var message;
-
-                    beforeEach(function() {
-                        spyOn(emitter, 'emit').and.callThrough();
-                        message = 'I suck.';
-                        spyOn(vpaid, 'stopAd').and.callThrough();
-
-                        session.emit('error', message);
-                    });
-
-                    it('should emit the "AdError" event', function() {
-                        expect(emitter.emit).toHaveBeenCalledWith('AdError', message);
-                    });
-
-                    it('should call stopAd()', function() {
-                        expect(vpaid.stopAd).toHaveBeenCalled();
-                    });
-                });
-
-                describe('when the session emits "close"', function() {
-                    beforeEach(function() {
-                        spyOn(vpaid, 'skipAd').and.callThrough();
-
-                        session.emit('close');
-                    });
-
-                    it('should call skipAd()', function() {
-                        expect(vpaid.skipAd).toHaveBeenCalled();
-                    });
-                });
-
-                describe('when the session emits "cardComplete"', function() {
-                    beforeEach(function() {
-                        spyOn(vpaid, 'stopAd').and.callThrough();
-
-                        session.emit('cardComplete');
-                    });
-
-                    it('should call vpaid.stopAd()', function() {
-                        expect(vpaid.stopAd).toHaveBeenCalled();
-                    });
-                });
-
-                describe('if container, standalone or interstitial are not specified', function() {
-                    beforeEach(function() {
-                        stubs['../../lib/Player'].calls.reset();
-
-                        delete config.params.container;
-                        delete config.params.standalone;
-                        delete config.params.interstitial;
-                        creativeData = { AdParameters: JSON.stringify(config) };
-
-                        vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
-                    });
-
-                    it('should give the player a container, standalone and interstitial', function() {
-                        expect(stubs['../../lib/Player']).toHaveBeenCalledWith(jasmine.any(String), jasmine.objectContaining({
-                            container: 'vpaid',
-                            standalone: false,
-                            interstitial: true
-                        }));
-                    });
-                });
-
-                describe('if the config is in query params format', function() {
-                    beforeEach(function() {
-                        stubs['../../lib/Player'].calls.reset();
-
-                        config = querystring.stringify({
-                            apiRoot: 'https://dev.cinema6.com/',
-                            type: 'solo',
-                            experience: 'e-d0817b1227cc37',
-                            campaign: 'cam-c8cd8927915d1b',
-                            preview: true,
-                            autoLaunch: true,
-                            context: 'standalone',
-                            container: 'q1',
-                            standalone: true,
-                            interstitial: false
+                        it('should emit "AdImpression"', function() {
+                            expect(emitter.emit).toHaveBeenCalledWith('AdImpression');
                         });
 
-                        creativeData.AdParameters = config;
+                        it('should emit "AdStarted"', function() {
+                            expect(emitter.emit).toHaveBeenCalledWith('AdStarted');
+                        });
 
-                        vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
-                    });
+                        it('should emit "AdStarted" before "AdImpression"', function() {
+                            expect(emitter.emit.calls.argsFor(0)[0]).toBe('AdStarted');
+                            expect(emitter.emit.calls.argsFor(1)[0]).toBe('AdImpression');
+                        });
 
-                    it('should create a Player', function() {
-                        expect(stubs['../../lib/Player']).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/solo', {
-                            apiRoot: 'https://dev.cinema6.com/',
-                            type: 'solo',
-                            experience: 'e-d0817b1227cc37',
-                            campaign: 'cam-c8cd8927915d1b',
-                            preview: 'true',
-                            container: 'q1',
-                            standalone: 'true',
-                            interstitial: 'false',
-                            vpaid: true,
-                            autoLaunch: false,
-                            context: 'vpaid'
+                        describe('a second time', function() {
+                            beforeEach(function() {
+                                emitter.emit.calls.reset();
+
+                                session.emit('video:play');
+                            });
+
+                            it('should not emit any events', function() {
+                                expect(emitter.emit).not.toHaveBeenCalled();
+                            });
                         });
                     });
 
-                    describe('if container, standalone, interstitial, apiRoot or type are not specified', function() {
+                    describe('when the session emits "error"', function() {
+                        var message;
+
                         beforeEach(function() {
-                            stubs['../../lib/Player'].calls.reset();
+                            spyOn(emitter, 'emit').and.callThrough();
+                            message = 'I suck.';
+                            spyOn(vpaid, 'stopAd').and.callThrough();
+
+                            session.emit('error', message);
+                        });
+
+                        it('should emit the "AdError" event', function() {
+                            expect(emitter.emit).toHaveBeenCalledWith('AdError', message);
+                        });
+
+                        it('should call stopAd()', function() {
+                            expect(vpaid.stopAd).toHaveBeenCalled();
+                        });
+                    });
+
+                    describe('when the session emits "close"', function() {
+                        beforeEach(function() {
+                            spyOn(vpaid, 'skipAd').and.callThrough();
+
+                            session.emit('close');
+                        });
+
+                        it('should call skipAd()', function() {
+                            expect(vpaid.skipAd).toHaveBeenCalled();
+                        });
+                    });
+
+                    describe('when the session emits "cardComplete"', function() {
+                        beforeEach(function() {
+                            spyOn(vpaid, 'stopAd').and.callThrough();
+
+                            session.emit('cardComplete');
+                        });
+
+                        it('should call vpaid.stopAd()', function() {
+                            expect(vpaid.stopAd).toHaveBeenCalled();
+                        });
+                    });
+
+                    describe('if the config is in query params format', function() {
+                        beforeEach(function() {
+                            Player.calls.reset();
+                            Player.getParams.calls.reset();
 
                             config = querystring.stringify({
+                                apiRoot: 'https://dev.cinema6.com/',
+                                type: 'solo',
                                 experience: 'e-d0817b1227cc37',
                                 campaign: 'cam-c8cd8927915d1b',
                                 preview: true,
                                 autoLaunch: true,
-                                context: 'standalone'
+                                context: 'standalone',
+                                container: 'q1',
+                                standalone: true,
+                                interstitial: false
                             });
-                            creativeData = { AdParameters: config };
+
+                            creativeData.AdParameters = config;
 
                             vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
                         });
 
-                        it('should load the desktop-card player from production', function() {
-                            expect(stubs['../../lib/Player']).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/desktop-card', jasmine.any(Object));
+                        it('should get the params', function() {
+                            expect(Player.getParams).toHaveBeenCalledWith(querystring.parse(config), {
+                                type: 'desktop-card',
+                                standalone: false,
+                                interstitial: true,
+                                container: 'vpaid'
+                            });
                         });
 
-                        it('should give the player a container, standalone and interstitial', function() {
-                            expect(stubs['../../lib/Player']).toHaveBeenCalledWith(jasmine.any(String), jasmine.objectContaining({
-                                container: 'vpaid',
-                                standalone: false,
-                                interstitial: true
-                            }));
+                        describe('when the params are fetched', function() {
+                            beforeEach(function(done) {
+                                Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                                    options = arguments[0];
+
+                                    player = Player.calls.mostRecent().returnValue;
+                                    iframe = player.frame;
+                                    session = player.session;
+                                }).then(done, done.fail);
+                            });
+
+                            it('should create a Player', function() {
+                                expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/solo', extend(options, {
+                                    vpaid: true,
+                                    autoLaunch: false,
+                                    context: 'vpaid'
+                                }));
+                            });
                         });
                     });
                 });
@@ -486,7 +476,7 @@ describe('getVPAIDAd()', function() {
                 var width, height, viewMode, desiredBitrate, creativeData, environmentVars;
                 var player, iframe, session;
 
-                beforeEach(function() {
+                beforeEach(function(done) {
                     config = {
                         uri: 'https://dev.cinema6.com/api/public/players/solo',
                         params: {
@@ -513,9 +503,13 @@ describe('getVPAIDAd()', function() {
 
                     vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
 
-                    player = stubs['../../lib/Player'].calls.mostRecent().returnValue;
-                    iframe = player.frame;
-                    session = player.session;
+                    Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                        options = arguments[0];
+
+                        player = Player.calls.mostRecent().returnValue;
+                        iframe = player.frame;
+                        session = player.session;
+                    }).then(done, done.fail);
 
                     spyOn(emitter, 'emit').and.callThrough();
                 });

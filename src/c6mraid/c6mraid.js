@@ -38,71 +38,71 @@ globalLogger.tasks.send.push(viaPixel({
     }
 }));
 
-module.exports = function c6mraid(/*config*/) {
-    var config = extend({
+module.exports = function c6mraid(params) {
+    return Player.getParams(params, {
         type: 'full-np',
-        apiRoot: 'https://platform.reelcontent.com/',
-        pageUrl: 'reelcontent.com',
         forceOrientation: 'portrait'
-    }, arguments[0]);
+    }).then(function init(config) {
+        initLogger(config);
 
-    initLogger(config);
+        var endpoint = resolveUrl(config.apiRoot, '/api/public/players/' + config.type);
+        var player = new Player(endpoint, extend(config, {
+            standalone: false,
+            interstitial: true,
+            context: 'mraid',
+            autoLaunch: false
+        }));
+        var mraid = new MRAID({ forceOrientation: config.forceOrientation, useCustomClose: true });
 
-    var endpoint = resolveUrl(config.apiRoot, '/api/public/players/' + config.type);
-    var player = new Player(endpoint, extend(config, {
-        standalone: false,
-        interstitial: true,
-        context: 'mraid',
-        autoLaunch: false
-    }));
-    var mraid = new MRAID({ forceOrientation: config.forceOrientation, useCustomClose: true });
-
-    player.bootstrap(document.body, {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%'
-    }).then(function logPlayerLoaded() {
-        logger.info('Player loaded.');
-    });
-
-    logger.info('Initialize.', config);
-
-    mraid.on('error', function logError(message, action) {
-        logger.error('MRAID Error:', message, action);
-    });
-
-    mraid.waitUntilViewable().then(function sendVisibleEvent() {
-        logger.info('MRAID is reporting ad is viewable. useCustomClose is', mraid.useCustomClose);
-
-        mraid.on('stateChange', function(state) {
-            logger.info('MRAID reports state changed to', state);
+        player.bootstrap(document.body, {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%'
+        }).then(function logPlayerLoaded() {
+            logger.info('Player loaded.');
         });
-    });
 
-    window.addEventListener('message', function(event) {
-        var data = (function() {
-            try { return JSON.parse(event.data) || {}; } catch(e) { return {}; }
-        }());
-        if (PLAYER_EVENTS.indexOf(data.event) < 0) { return; }
+        logger.info('Initialize.', config);
 
-        logger.info('Player event: ' + data.event, data);
-    });
-
-    return mraid.waitUntilViewable().then(function activatePlayer() {
-        logger.info('Showing player.');
-
-        player.show();
-
-        player.session.on('close', function closeMRAID() {
-            mraid.close();
+        mraid.on('error', function logError(message, action) {
+            logger.error('MRAID Error:', message, action);
         });
-        mraid.on('stateChange', function handleAdStateChange(state) {
-            if (state === 'hidden') {
-                logger.info('Hiding player.');
-                player.hide();
-            }
+
+        mraid.waitUntilViewable().then(function sendVisibleEvent() {
+            logger.info(
+                'MRAID is reporting ad is viewable. useCustomClose is', mraid.useCustomClose
+            );
+
+            mraid.on('stateChange', function(state) {
+                logger.info('MRAID reports state changed to', state);
+            });
+        });
+
+        window.addEventListener('message', function(event) {
+            var data = (function() {
+                try { return JSON.parse(event.data) || {}; } catch(e) { return {}; }
+            }());
+            if (PLAYER_EVENTS.indexOf(data.event) < 0) { return; }
+
+            logger.info('Player event: ' + data.event, data);
+        });
+
+        return mraid.waitUntilViewable().then(function activatePlayer() {
+            logger.info('Showing player.');
+
+            player.show();
+
+            player.session.on('close', function closeMRAID() {
+                mraid.close();
+            });
+            mraid.on('stateChange', function handleAdStateChange(state) {
+                if (state === 'hidden') {
+                    logger.info('Hiding player.');
+                    player.hide();
+                }
+            });
         });
     });
 };
