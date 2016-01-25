@@ -1,3 +1,5 @@
+var proxyquire = require('proxyquireify')(require);
+
 describe('Player', function() {
     'use strict';
 
@@ -6,6 +8,9 @@ describe('Player', function() {
     var parseUrl;
     var PlayerSession;
     var EventEmitter;
+
+    var importScripts, importScriptsDeferred;
+    var stubs;
 
     var Player;
 
@@ -16,12 +21,182 @@ describe('Player', function() {
         PlayerSession = require('../../lib/PlayerSession');
         EventEmitter = require('events').EventEmitter;
 
-        Player = require('../../lib/Player');
+        importScripts = jasmine.createSpy('importScripts()').and.returnValue((importScriptsDeferred = q.defer()).promise);
+
+        stubs = {
+            'events': require('events'),
+            './PlayerSession': PlayerSession,
+            './importScripts': importScripts,
+
+            '@noCallThru': true
+        };
+
+        Player = proxyquire('../../lib/Player', stubs);
     });
 
     it('should exist', function() {
         expect(Player).toEqual(jasmine.any(Function));
         expect(Player.name).toBe('Player');
+    });
+
+    describe('static:', function() {
+        describe('methods:', function() {
+            describe('getParams(params)', function() {
+                var params;
+                var success, failure;
+                var result;
+
+                beforeEach(function() {
+                    params = {
+                        apiRoot: 'https://dev.reelcontent.com/',
+                        placement: 'pl-fd17c524732abf',
+                        playUrls: ['{{SOME_MACRO}}'],
+                        debug: 2,
+                        forceOrientation: 'landscape'
+                    };
+
+                    success = jasmine.createSpy('success()');
+                    failure = jasmine.createSpy('failure()');
+
+                    result = Player.getParams(params);
+                    result.then(success, failure);
+                });
+
+                it('should make a request for the placement', function() {
+                    expect(importScripts).toHaveBeenCalledWith([
+                        'https://dev.reelcontent.com/api/public/placements/pl-fd17c524732abf.js'
+                    ]);
+                });
+
+                describe('when the placement is fetched', function() {
+                    var placement;
+
+                    beforeEach(function(done) {
+                        placement = {
+                            id: params.placement,
+                            tagParams: {
+                                campaign: 'cam-fbe79c20d3f9b6',
+                                card: 'rc-b2b46e95e12542',
+                                container: 'beeswax',
+                                debug: false
+                            }
+                        };
+
+                        importScriptsDeferred.fulfill([placement]);
+
+                        result.finally(done);
+                    });
+
+                    it('should fulfill with the placement tagParams, extended with the provided params', function() {
+                        expect(success).toHaveBeenCalledWith(extend(placement.tagParams, params));
+                    });
+                });
+
+                describe('if defaults are specified', function() {
+                    var defaults;
+                    var placement;
+
+                    beforeEach(function(done) {
+                        defaults = {
+                            type: 'full-np',
+                            pageUrl: 'reelcontent.com',
+                            forceOrientation: 'portrait'
+                        };
+
+                        importScripts.calls.reset();
+                        success.calls.reset();
+                        failure.calls.reset();
+
+                        importScripts.and.returnValue(q([(placement = {
+                            id: params.placement,
+                            tagParams: {
+                                campaign: 'cam-fbe79c20d3f9b6',
+                                card: 'rc-b2b46e95e12542',
+                                container: 'pocketmath',
+                                debug: false,
+                                type: 'desktop-card'
+                            }
+                        })]));
+
+                        Player.getParams(params, defaults).then(success, failure).finally(done);
+                    });
+
+                    it('should use the default values', function() {
+                        expect(success).toHaveBeenCalledWith(extend(defaults, placement.tagParams, params));
+                    });
+                });
+
+                describe('if there is no apiRoot', function() {
+                    var placement;
+
+                    beforeEach(function(done) {
+                        delete params.apiRoot;
+
+                        importScripts.calls.reset();
+                        success.calls.reset();
+                        failure.calls.reset();
+
+                        importScripts.and.returnValue(q([(placement = {
+                            id: params.placement,
+                            tagParams: {
+                                campaign: 'cam-fbe79c20d3f9b6',
+                                card: 'rc-b2b46e95e12542',
+                                container: 'pocketmath',
+                                debug: false
+                            }
+                        })]));
+
+                        Player.getParams(params).then(success, failure).finally(done);
+                    });
+
+                    it('should use "https://platform.reelcontent.com/" as the apiRoot', function() {
+                        expect(importScripts).toHaveBeenCalledWith([
+                            'https://platform.reelcontent.com/api/public/placements/pl-fd17c524732abf.js'
+                        ]);
+                    });
+
+                    it('should set the apiRoot', function() {
+                        expect(success).toHaveBeenCalledWith(extend({ apiRoot: 'https://platform.reelcontent.com/' }, placement.tagParams, params));
+                    });
+                });
+
+                describe('if there is no placement', function() {
+                    beforeEach(function(done) {
+                        delete params.placement;
+
+                        importScripts.calls.reset();
+                        success.calls.reset();
+                        failure.calls.reset();
+
+                        Player.getParams(params).then(success, failure).finally(done);
+                    });
+
+                    it('should not fetch the placement', function() {
+                        expect(importScripts).not.toHaveBeenCalled();
+                    });
+
+                    it('should fulfill with a copy of the params', function() {
+                        expect(success).toHaveBeenCalledWith(params);
+                        expect(success.calls.mostRecent().args[0]).not.toBe(params);
+                    });
+
+                    describe('and no apiRoot', function() {
+                        beforeEach(function(done) {
+                            delete params.apiRoot;
+
+                            success.calls.reset();
+                            failure.calls.reset();
+
+                            Player.getParams(params).then(success, failure).finally(done);
+                        });
+
+                        it('should set it to "https://platform.reelcontent.com/"', function() {
+                            expect(success).toHaveBeenCalledWith(extend({ apiRoot: 'https://platform.reelcontent.com/' }, params));
+                        });
+                    });
+                });
+            });
+        });
     });
 
     describe('instance:', function() {
