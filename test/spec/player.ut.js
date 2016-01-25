@@ -236,7 +236,8 @@ describe('Player', function() {
                 prebuffer: true,
                 embed: 'foo',
                 countdown: 15,
-                placement: 'pl-6a020c18a28c5d'
+                placement: 'pl-6a020c18a28c5d',
+                uuid: 'wuyrf4378f'
             };
             data = { foo: 'bar' };
 
@@ -315,7 +316,8 @@ describe('Player', function() {
                             prebuffer: 'true',
                             embed: 'true',
                             countdown: '15',
-                            placement: 'pl-6a020c18a28c5d'
+                            placement: 'pl-6a020c18a28c5d',
+                            uuid: 'wuyrf4378f'
                         }
                     }));
                 });
