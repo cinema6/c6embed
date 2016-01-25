@@ -116,7 +116,9 @@ describe('importScripts(scripts, callback)', function() {
             });
 
             describe('when the new function is called', function() {
+                var importScripts;
                 var callback;
+                var success, failure;
                 var iframe;
 
                 beforeEach(function() {
@@ -139,16 +141,21 @@ describe('importScripts(scripts, callback)', function() {
                         }
                     });
 
-                    callback = jasmine.createSpy('callback()');
+                    importScripts = result;
 
-                    result(['adtech', '//foo.com/foo.js'], callback);
+                    callback = jasmine.createSpy('callback()');
+                    success = jasmine.createSpy('success()');
+                    failure = jasmine.createSpy('failure()');
+
+                    result = importScripts(['adtech', '//foo.com/foo.js'], callback);
+                    result.then(success, failure);
 
                     iframe = iframes[0];
                 });
 
                 it('should use the paths config', function() {
                     expect(iframe.contentWindow.document.write).toHaveBeenCalledWith(jasmine.stringMatching(
-                        '<script src="' + config.paths.adtech + '" charset="utf-8"><\/script>'
+                        '<script src="' + config.paths.adtech + '"'
                     ));
                 });
 
@@ -163,7 +170,7 @@ describe('importScripts(scripts, callback)', function() {
                 });
 
                 describe('when the iframe is loaded', function() {
-                    beforeEach(function() {
+                    beforeEach(function(done) {
                         iframe.contentWindow.document.head.appendChild(createElement.call(document, 'script'));
                         iframe.contentWindow.module = {
                             exports: {}
@@ -172,11 +179,16 @@ describe('importScripts(scripts, callback)', function() {
                             loadAd: function() {}
                         };
 
-                        iframe.__trigger__('load', {});
+                        iframe.__load__();
+                        result.finally(done);
                     });
 
                     it('should callback with the specified global', function() {
                         expect(callback).toHaveBeenCalledWith(iframe.contentWindow.ADTECH, config.cache['//foo.com/foo.js']);
+                    });
+
+                    it('should fulfill with the specified global', function() {
+                        expect(success).toHaveBeenCalledWith([iframe.contentWindow.ADTECH, config.cache['//foo.com/foo.js']]);
                     });
                 });
             });
@@ -184,8 +196,9 @@ describe('importScripts(scripts, callback)', function() {
     });
 
     describe('when called', function() {
-        var srcs;
-        var callback;
+        var srcs, callback;
+        var result;
+        var success, failure;
 
         beforeEach(function() {
             var createElement = document.createElement;
@@ -212,23 +225,58 @@ describe('importScripts(scripts, callback)', function() {
                 '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
                 '//portal.cinema6.com/collateral/splash/splash.js'
             ];
-
             callback = jasmine.createSpy('callback()');
+
+            success = jasmine.createSpy('success()');
+            failure = jasmine.createSpy('failure()');
 
             importScripts.cache = {};
 
-            importScripts(srcs, callback);
+            result = importScripts(srcs, callback);
+            result.then(success, failure);
         });
 
         describe('with an empty array', function() {
-            beforeEach(function() {
+            beforeEach(function(done) {
                 callback.calls.reset();
+                success.calls.reset();
+                failure.calls.reset();
 
-                importScripts([], callback);
+                result = importScripts([], callback);
+                result.then(success, failure).finally(done);
             });
 
             it('should immediately call back', function() {
                 expect(callback).toHaveBeenCalledWith();
+            });
+
+            it('should immediately fulfill', function() {
+                expect(success).toHaveBeenCalledWith([]);
+            });
+        });
+
+        describe('if no callback is specified', function() {
+            beforeEach(function(done) {
+                iframes = [];
+                success.calls.reset();
+                failure.calls.reset();
+
+                srcs = [
+                    '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js'
+                ];
+
+                result = importScripts(srcs);
+                result.then(success, failure).finally(done);
+
+                iframes[0].contentWindow.document.head.appendChild(createElement.call(document, 'script'));
+                iframes[0].contentWindow.module = {
+                    exports: { foo: 'hey' }
+                };
+                iframes[0].__load__();
+            });
+
+            it('should only invoke the Promise API', function() {
+                expect(success).toHaveBeenCalledWith([iframes[0].contentWindow.module.exports]);
             });
         });
 
@@ -249,16 +297,19 @@ describe('importScripts(scripts, callback)', function() {
                         exports: modules[index]
                     };
 
-                    iframe.__trigger__('load', {});
+                    iframe.__load__();
                 });
 
                 callback.calls.reset();
+                success.calls.reset();
+                failure.calls.reset();
                 document.createElement.calls.reset();
                 iframes.length = 0;
 
                 srcs[1] += '?cb=89yr8493';
 
-                importScripts(srcs, callback);
+                result = importScripts(srcs, callback);
+                result.then(success, failure);
 
                 iframe = iframes[0];
             });
@@ -268,18 +319,24 @@ describe('importScripts(scripts, callback)', function() {
             });
 
             describe('when that iframe has loaded', function() {
-                beforeEach(function() {
+                beforeEach(function(done) {
                     iframe.contentWindow.document.head.appendChild(createElement.call(document, 'script'));
                     iframe.contentWindow.module = {
                         exports: {
                             age: 23
                         }
                     };
-                    iframe.__trigger__('load', {});
+                    iframe.__load__();
+
+                    result.finally(done);
                 });
 
                 it('should callback', function() {
                     expect(callback).toHaveBeenCalledWith(modules[0], iframe.contentWindow.module.exports, modules[2]);
+                });
+
+                it('should fulfill', function() {
+                    expect(success).toHaveBeenCalledWith([modules[0], iframe.contentWindow.module.exports, modules[2]]);
                 });
             });
         });
@@ -306,88 +363,111 @@ describe('importScripts(scripts, callback)', function() {
                 var src = srcs[index];
 
                 expect(iframe.contentWindow.document.write).toHaveBeenCalledWith([
-                    '<script>',
-                    '(' + function(window) {
-                        try {
-                            // This hack is needed in order for the browser to send the
-                            // "referer" header in Safari.
-                            window.history.replaceState(null, null, window.parent.location.href);
-                        } catch(e) {}
-                        window.Text = window.parent.Text;
-                        window.module = {
-                            exports: {}
-                        };
-                        window.exports = window.module.exports;
-                    }.toString() + '(window))',
-                    '<\/script>',
-                    '<script>(' + (function() {}).toString() + '(window))<\/script>',
-                    '<script src="' + src + '" charset="utf-8"><\/script>'
+                        '<script>',
+                        '(' + function(window) {
+                            var href = window.parent.location.href;
+
+                            try {
+                                // This hack is needed in order for the browser to send the
+                                // "referer" header in Safari.
+                                window.history.replaceState(null, null, href);
+                            } catch(e) {}
+                            window.Text = window.parent.Text;
+                            window.module = {
+                                exports: {}
+                            };
+                            window.exports = window.module.exports;
+                        }.toString() + '(window))',
+                        '<\/script>',
+                        '<script>(' + (function() {}).toString() + '(window))<\/script>',
+                        '<script src="' + src + '"',
+                        '    onload="window.frameElement.__load__()"',
+                        '    onerror="window.frameElement.__error__()"',
+                        '    charset="utf-8">',
+                        '<\/script>'
                 ].join('\n'));
                 expect(iframe.contentWindow.document.close).toHaveBeenCalled();
             });
         });
 
-        describe('when an iframe loads', function() {
+        describe('when a <script> loads', function() {
             var iframe;
             var src;
 
             beforeEach(function() {
                 iframe = iframes[1];
                 src = srcs[1];
+
+                iframe.contentWindow.document.head.appendChild(createElement.call(document, 'script'));
+                iframe.contentWindow.module = {
+                    exports: {}
+                };
+
+                iframe.__load__();
             });
 
-            describe('when there are no elements in the iframe\'s <head>', function() {
-                beforeEach(function() {
-                    iframe.__trigger__('load', {});
-                });
-
-                it('should do nothing', function() {
-                    expect(src in importScripts.cache).toBe(false);
-                });
-            });
-
-            describe('when there are elements in the iframe\'s <head>', function() {
-                beforeEach(function() {
-                    iframe.contentWindow.document.head.appendChild(createElement.call(document, 'script'));
-                    iframe.contentWindow.module = {
-                        exports: {}
-                    };
-
-                    iframe.__trigger__('load', {});
-                });
-
-                it('should cache the module\'s exports', function() {
-                    expect(importScripts.cache[src]).toBe(iframe.contentWindow.module.exports);
-                });
+            it('should cache the module\'s exports', function() {
+                expect(importScripts.cache[src]).toBe(iframe.contentWindow.module.exports);
             });
         });
 
-        it('should call the callback when all of the iframes load', function() {
+        it('should call the callback when all of the iframes load', function(done) {
             iframes[1].contentWindow.document.head.appendChild(createElement.call(document, 'script'));
             iframes[1].contentWindow.module = {
                 exports: { foo: 'bar' }
             };
-            iframes[1].__trigger__('load', {});
+            iframes[1].__load__();
             expect(callback).not.toHaveBeenCalled();
 
             iframes[2].contentWindow.document.head.appendChild(createElement.call(document, 'script'));
             iframes[2].contentWindow.module = {
                 exports: { foo: 'foo' }
             };
-            iframes[2].__trigger__('load', {});
+            iframes[2].__load__();
             expect(callback).not.toHaveBeenCalled();
 
             iframes[0].contentWindow.document.head.appendChild(createElement.call(document, 'script'));
             iframes[0].contentWindow.module = {
                 exports: { foo: 'hey' }
             };
-            iframes[0].__trigger__('load', {});
+            iframes[0].__load__();
 
             expect(callback).toHaveBeenCalledWith(
                 iframes[0].contentWindow.module.exports,
                 iframes[1].contentWindow.module.exports,
                 iframes[2].contentWindow.module.exports
             );
+
+            result.finally(function() {
+                expect(success).toHaveBeenCalledWith([
+                    iframes[0].contentWindow.module.exports,
+                    iframes[1].contentWindow.module.exports,
+                    iframes[2].contentWindow.module.exports
+                ]);
+            }).then(done, done.fail);
+        });
+
+        describe('if a <script> fails to load', function() {
+            beforeEach(function(done) {
+                iframes[0].contentWindow.document.head.appendChild(createElement.call(document, 'script'));
+                iframes[0].contentWindow.module = {
+                    exports: { foo: 'hey' }
+                };
+                iframes[0].__load__();
+
+                iframes[2].contentWindow.document.head.appendChild(createElement.call(document, 'script'));
+                iframes[2].__error__();
+
+                result.finally(done);
+            });
+
+            it('should not call the callback()', function() {
+                expect(callback).not.toHaveBeenCalled();
+            });
+
+            it('should reject the Promise', function() {
+                expect(failure).toHaveBeenCalledWith(new Error('Failed to load script [' + srcs[2] + '].'));
+            });
         });
     });
 });
