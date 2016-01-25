@@ -26,14 +26,6 @@ function pick(object, keys) {
     }, {});
 }
 
-function importDeps(deps) {
-    return new q.Promise(function callImportScripts(resolve) {
-        return importScripts(deps, function(/*...modules*/) {
-            return resolve(Array.prototype.slice.call(arguments));
-        });
-    });
-}
-
 function c6embed(beforeElement/*, params*/) {
     var params = extend({
         apiRoot: 'https://platform.reelcontent.com/',
@@ -151,7 +143,10 @@ function c6embed(beforeElement/*, params*/) {
             splash.removeEventListener('mouseenter', handleMouseenter, false);
         }, false);
 
-        return importDeps([splashJsUrl, splashHtmlUrl]).spread(function init(splashJs, splashHtml) {
+        return importScripts([splashJsUrl, splashHtmlUrl]).spread(function init(
+            splashJs,
+            splashHtml
+        ) {
             var splashDelegate;
 
             player.once('bootstrap', function addPlayerListeners() {

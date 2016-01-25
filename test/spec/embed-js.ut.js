@@ -12,6 +12,7 @@ describe('c6embed(beforeElement, params)', function() {
     var container;
 
     var playerBootstrapDeferred;
+    var importScriptsDeferred;
 
     var c6embed;
 
@@ -38,7 +39,8 @@ describe('c6embed(beforeElement, params)', function() {
             return player;
         });
 
-        importScripts = jasmine.createSpy('importScripts()');
+        importScriptsDeferred = q.defer();
+        importScripts = jasmine.createSpy('importScripts()').and.returnValue(importScriptsDeferred.promise);
 
         BrowserInfo = jasmine.createSpy('BrowserInfo()').and.callFake(function(agent) {
             this.agent = agent;
@@ -263,7 +265,7 @@ describe('c6embed(beforeElement, params)', function() {
             expect(importScripts).toHaveBeenCalledWith([
                 'https://dev.cinema6.com/collateral/splash/splash.js',
                 'https://dev.cinema6.com/collateral/splash/img-text-overlay/16-9.js'
-            ], jasmine.any(Function));
+            ]);
         });
 
         describe('if there is already a <div> for lightboxes', function() {
@@ -329,7 +331,7 @@ describe('c6embed(beforeElement, params)', function() {
                 expect(success).not.toHaveBeenCalled();
                 expect(failure).not.toHaveBeenCalled();
 
-                importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                importScriptsDeferred.fulfill([splashJs, splashHTML]);
                 setTimeout(done, 1);
             });
 
@@ -371,6 +373,8 @@ describe('c6embed(beforeElement, params)', function() {
                     importScripts.calls.reset();
                     twobits.parse.calls.reset();
 
+                    importScripts.and.returnValue(q([splashJs, splashHTML]));
+
                     params = {
                         experience: 'e-3f3b58482741e3'
                     };
@@ -382,12 +386,11 @@ describe('c6embed(beforeElement, params)', function() {
                     embed = document.createElement.calls.all()[0].returnValue;
                     splash = document.createElement.calls.all()[1].returnValue;
 
-                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
                     setTimeout(done, 1);
                 });
 
                 it('should fetch a default splash image', function() {
-                    expect(importScripts).toHaveBeenCalledWith(jasmine.arrayContaining(['https://platform.reelcontent.com/collateral/splash/img-text-overlay/16-9.js']), jasmine.any(Function));
+                    expect(importScripts).toHaveBeenCalledWith(jasmine.arrayContaining(['https://platform.reelcontent.com/collateral/splash/img-text-overlay/16-9.js']));
                 });
 
                 it('should create a player with some defaults', function() {
@@ -429,6 +432,9 @@ describe('c6embed(beforeElement, params)', function() {
                     params.preload = true;
 
                     document.createElement.calls.reset();
+                    importScripts.calls.reset();
+
+                    importScripts.and.returnValue((importScriptsDeferred = q.defer()).promise);
 
                     c6embed(beforeElement, params).then(success, failure).finally(function() {
                         player = Player.calls.mostRecent().returnValue;
@@ -439,7 +445,7 @@ describe('c6embed(beforeElement, params)', function() {
                     });
 
                     setTimeout(function() {
-                        importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                        importScriptsDeferred.fulfill([splashJs, splashHTML]);
                     }, 1);
                 });
 
@@ -560,6 +566,8 @@ describe('c6embed(beforeElement, params)', function() {
                         player.bootstrap.calls.reset();
                         Player.calls.reset();
 
+                        importScripts.and.returnValue((importScriptsDeferred = q.defer()).promise);
+
                         c6embed(beforeElement, params).then(success, failure);
 
                         player = Player.calls.mostRecent().returnValue;
@@ -627,7 +635,7 @@ describe('c6embed(beforeElement, params)', function() {
                             splashJs = jasmine.createSpy('splashJS()').and.returnValue(splashDelegate);
                             splashHTML = require('../helpers/collateral/splash/flavorc/16-9');
 
-                            importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                            importScriptsDeferred.fulfill([splashJs, splashHTML]);
                             setTimeout(done, 1);
                         });
 
@@ -1047,6 +1055,9 @@ describe('c6embed(beforeElement, params)', function() {
                                 params.type = type;
 
                                 document.createElement.calls.reset();
+                                importScripts.calls.reset();
+
+                                importScripts.and.returnValue((importScriptsDeferred = q.defer()).promise);
 
                                 c6embed(beforeElement, params).then(success, failure).finally(function() {
                                     player = Player.calls.mostRecent().returnValue;
@@ -1059,7 +1070,7 @@ describe('c6embed(beforeElement, params)', function() {
                                 }).then(done, done.fail);
 
                                 setTimeout(function() {
-                                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                                    importScriptsDeferred.fulfill([splashJs, splashHTML]);
                                 }, 1);
                             });
 
@@ -1097,6 +1108,9 @@ describe('c6embed(beforeElement, params)', function() {
                                 params.type = type;
 
                                 document.createElement.calls.reset();
+                                importScripts.calls.reset();
+
+                                importScripts.and.returnValue((importScriptsDeferred = q.defer()).promise);
 
                                 c6embed(beforeElement, params).then(success, failure).finally(function() {
                                     player = Player.calls.mostRecent().returnValue;
@@ -1108,7 +1122,7 @@ describe('c6embed(beforeElement, params)', function() {
                                 }).then(done, done.fail);
 
                                 setTimeout(function() {
-                                    importScripts.calls.mostRecent().args[1](splashJs, splashHTML);
+                                    importScriptsDeferred.fulfill([splashJs, splashHTML]);
                                 }, 1);
                             });
 
