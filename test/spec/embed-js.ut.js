@@ -7,6 +7,7 @@ describe('c6embed(beforeElement, params)', function() {
     var querystring;
     var q;
     var twobits;
+    var extend;
     var Player, importScripts, BrowserInfo;
     var stubs;
     var container;
@@ -21,6 +22,7 @@ describe('c6embed(beforeElement, params)', function() {
         querystring = require('querystring');
         q = require('q');
         twobits = require('twobits.js');
+        extend = require('../../lib/fns').extend;
         require('rc-browser-info'); // Make sure this is a valid module
 
         Player = jasmine.createSpy('Player()').and.callFake(function(endpoint, params, data) {
@@ -37,6 +39,11 @@ describe('c6embed(beforeElement, params)', function() {
             spyOn(player, 'hide').and.callThrough();
 
             return player;
+        });
+        Player.getParams = jasmine.createSpy('Player.getParams()').and.callFake(function() {
+            return require('../../lib/Player').getParams.apply(this, arguments).then(function(params) {
+                return extend(params, { processed: true });
+            });
         });
 
         importScriptsDeferred = q.defer();
@@ -84,6 +91,7 @@ describe('c6embed(beforeElement, params)', function() {
         var success, failure;
 
         var browser, player, embed, splash, lightboxes;
+        var options;
 
         beforeEach(function(done) {
             beforeElement = container.querySelector('span#two');
@@ -134,14 +142,21 @@ describe('c6embed(beforeElement, params)', function() {
             BrowserInfo.and.returnValue(browser);
 
             c6embed(beforeElement, params).then(success, failure);
-            setTimeout(function() {
-                player = Player.calls.mostRecent().returnValue;
-                embed = document.createElement.calls.all()[0].returnValue;
-                lightboxes = document.createElement.calls.all()[1].returnValue;
-                splash = document.createElement.calls.all()[2].returnValue;
+            Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                var divs = document.createElement.calls.all().map(function(call) {
+                    return call.returnValue;
+                }).filter(function(element) {
+                    return element.tagName.toLowerCase() === 'div';
+                });
 
-                done();
-            }, 1);
+                options = arguments[0];
+
+                player = Player.calls.mostRecent().returnValue;
+                embed = divs[0];
+                lightboxes = divs[1];
+                splash = divs[2];
+
+            }).then(done, done.fail);
         });
 
         afterEach(function() {
@@ -151,44 +166,28 @@ describe('c6embed(beforeElement, params)', function() {
             }
         });
 
+        it('should get the params', function() {
+            expect(Player.getParams).toHaveBeenCalledWith(params, {
+                type: 'light',
+                container: 'embed',
+                mobileType: 'mobile',
+                splash: {
+                    type: 'img-text-overlay',
+                    ratio: '16:9'
+                },
+                autoLaunch: false
+            });
+        });
+
         it('should create a BrowserInfo instance', function() {
             expect(BrowserInfo).toHaveBeenCalledWith(window.navigator.userAgent);
         });
 
         it('should create a Player', function() {
-            expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
-                apiRoot: 'https://dev.cinema6.com/',
-                type: 'desktop-card',
-                experience: 'e-3f3b58482741e3',
-                campaign: 'cam-f71ce1be881d10',
-                branding: 'theinertia',
-                placementId: '7475348',
-                container: 'digitaljournal',
-                wildCardPlacement: '485738459',
-                pageUrl: 'cinema6.com',
-                hostApp: 'Google Chrome',
-                network: 'cinema6',
-                preview: false,
-                categories: ['food', 'tech'],
-                playUrls: ['play1.gif', 'play2.gif'],
-                countUrls: ['count1.gif', 'count2.gif'],
-                launchUrls: ['launch1.gif', 'launch2.gif'],
-                mobileType: 'swipe',
-                width: '800px',
-                height: '600px',
-                autoLaunch: false,
-                splash: {
-                    type: 'img-text-overlay',
-                    ratio: '16:9'
-                },
-                ex: 'my-experiment',
-                vr: 'some-variant',
-                preload: false,
-                title: 'This is an Awesome MiniReel!',
-                image: '/collateral/experiences/e-3f3b58482741e3/splash',
-                standalone: false,
-                context: 'embed'
-            });
+            expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', extend(options, {
+                context: 'embed',
+                standalone: false
+            }));
         });
 
         it('should create a <div> for the embed, splash and lightboxes', function() {
@@ -245,11 +244,12 @@ describe('c6embed(beforeElement, params)', function() {
 
                 params.branding = 'elitedaily';
                 c6embed(beforeElement, params).then(success, failure);
-                setTimeout(done, 1);
 
-                player = Player.calls.mostRecent().returnValue;
-                embed = document.createElement.calls.all()[0].returnValue;
-                splash = document.createElement.calls.all()[1].returnValue;
+                Player.getParams.calls.mostRecent().returnValue.then(function() {
+                    player = Player.calls.mostRecent().returnValue;
+                    embed = document.createElement.calls.all()[0].returnValue;
+                    splash = document.createElement.calls.all()[1].returnValue;
+                }).then(done, done.fail);
             });
 
             it('should not add another stylesheet', function() {
@@ -279,7 +279,11 @@ describe('c6embed(beforeElement, params)', function() {
                 document.createElement.calls.reset();
 
                 c6embed(beforeElement, params).then(success, failure);
-                setTimeout(done, 1);
+                Player.getParams.calls.mostRecent().returnValue.then(function() {
+                    player = Player.calls.mostRecent().returnValue;
+                    embed = document.createElement.calls.all()[0].returnValue;
+                    splash = document.createElement.calls.all()[1].returnValue;
+                }).then(done, done.fail);
             });
 
             it('should not create another lightboxes <div>', function() {
@@ -299,11 +303,12 @@ describe('c6embed(beforeElement, params)', function() {
                 browser.isMobile = true;
 
                 c6embed(beforeElement, params).then(success, failure);
-                setTimeout(done, 1);
 
-                player = Player.calls.mostRecent().returnValue;
-                embed = document.createElement.calls.all()[0].returnValue;
-                splash = document.createElement.calls.all()[1].returnValue;
+                Player.getParams.calls.mostRecent().returnValue.then(function() {
+                    player = Player.calls.mostRecent().returnValue;
+                    embed = document.createElement.calls.all()[0].returnValue;
+                    splash = document.createElement.calls.all()[1].returnValue;
+                }).then(done, done.fail);
             });
 
             it('should make the type the mobileType', function() {
@@ -380,13 +385,16 @@ describe('c6embed(beforeElement, params)', function() {
                     };
 
                     c6embed(beforeElement, params).then(success, failure);
-                    setTimeout(done, 1);
 
-                    player = Player.calls.mostRecent().returnValue;
-                    embed = document.createElement.calls.all()[0].returnValue;
-                    splash = document.createElement.calls.all()[1].returnValue;
-
-                    setTimeout(done, 1);
+                    Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                        options = arguments[0];
+                    }).then(function() {
+                        player = Player.calls.mostRecent().returnValue;
+                        embed = document.createElement.calls.all()[0].returnValue;
+                        splash = document.createElement.calls.all()[1].returnValue;
+                    }).then(function() {
+                        return importScripts.calls.mostRecent().returnValue.delay(1);
+                    }).then(done, done.fail);
                 });
 
                 it('should fetch a default splash image', function() {
@@ -394,20 +402,10 @@ describe('c6embed(beforeElement, params)', function() {
                 });
 
                 it('should create a player with some defaults', function() {
-                    expect(Player).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/light', {
-                        apiRoot: 'https://platform.reelcontent.com/',
-                        type: 'light',
-                        container: 'embed',
-                        mobileType: 'mobile',
-                        splash: {
-                            type: 'img-text-overlay',
-                            ratio: '16:9'
-                        },
-                        autoLaunch: false,
-                        experience: 'e-3f3b58482741e3',
-                        standalone: false,
-                        context: 'embed'
-                    });
+                    expect(Player).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/light', extend(options, {
+                        context: 'embed',
+                        standalone: false
+                    }));
                 });
 
                 it('should not give the embed <div> a width or height', function() {
@@ -493,10 +491,14 @@ describe('c6embed(beforeElement, params)', function() {
 
                     c6embed(beforeElement, params).then(success, failure);
 
-                    player = Player.calls.mostRecent().returnValue;
-                    embed = document.createElement.calls.all()[0].returnValue;
-
-                    setTimeout(done, 1);
+                    Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                        options = arguments[0];
+                    }).then(function() {
+                        player = Player.calls.mostRecent().returnValue;
+                        embed = document.createElement.calls.all()[0].returnValue;
+                    }).then(function() {
+                        return q.delay(1);
+                    }).then(done, done.fail);
                 });
 
                 it('should not create a splash <div>', function() {
@@ -511,35 +513,10 @@ describe('c6embed(beforeElement, params)', function() {
                 });
 
                 it('should create a standalone player', function() {
-                    expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
-                        splash: {
-                            type: 'img-text-overlay',
-                            ratio: '16:9'
-                        },
-                        apiRoot: 'https://dev.cinema6.com/',
-                        type: 'desktop-card',
-                        experience: 'e-3f3b58482741e3',
-                        campaign: 'cam-f71ce1be881d10',
-                        branding: 'some-new-thing',
-                        placementId: '7475348',
-                        container: 'digitaljournal',
-                        wildCardPlacement: '485738459',
-                        pageUrl: 'cinema6.com',
-                        hostApp: 'Google Chrome',
-                        network: 'cinema6',
-                        preview: false,
-                        categories: ['food', 'tech'],
-                        playUrls: ['play1.gif', 'play2.gif'],
-                        countUrls: ['count1.gif', 'count2.gif'],
-                        launchUrls: ['launch1.gif', 'launch2.gif'],
-                        mobileType: 'swipe',
-                        autoLaunch: true,
-                        ex: 'my-experiment',
-                        vr: 'some-variant',
-                        preload: false,
-                        standalone: true,
-                        context: 'embed'
-                    });
+                    expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', extend(options, {
+                        context: 'embed',
+                        standalone: true
+                    }));
                 });
 
                 it('should append the embed to the DOM', function() {
@@ -570,44 +547,20 @@ describe('c6embed(beforeElement, params)', function() {
 
                         c6embed(beforeElement, params).then(success, failure);
 
-                        player = Player.calls.mostRecent().returnValue;
-                        embed = document.createElement.calls.all()[0].returnValue;
-                        splash = document.createElement.calls.all()[1].returnValue;
-
-                        setTimeout(done, 1);
+                        Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                            options = arguments[0];
+                        }).then(function() {
+                            player = Player.calls.mostRecent().returnValue;
+                            embed = document.createElement.calls.all()[0].returnValue;
+                            splash = document.createElement.calls.all()[1].returnValue;
+                        }).then(done, done.fail);
                     });
 
                     it('should set interstitial to true and standalone to false', function() {
-                        expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', {
-                            splash: {
-                                type: 'img-text-overlay',
-                                ratio: '16:9'
-                            },
-                            apiRoot: 'https://dev.cinema6.com/',
-                            type: 'desktop-card',
-                            experience: 'e-3f3b58482741e3',
-                            campaign: 'cam-f71ce1be881d10',
-                            branding: 'some-new-thing',
-                            placementId: '7475348',
-                            container: 'digitaljournal',
-                            wildCardPlacement: '485738459',
-                            pageUrl: 'cinema6.com',
-                            hostApp: 'Google Chrome',
-                            network: 'cinema6',
-                            preview: false,
-                            categories: ['food', 'tech'],
-                            playUrls: ['play1.gif', 'play2.gif'],
-                            countUrls: ['count1.gif', 'count2.gif'],
-                            launchUrls: ['launch1.gif', 'launch2.gif'],
-                            mobileType: 'swipe',
-                            autoLaunch: true,
-                            ex: 'my-experiment',
-                            vr: 'some-variant',
-                            interstitial: true,
-                            preload: false,
-                            standalone: false,
-                            context: 'embed'
-                        });
+                        expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', extend(options, {
+                            context: 'embed',
+                            standalone: false
+                        }));
                     });
 
                     it('should create a splash <div>', function() {
