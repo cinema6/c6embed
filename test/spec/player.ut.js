@@ -235,7 +235,8 @@ describe('Player', function() {
                 vr: 'some-variant',
                 prebuffer: true,
                 embed: 'foo',
-                countdown: 15
+                countdown: 15,
+                placement: 'pl-6a020c18a28c5d'
             };
             data = { foo: 'bar' };
 
@@ -313,7 +314,8 @@ describe('Player', function() {
                             vr: 'some-variant',
                             prebuffer: 'true',
                             embed: 'true',
-                            countdown: '15'
+                            countdown: '15',
+                            placement: 'pl-6a020c18a28c5d'
                         }
                     }));
                 });
