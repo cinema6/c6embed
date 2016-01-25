@@ -68,70 +68,81 @@ function getVPAIDAd() {
             return '2.0';
         },
 
-        initAd: function initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars) {
+        initAd: function initAd(
+            width,
+            height,
+            viewMode,
+            desiredBitrate,
+            creativeData,
+            environmentVars
+        ) {
             var self = this;
             var adParams = creativeData.AdParameters;
             var config = adParams.charAt(0) === '{' ?
                 JSON.parse(adParams) : querystring.parse(adParams);
-            var apiRoot = config.apiRoot || 'https://platform.reelcontent.com/';
-            var type = config.type || 'desktop-card';
-            var uri = config.uri || resolveUrl(apiRoot, '/api/public/players/' + type);
             var params = config.params || config;
 
-            player = new Player(uri, extend({
+            Player.getParams(params, {
+                type: 'desktop-card',
                 standalone: false,
                 interstitial: true,
                 container: 'vpaid'
-            }, params, {
-                vpaid: true,
-                autoLaunch: false,
-                context: 'vpaid'
-            }));
+            }).then(function init(params) {
+                var type = config.type;
+                var apiRoot = config.apiRoot;
+                var uri = config.uri || resolveUrl(apiRoot, '/api/public/players/' + type);
 
-            player.bootstrap(environmentVars.slot, {
-                width: width + 'px',
-                height: height + 'px',
-                position: 'absolute',
-                top: 0,
-                left: 0
-            }).then(function() { emitter.emit('AdLoaded'); });
+                player = new Player(uri, extend(params, {
+                    vpaid: true,
+                    autoLaunch: false,
+                    context: 'vpaid'
+                }));
 
-            state.adWidth = width;
-            state.adHeight = height;
+                player.bootstrap(environmentVars.slot, {
+                    width: width + 'px',
+                    height: height + 'px',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0
+                }).then(function() { emitter.emit('AdLoaded'); });
 
-            player.session.on('vpaid:stateUpdated', function updateState(update) {
-                var prop = update.prop;
-                var value = update.value;
-                var event = update.event;
-                var params = update.params || [];
-                var valueChanged = prop && (value !== state[prop]);
-                var shouldEmit = event && (!prop || valueChanged);
+                state.adWidth = width;
+                state.adHeight = height;
 
-                if (valueChanged) {
-                    state[prop] = value;
-                }
+                player.session.on('vpaid:stateUpdated', function updateState(update) {
+                    var prop = update.prop;
+                    var value = update.value;
+                    var event = update.event;
+                    var params = update.params || [];
+                    var valueChanged = prop && (value !== state[prop]);
+                    var shouldEmit = event && (!prop || valueChanged);
 
-                if (shouldEmit) {
-                    emitter.emit.apply(emitter, [event].concat(params));
-                }
-            });
+                    if (valueChanged) {
+                        state[prop] = value;
+                    }
 
-            player.session.on('error', function emitAdError(message) {
-                emitter.emit('AdError', message);
-                self.stopAd();
-            });
+                    if (shouldEmit) {
+                        emitter.emit.apply(emitter, [event].concat(params));
+                    }
+                });
 
-            player.session.on('cardComplete', function stopAd() {
-                self.stopAd();
-            });
+                player.session.on('error', function emitAdError(message) {
+                    emitter.emit('AdError', message);
+                    self.stopAd();
+                });
 
-            player.session.on('close', function skipAd() {
-                self.skipAd();
-            });
+                player.session.on('cardComplete', function stopAd() {
+                    self.stopAd();
+                });
 
-            player.session.once('video:play', function countImpression() {
-                emitter.emit('AdStarted');
-                emitter.emit('AdImpression');
+                player.session.on('close', function skipAd() {
+                    self.skipAd();
+                });
+
+                player.session.once('video:play', function countImpression() {
+                    emitter.emit('AdStarted');
+                    emitter.emit('AdImpression');
+                });
             });
         },
 
