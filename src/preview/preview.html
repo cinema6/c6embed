@@ -49,6 +49,9 @@
                         return '//s3.amazonaws.com/c6.dev/ext/c6embed/v1/embed-js.js'
                     }
                 }());
+                var experience = params.experience || params.id;
+                var card = params.card;
+                var path = (experience ? 'experience/' + experience : null) || (card ? 'card/' + card : null);
 
                 function writeScript(src) {
                     document.write('<script src="' + src +'" charset="utf-8"><\/script>');
@@ -59,7 +62,7 @@
                 };
 
                 writeScript(embedSrc);
-                writeScript(base + 'api/public/content/experience/' + (params.experience || params.id) + '.js?preview=true');
+                writeScript(base + 'api/public/content/' + path + '.js?preview=true');
 
                 window.params = params;
                 window.apiRoot = base;
@@ -73,7 +76,7 @@
                     <div class="rcBrand rc--logo">
                         <span class="ir">Reelcontent</span>
                     </div>
-                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+module.exports.data.title+'<\/strong>')</script></em>&rdquo;</h1>
+                    <h1 class="mast__title">Previewing : &ldquo;<em><script>document.write('<strong>'+ (module.exports.data.title || module.exports.title)+'<\/strong>')</script></em>&rdquo;</h1>
                 </header>
             </div>
 
@@ -86,12 +89,12 @@
                         var apiRoot = window.apiRoot;
 
                         c6embed(document.getElementById('embed-target'), extend({
-                            type: experience.data.mode,
+                            type: params.mode || experience.data.mode,
                         }, params, {
                             apiRoot:    apiRoot,
-                            experience: experience.id,
-                            title:      experience.data.title,
-                            image:      experience.data.collateral.splash,
+                            // experience: experience.id,
+                            // title:      experience.data.title,
+                            // image:      experience.data.collateral.splash,
                             preview:    true,
                             autoLaunch: true
                         }));
