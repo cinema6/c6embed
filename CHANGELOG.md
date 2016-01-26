@@ -1,10 +1,12 @@
 # C6Embed Changelog
 
+## v3.9.0 (January 26, 2016)
 * *[v3.9.0-rc1]*
   * [FEATURE]: Add support for getting embed params from a placement
   * [FEATURE]: Add support for passing a `uuid` to the player service
     for tracking purposes
   * Remove support for embed parameters that no longer do anything
+* *[/v3.9.0-rc1]*
 
 ## v3.8.0 (January 20, 2016)
 * *[v3.8.0-rc1]*
