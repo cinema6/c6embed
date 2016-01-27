@@ -17,6 +17,7 @@
 
         iframe.scrolling = 'no';
         iframe.style.position = 'absolute';
+        iframe.style.zIndex = '2147483647';
         iframe.frameBorder = '0';
         iframe.setAttribute('frameBorder', '0');
     };
