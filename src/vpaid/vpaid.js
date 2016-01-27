@@ -88,8 +88,8 @@ function getVPAIDAd() {
                 interstitial: true,
                 container: 'vpaid'
             }).then(function init(params) {
-                var type = config.type;
-                var apiRoot = config.apiRoot;
+                var type = params.type;
+                var apiRoot = params.apiRoot;
                 var uri = config.uri || resolveUrl(apiRoot, '/api/public/players/' + type);
 
                 player = new Player(uri, extend(params, {
