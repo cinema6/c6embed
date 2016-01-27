@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.9.1 (January 27, 2016)
+* *[v3.9.1-rc1]*
+  * [FIX]: Fix for an issue that caused VPAID not to work if no
+    `apiRoot` or `type` was specified
+* *[/v3.9.1-rc1]*
+
 ## v3.9.0 (January 26, 2016)
 * *[v3.9.0-rc1]*
   * [FEATURE]: Add support for getting embed params from a placement
