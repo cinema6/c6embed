@@ -397,6 +397,33 @@ describe('getVPAIDAd()', function() {
                                     context: 'vpaid'
                                 }));
                             });
+
+                            describe('and there is no type or apiRoot', function() {
+                                beforeEach(function(done) {
+                                    Player.calls.reset();
+                                    Player.getParams.calls.reset();
+
+                                    config = querystring.stringify({
+                                        campaign: 'cam-c8cd8927915d1b'
+                                    });
+
+                                    creativeData.AdParameters = config;
+
+                                    vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
+
+                                    Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
+                                        options = arguments[0];
+
+                                        player = Player.calls.mostRecent().returnValue;
+                                        iframe = player.frame;
+                                        session = player.session;
+                                    }).then(done, done.fail);
+                                });
+
+                                it('should use the apiRoot and type from the defaults', function() {
+                                    expect(Player).toHaveBeenCalledWith('https://platform.reelcontent.com/api/public/players/desktop-card', jasmine.any(Object));
+                                });
+                            });
                         });
                     });
                 });
