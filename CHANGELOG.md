@@ -1,5 +1,11 @@
 # C6Embed Changelog
 
+## v3.9.2 (January 27, 2016)
+* *[v3.9.2-rc1]*
+  * [FIX]: Fix for an issue that caused the flash VPAID unit not to be
+    visisble
+* *[/v3.9.2-rc1]*
+
 ## v3.9.1 (January 27, 2016)
 * *[v3.9.1-rc1]*
   * [FIX]: Fix for an issue that caused VPAID not to work if no
