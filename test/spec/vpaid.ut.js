@@ -94,7 +94,7 @@ describe('getVPAIDAd()', function() {
 
                 beforeEach(function() {
                     config = {
-                        uri: 'https://dev.cinema6.com/api/public/players/solo',
+                        uri: 'https://dev.reelcontent.com/api/public/players/solo',
                         params: {
                             experience: 'e-d0817b1227cc37',
                             campaign: 'cam-c8cd8927915d1b',
@@ -353,7 +353,7 @@ describe('getVPAIDAd()', function() {
                             Player.getParams.calls.reset();
 
                             config = querystring.stringify({
-                                apiRoot: 'https://dev.cinema6.com/',
+                                apiRoot: 'https://dev.reelcontent.com/',
                                 type: 'solo',
                                 experience: 'e-d0817b1227cc37',
                                 campaign: 'cam-c8cd8927915d1b',
@@ -391,7 +391,7 @@ describe('getVPAIDAd()', function() {
                             });
 
                             it('should create a Player', function() {
-                                expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/solo', extend(options, {
+                                expect(Player).toHaveBeenCalledWith('https://dev.reelcontent.com/api/public/players/solo', extend(options, {
                                     vpaid: true,
                                     autoLaunch: false,
                                     context: 'vpaid'
@@ -505,7 +505,7 @@ describe('getVPAIDAd()', function() {
 
                 beforeEach(function(done) {
                     config = {
-                        uri: 'https://dev.cinema6.com/api/public/players/solo',
+                        uri: 'https://dev.reelcontent.com/api/public/players/solo',
                         params: {
                             experience: 'e-d0817b1227cc37',
                             campaign: 'cam-c8cd8927915d1b',
