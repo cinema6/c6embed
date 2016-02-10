@@ -204,7 +204,7 @@ describe('Player', function() {
         var player;
 
         beforeEach(function() {
-            endpoint = 'https://dev.cinema6.com/api/public/players/desktop-card';
+            endpoint = 'https://dev.reelcontent.com/api/public/players/desktop-card';
             params = {
                 experience: 'e-4158d66ede3306',
                 card: 'rc-677091d298a151',
@@ -286,7 +286,7 @@ describe('Player', function() {
 
                     expect(url).toEqual(jasmine.objectContaining({
                         protocol: 'https:',
-                        host: 'dev.cinema6.com',
+                        host: 'dev.reelcontent.com',
                         pathname: '/api/public/players/desktop-card',
                         query: {
                             experience: 'e-4158d66ede3306',

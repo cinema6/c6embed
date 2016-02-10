@@ -107,8 +107,8 @@ describe('[c6mraid(config)]', function() {
             placementId: '87654321',
             campaign: 'cam-9c9692e33a8e98',
             wildCardPlacement: '12345678',
-            apiRoot: 'https://dev.cinema6.com',
-            pageUrl: 'staging.cinema6.com',
+            apiRoot: 'https://dev.reelcontent.com',
+            pageUrl: 'staging.reelcontent.com',
             forceOrientation: 'none',
             debug: true,
             hostApp: 'Talking Tom',
@@ -132,7 +132,7 @@ describe('[c6mraid(config)]', function() {
 
     it('should configure the logger to send pixels', function() {
         expect(viaPixel).toHaveBeenCalledWith({
-            url: 'https://logging.cinema6.com/pixel.gif',
+            url: 'https://logging.reelcontent.com/pixel.gif',
             addParams: jasmine.any(Function)
         });
         expect(viaPixel.calls.count()).toBe(1);
@@ -175,7 +175,7 @@ describe('[c6mraid(config)]', function() {
         });
 
         it('should create a new Player instance', function() {
-            expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/full', extend(options, {
+            expect(Player).toHaveBeenCalledWith('https://dev.reelcontent.com/api/public/players/full', extend(options, {
                 standalone: false,
                 interstitial: true,
                 context: 'mraid',

@@ -222,8 +222,8 @@ describe('importScripts(scripts, callback)', function() {
 
             srcs = [
                 '//aka-cdn.adtechus.com/dt/common/DAC.js',
-                '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
-                '//portal.cinema6.com/collateral/splash/splash.js'
+                '//lib.reelcontent.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js',
+                '//portal.reelcontent.com/collateral/splash/splash.js'
             ];
             callback = jasmine.createSpy('callback()');
 
@@ -262,7 +262,7 @@ describe('importScripts(scripts, callback)', function() {
                 failure.calls.reset();
 
                 srcs = [
-                    '//lib.cinema6.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js'
+                    '//lib.reelcontent.com/twobits.js/v0.0.1-0-g7a19518/twobits.min.js'
                 ];
 
                 result = importScripts(srcs);

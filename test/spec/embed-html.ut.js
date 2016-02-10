@@ -66,7 +66,7 @@ describe('<script src="c6embed.js"></script>', function() {
 
         beforeEach(function() {
             script = load({
-                'data-api-root': 'https://dev.cinema6.com/',
+                'data-api-root': 'https://dev.reelcontent.com/',
                 'data-type': 'desktop-card',
                 'data-experience': 'e-3f3b58482741e3',
                 'data-campaign': 'cam-f71ce1be881d10',
@@ -74,9 +74,9 @@ describe('<script src="c6embed.js"></script>', function() {
                 'data-placement-id': '7475348',
                 'data-container': 'digitaljournal',
                 'data-wild-card-placement': '485738459',
-                'data-page-url': 'cinema6.com',
+                'data-page-url': 'reelcontent.com',
                 'data-host-app': 'Google Chrome',
-                'data-network': 'cinema6',
+                'data-network': 'reelcontent',
                 //'data-preview': false,
                 'data-categories': 'food, tech',
                 'data-play-urls': 'play1.gif,play2.gif',
@@ -98,7 +98,7 @@ describe('<script src="c6embed.js"></script>', function() {
 
         it('should parse the configuration and call c6embed()', function() {
             expect(c6embed).toHaveBeenCalledWith(script, {
-                apiRoot: 'https://dev.cinema6.com/',
+                apiRoot: 'https://dev.reelcontent.com/',
                 type: 'desktop-card',
                 experience: 'e-3f3b58482741e3',
                 campaign: 'cam-f71ce1be881d10',
@@ -106,9 +106,9 @@ describe('<script src="c6embed.js"></script>', function() {
                 placementId: '7475348',
                 container: 'digitaljournal',
                 wildCardPlacement: '485738459',
-                pageUrl: 'cinema6.com',
+                pageUrl: 'reelcontent.com',
                 hostApp: 'Google Chrome',
-                network: 'cinema6',
+                network: 'reelcontent',
                 preview: false,
                 categories: ['food', 'tech'],
                 playUrls: ['play1.gif', 'play2.gif'],
@@ -139,7 +139,7 @@ describe('<script src="c6embed.js"></script>', function() {
             beforeEach(function() {
                 c6embed.calls.reset();
                 script = load({
-                    'data-api-root': 'https://dev.cinema6.com/',
+                    'data-api-root': 'https://dev.reelcontent.com/',
                     'data-type': 'desktop-card',
                     'data-experience': 'e-3f3b58482741e3',
                     'data-campaign': 'cam-f71ce1be881d10',
@@ -147,9 +147,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-placement-id': '7475348',
                     'data-container': 'digitaljournal',
                     'data-wild-card-placement': '485738459',
-                    'data-page-url': 'cinema6.com',
+                    'data-page-url': 'reelcontent.com',
                     'data-host-app': 'Google Chrome',
-                    'data-network': 'cinema6',
+                    'data-network': 'reelcontent',
                     'data-preview': '', // boolean
                     'data-categories': 'food, tech',
                     'data-play-urls': 'play1.gif,play2.gif',
@@ -185,7 +185,7 @@ describe('<script src="c6embed.js"></script>', function() {
             beforeEach(function() {
                 c6embed.calls.reset();
                 script = load({
-                    'data-api-root': 'https://dev.cinema6.com/',
+                    'data-api-root': 'https://dev.reelcontent.com/',
                     'data-type': 'desktop-card',
                     'data-experience': 'e-3f3b58482741e3',
                     'data-campaign': 'cam-f71ce1be881d10',
@@ -193,9 +193,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-placement-id': '7475348',
                     'data-container': 'digitaljournal',
                     'data-wild-card-placement': '485738459',
-                    'data-page-url': 'cinema6.com',
+                    'data-page-url': 'reelcontent.com',
                     'data-host-app': 'Google Chrome',
-                    'data-network': 'cinema6',
+                    'data-network': 'reelcontent',
                     //'data-preview': '', // boolean
                     'data-categories': 'food, tech',
                     'data-play-urls': 'play1.gif,play2.gif',
@@ -217,7 +217,7 @@ describe('<script src="c6embed.js"></script>', function() {
 
             it('should find the <script> by looking for the last one', function() {
                 expect(c6embed).toHaveBeenCalledWith(script, {
-                    apiRoot: 'https://dev.cinema6.com/',
+                    apiRoot: 'https://dev.reelcontent.com/',
                     type: 'desktop-card',
                     experience: 'e-3f3b58482741e3',
                     campaign: 'cam-f71ce1be881d10',
@@ -225,9 +225,9 @@ describe('<script src="c6embed.js"></script>', function() {
                     placementId: '7475348',
                     container: 'digitaljournal',
                     wildCardPlacement: '485738459',
-                    pageUrl: 'cinema6.com',
+                    pageUrl: 'reelcontent.com',
                     hostApp: 'Google Chrome',
-                    network: 'cinema6',
+                    network: 'reelcontent',
                     preview: false,
                     categories: ['food', 'tech'],
                     playUrls: ['play1.gif', 'play2.gif'],

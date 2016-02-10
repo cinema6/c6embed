@@ -96,7 +96,7 @@ describe('c6embed(beforeElement, params)', function() {
         beforeEach(function(done) {
             beforeElement = container.querySelector('span#two');
             params = {
-                apiRoot: 'https://dev.cinema6.com/',
+                apiRoot: 'https://dev.reelcontent.com/',
                 type: 'desktop-card',
                 experience: 'e-3f3b58482741e3',
                 campaign: 'cam-f71ce1be881d10',
@@ -104,9 +104,9 @@ describe('c6embed(beforeElement, params)', function() {
                 placementId: '7475348',
                 container: 'digitaljournal',
                 wildCardPlacement: '485738459',
-                pageUrl: 'cinema6.com',
+                pageUrl: 'reelcontent.com',
                 hostApp: 'Google Chrome',
-                network: 'cinema6',
+                network: 'reelcontent',
                 preview: false,
                 categories: ['food', 'tech'],
                 playUrls: ['play1.gif', 'play2.gif'],
@@ -184,7 +184,7 @@ describe('c6embed(beforeElement, params)', function() {
         });
 
         it('should create a Player', function() {
-            expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', extend(options, {
+            expect(Player).toHaveBeenCalledWith('https://dev.reelcontent.com/api/public/players/desktop-card', extend(options, {
                 context: 'embed',
                 standalone: false
             }));
@@ -225,7 +225,7 @@ describe('c6embed(beforeElement, params)', function() {
             var link = document.getElementById('c6-theinertia');
 
             expect(link.tagName).toBe('LINK');
-            expect(link.href).toBe('https://dev.cinema6.com/collateral/branding/theinertia/styles/splash.css');
+            expect(link.href).toBe('https://dev.reelcontent.com/collateral/branding/theinertia/styles/splash.css');
             expect(link.rel).toBe('stylesheet');
             expect(link.parentNode).toBe(document.head);
         });
@@ -235,7 +235,7 @@ describe('c6embed(beforeElement, params)', function() {
                 var link = document.createElement('link');
 
                 link.id = 'c6-elitedaily';
-                link.href = 'https://dev.cinema6.com/collateral/branding/elitedaily/styles/splash.css';
+                link.href = 'https://dev.reelcontent.com/collateral/branding/elitedaily/styles/splash.css';
                 link.rel = 'stylesheet';
 
                 document.head.appendChild(link);
@@ -263,8 +263,8 @@ describe('c6embed(beforeElement, params)', function() {
 
         it('should use importScripts() to fetch some required resources', function() {
             expect(importScripts).toHaveBeenCalledWith([
-                'https://dev.cinema6.com/collateral/splash/splash.js',
-                'https://dev.cinema6.com/collateral/splash/img-text-overlay/16-9.js'
+                'https://dev.reelcontent.com/collateral/splash/splash.js',
+                'https://dev.reelcontent.com/collateral/splash/img-text-overlay/16-9.js'
             ]);
         });
 
@@ -312,7 +312,7 @@ describe('c6embed(beforeElement, params)', function() {
             });
 
             it('should make the type the mobileType', function() {
-                expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/swipe', jasmine.any(Object));
+                expect(Player).toHaveBeenCalledWith('https://dev.reelcontent.com/api/public/players/swipe', jasmine.any(Object));
             });
         });
 
@@ -461,7 +461,7 @@ describe('c6embed(beforeElement, params)', function() {
                     embed.parentNode.removeChild(embed);
 
                     params = {
-                        apiRoot: 'https://dev.cinema6.com/',
+                        apiRoot: 'https://dev.reelcontent.com/',
                         type: 'desktop-card',
                         experience: 'e-3f3b58482741e3',
                         campaign: 'cam-f71ce1be881d10',
@@ -469,9 +469,9 @@ describe('c6embed(beforeElement, params)', function() {
                         placementId: '7475348',
                         container: 'digitaljournal',
                         wildCardPlacement: '485738459',
-                        pageUrl: 'cinema6.com',
+                        pageUrl: 'reelcontent.com',
                         hostApp: 'Google Chrome',
-                        network: 'cinema6',
+                        network: 'reelcontent',
                         preview: false,
                         categories: ['food', 'tech'],
                         playUrls: ['play1.gif', 'play2.gif'],
@@ -513,7 +513,7 @@ describe('c6embed(beforeElement, params)', function() {
                 });
 
                 it('should create a standalone player', function() {
-                    expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', extend(options, {
+                    expect(Player).toHaveBeenCalledWith('https://dev.reelcontent.com/api/public/players/desktop-card', extend(options, {
                         context: 'embed',
                         standalone: true
                     }));
@@ -557,7 +557,7 @@ describe('c6embed(beforeElement, params)', function() {
                     });
 
                     it('should set interstitial to true and standalone to false', function() {
-                        expect(Player).toHaveBeenCalledWith('https://dev.cinema6.com/api/public/players/desktop-card', extend(options, {
+                        expect(Player).toHaveBeenCalledWith('https://dev.reelcontent.com/api/public/players/desktop-card', extend(options, {
                             context: 'embed',
                             standalone: false
                         }));

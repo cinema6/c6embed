@@ -28,7 +28,7 @@ function initLogger(config) {
 }
 
 globalLogger.tasks.send.push(viaPixel({
-    url: 'https://logging.cinema6.com/pixel.gif',
+    url: 'https://logging.reelcontent.com/pixel.gif',
     addParams: function addParams(logger) {
         return {
             c: logger.meta.container,
