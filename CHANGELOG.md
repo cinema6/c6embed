@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v3.9.3 (February 10, 2016)
+* *[v3.9.3-rc1]*
+  * Migrate from cinema6.com to reelcontent.com
+* *[/v3.9.3-rc1]*
+
 ## v3.9.2 (January 27, 2016)
 * *[v3.9.2-rc1]*
   * [FIX]: Fix for an issue that caused the flash VPAID unit not to be
