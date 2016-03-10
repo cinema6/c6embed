@@ -1,5 +1,8 @@
 # C6Embed Changelog
 
+* *[v3.10.0-rc1]*
+  * [FEATURE]: Add support for `autoplay` player parameter
+
 ## v3.9.3 (February 10, 2016)
 * *[v3.9.3-rc1]*
   * Migrate from cinema6.com to reelcontent.com
