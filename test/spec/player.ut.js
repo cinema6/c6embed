@@ -237,7 +237,8 @@ describe('Player', function() {
                 embed: 'foo',
                 countdown: 15,
                 placement: 'pl-6a020c18a28c5d',
-                uuid: 'wuyrf4378f'
+                uuid: 'wuyrf4378f',
+                autoplay: false
             };
             data = { foo: 'bar' };
 
@@ -314,7 +315,8 @@ describe('Player', function() {
                             embed: 'true',
                             countdown: '15',
                             placement: 'pl-6a020c18a28c5d',
-                            uuid: 'wuyrf4378f'
+                            uuid: 'wuyrf4378f',
+                            autoplay: 'false'
                         }
                     }));
                 });
