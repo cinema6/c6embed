@@ -1,7 +1,10 @@
 # C6Embed Changelog
 
+## v3.10.0 (March 14, 2016)
 * *[v3.10.0-rc1]*
   * [FEATURE]: Add support for `autoplay` player parameter
+  * [FEATURE]: Add support for `debug` player parameter
+* *[/v3.10.0-rc1]*
 
 ## v3.9.3 (February 10, 2016)
 * *[v3.9.3-rc1]*
