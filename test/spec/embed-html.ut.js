@@ -11,6 +11,8 @@ describe('<script src="c6embed.js"></script>', function() {
     var c6embed;
     var stubs;
 
+    var mockDocument;
+
     function load(attributes, setCurrentScript) {
         var script = document.createElement('script');
         var target = document.getElementById('target');
@@ -25,10 +27,10 @@ describe('<script src="c6embed.js"></script>', function() {
         target.parentNode.insertBefore(script, target.nextSibling);
 
         if (setCurrentScript) {
-            document.currentScript = script;
+            mockDocument.currentScript = script;
         }
         execute();
-        document.currentScript = null;
+        mockDocument.currentScript = null;
 
         return script;
     }
@@ -54,7 +56,12 @@ describe('<script src="c6embed.js"></script>', function() {
             '@noCallThru': true
         };
 
-        execute = proxyquire('../../src/embed/embed-html', stubs);
+        mockDocument = {
+            currentScript: null,
+            querySelectorAll: document.querySelectorAll.bind(document)
+        };
+
+        execute = proxyquire('../../src/embed/embed-html', stubs).bind(null, mockDocument);
     });
 
     afterEach(function() {
@@ -92,7 +99,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 //'data-preload': false,
                 //'data-interstitial': false,
                 //'data-standalone': false,
-                //'data-prebuffer': false
+                //'data-prebuffer': false,
+                //'data-soundoff': false
             }, true);
         });
 
@@ -127,7 +135,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 preload: false,
                 interstitial: false,
                 standalone: false,
-                prebuffer: false
+                prebuffer: false,
+                soundoff: false
             });
         });
 
@@ -165,7 +174,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-preload': '', // boolean,
                     'data-interstitial': '', // boolean
                     'data-standalone': '', // boolean
-                    'data-prebuffer': '' // boolean
+                    'data-prebuffer': '', // boolean
+                    'data-soundoff': '' // boolean
                 }, true);
             });
 
@@ -176,7 +186,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     preload: true,
                     interstitial: true,
                     standalone: true,
-                    prebuffer: true
+                    prebuffer: true,
+                    soundoff: true
                 }));
             });
         });
@@ -211,7 +222,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     //'data-preload': false,
                     //'data-interstitial': false,
                     //'data-standalone': false,
-                    //'data-prebuffer': false
+                    //'data-prebuffer': false,
+                    //'data-soundoff': false
                 }, false);
             });
 
@@ -246,7 +258,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     preload: false,
                     interstitial: false,
                     standalone: false,
-                    prebuffer: false
+                    prebuffer: false,
+                    soundoff: false
                 });
             });
 
@@ -271,7 +284,8 @@ describe('<script src="c6embed.js"></script>', function() {
                         preview: false,
                         interstitial: false,
                         standalone: false,
-                        prebuffer: false
+                        prebuffer: false,
+                        soundoff: false,
                     });
                 });
             });

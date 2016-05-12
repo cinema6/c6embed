@@ -1,5 +1,10 @@
 # C6Embed Changelog
 
+## v3.11.0 (May 12, 2016)
+* *[v3.11.0-rc1]*
+  * [FEATURE]: Add support for `soundoff` player parameter
+* *[/v3.11.0-rc1]*
+
 ## v3.10.0 (March 14, 2016)
 * *[v3.10.0-rc1]*
   * [FEATURE]: Add support for `autoplay` player parameter

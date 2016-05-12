@@ -9,14 +9,15 @@ var BOOLEANS = {
     preload: false,
     standalone: false,
     interstitial: false,
-    prebuffer: false
+    prebuffer: false,
+    soundoff: false
 };
 
 function toArray(arraylike) {
     return Array.prototype.slice.call(arraylike);
 }
 
-function embed() {
+function embed(document) {
     var script = document.currentScript || (function(scripts) {
         return scripts[scripts.length - 1];
     }(toArray(document.querySelectorAll('script[data-splash]')).filter(function (script) {
@@ -69,4 +70,4 @@ function embed() {
 
 module.exports = embed;
 
-if (!window.__karma__) { embed(); }
+if (!window.__karma__) { embed(document); }
