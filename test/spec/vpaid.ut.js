@@ -530,9 +530,7 @@ describe('getVPAIDAd()', function() {
 
                     vpaid.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
 
-                    Player.getParams.calls.mostRecent().returnValue.then(function(/*options*/) {
-                        options = arguments[0];
-
+                    Player.getParams.calls.mostRecent().returnValue.then(function() {
                         player = Player.calls.mostRecent().returnValue;
                         iframe = player.frame;
                         session = player.session;

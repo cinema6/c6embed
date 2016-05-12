@@ -11,6 +11,8 @@ describe('<script src="c6embed.js"></script>', function() {
     var c6embed;
     var stubs;
 
+    var mockDocument;
+
     function load(attributes, setCurrentScript) {
         var script = document.createElement('script');
         var target = document.getElementById('target');
@@ -25,10 +27,10 @@ describe('<script src="c6embed.js"></script>', function() {
         target.parentNode.insertBefore(script, target.nextSibling);
 
         if (setCurrentScript) {
-            document.currentScript = script;
+            mockDocument.currentScript = script;
         }
         execute();
-        document.currentScript = null;
+        mockDocument.currentScript = null;
 
         return script;
     }
@@ -54,7 +56,12 @@ describe('<script src="c6embed.js"></script>', function() {
             '@noCallThru': true
         };
 
-        execute = proxyquire('../../src/embed/embed-html', stubs);
+        mockDocument = {
+            currentScript: null,
+            querySelectorAll: document.querySelectorAll.bind(document)
+        };
+
+        execute = proxyquire('../../src/embed/embed-html', stubs).bind(null, mockDocument);
     });
 
     afterEach(function() {

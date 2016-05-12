@@ -50,7 +50,7 @@
     "karma-jasmine": "^0.3.5",
     "karma-jshint": "^0.1.0",
     "karma-junit-reporter": "^0.2.1",
-    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-phantomjs-launcher": "^1.0.0",
     "karma-requirejs": "^0.2.1",
     "karma-script-launcher": "^0.1.0",
     "load-grunt-config": "git://github.com/firstandthird/load-grunt-config",
