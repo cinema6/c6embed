@@ -92,7 +92,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 //'data-preload': false,
                 //'data-interstitial': false,
                 //'data-standalone': false,
-                //'data-prebuffer': false
+                //'data-prebuffer': false,
+                //'data-soundoff': false
             }, true);
         });
 
@@ -127,7 +128,8 @@ describe('<script src="c6embed.js"></script>', function() {
                 preload: false,
                 interstitial: false,
                 standalone: false,
-                prebuffer: false
+                prebuffer: false,
+                soundoff: false
             });
         });
 
@@ -165,7 +167,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     'data-preload': '', // boolean,
                     'data-interstitial': '', // boolean
                     'data-standalone': '', // boolean
-                    'data-prebuffer': '' // boolean
+                    'data-prebuffer': '', // boolean
+                    'data-soundoff': '' // boolean
                 }, true);
             });
 
@@ -176,7 +179,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     preload: true,
                     interstitial: true,
                     standalone: true,
-                    prebuffer: true
+                    prebuffer: true,
+                    soundoff: true
                 }));
             });
         });
@@ -211,7 +215,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     //'data-preload': false,
                     //'data-interstitial': false,
                     //'data-standalone': false,
-                    //'data-prebuffer': false
+                    //'data-prebuffer': false,
+                    //'data-soundoff': false
                 }, false);
             });
 
@@ -246,7 +251,8 @@ describe('<script src="c6embed.js"></script>', function() {
                     preload: false,
                     interstitial: false,
                     standalone: false,
-                    prebuffer: false
+                    prebuffer: false,
+                    soundoff: false
                 });
             });
 
@@ -271,7 +277,8 @@ describe('<script src="c6embed.js"></script>', function() {
                         preview: false,
                         interstitial: false,
                         standalone: false,
-                        prebuffer: false
+                        prebuffer: false,
+                        soundoff: false,
                     });
                 });
             });

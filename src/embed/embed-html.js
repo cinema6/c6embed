@@ -9,7 +9,8 @@ var BOOLEANS = {
     preload: false,
     standalone: false,
     interstitial: false,
-    prebuffer: false
+    prebuffer: false,
+    soundoff: false
 };
 
 function toArray(arraylike) {
