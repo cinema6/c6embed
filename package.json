@@ -2,6 +2,11 @@
   "name": "c6embed",
   "version": "3.11.0",
   "description": "Script to embed Cinema6 experiences.",
+  "main": "src/utils/utils.js",
+  "files": [
+    "lib",
+    "src"
+  ],
   "keywords": [
     "c6embed"
   ],
@@ -60,11 +65,10 @@
     "requirejs": "^2.1.11",
     "underscore": "~1.5.2"
   },
-  "engines": {
-    "node": ">=0.8.0"
+  "publishConfig": {
+    "registry": "http://deployer1:4873/"
   },
   "readmeFilename": "README.md",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/cinema6/c6embed.git"
